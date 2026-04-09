@@ -11,7 +11,7 @@
 // メインタスク
 void main_task(intptr_t unused)
 {
-  std::cout << "Hello ETROBO!" << std::endl;
+  printf("Hello ETROBO!\n");
   EtRobocon2026::start();
   ext_tsk();
 }

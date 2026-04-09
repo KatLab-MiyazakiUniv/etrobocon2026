@@ -1,17 +1,17 @@
 /**
  * @file app.cpp
  * @brief タスクを管理するクラス
- * @author miyahara046
+ * @author HaruArima08
  */
 
 #include "app.h"
-#include <iostream>
+#include <stdio.h>
 #include "EtRobocon2026.h"
 
 // メインタスク
 void main_task(intptr_t unused)
 {
-  std::cout << "Hello ETROBO!" << std::endl;
+  printf("Hello ETROBO!\n");
   EtRobocon2026::start();
   ext_tsk();
 }

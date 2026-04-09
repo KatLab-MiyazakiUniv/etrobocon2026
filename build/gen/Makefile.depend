@@ -1,0 +1,70 @@
+# Celltype: tTask  #_MDEP_#
+$(_TECS_OBJ_DIR)tTask_tecsgen.o : tTask_tecsgen.c  $(GEN_DIR)/tLogTaskMain_tecsgen.h  $(GEN_DIR)/tPutLogEmpty_tecsgen.h  $(GEN_DIR)/tSemaphore_tecsgen.h  $(GEN_DIR)/tSerialAsyncPortMain_tecsgen.h  $(GEN_DIR)/tSysLog_tecsgen.h  tSemaphore_inline.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sTaskBody_tecsgen.h $(GEN_DIR)/sTask_tecsgen.h $(GEN_DIR)/siTask_tecsgen.h $(GEN_DIR)/tTask_factory.h $(GEN_DIR)/tTask_tecsgen.h tTask_inline.h
+$(_TECS_OBJ_DIR)tTask_templ.o : tTask_templ.c  $(GEN_DIR)/tLogTaskMain_tecsgen.h  $(GEN_DIR)/tPutLogEmpty_tecsgen.h  $(GEN_DIR)/tSemaphore_tecsgen.h  $(GEN_DIR)/tSerialAsyncPortMain_tecsgen.h  $(GEN_DIR)/tSysLog_tecsgen.h  tSemaphore_inline.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sTaskBody_tecsgen.h $(GEN_DIR)/sTask_tecsgen.h $(GEN_DIR)/siTask_tecsgen.h $(GEN_DIR)/tTask_factory.h $(GEN_DIR)/tTask_tecsgen.h tTask_inline.h
+$(_TECS_OBJ_DIR)tTask.o : tTask.c  $(GEN_DIR)/tLogTaskMain_tecsgen.h  $(GEN_DIR)/tPutLogEmpty_tecsgen.h  $(GEN_DIR)/tSemaphore_tecsgen.h  $(GEN_DIR)/tSerialAsyncPortMain_tecsgen.h  $(GEN_DIR)/tSysLog_tecsgen.h  tSemaphore_inline.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sTaskBody_tecsgen.h $(GEN_DIR)/sTask_tecsgen.h $(GEN_DIR)/siTask_tecsgen.h $(GEN_DIR)/tTask_factory.h $(GEN_DIR)/tTask_tecsgen.h tTask_inline.h
+
+# Celltype: tSemaphore  #_MDEP_#
+$(_TECS_OBJ_DIR)tSemaphore_tecsgen.o : tSemaphore_tecsgen.c $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sSemaphore_tecsgen.h $(GEN_DIR)/siSemaphore_tecsgen.h $(GEN_DIR)/tSemaphore_factory.h $(GEN_DIR)/tSemaphore_tecsgen.h tSemaphore_inline.h
+$(_TECS_OBJ_DIR)tSemaphore_templ.o : tSemaphore_templ.c $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sSemaphore_tecsgen.h $(GEN_DIR)/siSemaphore_tecsgen.h $(GEN_DIR)/tSemaphore_factory.h $(GEN_DIR)/tSemaphore_tecsgen.h tSemaphore_inline.h
+$(_TECS_OBJ_DIR)tSemaphore.o : tSemaphore.c $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sSemaphore_tecsgen.h $(GEN_DIR)/siSemaphore_tecsgen.h $(GEN_DIR)/tSemaphore_factory.h $(GEN_DIR)/tSemaphore_tecsgen.h tSemaphore_inline.h
+
+# Celltype: tInitializeRoutine  #_MDEP_#
+$(_TECS_OBJ_DIR)tInitializeRoutine_tecsgen.o : tInitializeRoutine_tecsgen.c  $(GEN_DIR)/tBannerMain_tecsgen.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sRoutineBody_tecsgen.h $(GEN_DIR)/tInitializeRoutine_factory.h $(GEN_DIR)/tInitializeRoutine_tecsgen.h
+$(_TECS_OBJ_DIR)tInitializeRoutine_templ.o : tInitializeRoutine_templ.c  $(GEN_DIR)/tBannerMain_tecsgen.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sRoutineBody_tecsgen.h $(GEN_DIR)/tInitializeRoutine_factory.h $(GEN_DIR)/tInitializeRoutine_tecsgen.h
+$(_TECS_OBJ_DIR)tInitializeRoutine.o : tInitializeRoutine.c  $(GEN_DIR)/tBannerMain_tecsgen.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sRoutineBody_tecsgen.h $(GEN_DIR)/tInitializeRoutine_factory.h $(GEN_DIR)/tInitializeRoutine_tecsgen.h
+
+# Celltype: tTerminateRoutine  #_MDEP_#
+$(_TECS_OBJ_DIR)tTerminateRoutine_tecsgen.o : tTerminateRoutine_tecsgen.c  $(GEN_DIR)/tLogTaskMain_tecsgen.h  $(GEN_DIR)/tPutLogEmpty_tecsgen.h  $(GEN_DIR)/tSemaphore_tecsgen.h  $(GEN_DIR)/tSerialAsyncPortMain_tecsgen.h  $(GEN_DIR)/tSysLog_tecsgen.h  tSemaphore_inline.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sRoutineBody_tecsgen.h $(GEN_DIR)/tTerminateRoutine_factory.h $(GEN_DIR)/tTerminateRoutine_tecsgen.h
+$(_TECS_OBJ_DIR)tTerminateRoutine_templ.o : tTerminateRoutine_templ.c  $(GEN_DIR)/tLogTaskMain_tecsgen.h  $(GEN_DIR)/tPutLogEmpty_tecsgen.h  $(GEN_DIR)/tSemaphore_tecsgen.h  $(GEN_DIR)/tSerialAsyncPortMain_tecsgen.h  $(GEN_DIR)/tSysLog_tecsgen.h  tSemaphore_inline.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sRoutineBody_tecsgen.h $(GEN_DIR)/tTerminateRoutine_factory.h $(GEN_DIR)/tTerminateRoutine_tecsgen.h
+$(_TECS_OBJ_DIR)tTerminateRoutine.o : tTerminateRoutine.c  $(GEN_DIR)/tLogTaskMain_tecsgen.h  $(GEN_DIR)/tPutLogEmpty_tecsgen.h  $(GEN_DIR)/tSemaphore_tecsgen.h  $(GEN_DIR)/tSerialAsyncPortMain_tecsgen.h  $(GEN_DIR)/tSysLog_tecsgen.h  tSemaphore_inline.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sRoutineBody_tecsgen.h $(GEN_DIR)/tTerminateRoutine_factory.h $(GEN_DIR)/tTerminateRoutine_tecsgen.h
+
+# Celltype: tSerialAdapter  #_MDEP_#
+$(_TECS_OBJ_DIR)tSerialAdapter_tecsgen.o : tSerialAdapter_tecsgen.c $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sSerialPort_tecsgen.h $(GEN_DIR)/tSerialAdapter_factory.h $(GEN_DIR)/tSerialAdapter_tecsgen.h
+$(_TECS_OBJ_DIR)tSerialAdapter_templ.o : tSerialAdapter_templ.c $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sSerialPort_tecsgen.h $(GEN_DIR)/tSerialAdapter_factory.h $(GEN_DIR)/tSerialAdapter_tecsgen.h
+$(_TECS_OBJ_DIR)tSerialAdapter.o : tSerialAdapter.c $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sSerialPort_tecsgen.h $(GEN_DIR)/tSerialAdapter_factory.h $(GEN_DIR)/tSerialAdapter_tecsgen.h
+
+# Celltype: tSysLog  #_MDEP_#
+$(_TECS_OBJ_DIR)tSysLog_tecsgen.o : tSysLog_tecsgen.c  $(GEN_DIR)/tPutLogEmpty_tecsgen.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sPutLog_tecsgen.h $(GEN_DIR)/sSysLog_tecsgen.h $(GEN_DIR)/tSysLog_factory.h $(GEN_DIR)/tSysLog_tecsgen.h
+$(_TECS_OBJ_DIR)tSysLog_templ.o : tSysLog_templ.c  $(GEN_DIR)/tPutLogEmpty_tecsgen.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sPutLog_tecsgen.h $(GEN_DIR)/sSysLog_tecsgen.h $(GEN_DIR)/tSysLog_factory.h $(GEN_DIR)/tSysLog_tecsgen.h
+$(_TECS_OBJ_DIR)tSysLog.o : tSysLog.c  $(GEN_DIR)/tPutLogEmpty_tecsgen.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sPutLog_tecsgen.h $(GEN_DIR)/sSysLog_tecsgen.h $(GEN_DIR)/tSysLog_factory.h $(GEN_DIR)/tSysLog_tecsgen.h
+
+# Celltype: tSysLogAdapter  #_MDEP_#
+$(_TECS_OBJ_DIR)tSysLogAdapter_tecsgen.o : tSysLogAdapter_tecsgen.c  $(GEN_DIR)/tPutLogEmpty_tecsgen.h  $(GEN_DIR)/tSysLog_tecsgen.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sSysLog_tecsgen.h $(GEN_DIR)/tSysLogAdapter_factory.h $(GEN_DIR)/tSysLogAdapter_tecsgen.h
+$(_TECS_OBJ_DIR)tSysLogAdapter_templ.o : tSysLogAdapter_templ.c  $(GEN_DIR)/tPutLogEmpty_tecsgen.h  $(GEN_DIR)/tSysLog_tecsgen.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sSysLog_tecsgen.h $(GEN_DIR)/tSysLogAdapter_factory.h $(GEN_DIR)/tSysLogAdapter_tecsgen.h
+$(_TECS_OBJ_DIR)tSysLogAdapter.o : tSysLogAdapter.c  $(GEN_DIR)/tPutLogEmpty_tecsgen.h  $(GEN_DIR)/tSysLog_tecsgen.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sSysLog_tecsgen.h $(GEN_DIR)/tSysLogAdapter_factory.h $(GEN_DIR)/tSysLogAdapter_tecsgen.h
+
+# Celltype: tLogTaskMain  #_MDEP_#
+$(_TECS_OBJ_DIR)tLogTaskMain_tecsgen.o : tLogTaskMain_tecsgen.c  $(GEN_DIR)/tPutLogEmpty_tecsgen.h  $(GEN_DIR)/tSemaphore_tecsgen.h  $(GEN_DIR)/tSerialAsyncPortMain_tecsgen.h  $(GEN_DIR)/tSysLog_tecsgen.h  tSemaphore_inline.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sLogTask_tecsgen.h $(GEN_DIR)/sPutLog_tecsgen.h $(GEN_DIR)/sRoutineBody_tecsgen.h $(GEN_DIR)/sSerialPort_tecsgen.h $(GEN_DIR)/sSysLog_tecsgen.h $(GEN_DIR)/sTaskBody_tecsgen.h $(GEN_DIR)/snSerialPortManage_tecsgen.h $(GEN_DIR)/tLogTaskMain_factory.h $(GEN_DIR)/tLogTaskMain_tecsgen.h
+$(_TECS_OBJ_DIR)tLogTaskMain_templ.o : tLogTaskMain_templ.c  $(GEN_DIR)/tPutLogEmpty_tecsgen.h  $(GEN_DIR)/tSemaphore_tecsgen.h  $(GEN_DIR)/tSerialAsyncPortMain_tecsgen.h  $(GEN_DIR)/tSysLog_tecsgen.h  tSemaphore_inline.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sLogTask_tecsgen.h $(GEN_DIR)/sPutLog_tecsgen.h $(GEN_DIR)/sRoutineBody_tecsgen.h $(GEN_DIR)/sSerialPort_tecsgen.h $(GEN_DIR)/sSysLog_tecsgen.h $(GEN_DIR)/sTaskBody_tecsgen.h $(GEN_DIR)/snSerialPortManage_tecsgen.h $(GEN_DIR)/tLogTaskMain_factory.h $(GEN_DIR)/tLogTaskMain_tecsgen.h
+$(_TECS_OBJ_DIR)tLogTaskMain.o : tLogTaskMain.c  $(GEN_DIR)/tPutLogEmpty_tecsgen.h  $(GEN_DIR)/tSemaphore_tecsgen.h  $(GEN_DIR)/tSerialAsyncPortMain_tecsgen.h  $(GEN_DIR)/tSysLog_tecsgen.h  tSemaphore_inline.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sLogTask_tecsgen.h $(GEN_DIR)/sPutLog_tecsgen.h $(GEN_DIR)/sRoutineBody_tecsgen.h $(GEN_DIR)/sSerialPort_tecsgen.h $(GEN_DIR)/sSysLog_tecsgen.h $(GEN_DIR)/sTaskBody_tecsgen.h $(GEN_DIR)/snSerialPortManage_tecsgen.h $(GEN_DIR)/tLogTaskMain_factory.h $(GEN_DIR)/tLogTaskMain_tecsgen.h
+
+# Celltype: tBannerMain  #_MDEP_#
+$(_TECS_OBJ_DIR)tBannerMain_tecsgen.o : tBannerMain_tecsgen.c $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sRoutineBody_tecsgen.h $(GEN_DIR)/tBannerMain_factory.h $(GEN_DIR)/tBannerMain_tecsgen.h
+$(_TECS_OBJ_DIR)tBannerMain_templ.o : tBannerMain_templ.c $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sRoutineBody_tecsgen.h $(GEN_DIR)/tBannerMain_factory.h $(GEN_DIR)/tBannerMain_tecsgen.h
+$(_TECS_OBJ_DIR)tBannerMain.o : tBannerMain.c $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sRoutineBody_tecsgen.h $(GEN_DIR)/tBannerMain_factory.h $(GEN_DIR)/tBannerMain_tecsgen.h
+
+# Celltype: tSerialAsyncPortMain  #_MDEP_#
+$(_TECS_OBJ_DIR)tSerialAsyncPortMain_tecsgen.o : tSerialAsyncPortMain_tecsgen.c  $(GEN_DIR)/tSemaphore_tecsgen.h  tSemaphore_inline.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sSIOAsyncCBR_tecsgen.h $(GEN_DIR)/sSIOAsyncPort_tecsgen.h $(GEN_DIR)/sSemaphore_tecsgen.h $(GEN_DIR)/sSerialPort_tecsgen.h $(GEN_DIR)/snSerialPortManage_tecsgen.h $(GEN_DIR)/tSerialAsyncPortMain_factory.h $(GEN_DIR)/tSerialAsyncPortMain_tecsgen.h
+$(_TECS_OBJ_DIR)tSerialAsyncPortMain_templ.o : tSerialAsyncPortMain_templ.c  $(GEN_DIR)/tSemaphore_tecsgen.h  tSemaphore_inline.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sSIOAsyncCBR_tecsgen.h $(GEN_DIR)/sSIOAsyncPort_tecsgen.h $(GEN_DIR)/sSemaphore_tecsgen.h $(GEN_DIR)/sSerialPort_tecsgen.h $(GEN_DIR)/snSerialPortManage_tecsgen.h $(GEN_DIR)/tSerialAsyncPortMain_factory.h $(GEN_DIR)/tSerialAsyncPortMain_tecsgen.h
+$(_TECS_OBJ_DIR)tSerialAsyncPortMain.o : tSerialAsyncPortMain.c  $(GEN_DIR)/tSemaphore_tecsgen.h  tSemaphore_inline.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sSIOAsyncCBR_tecsgen.h $(GEN_DIR)/sSIOAsyncPort_tecsgen.h $(GEN_DIR)/sSemaphore_tecsgen.h $(GEN_DIR)/sSerialPort_tecsgen.h $(GEN_DIR)/snSerialPortManage_tecsgen.h $(GEN_DIR)/tSerialAsyncPortMain_factory.h $(GEN_DIR)/tSerialAsyncPortMain_tecsgen.h
+
+# Celltype: tSIOAsyncPortPybricksUSB  #_MDEP_#
+$(_TECS_OBJ_DIR)tSIOAsyncPortPybricksUSB_tecsgen.o : tSIOAsyncPortPybricksUSB_tecsgen.c  $(GEN_DIR)/tSemaphore_tecsgen.h  $(GEN_DIR)/tSerialAsyncPortMain_tecsgen.h  tSemaphore_inline.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sSIOAsyncCBR_tecsgen.h $(GEN_DIR)/sSIOAsyncPort_tecsgen.h $(GEN_DIR)/tSIOAsyncPortPybricksUSB_factory.h $(GEN_DIR)/tSIOAsyncPortPybricksUSB_tecsgen.h
+$(_TECS_OBJ_DIR)tSIOAsyncPortPybricksUSB_templ.o : tSIOAsyncPortPybricksUSB_templ.c  $(GEN_DIR)/tSemaphore_tecsgen.h  $(GEN_DIR)/tSerialAsyncPortMain_tecsgen.h  tSemaphore_inline.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sSIOAsyncCBR_tecsgen.h $(GEN_DIR)/sSIOAsyncPort_tecsgen.h $(GEN_DIR)/tSIOAsyncPortPybricksUSB_factory.h $(GEN_DIR)/tSIOAsyncPortPybricksUSB_tecsgen.h
+$(_TECS_OBJ_DIR)tSIOAsyncPortPybricksUSB.o : tSIOAsyncPortPybricksUSB.c  $(GEN_DIR)/tSemaphore_tecsgen.h  $(GEN_DIR)/tSerialAsyncPortMain_tecsgen.h  tSemaphore_inline.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sSIOAsyncCBR_tecsgen.h $(GEN_DIR)/sSIOAsyncPort_tecsgen.h $(GEN_DIR)/tSIOAsyncPortPybricksUSB_factory.h $(GEN_DIR)/tSIOAsyncPortPybricksUSB_tecsgen.h
+
+# Celltype: tSIOAsyncPortPybricksBluetooth  #_MDEP_#
+$(_TECS_OBJ_DIR)tSIOAsyncPortPybricksBluetooth_tecsgen.o : tSIOAsyncPortPybricksBluetooth_tecsgen.c  $(GEN_DIR)/tSemaphore_tecsgen.h  $(GEN_DIR)/tSerialAsyncPortMain_tecsgen.h  tSemaphore_inline.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sSIOAsyncCBR_tecsgen.h $(GEN_DIR)/sSIOAsyncPort_tecsgen.h $(GEN_DIR)/tSIOAsyncPortPybricksBluetooth_factory.h $(GEN_DIR)/tSIOAsyncPortPybricksBluetooth_tecsgen.h
+$(_TECS_OBJ_DIR)tSIOAsyncPortPybricksBluetooth_templ.o : tSIOAsyncPortPybricksBluetooth_templ.c  $(GEN_DIR)/tSemaphore_tecsgen.h  $(GEN_DIR)/tSerialAsyncPortMain_tecsgen.h  tSemaphore_inline.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sSIOAsyncCBR_tecsgen.h $(GEN_DIR)/sSIOAsyncPort_tecsgen.h $(GEN_DIR)/tSIOAsyncPortPybricksBluetooth_factory.h $(GEN_DIR)/tSIOAsyncPortPybricksBluetooth_tecsgen.h
+$(_TECS_OBJ_DIR)tSIOAsyncPortPybricksBluetooth.o : tSIOAsyncPortPybricksBluetooth.c  $(GEN_DIR)/tSemaphore_tecsgen.h  $(GEN_DIR)/tSerialAsyncPortMain_tecsgen.h  tSemaphore_inline.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sSIOAsyncCBR_tecsgen.h $(GEN_DIR)/sSIOAsyncPort_tecsgen.h $(GEN_DIR)/tSIOAsyncPortPybricksBluetooth_factory.h $(GEN_DIR)/tSIOAsyncPortPybricksBluetooth_tecsgen.h
+
+# Celltype: tPutLogEmpty  #_MDEP_#
+$(_TECS_OBJ_DIR)tPutLogEmpty_tecsgen.o : tPutLogEmpty_tecsgen.c $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sPutLog_tecsgen.h $(GEN_DIR)/tPutLogEmpty_factory.h $(GEN_DIR)/tPutLogEmpty_tecsgen.h
+$(_TECS_OBJ_DIR)tPutLogEmpty_templ.o : tPutLogEmpty_templ.c $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sPutLog_tecsgen.h $(GEN_DIR)/tPutLogEmpty_factory.h $(GEN_DIR)/tPutLogEmpty_tecsgen.h
+$(_TECS_OBJ_DIR)tPutLogEmpty.o : tPutLogEmpty.c $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sPutLog_tecsgen.h $(GEN_DIR)/tPutLogEmpty_factory.h $(GEN_DIR)/tPutLogEmpty_tecsgen.h
+
+# Celltype: tSIOAsyncPortTest  #_MDEP_#
+$(_TECS_OBJ_DIR)tSIOAsyncPortTest_tecsgen.o : tSIOAsyncPortTest_tecsgen.c  $(GEN_DIR)/tSemaphore_tecsgen.h  $(GEN_DIR)/tSerialAsyncPortMain_tecsgen.h  tSemaphore_inline.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sSIOAsyncCBR_tecsgen.h $(GEN_DIR)/sSIOAsyncPort_tecsgen.h $(GEN_DIR)/tSIOAsyncPortTest_factory.h $(GEN_DIR)/tSIOAsyncPortTest_tecsgen.h
+$(_TECS_OBJ_DIR)tSIOAsyncPortTest_templ.o : tSIOAsyncPortTest_templ.c  $(GEN_DIR)/tSemaphore_tecsgen.h  $(GEN_DIR)/tSerialAsyncPortMain_tecsgen.h  tSemaphore_inline.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sSIOAsyncCBR_tecsgen.h $(GEN_DIR)/sSIOAsyncPort_tecsgen.h $(GEN_DIR)/tSIOAsyncPortTest_factory.h $(GEN_DIR)/tSIOAsyncPortTest_tecsgen.h
+$(_TECS_OBJ_DIR)tSIOAsyncPortTest.o : tSIOAsyncPortTest.c  $(GEN_DIR)/tSemaphore_tecsgen.h  $(GEN_DIR)/tSerialAsyncPortMain_tecsgen.h  tSemaphore_inline.h $(GEN_DIR)/global_tecsgen.h $(GEN_DIR)/sSIOAsyncCBR_tecsgen.h $(GEN_DIR)/sSIOAsyncPort_tecsgen.h $(GEN_DIR)/tSIOAsyncPortTest_factory.h $(GEN_DIR)/tSIOAsyncPortTest_tecsgen.h
+

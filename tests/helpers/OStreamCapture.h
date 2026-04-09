@@ -14,7 +14,7 @@
 
 using namespace std;
 
-class StreamCapture {
+class OStreamCapture {
  private:
   ostream& targetStream;   // キャプチャ対象の出力ストリーム (例: std::cout)
   stringstream buffer;     // 出力を一時的に保存するバッファ

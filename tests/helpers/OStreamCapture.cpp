@@ -17,7 +17,7 @@ OStreamCapture::~OStreamCapture()
   targetStream.rdbuf(originalBuf);
 }
 
-string StreamCapture::getOutput() const
+string OStreamCapture::getOutput() const
 {
   return buffer.str();
 }

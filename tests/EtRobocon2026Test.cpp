@@ -24,4 +24,4 @@ namespace etrobocon2026_test {
 
     EXPECT_EQ(expected, capture.getOutput());
   }
-}  // namespace etrobocon2025_test
+}  // namespace etrobocon2026_test

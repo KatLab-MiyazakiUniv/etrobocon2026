@@ -1,0 +1,9 @@
+services:
+  etrobocon:
+    image: haruarima08/etrobocon2026:arm64
+    platform: linux/arm64
+    container_name: etrobocon2026
+    tty: true
+    stdin_open: true
+    volumes:
+      - .:/RasPike-ART/sdk/workspace/etrobocon2026

@@ -5,9 +5,8 @@
  */
 
 #include "EtRobocon2026.h"
-#include <stdio.h>
 
 void EtRobocon2026::start()
 {
-  printf("Hello KATLAB\n");
+  std::cout << "Hello KATLAB" << std::endl;
 }

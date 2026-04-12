@@ -7,11 +7,10 @@
 #ifndef ETROBOCON2026_H
 #define ETROBOCON2026_H
 
-#include "iostream"
+#include <iostream>
 
-class EtRobocon2026
-{
-public:
+class EtRobocon2026 {
+ public:
   static void start();
 };
 

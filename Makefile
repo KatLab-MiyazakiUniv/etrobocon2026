@@ -32,52 +32,6 @@ build:
 start:
 	cd $(MAKEFILE_PATH)../ && make start
 
-## テスト関連 ##
-# テストのビルドディレクトリが存在しない場合は作成する
-test-build:
-	@mkdir -p $(MAKEFILE_PATH)test_build
-	cd $(MAKEFILE_PATH)test_build && cmake .. && make
-
-# テストを実行する
-test-exec:
-	@if [ ! -f $(MAKEFILE_PATH)test_build/etrobocon2026_test ]; then \
-		echo "テスト実行ファイルが見つかりません。まずビルドを実行してください。"; \
-		echo " $$ make test-build"; \
-		exit 1; \
-	fi
-	cd $(MAKEFILE_PATH)test_build && ./etrobocon2026_test
-
-# テストをビルドして実行する
-test: smart-clean test-build test-exec
-
-# test_build ディレクトリを完全に削除する
-clean:
-	@if [ -d $(MAKEFILE_PATH)test_build ]; then \
-		rm -rf $(MAKEFILE_PATH)test_build; \
-		echo "'test_build/' ディレクトリを削除しました。"; \
-	else \
-		echo "'test_build/' ディレクトリは既に存在しません。"; \
-	fi
-
-# 実行環境が変更されている場合にのみ 'test_build' を削除する
-smart-clean:
-	@if [ -d $(MAKEFILE_PATH)test_build ]; then \
-		if [ -f "$(MAKEFILE_PATH)test_build/Makefile" ]; then \
-			CMAKE_SOURCE_DIR=`grep -E "^CMAKE_SOURCE_DIR[[:space:]]*=" $(MAKEFILE_PATH)test_build/Makefile | cut -d= -f2 | xargs`; \
-			CMAKE_SOURCE_DIR_REAL=`readlink -f "$$CMAKE_SOURCE_DIR"`; \
-			CURRENT_DIR_REAL=`readlink -f "$$(pwd)"`; \
-			echo "[DEBUG] CMAKE_SOURCE_DIR: '$$CMAKE_SOURCE_DIR_REAL'"; \
-			echo "[DEBUG] CURRENT_DIR    : '$$CURRENT_DIR_REAL'"; \
-			if [ "$$CMAKE_SOURCE_DIR_REAL" != "$$CURRENT_DIR_REAL" ]; then \
-				echo "[LOG] 実行環境の変更が検出されたため 'test_build/' を削除します。"; \
-				rm -rf $(MAKEFILE_PATH)test_build; \
-			else \
-				echo "[LOG] 実行環境は変更されていません。"; \
-			fi; \
-		fi; \
-	else \
-		echo "'test_build/' ディレクトリは既に存在しません。"; \
-	fi
 ## 開発関連 ##
 # ファイルにclang-formatを適用する
 format:
@@ -119,6 +73,7 @@ endif
 
 format-check:
 	find ./modules -type f \( -name "*.cpp" -o -name "*.h" \) | xargs clang-format --dry-run --Werror
+
 ## テスト関連 ##
 # テストのビルドディレクトリが存在しない場合は作成する
 test-build:

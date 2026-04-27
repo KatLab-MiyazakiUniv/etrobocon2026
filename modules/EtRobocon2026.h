@@ -1,7 +1,7 @@
 /**
  * @file   EtRobocon2026.h
  * @brief  全体を制御するクラス
- * @author miyahara046
+ * @author HaruArima08
  */
 
 #ifndef ETROBOCON2026_H

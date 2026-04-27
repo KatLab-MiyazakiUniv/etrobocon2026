@@ -10,7 +10,7 @@
 // メインタスク
 void main_task(intptr_t unused)
 {
-  printf("Hello ETROBO!\n");
+  std::cout << "Hello ETROBO!" << std::endl;
   EtRobocon2026::start();
   ext_tsk();
 }

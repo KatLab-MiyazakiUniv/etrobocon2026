@@ -8,5 +8,5 @@
 
 void EtRobocon2026::start()
 {
-    printf("Hello KATLAB\n");
+    std::cout << "Hello KATLAB" << std::endl;
 }

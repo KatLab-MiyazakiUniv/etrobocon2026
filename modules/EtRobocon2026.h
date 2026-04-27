@@ -7,7 +7,7 @@
 #ifndef ETROBOCON2026_H
 #define ETROBOCON2026_H
 
-#include <stdio.h>
+#include "iostream"
 
 class EtRobocon2026
 {

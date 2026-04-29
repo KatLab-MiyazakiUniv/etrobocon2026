@@ -118,5 +118,5 @@ smart-clean:
 			fi; \
 		fi; \
 	else \
-		echo "'build/' ディレクトリは既に存在しません。"; \
+		echo "'test_build/' ディレクトリは既に存在しません。"; \
 	fi

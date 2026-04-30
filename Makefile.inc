@@ -22,4 +22,5 @@ APPL_DIRS += \
 INCLUDES += \
   -I$(mkfile_path)modules \
   -I$(mkfile_path)modules/API \
-  -I$(mkfile_path)../../common/library/libcpp-spike/include \
+  -I$(mkfile_path)../../common/library/libcpp-spike/include
+  

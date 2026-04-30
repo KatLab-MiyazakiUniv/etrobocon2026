@@ -72,7 +72,7 @@ else
 endif
 
 format-check:
-	find ./modules -type f \( -name "*.cpp" -o -name "*.h" \) | xargs clang-format --dry-run --WerrorMAKEFILE_PATH := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+	find ./modules -type f \( -name "*.cpp" -o -name "*.h" \) | xargs clang-format --dry-run --Werror
 
 ## テスト関連 ##
 # テストのビルドディレクトリが存在しない場合は作成する

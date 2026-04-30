@@ -20,7 +20,7 @@ endif()
 include(FetchContent)
 FetchContent_Declare(
   googletest
-  URL https://github.com/google/googletest/archive/refs/tags/v1.16.0.zip
+  URL https://github.com/google/googletest/archive/refs/tags/v1.17.0.zip
 )
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
@@ -32,13 +32,11 @@ set(PROJECT_TEST_DIR ${PROJECT_SOURCE_DIR}/tests)
 # 必要なインクルードディレクトリの設定 (適宜登録)
 set(INCLUDE_DIRS
   ${PROJECT_MODULE_DIR}
-  ${PROJECT_TEST_DIR}/helpers
 )
 
 # ソースファイルの登録 (適宜登録)
 file(GLOB_RECURSE PROJECT_SOURCES
   "${PROJECT_MODULE_DIR}/*.cpp"
-  "${PROJECT_TEST_DIR}/helpers/*.cpp"
 )
 
 # プロジェクトのライブラリターゲットを作成

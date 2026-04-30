@@ -10,10 +10,6 @@ RUN apt-get update && apt-get install -y \
   clang-format \
   libopencv-dev \
   nlohmann-json3-dev \
-  python3 \
-  python3-venv \
-  python3-pip \
-  libusb-1.0-0-dev \
   && gem install shell \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 

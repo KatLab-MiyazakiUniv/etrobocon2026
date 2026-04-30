@@ -5,7 +5,6 @@
  */
 
 #include "app.h"
-#include <stdio.h>
 #include "EtRobocon2026.h"
 
 // メインタスク

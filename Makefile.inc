@@ -15,11 +15,13 @@ APPL_LIBS += -lm
 APPL_DIRS += \
             $(mkfile_path)modules\
             $(mkfile_path)modules/API\
+            $(mkfile_path)common\
             $(mkfile_path)../../common/library/libcpp-spike/src \
-
+            
 INCLUDES +=  \
                 -I$(mkfile_path)modules\
                 -I$(mkfile_path)modules/API\
+                -I$(mkfile_path)common\
                 -I$(mkfile_path)../../common/library/libcpp-spike/include
 
 

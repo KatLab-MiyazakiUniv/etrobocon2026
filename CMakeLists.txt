@@ -2,6 +2,9 @@
 cmake_minimum_required(VERSION 3.14)
 project(etrobocon2026)
 
+find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
+
 # C++標準とカバレッジ用フラグ
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -28,33 +31,45 @@ FetchContent_MakeAvailable(googletest)
 # プロジェクトのソースディレクトリ構造の定義 (適宜登録)
 set(PROJECT_MODULE_DIR ${PROJECT_SOURCE_DIR}/modules)
 set(PROJECT_TEST_DIR ${PROJECT_SOURCE_DIR}/tests)
+set(CAMERA_SERVER_MODULE_DIR ${PROJECT_SOURCE_DIR}/camera_server/modules)
+set(CAMERA_SERVER_TEST_DIR ${PROJECT_SOURCE_DIR}/camera_server/tests)
 
 # 必要なインクルードディレクトリの設定 (適宜登録)
 set(INCLUDE_DIRS
   ${PROJECT_MODULE_DIR}
+  ${CAMERA_SERVER_MODULE_DIR}/camera
+  ${CAMERA_SERVER_MODULE_DIR}/utils
 )
 
 # ソースファイルの登録 (適宜登録)
 file(GLOB_RECURSE PROJECT_SOURCES
   "${PROJECT_MODULE_DIR}/*.cpp"
+  "${CAMERA_SERVER_MODULE_DIR}/camera/*.cpp"
+  "${CAMERA_SERVER_MODULE_DIR}/utils/*.cpp"
 )
 
 # プロジェクトのライブラリターゲットを作成
 add_library(${PROJECT_NAME}_impl STATIC ${PROJECT_SOURCES})
 target_include_directories(${PROJECT_NAME}_impl PUBLIC ${INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME}_impl ${OpenCV_LIBS})
 
 # テスト設定
 enable_testing()
 
 # tests ディレクトリ内の *Test.cpp をすべてテストソースとして登録
-file(GLOB TEST_SOURCES "${PROJECT_TEST_DIR}/*Test.cpp")
+file(GLOB TEST_SOURCES
+  "${PROJECT_TEST_DIR}/*Test.cpp"
+  "${CAMERA_SERVER_TEST_DIR}/*Test.cpp"
+)
 
 # テスト実行可能ファイルの作成
 add_executable(${PROJECT_NAME}_test ${TEST_SOURCES})
+
 target_link_libraries(${PROJECT_NAME}_test
   PRIVATE
     ${PROJECT_NAME}_impl
     gtest_main
+    ${OpenCV_LIBS}
 )
 
 # テストの登録

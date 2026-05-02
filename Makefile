@@ -1,11 +1,23 @@
 MAKEFILE_PATH := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
+DOCKER_IMAGE   := kat_etrobo2026:arm64
+DOCKER_WORKDIR := /RasPike-ART/sdk/workspace/etrobocon2026
+DOCKER_MOUNT   := -v $(MAKEFILE_PATH):$(DOCKER_WORKDIR)
+
 # 使い方
 help:
 	@echo ビルドする
 	@echo " $$ make build"
+	@echo 走行システムをビルドする
+	@echo " $$ make build-client"
+	@echo 撮影システムをビルドする
+	@echo " $$ make build-camera"
 	@echo 走行を開始する\(実機限定\)
 	@echo " $$ make start"
+	@echo 走行システムを開始する
+	@echo " $$ make start-client"
+	@echo 撮影システムを開始する
+	@echo " $$ make start-camera"
 	@echo 指定ファイルをフォーマットする
 	@echo " $$ make format FILES=<ディレクトリ名>/<ファイル名>.cpp"
 	@echo すべての変更ファイルをフォーマットする
@@ -22,15 +34,33 @@ help:
 	@echo " $$ make smart-clean"
 	@echo 必要があればtest_buildディレクトリを削除し, テストをビルドして実行する
 	@echo " $$ make test"
+	@echo Dockerイメージをビルドする
+	@echo " $$ make docker-build"
+	@echo Dockerコンテナを起動する
+	@echo " $$ make docker-run"
+	@echo UID/GIDを指定してDockerコンテナを起動する\(権限問題が起きた場合\)
+	@echo " $$ make docker-run-user"
 
 ## 実行関連 ##
 .PHONY: build
-build:
-	cd $(MAKEFILE_PATH)../ && make img=etrobocon2026
+build: build-client build-camera
+
+# 走行システムをビルドする
+build-client:
+	cd $(MAKEFILE_PATH)../ && make img=etrobocon2026 -j5
+
+# 撮影システムをビルドする
+build-camera:
+	cd $(MAKEFILE_PATH)camera_server && make -f Makefile.camera -j5
 
 # 実機の場合、走行を開始する
-start:
+start: start-camera start-client
+
+start-client:
 	cd $(MAKEFILE_PATH)../ && make start
+
+start-camera:
+	cd $(MAKEFILE_PATH)camera_server ./camera_app
 
 ## 開発関連 ##
 # ファイルにclang-formatを適用する
@@ -120,3 +150,18 @@ smart-clean:
 	else \
 		echo "'test_build/' ディレクトリは既に存在しません。"; \
 	fi
+
+## Docker関連 ##
+docker-build:
+	docker buildx build --platform linux/arm64 -t $(DOCKER_IMAGE) .
+
+docker-run:
+	docker run -it --rm \
+		$(DOCKER_MOUNT) \
+		$(DOCKER_IMAGE) bash
+
+docker-run-user:
+	docker run -it --rm \
+		--user $$(id -u):$$(id -g) \
+		$(DOCKER_MOUNT) \
+		$(DOCKER_IMAGE) bash

@@ -1,4 +1,4 @@
-name: Build Check
+name: Build Check Client
 
 on: [push, pull_request]
 

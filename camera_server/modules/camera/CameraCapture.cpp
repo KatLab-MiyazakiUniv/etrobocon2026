@@ -75,12 +75,12 @@ bool CameraCapture::openCamera()
   }
 
   // 解像度設定
-  if(!cap.set(cv::CAP_PROP_FRAME_WIDTH, 800)) {
+  if(!cap.set(cv::CAP_PROP_FRAME_WIDTH, MAX_WIDTH)) {
     cerr << "幅設定に失敗しました。" << endl;
     return false;
   }
 
-  if(!cap.set(cv::CAP_PROP_FRAME_HEIGHT, 600)) {
+  if(!cap.set(cv::CAP_PROP_FRAME_HEIGHT, MAX_HEIGHT)) {
     cerr << "高さ設定に失敗しました。" << endl;
     return false;
   }
@@ -120,11 +120,6 @@ bool CameraCapture::getFrame(cv::Mat& outFrame)
 
 bool CameraCapture::getFrames(vector<cv::Mat>& frames, int numFrames, int millisecondInterval)
 {
-  if(frames.empty()) {
-    cerr << "フレームバッファが空です。" << endl;
-    return false;
-  }
-
   if(numFrames <= 0) {
     cerr << "フレーム数が無効です: " << numFrames << endl;
     return false;

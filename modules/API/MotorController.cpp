@@ -1,7 +1,7 @@
 /**
  * @file MotorController.cpp
  * @brief モータ制御に用いる関数をまとめたラッパークラス
- * @author nishijima515
+ * @author sadimiya-sousi
  */
 #include "MotorController.h"
 

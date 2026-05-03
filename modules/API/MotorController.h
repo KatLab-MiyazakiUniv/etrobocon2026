@@ -1,7 +1,7 @@
 /**
  * @file MotorController.h
  * @brief モータ制御に用いる関数をまとめたラッパークラス
- * @author nishijima515
+ * @author sadomiya-sousi
  */
 #ifndef MOTOR_MOTORCONTROLLER_H
 #define MOTOR_MOTORCONTROLLER_H

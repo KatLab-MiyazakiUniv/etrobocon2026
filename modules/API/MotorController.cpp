@@ -57,16 +57,16 @@ void MotorController::resetWheelsMotorPower()
 }
 
 // 右タイヤのモータに,線速度を回転速度に変換しセットする
-void MotorController::setRightMotorSpeed(double speed)
+void MotorController::setRightMotorSpeed(double linearSpeedMmPerSec)
 {
-  int rightAngleSpeed = static_cast<int>(speed / WHEEL_RADIUS * (RAD_TO_DEG));
+  int rightAngleSpeed = static_cast<int>(linearSpeedMmPerSec / WHEEL_RADIUS * (RAD_TO_DEG));
   rightWheel.setSpeed(rightAngleSpeed);
 }
 
 // 左タイヤのモータに,線速度を回転速度に変換しセットする
-void MotorController::setLeftMotorSpeed(double speed)
+void MotorController::setLeftMotorSpeed(double linearSpeedMmPerSec)
 {
-  int leftAngleSpeed = static_cast<int>(speed / WHEEL_RADIUS * (RAD_TO_DEG));
+  int leftAngleSpeed = static_cast<int>(linearSpeedMmPerSec / WHEEL_RADIUS * (RAD_TO_DEG));
   leftWheel.setSpeed(leftAngleSpeed);
 }
 

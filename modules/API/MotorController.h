@@ -51,15 +51,15 @@ class MotorController {
 
   /**
    * @brief 右タイヤのモータに, 線速度から算出した回転速度をセット
-   * @param speed 線速度（mm/秒）
+   * @param linearSpeedMmPerSec 線速度（mm/秒）
    */
-  void setRightMotorSpeed(double speed);
+  void setRightMotorSpeed(double linearSpeedMmPerSec);
 
   /**
    * @brief 左タイヤのモータに, 線速度から算出した回転速度をセット
-   * @param speed 線速度（mm/秒）
+   * @param linearSpeedMmPerSec 線速度（mm/秒）
    */
-  void setLeftMotorSpeed(double speed);
+  void setLeftMotorSpeed(double linearSpeedMmPerSec);
 
   /**
    * @brief 両タイヤのモータを停止する

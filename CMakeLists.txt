@@ -32,11 +32,15 @@ set(PROJECT_TEST_DIR ${PROJECT_SOURCE_DIR}/tests)
 # 必要なインクルードディレクトリの設定 (適宜登録)
 set(INCLUDE_DIRS
   ${PROJECT_MODULE_DIR}
+  ${PROJECT_MODULE_DIR}/API
+  ${PROJECT_TEST_DIR}
+  ${PROJECT_TEST_DIR}/dummy
 )
 
 # ソースファイルの登録 (適宜登録)
 file(GLOB_RECURSE PROJECT_SOURCES
   "${PROJECT_MODULE_DIR}/*.cpp"
+  "${PROJECT_TEST_DIR}/dummy/utils/*.cpp"
 )
 
 # プロジェクトのライブラリターゲットを作成

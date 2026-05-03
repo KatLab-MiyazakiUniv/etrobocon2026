@@ -60,7 +60,7 @@ start-client:
 	cd $(MAKEFILE_PATH)../ && make start
 
 start-camera:
-	cd $(MAKEFILE_PATH)camera_server ./camera_app
+	cd $(MAKEFILE_PATH)camera_server && ./camera_app
 
 ## 開発関連 ##
 # ファイルにclang-formatを適用する

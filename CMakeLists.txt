@@ -32,6 +32,7 @@ set(PROJECT_TEST_DIR ${PROJECT_SOURCE_DIR}/tests)
 # 必要なインクルードディレクトリの設定 (適宜登録)
 set(INCLUDE_DIRS
   ${PROJECT_MODULE_DIR}
+  ${PROJECT_MODULE_DIR}/calculators
 )
 
 # ソースファイルの登録 (適宜登録)

@@ -12,6 +12,18 @@ void EtRobocon2026::start()
 {
   std::cout << "Hello KATLAB" << std::endl;
   MotorController controller;
+  // int rightPower = 0;
+  // int leftPower = 0;
+
+  // controller.setRightMotorPower(100);
+  // controller.setLeftMotorPower(100);
+  // rightPower = controller.getRightMotorPower();
+  // leftPower = controller.getLeftMotorPower();
+
+  // std::cout << "Right Motor Power: " << rightPower << std::endl;
+  // std::cout << "Left Motor Power: " << leftPower << std::endl;
+
+  // tslp_tsk(2000000);  // 2秒待機
   // // controller.setRightMotorPower(50);
 
   // controller.setRightMotorSpeed(720);
@@ -38,21 +50,21 @@ void EtRobocon2026::start()
   // // controller.stopWheelsMotor();
   // controller.brakeWheelsMotor();
   // controller.stopArmMotor();
-  int i;
-  for(i = 0; i < 100; i++) {
-    if(i == 0) {
-      controller.setRightMotorSpeed(-1000);
-      controller.setLeftMotorSpeed(-1000);
-    } else if(i == 70) {
-      controller.setArmMotorPower(30);
-    } else if(i == 80) {
-      controller.holdArmMotor();
-    } else if(i == 90) {
-      controller.setArmMotorPower(-30);
-    }
-    printf("right:%d\n", controller.getRightMotorPower());
-    // printf("left:%d\n", controller.getLeftMotorPower());
-    tslp_tsk(100000);
-  }
-  controller.brakeWheelsMotor();
+  // int i;
+  // for(i = 0; i < 100; i++) {
+  //   if(i == 0) {
+  //     controller.setRightMotorSpeed(-1000);
+  //     controller.setLeftMotorSpeed(-1000);
+  //   } else if(i == 70) {
+  //     controller.setArmMotorPower(30);
+  //   } else if(i == 80) {
+  //     controller.holdArmMotor();
+  //   } else if(i == 90) {
+  //     controller.setArmMotorPower(-30);
+  //   }
+  //   printf("right:%d\n", controller.getRightMotorPower());
+  //   // printf("left:%d\n", controller.getLeftMotorPower());
+  //   tslp_tsk(100000);
+  // }
+  // controller.brakeWheelsMotor();
 }

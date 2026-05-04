@@ -55,7 +55,7 @@ namespace etrobocon2026_test {
   // 基本的なPID計算の結果が正しいかをテスト
   TEST(PidTest, CalculatePid)
   {
-    Pid actualPid(0.6, 0.02, 0.03, 70, 100.0, -100.0);
+    Pid actualPid(0.6, 0.02, 0.03, 70.0, 100.0, -100.0);
     double currentValue = 20.0;
     /** 計算過程
      * 1. 前回の誤差
@@ -66,7 +66,7 @@ namespace etrobocon2026_test {
      * integral = 0 + (50 + 0) * 0.01 / 2 = 0.25
      * 4. 微分の処理を行う
      * currentDerivative = (50 - 0) / 0.01 = 5000
-     *  4.1.  4.1 微分項にローパスフィルタを適用
+     *  4.1. 微分項にローパスフィルタを適用
      * prevDeviat filteredDerivative = 0.8 * 5000 + (1 - 0.8) * 0 = 4000
      * 5. PID制御を計算
      * expected = 0.6 * 50 + 0.02 * 0.25 + 0.03 * 4000 = 150.005
@@ -78,7 +78,7 @@ namespace etrobocon2026_test {
   // ゲインが全て0の時のPID計算の結果が正しいかをテスト
   TEST(PidTest, CalculatePidGainZero)
   {
-    Pid actualPid(0.0, 0.0, 0.0, 70, 100.0, -100.0);
+    Pid actualPid(0.0, 0.0, 0.0, 70.0, 100.0, -100.0);
     double currentValue = 20.0;
     /** 計算過程
      * 1. 前回の誤差
@@ -101,8 +101,8 @@ namespace etrobocon2026_test {
   // 周期を変更した場合のPID計算結果をテスト
   TEST(PidTest, CalculatePidChangeDelta)
   {
-    double DELTA = 0.03;
-    Pid actualPid(0.6, 0.02, 0.03, 70, 100.0, -100.0);
+    double delta = 0.03;
+    Pid actualPid(0.6, 0.02, 0.03, 70.0, 100.0, -100.0);
     double currentValue = 55.0;
     /** 計算過程
      * 1. 前回の誤差
@@ -119,13 +119,13 @@ namespace etrobocon2026_test {
      * expected = 0.6 * 15 + 0.02 * 0.225 + 0.03 * 400 = 21.0045
      */
     double expected = 21.0045;
-    EXPECT_DOUBLE_EQ(expected, actualPid.calculatePid(currentValue, DELTA));
+    EXPECT_DOUBLE_EQ(expected, actualPid.calculatePid(currentValue, delta));
   }
 
   // 周期に0を渡したとき、内部でデフォルトの0.01が使用されるかをテスト
   TEST(PidTest, CalculatePidChangeDeltaZero)
   {
-    Pid actualPid(0.6, 0.02, 0.03, 70, 100.0, -100.0);
+    Pid actualPid(0.6, 0.02, 0.03, 70.0, 100.0, -100.0);
     double currentValue = 55.0;
     /** 計算過程
      * 1. 前回の誤差
@@ -148,7 +148,7 @@ namespace etrobocon2026_test {
   // setPidGainでゲイン変更後にPID計算が新しいゲインを使用しているかをテスト
   TEST(PidTest, CalculatePidAfterSetNewGain)
   {
-    Pid actualPid(0.6, 0.05, 0.01, 70, 100.0, -100.0);
+    Pid actualPid(0.6, 0.05, 0.01, 70.0, 100.0, -100.0);
     double prevValue = 60.0;
     /** 計算過程
      * 1. 前回の誤差
@@ -190,7 +190,7 @@ namespace etrobocon2026_test {
   // 初回呼び出し時に微分項が正しく計算されるかをテスト
   TEST(PidTest, CalculatePidFirstDerivative)
   {
-    Pid pid(0.0, 0.0, 1.0, 100, 100.0, -100.0);
+    Pid pid(0.0, 0.0, 1.0, 100.0, 100.0, -100.0);
     double currentValue = 90.0;
     /** 計算過程
      * 1. 前回の誤差
@@ -211,7 +211,7 @@ namespace etrobocon2026_test {
   // 同じ入力を連続して与えたときに微分出力の絶対値が減少することをテスト
   TEST(PidTest, CalculatePidChangeDerivative)
   {
-    Pid pid(0.0, 0.0, 1.0, 100, 100.0, -100.0);
+    Pid pid(0.0, 0.0, 1.0, 100.0, 100.0, -100.0);
     double prevValue = 90.0;
     pid.calculatePid(prevValue);
     /** 計算過程
@@ -263,7 +263,7 @@ namespace etrobocon2026_test {
   // 偏差が0の状態が続くと出力も0を維持するかをテスト
   TEST(PidTest, CalculatePidZeroDeviation)
   {
-    Pid pid(1.0, 1.0, 1.0, 50, 100.0, -100.0);
+    Pid pid(1.0, 1.0, 1.0, 50.0, 100.0, -100.0);
     double expected = 0.0;
     double currentValue = 50.0;
     for(int i = 0; i < 5; ++i) {
@@ -274,7 +274,7 @@ namespace etrobocon2026_test {
   // 積分項が正しく累積されていくかをテスト
   TEST(PidTest, CalculatePidIntegralUpdate)
   {
-    Pid pid(0.0, 1.0, 0.0, 100, 100.0, -100.0);
+    Pid pid(0.0, 1.0, 0.0, 100.0, 100.0, -100.0);
     double currentValue = 0.0;
     double first = pid.calculatePid(currentValue);
     /** 計算過程
@@ -307,7 +307,7 @@ namespace etrobocon2026_test {
   // 積分項がmaxIntegralで正しく制限されているかをテスト
   TEST(PidTest, CalculatePidIntegralUpperBound)
   {
-    Pid pid(0.0, 1.0, 0.0, 100, 50, -100.0);  // maxIntegral = 50.0
+    Pid pid(0.0, 1.0, 0.0, 100.0, 50, -100.0);  // maxIntegral = 50.0
     double currentValue = 0.0;
     for(int i = 0; i < 500; ++i) {  // 5秒間の累積
       pid.calculatePid(currentValue);
@@ -320,7 +320,7 @@ namespace etrobocon2026_test {
   // 積分項がminIntegralで正しく制限されているかをテスト
   TEST(PidTest, CalculatePidIntegralLowerBound)
   {
-    Pid pid(0.0, 1.0, 0.0, -100, 100.0, -50.0);  // minIntegral = -50.0
+    Pid pid(0.0, 1.0, 0.0, -100.0, 100.0, -50.0);  // minIntegral = -50.0
     double currentValue = 0.0;
     for(int i = 0; i < 500; ++i) {  // 5秒間の累積
       pid.calculatePid(currentValue);
@@ -333,7 +333,7 @@ namespace etrobocon2026_test {
   // 積分項の制限をしない時積分項がmaxIntegral = 100.0で正しく制限されているかをテスト
   TEST(PidTest, CalculatePidNotSetIntegralUpperBound)
   {
-    Pid pid(0.0, 1.0, 0.0, 100);  // maxIntegral = 100.0
+    Pid pid(0.0, 1.0, 0.0, 100.0);  // maxIntegral = 100.0
     double currentValue = 0.0;
     for(int i = 0; i < 500; ++i) {  // 5秒間の累積
       pid.calculatePid(currentValue);
@@ -346,7 +346,7 @@ namespace etrobocon2026_test {
   // 積分項の制限をしない時積分項がminIntegral = -100.0で正しく制限されているかをテスト
   TEST(PidTest, CalculatePidNotSetIntegralLowerBound)
   {
-    Pid pid(0.0, 1.0, 0.0, -100);  // minIntegral = -100.0
+    Pid pid(0.0, 1.0, 0.0, -100.0);  // minIntegral = -100.0
     double currentValue = 0.0;
     for(int i = 0; i < 500; ++i) {  // 5秒間の累積
       pid.calculatePid(currentValue);

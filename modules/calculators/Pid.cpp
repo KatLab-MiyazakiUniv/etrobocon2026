@@ -1,7 +1,7 @@
 /**
  * @file Pid.cpp
  * @brief PIDを計算するクラス
- * @author watarai
+ * @author migaku2645
  */
 
 #include "Pid.h"

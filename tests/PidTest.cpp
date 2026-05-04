@@ -256,8 +256,8 @@ namespace etrobocon2026_test {
     double expectedFirst = -240.0;
     double expectedSecond = -48.0;
 
-    EXPECT_DOUBLE_EQ(derivationFirst, expectedFirst);
-    EXPECT_DOUBLE_EQ(derivationSecond, expectedSecond);
+    EXPECT_DOUBLE_EQ(expectedFirst, derivationFirst);
+    EXPECT_DOUBLE_EQ(expectedSecond, derivationSecond);
   }
 
   // 偏差が0の状態が続くと出力も0を維持するかをテスト
@@ -314,7 +314,7 @@ namespace etrobocon2026_test {
     }
     double output = pid.calculatePid(currentValue);
     double expected = 50.0;
-    EXPECT_DOUBLE_EQ(output, expected);
+    EXPECT_DOUBLE_EQ(expected, output);
   }
 
   // 積分項がminIntegralで正しく制限されているかをテスト
@@ -327,7 +327,7 @@ namespace etrobocon2026_test {
     }
     double output = pid.calculatePid(currentValue);
     double expected = -50.0;
-    EXPECT_DOUBLE_EQ(output, expected);
+    EXPECT_DOUBLE_EQ(expected, output);
   }
 
   // 積分項の制限をしない時積分項がmaxIntegral = 100.0で正しく制限されているかをテスト
@@ -340,7 +340,7 @@ namespace etrobocon2026_test {
     }
     double output = pid.calculatePid(currentValue);
     double expected = 100.0;
-    EXPECT_DOUBLE_EQ(output, expected);
+    EXPECT_DOUBLE_EQ(expected, output);
   }
 
   // 積分項の制限をしない時積分項がminIntegral = -100.0で正しく制限されているかをテスト
@@ -353,7 +353,7 @@ namespace etrobocon2026_test {
     }
     double output = pid.calculatePid(currentValue);
     double expected = -100.0;
-    EXPECT_DOUBLE_EQ(output, expected);
+    EXPECT_DOUBLE_EQ(expected, output);
   }
 
 }  // namespace etrobocon2026_test

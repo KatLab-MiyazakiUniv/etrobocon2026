@@ -57,10 +57,11 @@ class Pid {
    * @param delta 周期[ms](デフォルト値0.01[10ms]、省略可)
    * @return PIDの計算結果(操作量)
    */
-  double calculatePid(double currentValue, double delta = 0.01);
+  double calculatePid(double currentValue, double delta);
 
  private:
   PidGain pidGain;
+  double delta = 0.01;
   double prevDeviation = 0.0;           // 前回の偏差
   double integral = 0.0;                // 偏差の累積
   double filteredDerivative = 0.0;      // フィルタされた微分項を保持する変数

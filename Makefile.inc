@@ -14,8 +14,8 @@ APPL_LIBS += -lm
 
 APPL_DIRS += \
             $(mkfile_path)modules\
-            $(mkfile_path)modules/calculators\
+            $(mkfile_path)modules/calculators
 
 INCLUDES += \
             -I$(mkfile_path)modules\
-            -I$(mkfile_path)modules/calculators\
+            -I$(mkfile_path)modules/calculators

@@ -181,7 +181,7 @@ namespace etrobocon2026_test {
      *  4.1 微分項にローパスフィルタを適用
      * filteredDerivative = 0.8 * -4000 + (1 - 0.8) * 800 = -3040
      * 5. PID制御を計算
-     * expected = 0.1 * -30 + 0.2 * -0.1 + 0.3 * -3040 = -915.01
+     * expected = 0.1 * -30 + 0.2 * -0.05 + 0.3 * -3040 = -915.01
      */
     expected = -915.01;
     EXPECT_DOUBLE_EQ(expected, actualPid.calculatePid(currentValue));
@@ -292,9 +292,9 @@ namespace etrobocon2026_test {
      * 1. 前回の誤差
      * prevDeviation = 100
      * 2. 現在の誤差
-     * currentDeviation = (100 - 100) = 0
+     * currentDeviation = (100 - 0) = 100
      * 3. 誤差の積分を計算
-     * integral = 0.5 + (0 + 100) * 0.01 / 2 = 1.5
+     * integral = 0.5 + (100 + 100) * 0.01 / 2 = 1.5
      * 4. PID制御を計算
      * expectedSecond = 0 + 1.0 * 1.5 + 0 = 1.5
      */

@@ -1,6 +1,6 @@
 /**
  * @file   FrameSave.cpp
- * @brief  写真を保存するクラス
+ * @brief  フレームを保存するクラス
  * @author okuyama0528
  */
 
@@ -21,6 +21,6 @@ void FrameSave::save(cv::Mat& frame, const std::string& filePath, const std::str
 
   std::string imagePath = filePath + "/" + fileName + ".JPEG";
   if(!cv::imwrite(imagePath, frame)) {
-    std::cerr << "画像の保存に失敗しました:" << imagePath << std::endl;
+    std::cerr << "フレームの保存に失敗しました:" << imagePath << std::endl;
   }
 }

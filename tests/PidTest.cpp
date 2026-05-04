@@ -187,6 +187,30 @@ namespace etrobocon2026_test {
     EXPECT_DOUBLE_EQ(expected, actualPid.calculatePid(currentValue));
   }
 
+  // setPidGainの負のゲインが0に補正されるかをテスト
+  TEST(PidTest, CalculatePidSetMinusGain)
+  {
+    Pid actualPid(0.6, 0.05, 0.01, 70.0, 100.0, -100.0);
+    actualPid.setPidGain(-0.1, -0.2, -0.3);
+    double prevValue = 60.0;
+    /** 計算過程
+     * 1. 前回の誤差
+     * prevDeviation = 0
+     * 2. 現在の誤差
+     * currentDeviation = (70 - 60) = 10
+     * 3. 誤差の積分を計算
+     * integral = 0 + (10 + 0) * 0.01 / 2 = 0.05
+     * 4. 微分の処理を行う
+     * currentDerivative = (10 - 0) / 0.01 = 1000
+     *  4.1 微分項にローパスフィルタを適用
+     * filteredDerivative = 0.8 * 1000 + (1 - 0.8) * 0 = 800
+     * 5. PID制御を計算
+     * expected = 0 * 10 + 0 * 0.005 + 0 * 800 = 0
+     */
+    double expected = 0;
+    EXPECT_DOUBLE_EQ(expected, actualPid.calculatePid(prevValue));
+  }
+
   // 初回呼び出し時に微分項が正しく計算されるかをテスト
   TEST(PidTest, CalculatePidFirstDerivative)
   {

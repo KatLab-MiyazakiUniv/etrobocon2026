@@ -1,7 +1,7 @@
 /**
  * @file spikeapi.h
  * @brief  ヘッダファイルのインクルード(ダミー)
- * @author HaruArima08
+ * @author sadomiya-sousi
  */
 
 #ifndef SPIKEAPI_H

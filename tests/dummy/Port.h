@@ -1,7 +1,7 @@
 /**
  * @file Port.h
  * @brief ポート関連定義(ダミー)
- * @author nishijima515
+ * @author sadomiya-sousi
  */
 
 #ifndef SPIKE_CPP_API_PORT_H_

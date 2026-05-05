@@ -1,0 +1,81 @@
+/**
+ * @file WheelMotorControllerTest.cpp
+ * @brief WheelMotorControllerクラスをテストする
+ * @author sadomiya-sousi
+ */
+
+#include "gtest/gtest.h"
+#include "WheelMotorController.h"
+
+using namespace spikeapi;
+
+namespace etrobocon2026_test {
+
+  // 右車輪のモータにPower値をセットできるかのテスト
+  TEST(WheelMotorControllerTest, SetRightMotorPower)
+  {
+    WheelMotorController wheelController;
+    wheelController.setRightMotorPower(50);
+    EXPECT_EQ(50, wheelController.getRightMotorPower());
+  }
+
+  // 右車輪のモータにマイナスのPower値をセットできるかどうかのテスト
+  TEST(WheelMotorControllerTest, SetRightMotorMinusPower)
+  {
+    WheelMotorController wheelController;
+    wheelController.setRightMotorPower(-50);
+    EXPECT_EQ(-50, wheelController.getRightMotorPower());
+  }
+
+  // 左車輪のモータにPower値をセットできるかのテスト
+  TEST(WheelMotorControllerTest, SetLeftMotorPower)
+  {
+    WheelMotorController wheelController;
+    wheelController.setLeftMotorPower(50);
+    EXPECT_EQ(50, wheelController.getLeftMotorPower());
+  }
+
+  // 左車輪のモータにマイナスのPower値をセットできるかどうかのテスト
+  TEST(WheelMotorControllerTest, SetLeftMotorMinusPower)
+  {
+    WheelMotorController wheelController;
+    wheelController.setLeftMotorPower(-50);
+    EXPECT_EQ(-50, wheelController.getLeftMotorPower());
+  }
+
+  // モータに設定するPower値の下限の制限が行われているか確認するテスト
+  TEST(WheelMotorControllerTest, SetLeftMotorPowerMin)
+  {
+    WheelMotorController wheelController;
+
+    wheelController.setLeftMotorPower(-150);
+    EXPECT_EQ(WheelMotorController::MOTOR_POWER_MIN, wheelController.getLeftMotorPower());
+  }
+
+  // モータに設定するPower値の上限の制限が行われているか確認するテスト
+  TEST(WheelMotorControllerTest, SetLeftMotorPowerMax)
+  {
+    WheelMotorController wheelController;
+    wheelController.setLeftMotorPower(150);
+    EXPECT_EQ(WheelMotorController::MOTOR_POWER_MAX, wheelController.getLeftMotorPower());
+  }
+
+  // stopWheelsMotor()を呼び出せるか確認するテスト
+  TEST(WheelMotorControllerTest, StopWheelsMotor)
+  {
+    WheelMotorController wheelController;
+    wheelController.stopWheelsMotor();
+    EXPECT_EQ(0, wheelController.getRightMotorPower());
+    EXPECT_EQ(0, wheelController.getLeftMotorPower());
+  }
+
+  // brakeWheelsMotor()を呼び出せるか確認するテスト
+  TEST(WheelMotorControllerTest, BrakeWheelsMotor)
+  {
+    WheelMotorController wheelController;
+    wheelController.brakeWheelsMotor();
+    EXPECT_EQ(0, wheelController.getRightMotorPower());
+    EXPECT_EQ(0, wheelController.getLeftMotorPower());
+  }
+
+}  // namespace etrobocon2026_test

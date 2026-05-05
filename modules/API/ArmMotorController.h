@@ -1,14 +1,13 @@
 /**
  * @file ArmMotorController.h
- * @brief アームのモータ制御に用いる関数をまとめたラッパークラス
+ * @brief アームモータ制御に用いる関数をまとめたラッパークラス
  * @author sadomiya-sousi
  */
 #ifndef ARM_MOTOR_CONTROLLER_H
 #define ARM_MOTOR_CONTROLLER_H
 
 #include "Motor.h"
-// #include "SystemInfo.h"  // WHEEL_RADIUS, PI, RAD_TO_DEG, DEG_TO_RADの定義を含む
-#include "MotorSystemInfo.h"  // WHEEL_RADIUS, PI, RAD_TO_DEG, DEG_TO_RADの定義を含む
+#include "MotorController.h"  // WHEEL_RADIUS, PI, RAD_TO_DEG, DEG_TO_RADの定義を含む
 
 class ArmMotorController {
  public:
@@ -24,18 +23,18 @@ class ArmMotorController {
   ArmMotorController();
 
   /**
-   * @brief アームのモータにpower値をセット
+   * @brief アームモータにpower値をセット
    * @param power power値
    */
   void setArmMotorPower(int power);
 
   /**
-   * @brief アームのモータのpower値を0にリセット
+   * @brief アームモータのpower値を0にリセット
    */
   void resetArmMotorPower();
 
   /**
-   * @brief アームのモータを停止する
+   * @brief アームモータを停止する
    */
   void stopArmMotor();
 

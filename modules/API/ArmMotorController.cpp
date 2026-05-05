@@ -13,30 +13,19 @@ ArmMotorController::ArmMotorController()
 {
 }
 
-// モータに設定するpower値の制限
-int ArmMotorController::limitPowerValue(int inputPower)
-{
-  if(inputPower > MOTOR_POWER_MAX) {
-    return MOTOR_POWER_MAX;
-  } else if(inputPower < MOTOR_POWER_MIN) {
-    return MOTOR_POWER_MIN;
-  }
-  return inputPower;
-}
-
-// アームのモータにpower値をセット
+// アームモータにpower値をセット
 void ArmMotorController::setArmMotorPower(int power)
 {
   armMotor.setPower(limitPowerValue(power));
 }
 
-// アームのモータのpower値をリセット
+// アームモータのpower値をリセット
 void ArmMotorController::resetArmMotorPower()
 {
   armMotor.setPower(0);
 }
 
-// アームのモータを停止する
+// アームモータを停止する
 void ArmMotorController::stopArmMotor()
 {
   armMotor.stop();
@@ -58,4 +47,15 @@ int ArmMotorController::getArmMotorPower()
 int32_t ArmMotorController::getArmMotorCount()
 {
   return armMotor.getCount();
+}
+
+// アームモータに設定するpower値の制限
+int ArmMotorController::limitPowerValue(int inputPower)
+{
+  if(inputPower > MOTOR_POWER_MAX) {
+    return MOTOR_POWER_MAX;
+  } else if(inputPower < MOTOR_POWER_MIN) {
+    return MOTOR_POWER_MIN;
+  }
+  return inputPower;
 }

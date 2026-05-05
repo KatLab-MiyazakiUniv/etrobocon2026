@@ -11,17 +11,6 @@ WheelMotorController::WheelMotorController()
 {
 }
 
-// モータに設定するpower値の制限
-int WheelMotorController::limitPowerValue(int inputPower)
-{
-  if(inputPower > MOTOR_POWER_MAX) {
-    return MOTOR_POWER_MAX;
-  } else if(inputPower < MOTOR_POWER_MIN) {
-    return MOTOR_POWER_MIN;
-  }
-  return inputPower;
-}
-
 // 右モータにpower値をセット
 void WheelMotorController::setRightMotorPower(int power)
 {
@@ -53,53 +42,53 @@ void WheelMotorController::resetWheelsMotorPower()
   leftWheel.setPower(0);
 }
 
-// 右タイヤのモータに,線速度を回転速度に変換しセットする
+// 右タイヤモータに,線速度を回転速度に変換しセットする
 void WheelMotorController::setRightMotorSpeed(double linearSpeedMmPerSec)
 {
   int rightAngleSpeed = static_cast<int>(linearSpeedMmPerSec / WHEEL_RADIUS * (RAD_TO_DEG));
   rightWheel.setSpeed(rightAngleSpeed);
 }
 
-// 左タイヤのモータに,線速度を回転速度に変換しセットする
+// 左タイヤモータに,線速度を回転速度に変換しセットする
 void WheelMotorController::setLeftMotorSpeed(double linearSpeedMmPerSec)
 {
   int leftAngleSpeed = static_cast<int>(linearSpeedMmPerSec / WHEEL_RADIUS * (RAD_TO_DEG));
   leftWheel.setSpeed(leftAngleSpeed);
 }
 
-// 両タイヤのモータを停止する
+// 両タイヤモータを停止する
 void WheelMotorController::stopWheelsMotor()
 {
   rightWheel.stop();
   leftWheel.stop();
 }
 
-// ブレーキをかけてタイヤのモータを停止する
+// ブレーキをかけてタイヤモータを停止する
 void WheelMotorController::brakeWheelsMotor()
 {
   rightWheel.brake();
   leftWheel.brake();
 }
 
-// 右タイヤのpower値を取得する
+// 右タイヤpower値を取得する
 int WheelMotorController::getRightMotorPower()
 {
   return rightWheel.getPower();
 }
 
-// 左タイヤのpower値を取得する
+// 左タイヤpower値を取得する
 int WheelMotorController::getLeftMotorPower()
 {
   return leftWheel.getPower();
 }
 
-// 右モータの角位置を取得する
+// 右モータ角位置を取得する
 int32_t WheelMotorController::getRightMotorCount()
 {
   return rightWheel.getCount();
 }
 
-// 左モータの角位置を取得する
+// 左モータ角位置を取得する
 int32_t WheelMotorController::getLeftMotorCount()
 {
   return leftWheel.getCount();
@@ -117,4 +106,15 @@ double WheelMotorController::getLeftMotorSpeed()
 {
   double leftSpeed = leftWheel.getSpeed() * DEG_TO_RAD * WHEEL_RADIUS;
   return leftSpeed;
+}
+
+// モータに設定するpower値の制限
+int WheelMotorController::limitPowerValue(int inputPower)
+{
+  if(inputPower > MOTOR_POWER_MAX) {
+    return MOTOR_POWER_MAX;
+  } else if(inputPower < MOTOR_POWER_MIN) {
+    return MOTOR_POWER_MIN;
+  }
+  return inputPower;
 }

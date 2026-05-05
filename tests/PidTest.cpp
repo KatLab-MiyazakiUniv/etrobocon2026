@@ -6,6 +6,7 @@
 
 #include "Pid.h"
 #include "gtest/gtest.h"
+#include <stdexcept>
 
 namespace etrobocon2026_test {
 
@@ -55,23 +56,24 @@ namespace etrobocon2026_test {
   // 基本的なPID計算の結果が正しいかをテスト
   TEST(PidTest, CalculatePid)
   {
-    Pid actualPid(0.6, 0.02, 0.03, 70.0, 100.0, -100.0);
+    Pid actualPid(1.0, 0.02, 0.0075, 70.0, 100.0, -100.0);
     double currentValue = 20.0;
+
     /** 計算過程
-     * 1. 前回の誤差
-     * prevDeviation = 0
+     * 1. 前回の誤差 (初期値)
+     *    prevDeviation = 0
      * 2. 現在の誤差
-     * currentDeviation = (70 - 20) = 50
+     *    current算
      * 3. 誤差の積分を計算
-     * integral = 0 + (50 + 0) * 0.01 / 2 = 0.25
+     *    integral = 0 + (50 + 0) * 0.01 / 2 = 0.25
      * 4. 微分の処理を行う
-     * currentDerivative = (50 - 0) / 0.01 = 5000
-     *  4.1. 微分項にローパスフィルタを適用
-     * prevDeviat filteredDerivative = 0.8 * 5000 + (1 - 0.8) * 0 = 4000
+     *    currentDerivative = (50 - 0) / 0.01 = 5000
+     * 4.1. 微分項にローパスフィルタを適用
+     *    filteredDerivative = 0.8 * 5000 + (1 - 0.8) * 0 = 4000
      * 5. PID制御を計算
-     * expected = 0.6 * 50 + 0.02 * 0.25 + 0.03 * 4000 = 150.005
+     *    expected = 1.0 * 50 + 0.02 * 0.25 + 0.0075 * 4000 = 80.005
      */
-    double expected = 150.005;
+    double expected = 80.005;
     EXPECT_DOUBLE_EQ(expected, actualPid.calculatePid(currentValue));
   }
 
@@ -167,7 +169,7 @@ namespace etrobocon2026_test {
     double expected = 14.0025;
     EXPECT_DOUBLE_EQ(expected, actualPid.calculatePid(prevValue));
 
-    actualPid.setPidGain(0.1, 0.2, 0.3);
+    actualPid.setPidGain(0.1, 0.2, 0.01);
     double currentValue = 100.0;
     /** 計算過程
      * 1. 前回の誤差
@@ -181,34 +183,20 @@ namespace etrobocon2026_test {
      *  4.1 微分項にローパスフィルタを適用
      * filteredDerivative = 0.8 * -4000 + (1 - 0.8) * 800 = -3040
      * 5. PID制御を計算
-     * expected = 0.1 * -30 + 0.2 * -0.05 + 0.3 * -3040 = -915.01
+     * expected = 0.1 * -30 + 0.2 * -0.05 + 0.01 * -3040 = -33.41
      */
-    expected = -915.01;
+    expected = -33.41;
     EXPECT_DOUBLE_EQ(expected, actualPid.calculatePid(currentValue));
   }
 
-  // setPidGainの負のゲインが0に補正されるかをテスト
-  TEST(PidTest, CalculatePidSetMinusGain)
+  // setPidGainで負の値をセットしようとした時に例外が投げられることをテスト
+  TEST(PidTest, SetPidGainMinus)
   {
     Pid actualPid(0.6, 0.05, 0.01, 70.0, 100.0, -100.0);
-    actualPid.setPidGain(-0.1, -0.2, -0.3);
-    double prevValue = 60.0;
-    /** 計算過程
-     * 1. 前回の誤差
-     * prevDeviation = 0
-     * 2. 現在の誤差
-     * currentDeviation = (70 - 60) = 10
-     * 3. 誤差の積分を計算
-     * integral = 0 + (10 + 0) * 0.01 / 2 = 0.05
-     * 4. 微分の処理を行う
-     * currentDerivative = (10 - 0) / 0.01 = 1000
-     *  4.1 微分項にローパスフィルタを適用
-     * filteredDerivative = 0.8 * 1000 + (1 - 0.8) * 0 = 800
-     * 5. PID制御を計算
-     * expected = 0 * 10 + 0 * 0.005 + 0 * 800 = 0
-     */
-    double expected = 0;
-    EXPECT_DOUBLE_EQ(expected, actualPid.calculatePid(prevValue));
+    actualPid.setPidGain(-0.1, -0.2, -0.01);
+    double currentValue = 100.0;
+    double expected = 0.0;
+    EXPECT_DOUBLE_EQ(expected, actualPid.calculatePid(currentValue));
   }
 
   // 初回呼び出し時に微分項が正しく計算されるかをテスト

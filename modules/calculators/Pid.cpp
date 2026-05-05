@@ -5,11 +5,32 @@
  */
 
 #include "Pid.h"
+#include <iostream>
 
 PidGain::PidGain(double _kp, double _ki, double _kd)
-  // pidゲインが負の値にならないようにする
-  : kp(_kp < 0 ? 0 : _kp), ki(_ki < 0 ? 0 : _ki), kd(_kd < 0 ? 0 : _kd)
 {
+  // Pidゲインのいずれかが負の場合、一括で警告を出す
+  if(_kp < 0 || _ki < 0 || _kd < 0) {
+    std::cerr << "[Warning] PID gains cannot be negative. Negative values are clamped to 0.0."
+              << std::endl;
+  }
+
+  // 負の値は 0.0 に補正
+  kp = (_kp < 0) ? 0.0 : _kp;
+  ki = (_ki < 0) ? 0.0 : _ki;
+  kd = (_kd < 0) ? 0.0 : _kd;
+}
+
+void Pid::setPidGain(double _kp, double _ki, double _kd)
+{
+  // Pidゲインのいずれかが負の場合、一括で警告を出す
+  if(_kp < 0 || _ki < 0 || _kd < 0) {
+    std::cerr << "[Warning] Attempted to set negative PID gains. Clamped to 0.0." << std::endl;
+  }
+  // 負の値は 0.0 に補正
+  pidGain.kp = (_kp < 0) ? 0.0 : _kp;
+  pidGain.ki = (_ki < 0) ? 0.0 : _ki;
+  pidGain.kd = (_kd < 0) ? 0.0 : _kd;
 }
 
 Pid::Pid(double _kp, double _ki, double _kd, double _targetValue, double _maxIntegral,
@@ -24,14 +45,6 @@ Pid::Pid(double _kp, double _ki, double _kd, double _targetValue, double _maxInt
 Pid::Pid(double _kp, double _ki, double _kd, double _targetValue)
   : Pid(_kp, _ki, _kd, _targetValue, 100.0, -100.0)
 {
-}
-
-void Pid::setPidGain(double _kp, double _ki, double _kd)
-{
-  // pidゲインが負の値にならないようにする
-  pidGain.kp = _kp < 0 ? 0 : _kp;
-  pidGain.ki = _ki < 0 ? 0 : _ki;
-  pidGain.kd = _kd < 0 ? 0 : _kd;
 }
 
 double Pid::calculatePid(double currentValue, double delta)

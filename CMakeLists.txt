@@ -29,49 +29,77 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 # プロジェクトのソースディレクトリ構造の定義 (適宜登録)
-set(PROJECT_MODULE_DIR ${PROJECT_SOURCE_DIR}/modules)
-set(PROJECT_TEST_DIR ${PROJECT_SOURCE_DIR}/tests)
-set(CAMERA_SERVER_MODULE_DIR ${PROJECT_SOURCE_DIR}/camera_server/modules)
-set(CAMERA_SERVER_TEST_DIR ${PROJECT_SOURCE_DIR}/camera_server/tests)
-
-# 必要なインクルードディレクトリの設定 (適宜登録)
-set(INCLUDE_DIRS
-  ${PROJECT_MODULE_DIR}
-  ${CAMERA_SERVER_MODULE_DIR}/camera
-  ${CAMERA_SERVER_MODULE_DIR}/utils
-)
-
-# ソースファイルの登録 (適宜登録)
-file(GLOB_RECURSE PROJECT_SOURCES
-  "${PROJECT_MODULE_DIR}/*.cpp"
-  "${CAMERA_SERVER_MODULE_DIR}/camera/*.cpp"
-  "${CAMERA_SERVER_MODULE_DIR}/utils/*.cpp"
-)
-
-# プロジェクトのライブラリターゲットを作成
-add_library(${PROJECT_NAME}_impl STATIC ${PROJECT_SOURCES})
-target_include_directories(${PROJECT_NAME}_impl PUBLIC ${INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME}_impl ${OpenCV_LIBS})
+set(RUNNING_MODULE_DIR ${PROJECT_SOURCE_DIR}/modules)
+set(RUNNING_TEST_DIR ${PROJECT_SOURCE_DIR}/tests)
+set(CAMERA_MODULE_DIR ${PROJECT_SOURCE_DIR}/camera_server/modules)
+set(CAMERA_TEST_DIR ${PROJECT_SOURCE_DIR}/camera_server/tests)
 
 # テスト設定
 enable_testing()
 
+## 走行システム ##
+
+# 必要なインクルードディレクトリの設定 (適宜登録)
+set(RUNNING_INCLUDE_DIRS
+  ${RUNNING_MODULE_DIR}
+)
+
+# ソースファイルの登録 (適宜登録)
+file(GLOB_RECURSE RUNNING_SOURCES
+  "${RUNNING_MODULE_DIR}/*.cpp"
+)
+
+# ライブラリターゲットを作成
+add_library(running_impl STATIC ${RUNNING_SOURCES})
+target_include_directories(running_impl PUBLIC ${RUNNING_INCLUDE_DIRS})
+
 # tests ディレクトリ内の *Test.cpp をすべてテストソースとして登録
-file(GLOB TEST_SOURCES
-  "${PROJECT_TEST_DIR}/*Test.cpp"
-  "${CAMERA_SERVER_TEST_DIR}/*Test.cpp"
+file(GLOB RUNNING_TEST_SOURCES
+  "${RUNNING_TEST_DIR}/*Test.cpp"
 )
 
 # テスト実行可能ファイルの作成
-add_executable(${PROJECT_NAME}_test ${TEST_SOURCES})
-
-target_link_libraries(${PROJECT_NAME}_test
+add_executable(running_test ${RUNNING_TEST_SOURCES})
+target_link_libraries(running_test
   PRIVATE
-    ${PROJECT_NAME}_impl
+    running_impl
+    gtest_main
+)
+
+## 撮影システム ##
+
+# 必要なインクルードディレクトリの設定 (適宜登録)
+set(CAMERA_INCLUDE_DIRS
+  ${CAMERA_MODULE_DIR}/camera
+  ${CAMERA_MODULE_DIR}/utils
+)
+
+# ソースファイルの登録 (適宜登録)
+file(GLOB_RECURSE CAMERA_SOURCES
+  "${CAMERA_MODULE_DIR}/camera/*.cpp"
+  "${CAMERA_MODULE_DIR}/utils/*.cpp"
+)
+
+# ライブラリターゲットを作成
+add_library(camera_server_impl STATIC ${CAMERA_SOURCES})
+target_include_directories(camera_server_impl PUBLIC ${CAMERA_INCLUDE_DIRS})
+target_link_libraries(camera_server_impl ${OpenCV_LIBS})
+
+# camera_server/tests ディレクトリ内の *Test.cpp をすべてテストソースとして登録
+file(GLOB CAMERA_TEST_SOURCES
+  "${CAMERA_TEST_DIR}/*Test.cpp"
+)
+
+# テスト実行可能ファイルの作成
+add_executable(camera_server_test ${CAMERA_TEST_SOURCES})
+target_link_libraries(camera_server_test
+  PRIVATE
+    camera_server_impl
     gtest_main
     ${OpenCV_LIBS}
 )
 
 # テストの登録
 include(GoogleTest)
-gtest_discover_tests(${PROJECT_NAME}_test)
+gtest_discover_tests(running_test)
+gtest_discover_tests(camera_server_test)

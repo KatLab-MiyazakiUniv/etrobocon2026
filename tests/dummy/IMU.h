@@ -34,8 +34,8 @@ namespace spikeapi {
     float azimuth = 90;
     float tilt = 0;
     float angle = 0;
-    int stat;
-    int ready;
+    bool is_stat = false;
+    bool is_ready = false;
 
     /**
      * IMUから加速度を取得する
@@ -63,25 +63,13 @@ namespace spikeapi {
      * IMUモジュールが使用可能かチェックする
      * @return true: 準備が整っている, false: まだ準備が整っていない
      */
-    bool isReady() const
-    {
-      if(ready == 0)
-        return true;
-      else
-        return false;
-    }
+    bool isReady() const { return is_ready; }
 
     /**
      * IMUモジュールが静止状態かチェックする
      * @return true: 静止している, false: 動いている
      */
-    bool isStationary() const
-    {
-      if(stat == 0)
-        return true;
-      else
-        return false;
-    }
+    bool isStationary() const { return is_stat; }
 
     /**
      * IMUモジュールの傾斜角度をセットする

@@ -11,6 +11,19 @@
 
 class IMUController {
  public:
+  /* 加速度 mm/s^2*/
+  struct Acceleration {
+    float x;
+    float y;
+    float z;
+  };
+  /* 角速度 degree/s */
+  struct AngularVelocity {
+    float x;
+    float y;
+    float z;
+  };
+
   /**
    * コンストラクタ
    */
@@ -18,6 +31,7 @@ class IMUController {
 
   /**
    * @brief IMUの方位角を取得する
+   * @return 方位角（°）
    */
 
   float getAzimuth();
@@ -30,17 +44,17 @@ class IMUController {
 
   /**
    * @brief IMUから加速度を取得する
-   * @param accel[3] x/y/z軸の加速度を格納するためのfloat型の配列
+   * @param accel[3] x/y/z軸の加速度を格納するための構造体
    */
 
-  void getAcceleration(float (&accel)[3]);
+  void getAcceleration(Acceleration& accel);
 
   /**
    * @brief IMUから角速度を取得する
-   * @param ang[3] x/y/z軸の角速度を格納するためのfloat型の配列
+   * @param ang[3] x/y/z軸の角速度を格納するための構造体
    */
 
-  void getAngularVelocity(float (&ang)[3]);
+  void getAngularVelocity(AngularVelocity& ang);
 
   /**
    * @brief IMUモジュールが使用可能かチェックする

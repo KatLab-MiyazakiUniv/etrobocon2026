@@ -8,6 +8,19 @@
 
 using namespace spikeapi;
 
+/* 加速度 mm/s^2*/
+struct Acceleration {
+  float x;
+  float y;
+  float z;
+};
+/* 角速度 degree/s */
+struct AngularVelocity {
+  float x;
+  float y;
+  float z;
+};
+
 IMUController::IMUController() : imu() {}
 
 float IMUController::getAzimuth()
@@ -20,22 +33,22 @@ void IMUController::resetAzimuth()
   imu.resetHeading();
 }
 
-void IMUController::getAcceleration(float (&accel)[3])
+void IMUController::getAcceleration(Acceleration& accel)
 {
   IMU::Acceleration acceleration;
   imu.getAcceleration(acceleration);
-  accel[0] = acceleration.x;
-  accel[1] = acceleration.y;
-  accel[2] = acceleration.z;
+  accel.x = acceleration.x;
+  accel.y = acceleration.y;
+  accel.z = acceleration.z;
 }
 
-void IMUController::getAngularVelocity(float (&ang)[3])
+void IMUController::getAngularVelocity(AngularVelocity& ang)
 {
   IMU::AngularVelocity angularvelocity;
   imu.getAngularVelocity(angularvelocity);
-  ang[0] = angularvelocity.x;
-  ang[1] = angularvelocity.y;
-  ang[2] = angularvelocity.z;
+  ang.x = angularvelocity.x;
+  ang.y = angularvelocity.y;
+  ang.z = angularvelocity.z;
 }
 
 bool IMUController::isReady() const

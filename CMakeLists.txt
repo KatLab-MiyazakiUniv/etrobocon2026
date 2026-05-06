@@ -40,7 +40,6 @@ set(INCLUDE_DIRS
 # ソースファイルの登録 (適宜登録)
 file(GLOB_RECURSE PROJECT_SOURCES
   "${PROJECT_MODULE_DIR}/*.cpp"
-  "${PROJECT_TEST_DIR}/dummy/utils/*.cpp"
 )
 
 # プロジェクトのライブラリターゲットを作成

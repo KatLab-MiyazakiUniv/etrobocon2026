@@ -2,9 +2,6 @@
 cmake_minimum_required(VERSION 3.14)
 project(etrobocon2026)
 
-find_package(OpenCV REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIRS})
-
 # C++標準とカバレッジ用フラグ
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -67,6 +64,9 @@ target_link_libraries(running_test
 )
 
 ## 撮影システム ##
+
+find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
 
 # 必要なインクルードディレクトリの設定 (適宜登録)
 set(CAMERA_INCLUDE_DIRS

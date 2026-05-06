@@ -7,7 +7,7 @@
 #include "Pid.h"
 #include <iostream>
 
-PidGain::PidGain(double _kp, double _ki, double _kd)
+Pid::PidGain::PidGain(double _kp, double _ki, double _kd)
 {
   // Pidゲインのいずれかが負の場合、一括で警告を出す
   if(_kp < 0 || _ki < 0 || _kd < 0) {
@@ -50,7 +50,7 @@ Pid::Pid(double _kp, double _ki, double _kd, double _targetValue)
 double Pid::calculatePid(double currentValue, double delta)
 {
   // 0除算を避けるために delta=0 の場合はデフォルト周期0.01とする
-  if(delta == 0) delta = 0.01;
+  if(delta == 0) delta = defaultDelta;
 
   // 現在の目標値との偏差を求める
   double currentDeviation = targetValue - currentValue;

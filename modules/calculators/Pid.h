@@ -7,23 +7,23 @@
 #ifndef PID_H
 #define PID_H
 
-// PIDゲインを保持する構造体
-struct PidGain {
- public:
-  double kp;  // Pゲイン
-  double ki;  // Iゲイン
-  double kd;  // Dゲイン
-
-  /** コンストラクタ
-   * @param _kp Pゲイン
-   * @param _ki Iゲイン
-   * @param _kd Dゲイン
-   */
-  PidGain(double _kp, double _ki, double _kd);
-};
-
 class Pid {
  public:
+  // PIDゲインを保持する構造体
+  struct PidGain {
+   public:
+    double kp;  // Pゲイン
+    double ki;  // Iゲイン
+    double kd;  // Dゲイン
+
+    /** コンストラクタ
+     * @param _kp Pゲイン
+     * @param _ki Iゲイン
+     * @param _kd Dゲイン
+     */
+    PidGain(double _kp, double _ki, double _kd);
+  };
+
   /** コンストラクタ
    * @param _kp Pゲイン
    * @param _ki Iゲイン
@@ -57,18 +57,18 @@ class Pid {
    * @param delta 周期[ms](デフォルト値0.01[10ms]、省略可)
    * @return PIDの計算結果(操作量)
    */
-  double calculatePid(double currentValue, double delta = 0.01);
+  double calculatePid(double currentValue, double delta = defaultDelta);
 
  private:
   PidGain pidGain;
-  double delta = 0.01;
-  double prevDeviation = 0.0;           // 前回の偏差
-  double integral = 0.0;                // 偏差の累積
-  double filteredDerivative = 0.0;      // フィルタされた微分項を保持する変数
-  double targetValue;                   // 目標値
-  double maxIntegral = 100.0;           // 累積積分値の最大値
-  double minIntegral = -100.0;          // 累積積分値の最小値
-  static constexpr double alpha = 0.8;  // ローパスフィルタの係数
+  static constexpr double defaultDelta = 0.01;  // 周期
+  double prevDeviation = 0.0;                   // 前回の偏差
+  double integral = 0.0;                        // 偏差の累積
+  double filteredDerivative = 0.0;              // フィルタされた微分項を保持する変数
+  double targetValue;                           // 目標値
+  double maxIntegral = 100.0;                   // 累積積分値の最大値
+  double minIntegral = -100.0;                  // 累積積分値の最小値
+  static constexpr double alpha = 0.8;          // ローパスフィルタの係数
 };
 
 #endif  // PID_H

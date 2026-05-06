@@ -19,7 +19,7 @@ namespace etrobocon2026_test {
     double expected_kp = 0.1;
     double expected_ki = 0.03;
     double expected_kd = 0.612;
-    PidGain actualPidGain(kp, ki, kd);
+    Pid::PidGain actualPidGain(kp, ki, kd);
     EXPECT_DOUBLE_EQ(expected_kp, actualPidGain.kp);
     EXPECT_DOUBLE_EQ(expected_ki, actualPidGain.ki);
     EXPECT_DOUBLE_EQ(expected_kd, actualPidGain.kd);
@@ -34,7 +34,7 @@ namespace etrobocon2026_test {
     double expected_kp = 0.0;
     double expected_ki = 0.0;
     double expected_kd = 0.0;
-    PidGain actualPidGain(kp, ki, kd);
+    Pid::PidGain actualPidGain(kp, ki, kd);
     EXPECT_DOUBLE_EQ(expected_kp, actualPidGain.kp);
     EXPECT_DOUBLE_EQ(expected_ki, actualPidGain.ki);
     EXPECT_DOUBLE_EQ(expected_kd, actualPidGain.kd);
@@ -46,7 +46,7 @@ namespace etrobocon2026_test {
     double kp = -0.5;
     double ki = -0.2;
     double kd = -0.3;
-    PidGain actualPidGain(kp, ki, kd);
+    Pid::PidGain actualPidGain(kp, ki, kd);
     double expected = 0.0;
     EXPECT_DOUBLE_EQ(expected, actualPidGain.kp);
     EXPECT_DOUBLE_EQ(expected, actualPidGain.ki);
@@ -100,7 +100,7 @@ namespace etrobocon2026_test {
     EXPECT_DOUBLE_EQ(expected, actualPid.calculatePid(currentValue));
   }
 
-  // 周期を変更した場合のPID計算結果をテスト
+  // 周期がデフォルト値 (0.01) 以外かつ正常な値の場合に正しく計算できるかのテスト
   TEST(PidTest, CalculatePidChangeDelta)
   {
     double delta = 0.03;
@@ -164,7 +164,7 @@ namespace etrobocon2026_test {
      *  4.1 微分項にローパスフィルタを適用
      * filteredDerivative = 0.8 * 1000 + (1 - 0.8) * 0 = 800
      * 5. PID制御を計算
-     * expected = 0.6 * 10 + 0.05 * 0.005 + 0.01 * 800 = 14.0025
+     * expected = 0.6 * 10 + 0.05 * 0.05 + 0.01 * 800 = 14.0025
      */
     double expected = 14.0025;
     EXPECT_DOUBLE_EQ(expected, actualPid.calculatePid(prevValue));
@@ -189,7 +189,7 @@ namespace etrobocon2026_test {
     EXPECT_DOUBLE_EQ(expected, actualPid.calculatePid(currentValue));
   }
 
-  // setPidGainで負の値をセットしようとした時に例外が投げられることをテスト
+  // setPidGainで、いずれかのパラメータに負の値をセットした場合に計算結果が０になるのかテスト
   TEST(PidTest, SetPidGainMinus)
   {
     Pid actualPid(0.6, 0.05, 0.01, 70.0, 100.0, -100.0);

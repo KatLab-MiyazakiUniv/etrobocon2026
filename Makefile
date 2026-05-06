@@ -6,7 +6,7 @@ DOCKER_MOUNT   := -v $(MAKEFILE_PATH):$(DOCKER_WORKDIR)
 
 # 全システムの使い方
 help:
-	@echo ビルドする
+	@echo 全システムをビルドする
 	@echo " $$ make build"
 	@echo 走行システムをビルドする
 	@echo " $$ make build-running"
@@ -24,24 +24,28 @@ help:
 	@echo " $$ make format"
 	@echo フォーマットチェックをする
 	@echo " $$ make format-check"
-	@echo テストをビルドする
+	@echo 全システムのテストをビルドする
 	@echo " $$ make test-build"
+	@echo 走行システムのテストをビルドする
+	@echo " $$ make test-build-running"
+	@echo 撮影システムのテストをビルドする
+	@echo " $$ make test-build-camera"
+	@echo 全システムのテストを実行する
+	@echo " $$ make test-exec"
 	@echo 走行システムのテストを実行する
 	@echo " $$ make test-exec-running"
 	@echo 撮影システムのテストを実行する
 	@echo " $$ make test-exec-camera"
-	@echo 全システムのテストを実行する
-	@echo " $$ make test-exec"
+	@echo 全システムのテストをビルドして実行する
+	@echo " $$ make test"
+	@echo 走行システムのテストをビルドして実行する
+	@echo " $$ make test-running"
+	@echo 撮影システムのテストをビルドして実行する
+	@echo " $$ make test-camera"
 	@echo テスト用の'test_build'ディレクトリを削除する
 	@echo " $$ make clean"
 	@echo 環境が変わっている場合のみ test_build ディレクトリを削除する
 	@echo " $$ make smart-clean"
-	@echo 必要があればtest_buildディレクトリを削除し, 走行システムのテストをビルドして実行する
-	@echo " $$ make test-running"
-	@echo 必要があればtest_buildディレクトリを削除し, 撮影システムのテストをビルドして実行する
-	@echo " $$ make test-camera"
-	@echo 必要があればtest_buildディレクトリを削除し, 全システムのテストをビルドして実行する
-	@echo " $$ make test"
 	@echo Dockerイメージをビルドする
 	@echo " $$ make docker-build"
 	@echo Dockerコンテナを起動する
@@ -64,9 +68,11 @@ build-camera:
 # 実機の場合、走行を開始する
 start: start-camera start-running
 
+# 走行システムを開始する
 start-running:
 	cd $(MAKEFILE_PATH)../ && make start
 
+# 撮影システムを開始する
 start-camera:
 	cd $(MAKEFILE_PATH)camera_server && ./camera_app
 
@@ -113,16 +119,29 @@ format-check:
 	find ./modules -type f \( -name "*.cpp" -o -name "*.h" \) | xargs clang-format --dry-run --Werror
 
 ## テスト関連 ##
-# テストのビルドディレクトリが存在しない場合は作成する
+# 全システムのテストをビルドする
 test-build:
 	@mkdir -p $(MAKEFILE_PATH)test_build
 	cd $(MAKEFILE_PATH)test_build && cmake .. && make
+
+# 走行システムのテストをビルドする
+test-build-running:
+	@mkdir -p $(MAKEFILE_PATH)test_build
+	cd $(MAKEFILE_PATH)test_build && cmake .. -DENABLE_CAMERA_TESTS=OFF && make running_test
+
+# 撮影システムのテストをビルドする
+test-build-camera:
+	@mkdir -p $(MAKEFILE_PATH)test_build
+	cd $(MAKEFILE_PATH)test_build && cmake .. -DENABLE_CAMERA_TESTS=ON && make camera_server_test
+
+# 全システムのテストを実行する
+test-exec: test-exec-running test-exec-camera
 
 # 走行システムのテストを実行する
 test-exec-running:
 	@if [ ! -f $(MAKEFILE_PATH)test_build/running_test ]; then \
 		echo "テスト実行ファイルが見つかりません。まずビルドを実行してください。"; \
-		echo " $$ make test-build"; \
+		echo " $$ make test-build-running"; \
 		exit 1; \
 	fi
 	cd $(MAKEFILE_PATH)test_build && ./running_test
@@ -131,22 +150,19 @@ test-exec-running:
 test-exec-camera:
 	@if [ ! -f $(MAKEFILE_PATH)test_build/camera_server_test ]; then \
 		echo "テスト実行ファイルが見つかりません。まずビルドを実行してください。"; \
-		echo " $$ make test-build"; \
+		echo " $$ make test-build-camera"; \
 		exit 1; \
 	fi
 	cd $(MAKEFILE_PATH)test_build && ./camera_server_test
 
-# 全システムのテストを実行する
-test-exec: test-exec-running test-exec-camera
-
-# 走行システムのテストをビルドして実行する
-test-running: smart-clean test-build test-exec-running
-
-# 撮影システムのテストをビルドして実行する
-test-camera: smart-clean test-build test-exec-camera
-
 # 全システムのテストをビルドして実行する
 test: smart-clean test-build test-exec
+
+# 走行システムのテストをビルドして実行する
+test-running: smart-clean test-build-running test-exec-running
+
+# 撮影システムのテストをビルドして実行する
+test-camera: smart-clean test-build-camera test-exec-camera
 
 # test_build ディレクトリを完全に削除する
 clean:

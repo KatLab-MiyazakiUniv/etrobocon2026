@@ -33,6 +33,7 @@ set(CAMERA_TEST_DIR ${PROJECT_SOURCE_DIR}/camera_server/tests)
 
 # テスト設定
 enable_testing()
+include(GoogleTest)
 
 ## 走行システム ##
 
@@ -63,43 +64,49 @@ target_link_libraries(running_test
     gtest_main
 )
 
+# テストの登録
+gtest_discover_tests(running_test)
+
 ## 撮影システム ##
 
-find_package(OpenCV REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIRS})
+# テスト有効化オプション
+option(ENABLE_CAMERA_TESTS "Build camera tests" ON)
 
-# 必要なインクルードディレクトリの設定 (適宜登録)
-set(CAMERA_INCLUDE_DIRS
-  ${CAMERA_MODULE_DIR}/camera
-  ${CAMERA_MODULE_DIR}/utils
-)
+if(ENABLE_CAMERA_TESTS)
+  find_package(OpenCV REQUIRED)
 
-# ソースファイルの登録 (適宜登録)
-file(GLOB_RECURSE CAMERA_SOURCES
-  "${CAMERA_MODULE_DIR}/camera/*.cpp"
-  "${CAMERA_MODULE_DIR}/utils/*.cpp"
-)
+  # 必要なインクルードディレクトリの設定 (適宜登録)
+  set(CAMERA_INCLUDE_DIRS
+    ${CAMERA_MODULE_DIR}/camera
+    ${CAMERA_MODULE_DIR}/utils
+  )
 
-# ライブラリターゲットを作成
-add_library(camera_server_impl STATIC ${CAMERA_SOURCES})
-target_include_directories(camera_server_impl PUBLIC ${CAMERA_INCLUDE_DIRS})
-target_link_libraries(camera_server_impl ${OpenCV_LIBS})
+  # ソースファイルの登録 (適宜登録)
+  file(GLOB_RECURSE CAMERA_SOURCES
+    "${CAMERA_MODULE_DIR}/camera/*.cpp"
+    "${CAMERA_MODULE_DIR}/utils/*.cpp"
+  )
 
-# camera_server/tests ディレクトリ内の *Test.cpp をすべてテストソースとして登録
-file(GLOB CAMERA_TEST_SOURCES
-  "${CAMERA_TEST_DIR}/*Test.cpp"
-)
+  # ライブラリターゲットを作成
+  add_library(camera_server_impl STATIC ${CAMERA_SOURCES})
+  target_include_directories(camera_server_impl PUBLIC ${CAMERA_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
+  target_link_libraries(camera_server_impl ${OpenCV_LIBS})
 
-# テスト実行可能ファイルの作成
-add_executable(camera_server_test ${CAMERA_TEST_SOURCES})
-target_link_libraries(camera_server_test
-  PRIVATE
-    camera_server_impl
-    gtest_main
-    ${OpenCV_LIBS}
-)
+  # camera_server/tests ディレクトリ内の *Test.cpp をすべてテストソースとして登録
+  file(GLOB CAMERA_TEST_SOURCES
+    "${CAMERA_TEST_DIR}/*Test.cpp"
+  )
 
-# テストの登録
-include(GoogleTest)
-gtest_discover_tests(running_test)
-gtest_discover_tests(camera_server_test)
+  # テスト実行可能ファイルの作成
+  add_executable(camera_server_test ${CAMERA_TEST_SOURCES})
+  target_link_libraries(camera_server_test
+    PRIVATE
+      camera_server_impl
+      gtest_main
+      ${OpenCV_LIBS}
+  )
+
+  # テストの登録
+  gtest_discover_tests(camera_server_test)
+
+endif()

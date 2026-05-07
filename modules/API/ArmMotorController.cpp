@@ -9,7 +9,8 @@
 using namespace spikeapi;
 
 ArmMotorController::ArmMotorController()
-  : armMotor(EPort::PORT_C, Motor::EDirection::COUNTERCLOCKWISE)
+    : BaseMotorController(),
+      armMotor(EPort::PORT_C, Motor::EDirection::COUNTERCLOCKWISE)
 {
 }
 
@@ -47,15 +48,4 @@ int ArmMotorController::getArmMotorPower()
 int32_t ArmMotorController::getArmMotorCount()
 {
   return armMotor.getCount();
-}
-
-// アームモータに設定するpower値の制限
-int ArmMotorController::limitPowerValue(int inputPower)
-{
-  if(inputPower > MOTOR_POWER_MAX) {
-    return MOTOR_POWER_MAX;
-  } else if(inputPower < MOTOR_POWER_MIN) {
-    return MOTOR_POWER_MIN;
-  }
-  return inputPower;
 }

@@ -7,7 +7,9 @@
 #include "WheelMotorController.h"
 
 WheelMotorController::WheelMotorController()
-  : rightWheel(EPort::PORT_A), leftWheel(EPort::PORT_B, Motor::EDirection::COUNTERCLOCKWISE)
+    : MotorController(),
+      rightWheel(EPort::PORT_A),
+      leftWheel(EPort::PORT_B, Motor::EDirection::COUNTERCLOCKWISE)
 {
 }
 
@@ -106,15 +108,4 @@ double WheelMotorController::getLeftMotorSpeed()
 {
   double leftSpeed = leftWheel.getSpeed() * DEG_TO_RAD * WHEEL_RADIUS;
   return leftSpeed;
-}
-
-// モータに設定するpower値の制限
-int WheelMotorController::limitPowerValue(int inputPower)
-{
-  if(inputPower > MOTOR_POWER_MAX) {
-    return MOTOR_POWER_MAX;
-  } else if(inputPower < MOTOR_POWER_MIN) {
-    return MOTOR_POWER_MIN;
-  }
-  return inputPower;
 }

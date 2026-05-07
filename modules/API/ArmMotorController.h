@@ -6,17 +6,12 @@
 #ifndef ARM_MOTOR_CONTROLLER_H
 #define ARM_MOTOR_CONTROLLER_H
 
-#include "Motor.h"
-#include "MotorController.h"  // WHEEL_RADIUS, PI, RAD_TO_DEG, DEG_TO_RADの定義を含む
+// #include "Motor.h"
+#include "MotorController.h" // WHEEL_RADIUS, PI, RAD_TO_DEG, DEG_TO_RADの定義を含む
 
-class ArmMotorController {
- public:
-  /** Power値の上限 */
-  static constexpr int MOTOR_POWER_MAX = 100;
-
-  /** Power値の下限 */
-  static constexpr int MOTOR_POWER_MIN = -100;
-
+class ArmMotorController : public BaseMotorController
+{
+public:
   /**
    * コンストラクタ
    */
@@ -55,14 +50,7 @@ class ArmMotorController {
    */
   int getArmMotorPower();
 
- private:
-  spikeapi::Motor armMotor;  // アームモータのインスタンス
-
-  /**
-   * @brief モータに設定するpower値の制限
-   * @param inputpower 入力されたpower値
-   * @return 制限されたpower値
-   */
-  int limitPowerValue(int inputPower);
+private:
+  spikeapi::Motor armMotor; // アームモータのインスタンス
 };
 #endif

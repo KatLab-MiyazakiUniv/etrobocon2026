@@ -25,3 +25,6 @@ INCLUDES +=  \
                 -I$(mkfile_path)../../common/library/libcpp-spike/include
 
 
+APPL_DIRS += $(mkfile_path)modules
+
+INCLUDES += -I$(mkfile_path)modules

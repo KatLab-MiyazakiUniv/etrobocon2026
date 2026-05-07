@@ -40,6 +40,7 @@ include(GoogleTest)
 # 必要なインクルードディレクトリの設定 (適宜登録)
 set(RUNNING_INCLUDE_DIRS
   ${RUNNING_MODULE_DIR}
+  ${RUNNING_MODULE_DIR}/calculators
 )
 
 # ソースファイルの登録 (適宜登録)

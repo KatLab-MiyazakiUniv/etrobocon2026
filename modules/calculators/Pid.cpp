@@ -7,6 +7,20 @@
 #include "Pid.h"
 #include <iostream>
 
+Pid::Pid(double _kp, double _ki, double _kd, double _targetValue, double _maxIntegral,
+         double _minIntegral)
+  : pidGain(_kp, _ki, _kd),
+    targetValue(_targetValue),
+    maxIntegral(_maxIntegral),
+    minIntegral(_minIntegral)
+{
+}
+
+Pid::Pid(double _kp, double _ki, double _kd, double _targetValue)
+  : Pid(_kp, _ki, _kd, _targetValue, 100.0, -100.0)
+{
+}
+
 Pid::PidGain::PidGain(double _kp, double _ki, double _kd)
 {
   // Pidゲインのいずれかが負の場合、一括で警告を出す
@@ -32,21 +46,6 @@ void Pid::setPidGain(double _kp, double _ki, double _kd)
   pidGain.ki = (_ki < 0) ? 0.0 : _ki;
   pidGain.kd = (_kd < 0) ? 0.0 : _kd;
 }
-
-Pid::Pid(double _kp, double _ki, double _kd, double _targetValue, double _maxIntegral,
-         double _minIntegral)
-  : pidGain(_kp, _ki, _kd),
-    targetValue(_targetValue),
-    maxIntegral(_maxIntegral),
-    minIntegral(_minIntegral)
-{
-}
-
-Pid::Pid(double _kp, double _ki, double _kd, double _targetValue)
-  : Pid(_kp, _ki, _kd, _targetValue, 100.0, -100.0)
-{
-}
-
 double Pid::calculatePid(double currentValue, double delta)
 {
   // 0除算を避けるために delta=0 の場合はデフォルト周期0.01とする

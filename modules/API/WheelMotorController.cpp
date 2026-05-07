@@ -1,4 +1,4 @@
-/*
+/**
  * @file WheelMotorController.cpp
  * @brief タイヤモータ制御に用いる関数をまとめたラッパークラス
  * @author sadomiya-sousi

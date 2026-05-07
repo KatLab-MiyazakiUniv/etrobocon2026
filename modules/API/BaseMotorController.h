@@ -1,7 +1,7 @@
 /**
  * @file BaseMotorController.h
  * @brief モータ制御に用いる関数をまとめたラッパークラスの親クラス
- * * @author sadomiya-sousi
+ * @author sadomiya-sousi
  */
 #ifndef BASE_MOTOR_CONTROLLER_H
 #define BASE_MOTOR_CONTROLLER_H

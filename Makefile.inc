@@ -1,4 +1,4 @@
-\USE_RASPIKE_ART=1
+USE_RASPIKE_ART=1
 
 mkfile_path := $(dir $(lastword $(MAKEFILE_LIST)))
 

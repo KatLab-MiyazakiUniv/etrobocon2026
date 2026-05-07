@@ -19,34 +19,34 @@ class ArmMotorController : public BaseMotorController {
    * @brief アームモータにpower値をセット
    * @param power power値
    */
-  void setArmMotorPower(int power);
+  void setPower(int power);
 
   /**
    * @brief アームモータのpower値を0にリセット
    */
-  void resetArmMotorPower();
+  void resetPower();
 
   /**
    * @brief アームモータを停止する
    */
-  void stopArmMotor();
+  void stopMotor();
 
   /**
    * @brief アームモータを止めて角度を維持する
    */
-  void holdArmMotor();
+  void holdMotor();
 
   /**
    * @brief アームモータの角位置を取得する
    * @return アームモータの角位置（°）
    */
-  int32_t getArmMotorCount();
+  int32_t getCount();
 
   /**
    * @brief アームモータのpower値を取得する
    * @return アームモータのpower値
    */
-  int getArmMotorPower();
+  int getPower();
 
  private:
   spikeapi::Motor armMotor;  // アームモータのインスタンス

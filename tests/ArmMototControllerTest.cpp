@@ -12,31 +12,31 @@ using namespace spikeapi;
 namespace etrobocon2026_test {
 
   // アームモータにPower値をセットできるかどうか確認するテスト
-  TEST(ArmMotorControllerTest, SetArmMotorPower)
+  TEST(ArmMotorControllerTest, SetPower)
   {
     ArmMotorController armController;
-    armController.setArmMotorPower(50);
-    EXPECT_EQ(50, armController.getArmMotorPower());
+    armController.setPower(50);
+    EXPECT_EQ(50, armController.getPower());
   }
 
-  // stopArmMotor()を呼び出せる動作テスト
-  TEST(ArmMotorControllerTest, StopArmMotor)
+  // stopMotor()を呼び出せるかのテスト
+  TEST(ArmMotorControllerTest, StopMotor)
   {
     ArmMotorController armController;
-    armController.setArmMotorPower(50);
-    EXPECT_EQ(50, armController.getArmMotorPower());
-    armController.stopArmMotor();
-    EXPECT_EQ(0, armController.getArmMotorPower());
+    armController.setPower(50);
+    EXPECT_EQ(50, armController.getPower());
+    armController.stopMotor();
+    EXPECT_EQ(0, armController.getPower());
   }
 
   // holdArmMotor()を呼び出せるか動作テスト
   TEST(ArmMotorControllerTest, HoldArmMotor)
   {
     ArmMotorController armController;
-    armController.setArmMotorPower(50);
-    EXPECT_EQ(50, armController.getArmMotorPower());
-    armController.holdArmMotor();
-    EXPECT_EQ(50, armController.getArmMotorPower());
+    armController.setPower(50);
+    EXPECT_EQ(50, armController.getPower());
+    armController.holdMotor();
+    EXPECT_EQ(50, armController.getPower());
   }
 
 }  // namespace etrobocon2026_test

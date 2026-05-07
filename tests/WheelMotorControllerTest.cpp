@@ -12,35 +12,35 @@ using namespace spikeapi;
 namespace etrobocon2026_test {
 
   // 右モータにPower値をセットできるかのテスト
-  TEST(WheelMotorControllerTest, SetRightMotorPower)
+  TEST(WheelMotorControllerTest, SetRightPower)
   {
     WheelMotorController wheelController;
-    wheelController.setRightMotorPower(50);
-    EXPECT_EQ(50, wheelController.getRightMotorPower());
+    wheelController.setRightPower(50);
+    EXPECT_EQ(50, wheelController.getRightPower());
   }
 
   // 右モータにマイナスのPower値をセットできるかどうかのテスト
-  TEST(WheelMotorControllerTest, SetRightMotorMinusPower)
+  TEST(WheelMotorControllerTest, SetminusPower)
   {
     WheelMotorController wheelController;
-    wheelController.setRightMotorPower(-50);
-    EXPECT_EQ(-50, wheelController.getRightMotorPower());
+    wheelController.setRightPower(-50);
+    EXPECT_EQ(-50, wheelController.getRightPower());
   }
 
   // 左モータにPower値をセットできるかのテスト
-  TEST(WheelMotorControllerTest, SetLeftMotorPower)
+  TEST(WheelMotorControllerTest, SetLeftPower)
   {
     WheelMotorController wheelController;
-    wheelController.setLeftMotorPower(50);
-    EXPECT_EQ(50, wheelController.getLeftMotorPower());
+    wheelController.setLeftPower(50);
+    EXPECT_EQ(50, wheelController.getLeftPower());
   }
 
   // 左モータにマイナスのPower値をセットできるかどうかのテスト
   TEST(WheelMotorControllerTest, SetLeftMotorMinusPower)
   {
     WheelMotorController wheelController;
-    wheelController.setLeftMotorPower(-50);
-    EXPECT_EQ(-50, wheelController.getLeftMotorPower());
+    wheelController.setLeftPower(-50);
+    EXPECT_EQ(-50, wheelController.getLeftPower());
   }
 
   // モータに設定するPower値の下限の制限が行われているか確認するテスト
@@ -48,53 +48,53 @@ namespace etrobocon2026_test {
   {
     WheelMotorController wheelController;
 
-    wheelController.setLeftMotorPower(-150);
-    EXPECT_EQ(MOTOR_POWER_MIN, wheelController.getLeftMotorPower());
+    wheelController.setLeftPower(-150);
+    EXPECT_EQ(MOTOR_POWER_MIN, wheelController.getLeftPower());
   }
 
   // モータに設定するPower値の上限の制限が行われているか確認するテスト
   TEST(WheelMotorControllerTest, SetLeftMotorPowerMax)
   {
     WheelMotorController wheelController;
-    wheelController.setLeftMotorPower(150);
-    EXPECT_EQ(MOTOR_POWER_MAX, wheelController.getLeftMotorPower());
+    wheelController.setLeftPower(150);
+    EXPECT_EQ(MOTOR_POWER_MAX, wheelController.getLeftPower());
   }
 
   // stopWheelsMotor()を呼び出せるか動作テスト
-  TEST(WheelMotorControllerTest, StopWheelsMotor)
+  TEST(WheelMotorControllerTest, StopBoth)
   {
     WheelMotorController wheelController;
-    wheelController.setLeftMotorPower(50);
-    wheelController.setRightMotorPower(50);
-    EXPECT_EQ(50, wheelController.getLeftMotorPower());
-    EXPECT_EQ(50, wheelController.getRightMotorPower());
-    wheelController.stopWheelsMotor();
-    EXPECT_EQ(0, wheelController.getRightMotorPower());
-    EXPECT_EQ(0, wheelController.getLeftMotorPower());
+    wheelController.setLeftPower(50);
+    wheelController.setRightPower(50);
+    EXPECT_EQ(50, wheelController.getLeftPower());
+    EXPECT_EQ(50, wheelController.getRightPower());
+    wheelController.stopBoth();
+    EXPECT_EQ(0, wheelController.getRightPower());
+    EXPECT_EQ(0, wheelController.getLeftPower());
   }
 
   // brakeWheelsMotor()を呼び出せるか動作テスト
-  TEST(WheelMotorControllerTest, BrakeWheelsMotor)
+  TEST(WheelMotorControllerTest, BrakeBoth)
   {
     WheelMotorController wheelController;
-    wheelController.setLeftMotorPower(50);
-    wheelController.setRightMotorPower(50);
-    EXPECT_EQ(50, wheelController.getLeftMotorPower());
-    EXPECT_EQ(50, wheelController.getRightMotorPower());
-    wheelController.brakeWheelsMotor();
-    EXPECT_EQ(0, wheelController.getRightMotorPower());
-    EXPECT_EQ(0, wheelController.getLeftMotorPower());
+    wheelController.setLeftPower(50);
+    wheelController.setRightPower(50);
+    EXPECT_EQ(50, wheelController.getLeftPower());
+    EXPECT_EQ(50, wheelController.getRightPower());
+    wheelController.brakeBoth();
+    EXPECT_EQ(0, wheelController.getRightPower());
+    EXPECT_EQ(0, wheelController.getLeftPower());
   }
   // resetWheelsMotor()で両モータの状態を0にset()したの動作テスト
-  TEST(WheelMotorControllerTest, ResetWheelsMotorPower)
+  TEST(WheelMotorControllerTest, ResetBoth)
   {
     WheelMotorController wheelController;
-    wheelController.setLeftMotorPower(50);
-    wheelController.setRightMotorPower(50);
-    EXPECT_EQ(50, wheelController.getLeftMotorPower());
-    EXPECT_EQ(50, wheelController.getRightMotorPower());
-    wheelController.resetWheelsMotorPower();
-    EXPECT_EQ(0, wheelController.getRightMotorPower());
-    EXPECT_EQ(0, wheelController.getLeftMotorPower());
+    wheelController.setLeftPower(50);
+    wheelController.setRightPower(50);
+    EXPECT_EQ(50, wheelController.getLeftPower());
+    EXPECT_EQ(50, wheelController.getRightPower());
+    wheelController.resetBothPower();
+    EXPECT_EQ(0, wheelController.getRightPower());
+    EXPECT_EQ(0, wheelController.getLeftPower());
   }
 }  // namespace etrobocon2026_test

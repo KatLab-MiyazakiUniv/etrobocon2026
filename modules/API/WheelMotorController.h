@@ -22,86 +22,86 @@ class WheelMotorController : public BaseMotorController {
    * @brief 右タイヤモータにPower値をセット
    * @param power Power値
    */
-  void setRightMotorPower(int power);
+  void setRightPower(int power);
 
   /**
    * @brief 左タイヤモータにPower値をセット
    * @param power Power値
    */
-  void setLeftMotorPower(int power);
+  void setLeftPower(int power);
 
   /**
    * @brief 右タイヤモータのpower値を0にリセット
    */
-  void resetRightMotorPower();
+  void resetRightPower();
 
   /**
    * @brief 左タイヤモータのpower値を0にリセット
    */
-  void resetLeftMotorPower();
+  void resetLeftPower();
 
   /**
    * @brief 両タイヤモータのpower値を0にリセット
    */
-  void resetWheelsMotorPower();
+  void resetBothPower();
 
   /**
    * @brief 右タイヤモータに, 線速度から算出した回転速度をセット
    * @param linearSpeedMmPerSec 線速度（mm/秒）
    */
-  void setRightMotorSpeed(double linearSpeedMmPerSec);
+  void setRightSpeed(double linearSpeedMmPerSec);
 
   /**
    * @brief 左タイヤモータに, 線速度から算出した回転速度をセット
    * @param linearSpeedMmPerSec 線速度（mm/秒）
    */
-  void setLeftMotorSpeed(double linearSpeedMmPerSec);
+  void setLeftSpeed(double linearSpeedMmPerSec);
 
   /**
    * @brief 両タイヤモータを停止する
    */
-  void stopWheelsMotor();
+  void stopBoth();
 
   /**
    * @brief ブレーキをかけてタイヤのモータを停止する
    */
-  void brakeWheelsMotor();
+  void brakeBoth();
 
   /**
    * @brief 右タイヤモータの角位置を取得する
    * @return 右タイヤモータの角位置（°）
    */
-  int32_t getRightMotorCount();
+  int32_t getRightCount();
 
   /**
    * @brief 左タイヤモータの角位置を取得する
    * @return 左タイヤモータの角位置（°）
    */
-  int32_t getLeftMotorCount();
+  int32_t getLeftCount();
 
   /**
    * @brief 右タイヤモータのpower値を取得する
    * @return 右タイヤモータのpower値
    */
-  int getRightMotorPower();
+  int getRightPower();
 
   /**
    * @brief 左タイヤモータのpower値を取得する
    * @return 左タイヤモータのpower値
    */
-  int getLeftMotorPower();
+  int getLeftPower();
 
   /**
    * @brief 右タイヤモータの線速度を取得する
    * @return 右タイヤモータの線速度（mm/秒）
    */
-  double getRightMotorSpeed();
+  double getRightSpeed();
 
   /**
    * @brief 左タイヤモータの線速度を取得する
    * @return 左タイヤモータの線速度（mm/秒）
    */
-  double getLeftMotorSpeed();
+  double getLeftSpeed();
 
  private:
   spikeapi::Motor rightWheel;  // 右タイヤモータのインスタンス
@@ -109,128 +109,3 @@ class WheelMotorController : public BaseMotorController {
 };
 
 #endif
-
-// /**
-//  * @file WheelMotorController.h
-//  * @brief タイヤモータ制御に用いる関数をまとめたラッパークラス
-//  * @author sadomiya-sousi
-//  */
-// #ifndef WHEEL_MOTOR_CONTROLLER_H
-// #define WHEEL_MOTOR_CONTROLLER_H
-
-// #include "Motor.h"
-// #include "MotorController.h"
-
-// using namespace spikeapi;
-
-// class WheelMotorController {
-//  public:
-//   /** Power値の上限 */
-//   static constexpr int MOTOR_POWER_MAX = 100;
-
-//   /** Power値の下限 */
-//   static constexpr int MOTOR_POWER_MIN = -100;
-
-//   /**
-//    * コンストラクタ
-//    */
-//   WheelMotorController();
-
-//   /**
-//    * @brief 右タイヤモータにPower値をセット
-//    * @param power Power値
-//    */
-//   void setRightMotorPower(int power);
-
-//   /**
-//    * @brief 左タイヤモータにPower値をセット
-//    * @param power Power値
-//    */
-//   void setLeftMotorPower(int power);
-
-//   /**
-//    * @brief 右タイヤモータのpower値を0にリセット
-//    */
-//   void resetRightMotorPower();
-
-//   /**
-//    * @brief 左タイヤモータのpower値を0にリセット
-//    */
-//   void resetLeftMotorPower();
-
-//   /**
-//    * @brief 両タイヤモータのpower値を0にリセット
-//    */
-//   void resetWheelsMotorPower();
-
-//   /**
-//    * @brief 右タイヤモータに, 線速度から算出した回転速度をセット
-//    * @param linearSpeedMmPerSec 線速度（mm/秒）
-//    */
-//   void setRightMotorSpeed(double linearSpeedMmPerSec);
-
-//   /**
-//    * @brief 左タイヤモータに, 線速度から算出した回転速度をセット
-//    * @param linearSpeedMmPerSec 線速度（mm/秒）
-//    */
-//   void setLeftMotorSpeed(double linearSpeedMmPerSec);
-
-//   /**
-//    * @brief 両タイヤモータを停止する
-//    */
-//   void stopWheelsMotor();
-
-//   /**
-//    * @brief ブレーキをかけてタイヤのモータを停止する
-//    */
-//   void brakeWheelsMotor();
-
-//   /**
-//    * @brief 右タイヤモータの角位置を取得する
-//    * @return 右タイヤモータの角位置（°）
-//    */
-//   int32_t getRightMotorCount();
-
-//   /**
-//    * @brief 左タイヤモータの角位置を取得する
-//    * @return 左タイヤモータの角位置（°）
-//    */
-//   int32_t getLeftMotorCount();
-
-//   /**
-//    * @brief 右タイヤモータのpower値を取得する
-//    * @return 右タイヤモータのpower値
-//    */
-//   int getRightMotorPower();
-
-//   /**
-//    * @brief 左タイヤモータのpower値を取得する
-//    * @return 左タイヤモータのpower値
-//    */
-//   int getLeftMotorPower();
-
-//   /**
-//    * @brief 右タイヤモータの線速度を取得する
-//    * @return 右タイヤモータの線速度（mm/秒）
-//    */
-//   double getRightMotorSpeed();
-
-//   /**
-//    * @brief 左タイヤモータの線速度を取得する
-//    * @return 左タイヤモータの線速度（mm/秒）
-//    */
-//   double getLeftMotorSpeed();
-
-//  private:
-//   spikeapi::Motor rightWheel;  // 右タイヤモータのインスタンス
-//   spikeapi::Motor leftWheel;   // 左タイヤモータのインスタンス
-
-//   /**
-//    * @brief モータに設定するpower値の制限
-//    * @param inputpower 入力されたpower値
-//    * @return 制限されたpower値
-//    */
-//   int limitPowerValue(int inputPower);
-// };
-
-// #endif

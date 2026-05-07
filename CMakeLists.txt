@@ -25,7 +25,7 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-# プロジェクトのソースディレクトリ構造の定義 (適宜登録)
+# プロジェクトのライブラリターゲットを作成
 set(RUNNING_MODULE_DIR ${PROJECT_SOURCE_DIR}/modules)
 set(RUNNING_TEST_DIR ${PROJECT_SOURCE_DIR}/tests)
 set(CAMERA_MODULE_DIR ${PROJECT_SOURCE_DIR}/camera_server/modules)
@@ -41,11 +41,15 @@ include(GoogleTest)
 set(RUNNING_INCLUDE_DIRS
   ${RUNNING_MODULE_DIR}
   ${RUNNING_MODULE_DIR}/calculators
+  ${RUNNING_MODULE_DIR}/API
+  ${RUNNING_TEST_DIR}
+  ${RUNNING_TEST_DIR}/dummy
 )
 
 # ソースファイルの登録 (適宜登録)
 file(GLOB_RECURSE RUNNING_SOURCES
   "${RUNNING_MODULE_DIR}/*.cpp"
+  "${RUNNING_TEST_DIR}/dummy/utils/*.cpp"
 )
 
 # ライブラリターゲットを作成

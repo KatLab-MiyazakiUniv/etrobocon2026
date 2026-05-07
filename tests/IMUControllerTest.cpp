@@ -5,6 +5,8 @@
  */
 
 #include <gtest/gtest.h>
+#include <iostream>
+#include <cstdlib>
 #include "IMUController.h"
 
 namespace IMUController_test {
@@ -32,12 +34,18 @@ namespace IMUController_test {
   {
     IMUController imuController;
 
-    IMUController::Acceleration accel = { 10, 10, 10 };
+    srand(12345);
+    IMUController::Acceleration accel = { 0, 0, 0 };
     imuController.getAcceleration(accel);
 
-    EXPECT_FLOAT_EQ(10, accel.x);
-    EXPECT_FLOAT_EQ(10, accel.y);
-    EXPECT_FLOAT_EQ(10, accel.z);
+    srand(12345);
+    float expected_x = (float)(rand() % 180 + 10);
+    float expected_y = (float)(rand() % 180);
+    float expected_z = (float)(rand() % 180 - 10);
+
+    EXPECT_FLOAT_EQ(expected_x, accel.x);
+    EXPECT_FLOAT_EQ(expected_y, accel.y);
+    EXPECT_FLOAT_EQ(expected_z, accel.z);
   }
 
   // 角速度を取得できるかのテスト
@@ -45,12 +53,18 @@ namespace IMUController_test {
   {
     IMUController imuController;
 
-    IMUController::AngularVelocity ang = { 10, 10, 10 };
+    srand(12345);
+    IMUController::AngularVelocity ang = { 0, 0, 0 };
     imuController.getAngularVelocity(ang);
 
-    EXPECT_FLOAT_EQ(10, ang.x);
-    EXPECT_FLOAT_EQ(10, ang.y);
-    EXPECT_FLOAT_EQ(10, ang.z);
+    srand(12345);
+    float expected_x = (float)(rand() % 180 + 20);
+    float expected_y = (float)(rand() % 180);
+    float expected_z = (float)(rand() % 180 - 20);
+
+    EXPECT_FLOAT_EQ(expected_x, ang.x);
+    EXPECT_FLOAT_EQ(expected_y, ang.y);
+    EXPECT_FLOAT_EQ(expected_z, ang.z);
   }
 
   // IMUモジュールが使用可能な状態かを調べられるかのテスト

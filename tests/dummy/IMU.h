@@ -9,6 +9,7 @@
 
 #include <cstdlib>
 #include <cmath>
+#include <iostream>
 
 namespace spikeapi {
   /**
@@ -29,8 +30,8 @@ namespace spikeapi {
       float z;
     };
 
-    spikeapi::IMU::Acceleration accel = { 10, 10, 10 };
-    spikeapi::IMU::AngularVelocity ang = { 10, 10, 10 };
+    spikeapi::IMU::Acceleration accel = { 0, 0, 0 };
+    spikeapi::IMU::AngularVelocity ang = { 0, 0, 0 };
     float azimuth = 90;
     float tilt = 0;
     float angle = 0;
@@ -38,14 +39,24 @@ namespace spikeapi {
     bool is_ready = false;
 
     /**
+     * コンストラクタ
+     * @param -
+     * @return -
+     */
+    IMU(void)
+    {
+      srand(12345);  // テスト用固定シード値
+    }
+
+    /**
      * IMUから加速度を取得する
      * @param accel [out] x/y/z軸の加速度を格納するためのAcceleration構造体[mm/s^2]
      */
     void getAcceleration(spikeapi::IMU::Acceleration& accel)
     {
-      accel.x = 10;
-      accel.y = 10;
-      accel.z = 10;
+      accel.x = (float)(rand() % 180 + 10);
+      accel.y = (float)(rand() % 180);
+      accel.z = (float)(rand() % 180 - 10);
     };
 
     /**
@@ -54,9 +65,9 @@ namespace spikeapi {
      */
     void getAngularVelocity(spikeapi::IMU::AngularVelocity& ang)
     {
-      ang.x = 10;
-      ang.y = 10;
-      ang.z = 10;
+      ang.x = (float)(rand() % 180 + 20);
+      ang.y = (float)(rand() % 180);
+      ang.z = (float)(rand() % 180 - 20);
     };
 
     /**

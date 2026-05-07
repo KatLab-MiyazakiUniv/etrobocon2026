@@ -60,7 +60,7 @@ namespace etrobocon2026_test {
     EXPECT_EQ(MOTOR_POWER_MAX, wheelController.getLeftPower());
   }
 
-  // stopWheelsMotor()を呼び出せるか動作テスト
+  // stopBoth()を呼び出して両モータのPower値が0になるかのテスト
   TEST(WheelMotorControllerTest, StopBoth)
   {
     WheelMotorController wheelController;
@@ -73,7 +73,7 @@ namespace etrobocon2026_test {
     EXPECT_EQ(0, wheelController.getLeftPower());
   }
 
-  // brakeWheelsMotor()を呼び出せるか動作テスト
+  // brakeBoth()を呼び出して両モータのPower値が0になるかのテスト
   TEST(WheelMotorControllerTest, BrakeBoth)
   {
     WheelMotorController wheelController;
@@ -85,7 +85,7 @@ namespace etrobocon2026_test {
     EXPECT_EQ(0, wheelController.getRightPower());
     EXPECT_EQ(0, wheelController.getLeftPower());
   }
-  // resetWheelsMotor()で両モータの状態を0にset()したの動作テスト
+  // resetBothPower()で両モータの状態を0にset()したの動作テスト
   TEST(WheelMotorControllerTest, ResetBoth)
   {
     WheelMotorController wheelController;

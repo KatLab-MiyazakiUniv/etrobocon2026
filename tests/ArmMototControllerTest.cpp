@@ -19,7 +19,7 @@ namespace etrobocon2026_test {
     EXPECT_EQ(50, armController.getPower());
   }
 
-  // stopMotor()を呼び出せるかのテスト
+  // stopMotor()を呼び出してアームモータのPower値が0になるかのテスト
   TEST(ArmMotorControllerTest, StopMotor)
   {
     ArmMotorController armController;
@@ -29,7 +29,7 @@ namespace etrobocon2026_test {
     EXPECT_EQ(0, armController.getPower());
   }
 
-  // holdArmMotor()を呼び出せるか動作テスト
+  // holdArmMotor()を呼び出してアームモータのPower値が維持されるかのテスト
   TEST(ArmMotorControllerTest, HoldArmMotor)
   {
     ArmMotorController armController;

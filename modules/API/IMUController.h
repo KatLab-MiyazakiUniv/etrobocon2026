@@ -36,7 +36,7 @@ class IMUController {
   float getAzimuth();
 
   /**
-   * @brief IMUの方位角をリセットする
+   * @brief IMUの方位角を0°にリセットする
    */
   void resetAzimuth();
 

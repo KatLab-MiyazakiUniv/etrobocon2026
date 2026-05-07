@@ -1,0 +1,50 @@
+# Debian/arm64向け カメラサーバー用Makefile
+	
+# コンパイラ
+CXX := g++
+
+# ディレクトリ
+SRCDIR := modules
+INCLUDEDIR := modules
+TARGET_DIR := bin
+OBJDIR := $(TARGET_DIR)/obj
+TARGET := camera_app
+
+# コンパイラとリンカのフラグ
+CXXFLAGS := -std=c++17 -Wall -Wextra -O2 -pthread
+
+# OpenCVのフラグを取得
+OPENCV_CFLAGS := $(shell pkg-config --cflags opencv4)
+OPENCV_LIBS := $(shell pkg-config --libs opencv4)
+
+# OpenCVのフラグを追加
+CXXFLAGS += $(OPENCV_CFLAGS)
+LIBS := $(OPENCV_LIBS)
+
+# インクルードパス
+INCLUDES := $(shell find $(INCLUDEDIR) -type d -printf '-I%p ')
+
+# --- ビルドルール ---
+
+# すべての .cpp ファイルを探す
+SOURCES := main.cpp $(shell find $(SRCDIR) -name '*.cpp')
+OBJS := $(addprefix $(OBJDIR)/,$(SOURCES:.cpp=.o))
+
+# デフォルトターゲット
+all: $(TARGET)
+
+# 実行ファイルをリンクするルール
+$(TARGET): $(OBJS)
+	@mkdir -p $(TARGET_DIR)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
+
+# 任意の .cpp ファイルを対応する .o ファイルにコンパイルするルール
+$(OBJDIR)/%.o: %.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+
+# 中間ファイルを削除
+clean:
+	rm -rf $(OBJDIR) $(TARGET_DIR)
+
+.PHONY: all clean

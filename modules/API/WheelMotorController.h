@@ -6,7 +6,6 @@
 #ifndef WHEEL_MOTOR_CONTROLLER_H
 #define WHEEL_MOTOR_CONTROLLER_H
 
-// #include "Motor.h"
 #include "BaseMotorController.h"
 
 using namespace spikeapi;

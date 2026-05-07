@@ -6,8 +6,7 @@
 #ifndef ARM_MOTOR_CONTROLLER_H
 #define ARM_MOTOR_CONTROLLER_H
 
-#include "BaseMotorController.h"  // WHEEL_RADIUS, PI, RAD_TO_DEG, DEG_TO_RADの定義を含む
-
+#include "BaseMotorController.h"
 class ArmMotorController : public BaseMotorController {
  public:
   /**

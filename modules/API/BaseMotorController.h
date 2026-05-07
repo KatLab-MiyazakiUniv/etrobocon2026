@@ -3,13 +3,11 @@
  * @brief モータ制御に用いる関数をまとめたラッパークラスの親クラス
  * * @author sadomiya-sousi
  */
-#ifndef Base_Motor_Controller_H
-#define Base_Motor_Controller_H
+#ifndef BASE_MOTOR_CONTROLLER_H
+#define BASE_MOTOR_CONTROLLER_H
 
 #include "Motor.h"
-#include "SystemInfo.h"
-
-// using namespace spikeapi;
+#include "SystemInfo.h"  // WHEEL_RADIUS, PI, RAD_TO_DEG, DEG_TO_RADの定義を含む
 
 class BaseMotorController {
  protected:
@@ -24,8 +22,6 @@ class BaseMotorController {
    * @return 制限されたpower値
    */
   int limitPowerValue(int inputPower);
-
- private:
 };
 
 #endif

@@ -5,8 +5,6 @@
  */
 #include "BaseMotorController.h"
 
-using namespace spikeapi;
-
 BaseMotorController::BaseMotorController() {}
 
 // モータに設定するpower値の制限

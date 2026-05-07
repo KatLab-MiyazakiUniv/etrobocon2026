@@ -49,7 +49,7 @@ namespace etrobocon2026_test {
     WheelMotorController wheelController;
 
     wheelController.setLeftMotorPower(-150);
-    EXPECT_EQ(WheelMotorController::MOTOR_POWER_MIN, wheelController.getLeftMotorPower());
+    EXPECT_EQ(MOTOR_POWER_MIN, wheelController.getLeftMotorPower());
   }
 
   // モータに設定するPower値の上限の制限が行われているか確認するテスト
@@ -57,7 +57,7 @@ namespace etrobocon2026_test {
   {
     WheelMotorController wheelController;
     wheelController.setLeftMotorPower(150);
-    EXPECT_EQ(WheelMotorController::MOTOR_POWER_MAX, wheelController.getLeftMotorPower());
+    EXPECT_EQ(MOTOR_POWER_MAX, wheelController.getLeftMotorPower());
   }
 
   // stopWheelsMotor()を呼び出せるか動作テスト

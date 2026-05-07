@@ -7,9 +7,9 @@
 #include "WheelMotorController.h"
 
 WheelMotorController::WheelMotorController()
-    : MotorController(),
-      rightWheel(EPort::PORT_A),
-      leftWheel(EPort::PORT_B, Motor::EDirection::COUNTERCLOCKWISE)
+  : BaseMotorController(),
+    rightWheel(EPort::PORT_A),
+    leftWheel(EPort::PORT_B, Motor::EDirection::COUNTERCLOCKWISE)
 {
 }
 

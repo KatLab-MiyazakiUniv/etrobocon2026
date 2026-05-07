@@ -6,12 +6,10 @@
 #ifndef ARM_MOTOR_CONTROLLER_H
 #define ARM_MOTOR_CONTROLLER_H
 
-// #include "Motor.h"
-#include "MotorController.h" // WHEEL_RADIUS, PI, RAD_TO_DEG, DEG_TO_RADの定義を含む
+#include "BaseMotorController.h"  // WHEEL_RADIUS, PI, RAD_TO_DEG, DEG_TO_RADの定義を含む
 
-class ArmMotorController : public BaseMotorController
-{
-public:
+class ArmMotorController : public BaseMotorController {
+ public:
   /**
    * コンストラクタ
    */
@@ -50,7 +48,7 @@ public:
    */
   int getArmMotorPower();
 
-private:
-  spikeapi::Motor armMotor; // アームモータのインスタンス
+ private:
+  spikeapi::Motor armMotor;  // アームモータのインスタンス
 };
 #endif

@@ -1,4 +1,4 @@
-name: Build Check Client
+name: Build Check Running
 
 on: [push, pull_request]
 
@@ -24,4 +24,4 @@ jobs:
       - name: Run build in container
         run: |
           docker run --rm -v $(pwd):/RasPike-ART/sdk/workspace/etrobocon2026 haruarima08/etrobocon2026:arm64 \
-          bash -c "cd /RasPike-ART/sdk/workspace/etrobocon2026 && make build-client"
+          bash -c "cd /RasPike-ART/sdk/workspace/etrobocon2026 && make build-running"

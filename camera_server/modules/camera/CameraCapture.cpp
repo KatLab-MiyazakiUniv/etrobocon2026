@@ -137,7 +137,7 @@ bool CameraCapture::getFrames(vector<cv::Mat>& frames, int numFrames, int millis
       allSuccess = false;
     }
     if(i < numFrames - 1) {
-      // 最後の1回以外は、intervals ミリ秒だけ待機
+      // 最後の1回以外は、milliseconds ミリ秒だけ待機
       this_thread::sleep_for(chrono::milliseconds(millisecondInterval));
     }
   }

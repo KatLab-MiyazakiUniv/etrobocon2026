@@ -8,19 +8,6 @@
 
 using namespace spikeapi;
 
-/* 加速度 mm/s^2*/
-struct Acceleration {
-  float x;
-  float y;
-  float z;
-};
-/* 角速度 degree/s */
-struct AngularVelocity {
-  float x;
-  float y;
-  float z;
-};
-
 IMUController::IMUController() : imu() {}
 
 float IMUController::getAzimuth()

@@ -33,9 +33,6 @@ void BaseMotion::run()
 
     // 制御を安定させるために待機する。
     wait();
-
-    // 継続条件の内部状態を更新する。
-    continuationCondition->update();
   }
 
   // モーター停止など、動作終了後の処理を行う。

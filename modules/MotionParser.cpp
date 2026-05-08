@@ -34,8 +34,8 @@ void MotionParser::createRunCSV(Robot& robot, Area area, bool isLeftCourse)
         return;
     }
 
-    // 出力ファイルを書き込みモードで開く
-    ofstream commandRunFile(commandRunFilePath, ios::app);
+    // 出力ファイルを書き込みモードで開き、初期化する
+    ofstream commandRunFile(commandRunFilePath, ios::out | ios::trunc);
     if (!commandRunFile) {
         cerr << "実行用コマンドファイルを開けませんでした: " << commandRunFilePath << endl;
         return;
@@ -90,8 +90,9 @@ void MotionParser::createRunCSV(Robot& robot, Area area, bool isLeftCourse)
                 motionParams.push_back(token);
             }
 
+            cout << "比較: commandID vs motionID = [ " << commandID << " ] vs [ " << motionParams[1] << " ]" << endl;
             // ID一致チェック（2列目がID想定）
-            if (!motionParams.empty() && motionParams[1] == commandID) {
+            if (motionParams.size() >= 2 && motionParams[1] == commandID) {
                 commandRunFile << motionsFileLine << "\n";
                 break;
             }
@@ -100,6 +101,24 @@ void MotionParser::createRunCSV(Robot& robot, Area area, bool isLeftCourse)
 
     cout << "実行用コマンドファイルの作成が完了しました" << endl;
 }
+
+
+// void MotionParser::deleteRunCSV(Robot& robot, Area area, bool isLeftCourse)
+// {
+//     cout << "実行用コマンドファイルの削除を開始します" << endl;
+
+//     string runPath = "../etrobocon2026/datafiles/commands/Run/";
+
+//     string areaName = areaCommandNames[static_cast<int>(area)];
+//     string course = isLeftCourse ? "Left" : "Right";
+//     string commandRunFilePath = runPath + "run_" + areaName + course + ".csv";
+
+//     if(remove(commandRunFilePath.c_str()) == 0) {
+//         cout << "ファイルを削除しました: " << commandRunFilePath << endl;
+//     } else {
+//         cerr << "ファイルの削除に失敗しました: " << commandRunFilePath << endl;
+//     }
+// }
 
 
 

@@ -16,4 +16,5 @@ void EtRobocon2026::start()
   Area area = Area::LineTrace;
   
   MotionParser::createRunCSV(robot, area, isLeftCourse);
+  // MotionParser::deleteRunCSV(robot, area, isLeftCourse);
 }

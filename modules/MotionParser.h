@@ -1,0 +1,97 @@
+/**
+ * @file   MotionParser.h
+ * @brief  動作コマンドファイルを解析するクラス
+ * @author nishijima515
+ */
+
+#ifndef MOTION_PARSER_H
+#define MOTION_PARSER_H
+
+constexpr char SEPARATOR = ',';
+
+#include <vector>
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <memory>
+#include "Motion.h"
+
+enum class COMMAND {
+  NONE
+};
+
+class MotionParser {
+ public:
+
+// Areaからコマンド名とIDを抽出し、Motionsから対応するコマンドファイルのなかのIDの行を抽出し、走行中のみrun_[Area名 + Left or Right].csvを作成する関数
+// キャリブレーションで使う。
+// areaを引数で受け取り、areaごとのrun_[Area名 + Left or Right].csvを作成する関数
+void createRunCSV(Robot& robot, Area area, bool isLeftCourse);
+
+
+//型チェック関数(publicに置く。キャリブレーション中にrun[].csvファイルを作成した後に、使う。)
+
+
+//csvファイル内の　「#」以降はコメントとして扱う
+
+
+//Areaの[Area名 + Left or Right].csvからコマンド名とIDを抽出(params[0]にコマンド名、params[1]にID)
+//抽出したコマンド名に対応するdatafiles/commands/Motions内にある[コマンド名].csvファイルを読み込む
+//[コマンド名].csvファイルのなかから対応するIDの行を読み込む
+//読み込んだ行のパラメータをparams[2]以降に格納する。(ID,コマンドは飛ばす or params[0], params[1]に再格納)(カンマ区切り)
+
+// コマンド名(paramsの0番目)を対応する動作コマンドに変換
+// コマンドに応じて対応する動作オブジェクトを生成し、動作リスト（motionList）に追加する処理
+// or
+//キャリブレーション段階で、run + [Area名 + Left or Right].csvを作成。(command/Runに作成)
+
+//　AreaからMotionにIDを見に行くのが時間がかかりそうだから、キャリブレーション段階でその動作を終わらせたい。
+
+// キャリブレーション段階で、エリアごとにMotionListを作成する(AreaMasterが引数でmotionListを受け取れるようにする。)
+// 走行体はエリアごとに異なるMotionListを読み込む
+// エリアが終われば、メモリを開放する。
+//この方法だとメモリが足りなくなるかも。
+
+//キャリブレーション段階で、run + [Area名 + Left or Right].csvを作成。
+//あとは去年のcreateMotionsをそのまま使う。
+//走行が終わったら、作成した run + [Area名 + Left or Right].csvを削除する。
+//この方法のだとメモリの心配はない。
+
+  /**
+   * @brief ファイルを解析して動作インスタンスのリストを生成する
+   * @param robot ロボット本体の参照
+   * @param commandFilePath ファイルパス
+   * @param targetBrightness 目標輝度
+   * @return 動作インスタンスリスト
+   */
+
+  // static std::vector<Motion*> createMotions(Robot& robot, std::string& commandFilePath,
+  //                                           int targetBrightness);
+
+ private:
+  MotionParser();  // インスタンス化を禁止する
+
+  /**
+   * @brief 文字列を列挙型COMMANDに変換する
+   * @param str 文字列のコマンド
+   * @return コマンド
+   */
+  // static COMMAND convertCommand(const std::string& str);
+
+  // /**
+  //  * @brief 文字列をbool型に変換する
+  //  * @param command 文字列のコマンド
+  //  * @param stringParameter 文字列のパラメータ
+  //  * @return bool値
+  //  */
+  // static bool convertBool(const std::string& command, const std::string& stringParameter);
+
+  // /**
+  //  * @brief 回頭方法の文字列をbool型に変換する（convertBoolは方向判定で使用済みのため専用関数化）
+  //  * @param stringParameter 文字列のパラメータ ("relative" or "absolute")
+  //  * @return false: 相対角度回頭, true: 絶対角度回頭
+  //  */
+  // static bool convertRotationModeToBool(const std::string& stringParameter);
+};
+
+#endif

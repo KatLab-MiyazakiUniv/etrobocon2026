@@ -9,5 +9,3 @@
 BaseContinuationCondition::BaseContinuationCondition(Robot& _robot) : robot(_robot) {}
 
 void BaseContinuationCondition::prepare() {}
-
-void BaseContinuationCondition::update() {}

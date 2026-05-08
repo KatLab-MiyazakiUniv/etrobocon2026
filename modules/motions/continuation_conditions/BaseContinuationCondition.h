@@ -35,11 +35,6 @@ class BaseContinuationCondition {
    */
   virtual bool shouldContinue() = 0;
 
-  /**
-   * @brief 継続条件の内部状態を更新する (デフォルトは何もしない)
-   */
-  virtual void update();
-
  protected:
   Robot& robot;  // Robot インスタンスの参照
 };

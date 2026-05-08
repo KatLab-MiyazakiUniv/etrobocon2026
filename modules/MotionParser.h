@@ -13,8 +13,10 @@ constexpr char SEPARATOR = ',';
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <memory>
-#include "Motion.h"
+#include "BaseMotion.h"
+#include "Area.h"
 
 enum class COMMAND {
   NONE
@@ -26,7 +28,7 @@ class MotionParser {
 // Areaからコマンド名とIDを抽出し、Motionsから対応するコマンドファイルのなかのIDの行を抽出し、走行中のみrun_[Area名 + Left or Right].csvを作成する関数
 // キャリブレーションで使う。
 // areaを引数で受け取り、areaごとのrun_[Area名 + Left or Right].csvを作成する関数
-void createRunCSV(Robot& robot, Area area, bool isLeftCourse);
+static void createRunCSV(Robot& robot, Area area, bool isLeftCourse);
 
 
 //型チェック関数(publicに置く。キャリブレーション中にrun[].csvファイルを作成した後に、使う。)
@@ -70,6 +72,8 @@ void createRunCSV(Robot& robot, Area area, bool isLeftCourse);
 
  private:
   MotionParser();  // インスタンス化を禁止する
+
+  static const std::array<std::string, 2> areaCommandNames;
 
   /**
    * @brief 文字列を列挙型COMMANDに変換する

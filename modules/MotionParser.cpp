@@ -8,13 +8,15 @@
 
 using namespace std;
 
+const array<string, 2> MotionParser::areaCommandNames = { "LineTrace", "Area2" };
+
 void MotionParser::createRunCSV(Robot& robot, Area area, bool isLeftCourse)
 {
     cout << "実行用コマンドファイルの作成を開始します" << endl;
 
-    string areaPath = "etrobocon2026/datafiles/commands/Area/";
-    string motionsPath = "etrobocon2026/datafiles/commands/Motions/";
-    string runPath = "etrobocon2026/datafiles/commands/Run/";
+    string areaPath = "../etrobocon2026/datafiles/commands/Area/";
+    string motionsPath = "../etrobocon2026/datafiles/commands/Motions/";
+    string runPath = "../etrobocon2026/datafiles/commands/Run/";
 
     string areaName = areaCommandNames[static_cast<int>(area)];
     string course = isLeftCourse ? "Left" : "Right";
@@ -22,14 +24,17 @@ void MotionParser::createRunCSV(Robot& robot, Area area, bool isLeftCourse)
     string commandAreaFilePath = areaPath + areaName + course + ".csv";
     string commandRunFilePath = runPath + "run_" + areaName + course + ".csv";
 
-    // 入力ファイル
+    cout << commandAreaFilePath << endl;
+    cout << commandRunFilePath << endl;
+
+    // 入力ファイルを読み取りモードで開く
     ifstream commandAreaFile(commandAreaFilePath);
     if (!commandAreaFile) {
         cerr << "エリアコマンドファイルを開けませんでした: " << commandAreaFilePath << endl;
         return;
     }
 
-    // 出力ファイル（追記モード）
+    // 出力ファイルを書き込みモードで開く
     ofstream commandRunFile(commandRunFilePath, ios::app);
     if (!commandRunFile) {
         cerr << "実行用コマンドファイルを開けませんでした: " << commandRunFilePath << endl;

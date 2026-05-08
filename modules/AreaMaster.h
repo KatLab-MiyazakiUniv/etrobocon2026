@@ -9,10 +9,11 @@
 
 #include <vector>
 #include <array>
+#include "Area.h"
 #include "MotionParser.h"
-
-// エリア名を持つ列挙型変数（LineTrace = 0, Area2 = 1）
-enum Area { LineTrace, Area2 };
+//Robot.hとBaseMotion.hはAreaMaster.hでincludeしないとエラーが出た。
+#include "Robot.h"     
+#include "BaseMotion.h"
 
 class AreaMaster {
  public:
@@ -29,6 +30,13 @@ class AreaMaster {
    */
   void run();
 
+  /**
+   * @brief エリア名を返す
+   * @param area エリアの指定(Enum型のArea)
+   * @return エリア名
+   */
+  // static std::string getAreaName(Area area);
+
  private:
   Robot& robot;          // Robotインスタンスの参照
   Area area;             // エリアの指定(Enum型のArea)
@@ -44,7 +52,7 @@ class AreaMaster {
    * @brief 動作リストを実行してメモリを解放する
    * @param motionList 実行する動作リスト
    */
-  void executeMotions(std::vector<Motion*>& motionList);
+  void executeMotions(std::vector<BaseMotion*>& motionList);
 
 //   /**
 //    * @brief 条件分岐用ファイルパスを生成

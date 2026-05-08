@@ -33,6 +33,8 @@ class BaseMotion {
   void run();
 
  protected:
+  Robot& robot;  // Robot インスタンスの参照
+
   /**
    * @brief 動作を開始できるかを判定する (デフォルトは true を返す)
    * @return true/動作を開始できる、false/動作を開始できない
@@ -58,8 +60,6 @@ class BaseMotion {
    * @brief 動作終了後の処理を行う (デフォルトは何もしない)
    */
   virtual void finish();
-
-  Robot& robot;  // Robot インスタンスの参照
 
  private:
   std::unique_ptr<BaseContinuationCondition> continuationCondition;  // 継続条件クラスのインスタンス

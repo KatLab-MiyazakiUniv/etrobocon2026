@@ -42,6 +42,8 @@ set(RUNNING_INCLUDE_DIRS
   ${RUNNING_MODULE_DIR}
   ${RUNNING_MODULE_DIR}/calculators
   ${RUNNING_MODULE_DIR}/API
+  ${RUNNING_MODULE_DIR}/motions
+  ${RUNNING_MODULE_DIR}/motions/continuation_conditions
   ${PROJECT_SOURCE_DIR}/common
   ${RUNNING_TEST_DIR}
   ${RUNNING_TEST_DIR}/dummy

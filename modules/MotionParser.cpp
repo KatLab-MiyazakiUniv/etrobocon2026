@@ -146,6 +146,90 @@ void MotionParser::createRunCSV(Robot& robot, Area area, bool isLeftCourse)
     cout << "実行用コマンドファイルの作成が完了しました" << endl;
 }
 
+bool MotionParser::checkType(string& commandFilePath)
+{
+    ifstream file(commandFilePath);
+    if (!file) {
+        cerr << "実行用コマンドファイルを開けませんでした: " << commandFilePath << endl;
+        return false;
+    }
+
+    string line;
+    int lineNum = 1;
+    bool allValid = true;
+
+    // 文字列の先頭と末尾の空白を削除するラムダ式
+    auto trim = [](string& s) {
+        size_t start = s.find_first_not_of(" \t");
+        if (start == string::npos) {
+            s.clear();
+            return;
+        }
+        size_t end = s.find_last_not_of(" \t");
+        s = s.substr(start, end - start + 1);
+    };
+
+    while (getline(file, line)) {
+        // コメント削除
+        size_t pos = line.find('#');
+        if (pos != string::npos) {
+            line = line.substr(0, pos);
+        }
+
+        trim(line);
+        if (line.empty()) {
+            lineNum++;
+            continue;
+        }
+
+        stringstream ss(line);
+        vector<string> params;
+        string token;
+        while (getline(ss, token, SEPARATOR)) {
+            trim(token);
+            params.push_back(token);
+        }
+
+        if (params.empty()) {
+            lineNum++;
+            continue;
+        }
+
+        string commandName = params[0];
+        // params[1] はIDなので型チェックでは考慮しない
+
+        try {
+            if (commandName == "AR") {
+                // AR: [2]:int 角度, [3]:double 速度, [4]:string 方向
+                if (params.size() < 5) {
+                    cerr << commandFilePath << ":" << lineNum << "行目 (" << commandName << "): 引数が足りません" << endl;
+                    allValid = false;
+                } else {
+                    stoi(params[2]); // int
+                    stod(params[3]); // double
+                    if (params[4] != "clockwise" && params[4] != "anticlockwise") {
+                        cerr << commandFilePath << ":" << lineNum << "行目 (" << commandName << "): 'clockwise' か 'anticlockwise' を指定してください" << endl;
+                        allValid = false;
+                    }
+                }
+            }
+            // 他のコマンドのチェックは必要に応じてここへ追加する
+            // else if (commandName == "...") { ... }
+            
+        } catch (const invalid_argument& e) {
+            cerr << commandFilePath << ":" << lineNum << "行目 (" << commandName << "): 引数の型が不正です" << endl;
+            allValid = false;
+        } catch (const out_of_range& e) {
+            cerr << commandFilePath << ":" << lineNum << "行目 (" << commandName << "): 値が範囲外です" << endl;
+            allValid = false;
+        }
+
+        lineNum++;
+    }
+
+    return allValid;
+}
+
 
 // void MotionParser::deleteRunCSV(Robot& robot, Area area, bool isLeftCourse)
 // {
@@ -166,63 +250,61 @@ void MotionParser::createRunCSV(Robot& robot, Area area, bool isLeftCourse)
 
 
 
-// vector<Motion*> MotionParser::createMotions(Robot& robot, string& commandFilePath,
-//                                             int targetBrightness)
-// {
-//   // 行番号カウンタ
-//   int lineNum = 1;
-//   // 動作インスタンスのリスト
-//   vector<Motion*> motionList;
+vector<Motion*> MotionParser::createMotionList(Robot& robot, string& commandFilePath)
+{
+  // 行番号カウンタ
+  int lineNum = 1;
+  // 動作インスタンスのリスト
+  vector<Motion*> motionList;
 
-//   // ファイルを開き、開けなければ空のリストを返す
-//   ifstream file(commandFilePath);
-//   if(!file) {
-//     cout << "コマンドファイルを開けませんでした: " << commandFilePath << endl;
-//     return motionList;
-//   }
+  // ファイルを開き、開けなければ空のリストを返す
+  ifstream file(commandFilePath);
+  if(!file) {
+    cout << "コマンドファイルを開けませんでした: " << commandFilePath << endl;
+    return motionList;
+  }
 
-//   // 各行を格納する変数と、区切り文字としてカンマを定義
-//   string line;
-// //   constexpr char separator = ',';
+  // 各行を格納する変数を定義
+  string line;
 
-//   // fileから1行ずつ文字列として line に読み込む
-//   while(getline(file, line)) {
-//     // 文字列 line をストリームに変換
-//     stringstream ss(line);
+  // fileから1行ずつ文字列として line に読み込む
+  while(getline(file, line)) {
+    // 文字列 line をストリームに変換
+    stringstream ss(line);
 
-//     // カンマ区切りでコマンド名とその引数を1つずつ取り出して params に追加
-//     vector<string> params;
-//     for(string token; getline(ss, token, SEPARATOR);) {
-//       params.push_back(move(token));
-//     }
+    // カンマ区切りでコマンド名とその引数を1つずつ取り出して params に追加
+    vector<string> params;
+    for(string token; getline(ss, token, SEPARATOR);) {
+      params.push_back(move(token));
+    }
 
-//     // コマンド名(paramsの0番目)を対応する動作コマンドに変換
-//     COMMAND command = convertCommand(params[0]);
+    // コマンド名(paramsの0番目)を対応する動作コマンドに変換
+    COMMAND command = convertCommand(params[0]);
 
-//     // コマンドに応じて対応する動作オブジェクトを生成し、動作リスト（motionList）に追加する処理
-//     switch(command) {
-//       // AR: 角度指定回頭
-//       // [1]:int 角度[deg], [2]:double 速度[mm/s], [3]:string 方向(clockwise or anticlockwise)
-//       case COMMAND::AR: {
-//         auto ar = new AngleRotation(robot, stoi(params[1]), stod(params[2]),
-//                                     convertBool(params[0], params[3]));
-//         motionList.push_back(ar);
-//         break;
-//       }
+    // コマンドに応じて対応する動作オブジェクトを生成し、動作リスト（motionList）に追加する処理
+    switch(command) {
+      // AR: 角度指定回頭
+      // [1]:int 角度[deg], [2]:double 速度[mm/s], [3]:string 方向(clockwise or anticlockwise)
+      case COMMAND::AR: {
+        auto ar = new AngleRotation(robot, stoi(params[1]), stod(params[2]),
+                                    convertBool(params[0], params[3]));
+        motionList.push_back(ar);
+        break;
+      }
 
-//       // 未定義コマンド
-//       default: {
-//         cout << commandFilePath << ":" << lineNum << " Command " << params[0] << " は未定義です"
-//              << endl;
-//         break;
-//       }
-//     }
+      // 未定義コマンド
+      default: {
+        cout << commandFilePath << ":" << lineNum << " Command " << params[0] << " は未定義です"
+             << endl;
+        break;
+      }
+    }
 
-//     lineNum++;  // 行番号をインクリメントする
-//   }
+    lineNum++;  // 行番号をインクリメントする
+  }
 
-//   return motionList;
-// }
+  return motionList;
+}
 
 // COMMAND MotionParser::convertCommand(const string& str)
 // {

@@ -30,13 +30,6 @@ class AreaMaster {
    */
   void run();
 
-  /**
-   * @brief エリア名を返す
-   * @param area エリアの指定(Enum型のArea)
-   * @return エリア名
-   */
-  // static std::string getAreaName(Area area);
-
  private:
   Robot& robot;          // Robotインスタンスの参照
   Area area;             // エリアの指定(Enum型のArea)
@@ -53,13 +46,7 @@ class AreaMaster {
    * @param motionList 実行する動作リスト
    */
   void executeMotions(std::vector<BaseMotion*>& motionList);
-
-//   /**
-//    * @brief 条件分岐用ファイルパスを生成
-//    * @param suffix ファイル名に付加するサフィックス（_Common, _FigJudgeSuccess, _FigJudgeFailure）
-//    * @return 生成されたファイルパス
-//    */
-//   std::string getConditionalFilePath(const std::string& suffix);
+  
 };
 
 #endif

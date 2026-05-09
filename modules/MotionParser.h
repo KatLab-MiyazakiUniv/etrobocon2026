@@ -7,7 +7,7 @@
 #ifndef MOTION_PARSER_H
 #define MOTION_PARSER_H
 
-constexpr char SEPARATOR = ',';
+constexpr char SEPARATOR = ',';  //csvファイル内の区切り文字として、カンマを定義
 
 #include <vector>
 #include <string>
@@ -32,7 +32,7 @@ static void createRunCSV(Robot& robot, Area area, bool isLeftCourse);
 
 
 //型チェック関数(publicに置く。キャリブレーション中にrun[].csvファイルを作成した後に、使う。)
-
+// static bool checkType(std::string& commandFilePath);
 
 //csvファイル内の　「#」以降はコメントとして扱う
 
@@ -41,34 +41,19 @@ static void createRunCSV(Robot& robot, Area area, bool isLeftCourse);
 //抽出したコマンド名に対応するdatafiles/commands/Motions内にある[コマンド名].csvファイルを読み込む
 //[コマンド名].csvファイルのなかから対応するIDの行を読み込む
 //読み込んだ行のパラメータをparams[2]以降に格納する。(ID,コマンドは飛ばす or params[0], params[1]に再格納)(カンマ区切り)
-
-// コマンド名(paramsの0番目)を対応する動作コマンドに変換
-// コマンドに応じて対応する動作オブジェクトを生成し、動作リスト（motionList）に追加する処理
-// or
 //キャリブレーション段階で、run + [Area名 + Left or Right].csvを作成。(command/Runに作成)
 
-//　AreaからMotionにIDを見に行くのが時間がかかりそうだから、キャリブレーション段階でその動作を終わらせたい。
-
-// キャリブレーション段階で、エリアごとにMotionListを作成する(AreaMasterが引数でmotionListを受け取れるようにする。)
-// 走行体はエリアごとに異なるMotionListを読み込む
-// エリアが終われば、メモリを開放する。
-//この方法だとメモリが足りなくなるかも。
 
 //キャリブレーション段階で、run + [Area名 + Left or Right].csvを作成。
-//あとは去年のcreateMotionsをそのまま使う。
-//走行が終わったら、作成した run + [Area名 + Left or Right].csvを削除する。
-//この方法のだとメモリの心配はない。
-
+//あとは去年のcreateMotionsをそのままAreaMasterで使う。
   /**
    * @brief ファイルを解析して動作インスタンスのリストを生成する
    * @param robot ロボット本体の参照
    * @param commandFilePath ファイルパス
-   * @param targetBrightness 目標輝度
    * @return 動作インスタンスリスト
    */
 
-  // static std::vector<Motion*> createMotions(Robot& robot, std::string& commandFilePath,
-  //                                           int targetBrightness);
+  static std::vector<Motion*> createMotionList(Robot& robot, std::string& commandFilePath);
 
  private:
   MotionParser();  // インスタンス化を禁止する

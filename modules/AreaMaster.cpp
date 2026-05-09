@@ -27,16 +27,11 @@ void AreaMaster::run()
                            + (isLeftCourse ? "Left" : "Right") + ".csv";
 
   // 動作インスタンスのリストを生成する
-  // motionList = MotionParser::createMotions(robot, commandFilePath);
+  motionList = MotionParser::createMotionList(robot, commandFilePath);
 
   // 各動作を実行し、動作し終えたらメモリを開放する
   executeMotions(motionList);
 }
-
-
-// std::string AreaMaster::getAreaName(Area area) {
-//     return areaCommandNames[static_cast<int>(area)];
-// }
 
 
 

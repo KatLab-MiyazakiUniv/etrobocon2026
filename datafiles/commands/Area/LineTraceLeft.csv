@@ -1,7 +1,11 @@
-DCL,A
-DCL,B
+DCL,A #
 DS,2
+#eee
+DCL,B
 DS,1
-DCL,AB
 DS,田中
+DCL,AB
+
+#あいう
+
 DS,10

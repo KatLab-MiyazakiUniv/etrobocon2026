@@ -27,6 +27,17 @@ void MotionParser::createRunCSV(Robot& robot, Area area, bool isLeftCourse)
     cout << commandAreaFilePath << endl;
     cout << commandRunFilePath << endl;
 
+    // 文字列の先頭と末尾の空白を削除するラムダ式
+    auto trim = [](string& s) {
+        size_t start = s.find_first_not_of(" \t");
+        if (start == string::npos) {
+            s.clear();
+            return;
+        }
+        size_t end = s.find_last_not_of(" \t");
+        s = s.substr(start, end - start + 1);
+    };
+
     // 入力ファイルを読み取りモードで開く
     ifstream commandAreaFile(commandAreaFilePath);
     if (!commandAreaFile) {
@@ -41,9 +52,22 @@ void MotionParser::createRunCSV(Robot& robot, Area area, bool isLeftCourse)
         return;
     }
 
+
+    // 改行制御フラグ
+    bool firstWrite = true;
+
     string areaFileLine;
 
     while (getline(commandAreaFile, areaFileLine)) {
+
+        // コメント削除
+        size_t areaPos = areaFileLine.find('#');
+        if (areaPos != string::npos) {
+            areaFileLine = areaFileLine.substr(0, areaPos);
+        }
+
+        // trim（行全体）
+        trim(areaFileLine);
 
         // 空行スキップ
         if (areaFileLine.empty()) continue;
@@ -54,6 +78,7 @@ void MotionParser::createRunCSV(Robot& robot, Area area, bool isLeftCourse)
         string token;
 
         while (getline(ssArea, token, SEPARATOR)) {
+            trim(token);
             areaFileParams.push_back(token);
         }
 
@@ -80,6 +105,15 @@ void MotionParser::createRunCSV(Robot& robot, Area area, bool isLeftCourse)
 
         while (getline(commandMotionsFile, motionsFileLine)) {
 
+            // コメント削除
+            size_t motionsPos = motionsFileLine.find('#');
+            if (motionsPos != string::npos) {
+                motionsFileLine = motionsFileLine.substr(0, motionsPos);
+            }
+
+            // trim
+            trim(motionsFileLine);
+
             if (motionsFileLine.empty()) continue;
 
             // CSV分割
@@ -87,13 +121,23 @@ void MotionParser::createRunCSV(Robot& robot, Area area, bool isLeftCourse)
             vector<string> motionParams;
 
             while (getline(ssMotions, token, SEPARATOR)) {
+                trim(token);
                 motionParams.push_back(token);
             }
 
             cout << "比較: commandID vs motionID = [ " << commandID << " ] vs [ " << motionParams[1] << " ]" << endl;
             // ID一致チェック（2列目がID想定）
             if (motionParams.size() >= 2 && motionParams[1] == commandID) {
-                commandRunFile << motionsFileLine << "\n";
+
+                // 1行目以外は改行してから書き込む
+                if (!firstWrite) {
+                    commandRunFile << "\n";
+                }
+
+                commandRunFile << motionsFileLine;
+                firstWrite = false;
+
+                // commandRunFile << motionsFileLine << "\n";
                 break;
             }
         }

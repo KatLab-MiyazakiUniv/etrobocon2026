@@ -30,10 +30,6 @@ class MotionParser {
 // areaを引数で受け取り、areaごとのrun_[Area名 + Left or Right].csvを作成する関数
 static void createRunCSV(Robot& robot, Area area, bool isLeftCourse);
 
-// run_[Area名 + Left or Right].csvを削除する関数
-// areaを引数で受け取り、areaごとのrun_[Area名 + Left or Right].csvを削除する関数
-// static void deleteRunCSV(Robot& robot, Area area, bool isLeftCourse);
-
 
 //型チェック関数(publicに置く。キャリブレーション中にrun[].csvファイルを作成した後に、使う。)
 

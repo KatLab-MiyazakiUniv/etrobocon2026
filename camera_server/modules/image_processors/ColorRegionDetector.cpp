@@ -1,4 +1,4 @@
-/**
+/*
  * @file ColorRegionDetector.cpp
  * @brief 色領域検出用の画像処理クラス
  * @author okuyama0528 sadomiya

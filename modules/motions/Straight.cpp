@@ -1,3 +1,9 @@
+/**
+ * @file   Straight.h
+ * @brief  直進動作を実行するクラス
+ * @author migaku2645
+ */
+
 #include "Straight.h"
 
 Straight::Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,

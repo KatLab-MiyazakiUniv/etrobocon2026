@@ -1,3 +1,9 @@
+/**
+ * @file ClockUtil.cpp
+ * @brief クロック操作に用いる関数をまとめたユーティリティクラス
+ * @author migaku2645
+ */
+
 #include "ClockUtil.h"
 
 int ClockUtil::now()

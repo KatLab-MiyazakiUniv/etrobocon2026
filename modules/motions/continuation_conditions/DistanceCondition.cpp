@@ -1,3 +1,9 @@
+/**
+ * @file   DistanceCondition.cpp
+ * @brief  距離条件を判定するクラス
+ * @author migaku2645
+ */
+
 #include "DistanceCondition.h"
 
 DistanceCondition::DistanceCondition(Robot& _robot, double _targetDistance)

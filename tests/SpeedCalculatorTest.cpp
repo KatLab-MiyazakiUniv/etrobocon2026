@@ -1,14 +1,14 @@
 /**
  * @file SpeedCalculatorTest.cpp
  * @brief SpeedCalculatorクラスのテスト
- * @author miyahara046
+ * @author migaku2645
  */
 
 #include "SpeedCalculator.h"
 #include <gtest/gtest.h>
 #include "MockSocketClient.h"
 
-namespace etrobocon2025_test {
+namespace etrobocon2026_test {
 
   // 左右のモーターに少しでもPower値が入っているかのテスト
   TEST(SpeedCalculatorTest, CalculateMotorPower)
@@ -16,8 +16,8 @@ namespace etrobocon2025_test {
     MockSocketClient mockSocketClient;
     Robot robot(mockSocketClient);
     // Powerの初期化
-    robot.getMotorControllerInstance().setRightMotorPower(0.0);
-    robot.getMotorControllerInstance().setLeftMotorPower(0.0);
+    robot.getWheelMotorControllerInstance().setRightPower(0.0);
+    robot.getWheelMotorControllerInstance().setLeftPower(0.0);
     SpeedCalculator speedCalculator(robot, 300.0);
     double actualLeftPower = speedCalculator.calculateLeftMotorPower();
     double actualRightPower = speedCalculator.calculateRightMotorPower();
@@ -32,8 +32,8 @@ namespace etrobocon2025_test {
     MockSocketClient mockSocketClient;
     Robot robot(mockSocketClient);
     // Powerの初期化
-    robot.getMotorControllerInstance().setRightMotorPower(0.0);
-    robot.getMotorControllerInstance().setLeftMotorPower(0.0);
+    robot.getWheelMotorControllerInstance().setRightPower(0.0);
+    robot.getWheelMotorControllerInstance().setLeftPower(0.0);
     SpeedCalculator speedCalculator(robot, -300.0);
     double actualLeftPower = speedCalculator.calculateLeftMotorPower();
     double actualRightPower = speedCalculator.calculateRightMotorPower();
@@ -48,8 +48,8 @@ namespace etrobocon2025_test {
     MockSocketClient mockSocketClient;
     Robot robot(mockSocketClient);
     // Powerの初期化
-    robot.getMotorControllerInstance().setRightMotorPower(0.0);
-    robot.getMotorControllerInstance().setLeftMotorPower(0.0);
+    robot.getWheelMotorControllerInstance().setRightPower(0.0);
+    robot.getWheelMotorControllerInstance().setLeftPower(0.0);
     SpeedCalculator speedCalculator(robot, 0.0);
     double actualLeftPower = speedCalculator.calculateLeftMotorPower();
     double actualRightPower = speedCalculator.calculateRightMotorPower();
@@ -57,4 +57,4 @@ namespace etrobocon2025_test {
     EXPECT_EQ(expected, actualLeftPower);
     EXPECT_EQ(expected, actualRightPower);
   }
-}  // namespace etrobocon2025_test
+}  // namespace etrobocon2026_test

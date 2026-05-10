@@ -14,11 +14,6 @@
 #include <thread>
 #include <chrono>
 
-static constexpr int MIN_WIDTH = 320;    // 解像度の幅（最小値）[px]
-static constexpr int MIN_HEIGHT = 240;   // 解像度の高さ（最小値）[px]
-static constexpr int MAX_WIDTH = 1920;   // 解像度の幅（最大値）[px]
-static constexpr int MAX_HEIGHT = 1080;  // 解像度の高さ（最大値）[px]
-
 class CameraCapture {
  public:
   /**

@@ -22,7 +22,7 @@ CXXFLAGS += $(OPENCV_CFLAGS)
 LIBS := $(OPENCV_LIBS)
 
 # インクルードパス
-INCLUDES := $(shell find $(INCLUDEDIR) -type d -printf '-I%p ')
+INCLUDES := $(shell find $(INCLUDEDIR) -type d -printf '-I%p '-I../common)
 
 # --- ビルドルール ---
 

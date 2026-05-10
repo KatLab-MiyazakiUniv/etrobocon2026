@@ -1,6 +1,6 @@
 /**
  * @file   DistanceCondition.cpp
- * @brief  距離条件を判定するクラス
+ * @brief  直進動作の継続条件を判定するクラス
  * @author migaku2645
  */
 

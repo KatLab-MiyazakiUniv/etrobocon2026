@@ -8,6 +8,36 @@
 
 using namespace std;
 
+// stoi/stodの代替関数 (v850クロスコンパイラはlibstdc++が簡略版のため、std::stoi/std::stodが利用不可)
+template<typename T>
+bool tryParse(const std::string& s);
+
+// int型用の特化：strtolを利用して確実に判定（組み込みのistringstreamの不具合回避）
+template<>
+bool tryParse<int>(const std::string& s)
+{
+    const char* p = s.c_str();
+    char* end;
+    errno = 0; // stdlib.h などのインクルードが必要だが、下部に既にあると想定
+    long x = std::strtol(p, &end, 10);
+    if (p == end || *end != '\0') return false;
+    if (errno == ERANGE || x < INT_MIN || x > INT_MAX) return false;
+    return true;
+}
+
+// double型用の特化：strtodを利用して確実に判定
+template<>
+bool tryParse<double>(const std::string& s)
+{
+    const char* p = s.c_str();
+    char* end;
+    errno = 0;
+    std::strtod(p, &end);
+    if (p == end || *end != '\0') return false;
+    if (errno == ERANGE) return false;
+    return true;
+}
+
 const array<string, 2> MotionParser::areaCommandNames = { "LineTrace", "Area2" };
 
 void MotionParser::createRunCSV(Robot& robot, Area area, bool isLeftCourse)
@@ -144,13 +174,23 @@ void MotionParser::createRunCSV(Robot& robot, Area area, bool isLeftCourse)
     }
 
     cout << "実行用コマンドファイルの作成が完了しました" << endl;
+
+    commandRunFile.close(); // バッファを書き出してファイルを閉じる
+
+    checkType(commandRunFilePath);
 }
 
+/**
+ * @brief 指定したcsvファイルの各コマンド毎にパラメータの型が正しいかチェックする関数
+ * @param commandFilePath 読み込むcsvファイルのファイルパス
+ * @return すべてのコマンドの型が一致していればtrue、不一致があればfalse
+ */
 bool MotionParser::checkType(string& commandFilePath)
 {
+    // 1. 指定されたファイルパスのファイルを開く
     ifstream file(commandFilePath);
     if (!file) {
-        cerr << "実行用コマンドファイルを開けませんでした: " << commandFilePath << endl;
+        cerr << "実行用コマンドファイルを開けないため、型チェックは行いません: " << commandFilePath << endl;
         return false;
     }
 
@@ -169,19 +209,22 @@ bool MotionParser::checkType(string& commandFilePath)
         s = s.substr(start, end - start + 1);
     };
 
+    // 2. csvファイルを1行ずつ読み込む
     while (getline(file, line)) {
-        // コメント削除
+        // csvファイル内の「#」以降はコメントとして扱うため削除する
         size_t pos = line.find('#');
         if (pos != string::npos) {
             line = line.substr(0, pos);
         }
 
         trim(line);
+        // 空行はスキップ
         if (line.empty()) {
             lineNum++;
             continue;
         }
 
+        // 3. カンマ区切りでコマンド名とその引数を1つずつ取り出して params に追加
         stringstream ss(line);
         vector<string> params;
         string token;
@@ -196,66 +239,71 @@ bool MotionParser::checkType(string& commandFilePath)
         }
 
         string commandName = params[0];
-        // params[1] はIDなので型チェックでは考慮しない
+        // 4. params[1] はIDであるため、型チェックのときは考慮しない
 
-        try {
-            if (commandName == "AR") {
-                // AR: [2]:int 角度, [3]:double 速度, [4]:string 方向
-                if (params.size() < 5) {
-                    cerr << commandFilePath << ":" << lineNum << "行目 (" << commandName << "): 引数が足りません" << endl;
+        // 5. 各コマンドに対応する関数で定義している引数の型とパラメータの値が一致しているかチェックする
+        //
+        // =====================================================================
+        // 【新しいコマンドを追加するときのガイド】
+        //
+        //   下の if (commandName == ...) のブロックを追加してください。
+        //
+        //   ＜ARコマンドを例に＞　AR=去年の角度指定回頭(AngleRotation)
+        //   ARコマンドのcsvの書式は以下の通りです:
+        //     AR, <ID>, <角度(int)>, <速度(double)>, <方向(string)>
+        //   params[0]=コマンド名, params[1]=ID, params[2]以降が実際の引数です
+        //   ※ params[1] はIDのため型チェックでは考慮しない
+        //
+        //   必要な引数の数（ARなら5つ）を params.size() で事前にチェックし、
+        //   tryParse<T>() によって整数や小数が正しい形式か例外(throw)を使わずにチェックします。
+        // =====================================================================
+
+        if (commandName == "EXAMPLE") {
+            char lineBuf[32];
+            sprintf(lineBuf, "%d", lineNum);
+            
+            // EXAMPLE: テスト用コマンド (int パラメータ, double パラメータ, string パラメータ("left" or "right"))
+            if (params.size() < 5) {
+                cerr << commandFilePath << ":" << lineBuf << "行目 (" << commandName << "): 引数の数が足りません" << endl;
+                allValid = false;
+            } else {
+                if (!tryParse<int>(params[2])) {
+                    cerr << commandFilePath << ":" << lineBuf << "行目 (" << commandName << "): 引数の型が不正です (intであるべき場所に文字が含まれています)" << endl;
                     allValid = false;
-                } else {
-                    stoi(params[2]); // int
-                    stod(params[3]); // double
-                    if (params[4] != "clockwise" && params[4] != "anticlockwise") {
-                        cerr << commandFilePath << ":" << lineNum << "行目 (" << commandName << "): 'clockwise' か 'anticlockwise' を指定してください" << endl;
-                        allValid = false;
-                    }
+                }
+                if (!tryParse<double>(params[3])) {
+                    cerr << commandFilePath << ":" << lineBuf << "行目 (" << commandName << "): 引数の型が不正です (doubleであるべき場所に文字が含まれています)" << endl;
+                    allValid = false;
+                }
+                if (params[4] != "left" && params[4] != "right") {
+                    cerr << commandFilePath << ":" << lineBuf << "行目 (" << commandName << "): 'left' か 'right' を指定してください" << endl;
+                    allValid = false;
                 }
             }
-            // 他のコマンドのチェックは必要に応じてここへ追加する
-            // else if (commandName == "...") { ... }
-            
-        } catch (const invalid_argument& e) {
-            cerr << commandFilePath << ":" << lineNum << "行目 (" << commandName << "): 引数の型が不正です" << endl;
-            allValid = false;
-        } catch (const out_of_range& e) {
-            cerr << commandFilePath << ":" << lineNum << "行目 (" << commandName << "): 値が範囲外です" << endl;
-            allValid = false;
         }
+        // ↓ 新しいコマンドはここに追加していく
+        // else if (commandName == "コマンド名") { ... }
 
         lineNum++;
     }
 
+    // 6. 全ての行のチェックが完了したら、最終結果をサマリーとして出力して返す
+    if (allValid) {
+        cout << "型チェック完了: 「" << commandFilePath << "」に問題はありませんでした" << endl;
+    } else {
+        cout << "型チェック完了: 「" << commandFilePath << "」に問題が見つかりました。上記のエラーを確認してください" << endl;
+    }
     return allValid;
 }
 
 
-// void MotionParser::deleteRunCSV(Robot& robot, Area area, bool isLeftCourse)
-// {
-//     cout << "実行用コマンドファイルの削除を開始します" << endl;
 
-//     string runPath = "../etrobocon2026/datafiles/commands/Run/";
-
-//     string areaName = areaCommandNames[static_cast<int>(area)];
-//     string course = isLeftCourse ? "Left" : "Right";
-//     string commandRunFilePath = runPath + "run_" + areaName + course + ".csv";
-
-//     if(remove(commandRunFilePath.c_str()) == 0) {
-//         cout << "ファイルを削除しました: " << commandRunFilePath << endl;
-//     } else {
-//         cerr << "ファイルの削除に失敗しました: " << commandRunFilePath << endl;
-//     }
-// }
-
-
-
-vector<Motion*> MotionParser::createMotionList(Robot& robot, string& commandFilePath)
+vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& commandFilePath)
 {
   // 行番号カウンタ
   int lineNum = 1;
   // 動作インスタンスのリスト
-  vector<Motion*> motionList;
+  vector<BaseMotion*> motionList;
 
   // ファイルを開き、開けなければ空のリストを返す
   ifstream file(commandFilePath);
@@ -268,6 +316,7 @@ vector<Motion*> MotionParser::createMotionList(Robot& robot, string& commandFile
   string line;
 
   // fileから1行ずつ文字列として line に読み込む
+  // TODO: 各動作クラスが完成したら、以下のコメントを外してswitch-caseを実装する
   while(getline(file, line)) {
     // 文字列 line をストリームに変換
     stringstream ss(line);
@@ -278,27 +327,24 @@ vector<Motion*> MotionParser::createMotionList(Robot& robot, string& commandFile
       params.push_back(move(token));
     }
 
-    // コマンド名(paramsの0番目)を対応する動作コマンドに変換
-    COMMAND command = convertCommand(params[0]);
-
-    // コマンドに応じて対応する動作オブジェクトを生成し、動作リスト（motionList）に追加する処理
-    switch(command) {
-      // AR: 角度指定回頭
-      // [1]:int 角度[deg], [2]:double 速度[mm/s], [3]:string 方向(clockwise or anticlockwise)
-      case COMMAND::AR: {
-        auto ar = new AngleRotation(robot, stoi(params[1]), stod(params[2]),
-                                    convertBool(params[0], params[3]));
-        motionList.push_back(ar);
-        break;
-      }
-
-      // 未定義コマンド
-      default: {
-        cout << commandFilePath << ":" << lineNum << " Command " << params[0] << " は未定義です"
-             << endl;
-        break;
-      }
-    }
+    // TODO: コマンド名をCOMMAND enumに変換して各Motionオブジェクトを生成する処理
+    //       各コマンドに対応するMotionクラスが実装済みになったら順次追加していく
+    // COMMAND command = convertCommand(params[0]);
+    // switch(command) {
+    //   case COMMAND::AR: {
+    //     // AR: 角度指定回頭
+    //     // params[1]:int 角度[deg], params[2]:double 速度[mm/s], params[3]:string 方向
+    //     auto ar = new AngleRotation(robot, std::stoi(params[1]), std::stod(params[2]),
+    //                                 convertBool(params[0], params[3]));
+    //     motionList.push_back(ar);
+    //     break;
+    //   }
+    //   // ↓ 他のコマンドはここに追加していく
+    //   default: {
+    //     cout << commandFilePath << ":" << lineNum << " Command " << params[0] << " は未定義です" << endl;
+    //     break;
+    //   }
+    // }
 
     lineNum++;  // 行番号をインクリメントする
   }
@@ -306,45 +352,21 @@ vector<Motion*> MotionParser::createMotionList(Robot& robot, string& commandFile
   return motionList;
 }
 
-// COMMAND MotionParser::convertCommand(const string& str)
-// {
-//   // コマンド文字列(string)と、それに対応する列挙型COMMANDのマッピングを定義
-//   static const unordered_map<string, COMMAND> commandMap = {
-//     { "AR", COMMAND::AR },         // 角度指定回頭
-//     { "IMUR", COMMAND::IMUR },     // IMU角度指定回頭
-//     { "IMUMR", COMMAND::IMUMR },   // IMU絶対角度を最小の角度で回頭動作
-//     { "DS", COMMAND::DS },         // 指定距離直進
-//     { "IDS", COMMAND::IDS },       // IMU角度補正直進
-//     { "CS", COMMAND::CS },         // 指定色直進
-//     { "DL", COMMAND::DL },         // 指定距離ライントレース
-//     { "DCL", COMMAND::DCL },       // 指定距離カメラライントレース
-//     { "CDCL", COMMAND::CDCL },     // 色距離指定カメラライントレース
-//     { "UDCL", COMMAND::UDCL },     // 超音波距離指定カメラライントレース
-//     { "CL", COMMAND::CL },         // 指定色ライントレース
-//     { "CDL", COMMAND::CDL },       // 色距離指定ライントレース
-//     { "EC", COMMAND::EC },         // エッジ切り替え
-//     { "SL", COMMAND::SL },         // スリープ
-//     { "SS", COMMAND::SS },         // カメラ撮影動作
-//     { "MCA", COMMAND::MCA },       // ミニフィグのカメラ撮影動作
-//     { "BCA", COMMAND::BCA },       // 風景・プラレールのカメラ撮影動作
-//     { "CRA", COMMAND::CRA },       // カメラ復帰動作
-//     { "BTCA", COMMAND::BTCA },     // ボトル2つ目のキャッチ動作
-//     { "BLA", COMMAND::BLA },       // ボトルランディング動作
-//     { "STOP", COMMAND::STOP },     // 走行体を停止させる動作
-//     { "PCIDS", COMMAND::PCIDS },   // 画像ラインを用いた距離直進
-//     { "IS", COMMAND::IS },         // IMU設定
-//     { "DTCCL", COMMAND::DTCCL },   // 2色指定距離カメラライントレース
-//     { "CDTCCL", COMMAND::CDTCCL }  // 2色色指定距離カメラライントレース
-//   };
+COMMAND MotionParser::convertCommand(const string& str)
+{
+  // コマンド文字列(string)と、それに対応する列挙型COMMANDのマッピングを定義
+  static const unordered_map<string, COMMAND> commandMap = {
+    { "EXAMPLE", COMMAND::EXAMPLE },         // 例
+  };
 
-//   // コマンド文字列に対応するCOMMAND値をマップから取得。なければCOMMAND::NONEを返す
-//   auto it = commandMap.find(str);
-//   if(it != commandMap.end()) {
-//     return it->second;
-//   } else {
-//     return COMMAND::NONE;
-//   }
-// }
+  // コマンド文字列に対応するCOMMAND値をマップから取得。なければCOMMAND::NONEを返す
+  auto it = commandMap.find(str);
+  if(it != commandMap.end()) {
+    return it->second;
+  } else {
+    return COMMAND::NONE;
+  }
+}
 
 // bool MotionParser::convertBool(const string& command, const string& stringParameter)
 // {
@@ -421,3 +443,74 @@ vector<Motion*> MotionParser::createMotionList(Robot& robot, string& commandFile
 //     return false;  // デフォルトは相対角度回頭
 //   }
 // }
+
+
+
+
+int MotionParser::stoi(const std::string& str, std::size_t* idx, int base) {
+  const char* p = str.c_str();
+  char* end;
+  errno = 0;
+  long x = std::strtol(p, &end, base);
+  if (p == end) {
+    throw std::invalid_argument("stoi");
+  }
+  if (errno == ERANGE || x < INT_MIN || x > INT_MAX) {
+    throw std::out_of_range("stoi");
+  }
+  if (idx != nullptr) {
+    *idx = static_cast<std::size_t>(end - p);
+  }
+  return static_cast<int>(x);
+}
+
+int MotionParser::stoi(const std::wstring& str, std::size_t* idx, int base) {
+  const wchar_t* p = str.c_str();
+  wchar_t* end;
+  errno = 0;
+  long x = std::wcstol(p, &end, base);
+  if (p == end) {
+    throw std::invalid_argument("stoi");
+  }
+  if (errno == ERANGE || x < INT_MIN || x > INT_MAX) {
+    throw std::out_of_range("stoi");
+  }
+  if (idx != nullptr) {
+    *idx = static_cast<std::size_t>(end - p);
+  }
+  return static_cast<int>(x);
+}
+
+double MotionParser::stod(const std::string& str, std::size_t* idx) {
+  const char* p = str.c_str();
+  char* end;
+  errno = 0;
+  double x = std::strtod(p, &end);
+  if (p == end) {
+    throw std::invalid_argument("stod");
+  }
+  if (errno == ERANGE) {
+    throw std::out_of_range("stod");
+  }
+  if (idx != nullptr) {
+    *idx = static_cast<std::size_t>(end - p);
+  }
+  return x;
+}
+
+double MotionParser::stod(const std::wstring& str, std::size_t* idx) {
+  const wchar_t* p = str.c_str();
+  wchar_t* end;
+  errno = 0;
+  double x = std::wcstod(p, &end);
+  if (p == end) {
+    throw std::invalid_argument("stod");
+  }
+  if (errno == ERANGE) {
+    throw std::out_of_range("stod");
+  }
+  if (idx != nullptr) {
+    *idx = static_cast<std::size_t>(end - p);
+  }
+  return x;
+}

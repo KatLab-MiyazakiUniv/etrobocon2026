@@ -1,0 +1,26 @@
+# EXAMPLE.csv
+# 書式: EXAMPLE, <ID>, <int型パラメータ>, <double型パラメータ>, <string型パラメータ("left" or "right")>
+# ※ #以降はコメントとして扱われる
+
+# ===== 正常なコマンド（型チェックが通るはずのもの） =====
+EXAMPLE, 001, 100, 1.5, left
+EXAMPLE, 002, 200, 2.75, right
+EXAMPLE, 003, -50, 0.0, left
+
+# ===== エラー確認用コマンド =====
+
+# [エラー確認1] invalid_argument: int型に変換できない文字列が含まれる場合
+# → "abc" は stoi() で変換不能なため、invalid_argument が発生する
+EXAMPLE, 101, abc, 1.5, left
+
+# [エラー確認2] invalid_argument: double型に変換できない文字列が含まれる場合
+# → "xyz" は stod() で変換不能なため、invalid_argument が発生する
+EXAMPLE, 102, 100, xyz, left
+
+# [エラー確認3] string型の選択肢違反: "left" でも "right" でもない値が指定されている場合
+# → "center" は許可されていないため、エラーメッセージが出力される
+EXAMPLE, 103, 100, 1.5, center
+
+# [エラー確認4] out_of_range: 引数の数が足りない場合
+# → params.at(4) が存在しないため、out_of_range が発生する
+EXAMPLE, 104, 100, 1.5

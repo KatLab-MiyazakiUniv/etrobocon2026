@@ -1,7 +1,7 @@
-DCL,A,50
-DS,2,789
-DCL,B,100
-DS,1,456
-DS,田中,3
-DCL,AB,2000
-DS,10,509
+EXAMPLE, 001, 100, 1.5, left
+EXAMPLE, 002, 200, 2.75, right
+EXAMPLE, 003, -50, 0.0, left
+EXAMPLE, 101, abc, 1.5, left
+EXAMPLE, 102, 100, xyz, left
+EXAMPLE, 103, 100, 1.5, center
+EXAMPLE, 104, 100, 1.5

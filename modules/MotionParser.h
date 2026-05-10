@@ -15,10 +15,17 @@ constexpr char SEPARATOR = ',';  //csvファイル内の区切り文字として
 #include <fstream>
 #include <sstream>
 #include <memory>
+#include <unordered_map>
+#include <cstdio>
+#include <cstdlib>
+#include <cerrno>
+#include <climits>
+#include <stdexcept>
 #include "BaseMotion.h"
 #include "Area.h"
 
 enum class COMMAND {
+  EXAMPLE,
   NONE
 };
 
@@ -31,8 +38,13 @@ class MotionParser {
 static void createRunCSV(Robot& robot, Area area, bool isLeftCourse);
 
 
-//型チェック関数(publicに置く。キャリブレーション中にrun[].csvファイルを作成した後に、使う。)
-// static bool checkType(std::string& commandFilePath);
+  /**
+   * @brief 指定したcsvファイルを読み込み、各コマンドのパラメータ値が関数の引数の型と一致しているか確認する関数
+   *        (キャリブレーション中にrun[].csvファイルを作成した後に使用する)
+   * @param commandFilePath 対象のcsvファイルパス
+   * @return すべて一致していればtrue、不一致があればfalse
+   */
+  static bool checkType(std::string& commandFilePath);
 
 //csvファイル内の　「#」以降はコメントとして扱う
 
@@ -53,7 +65,7 @@ static void createRunCSV(Robot& robot, Area area, bool isLeftCourse);
    * @return 動作インスタンスリスト
    */
 
-  static std::vector<Motion*> createMotionList(Robot& robot, std::string& commandFilePath);
+  static std::vector<BaseMotion*> createMotionList(Robot& robot, std::string& commandFilePath);
 
  private:
   MotionParser();  // インスタンス化を禁止する
@@ -65,7 +77,7 @@ static void createRunCSV(Robot& robot, Area area, bool isLeftCourse);
    * @param str 文字列のコマンド
    * @return コマンド
    */
-  // static COMMAND convertCommand(const std::string& str);
+  static COMMAND convertCommand(const std::string& str);
 
   // /**
   //  * @brief 文字列をbool型に変換する
@@ -81,6 +93,13 @@ static void createRunCSV(Robot& robot, Area area, bool isLeftCourse);
   //  * @return false: 相対角度回頭, true: 絶対角度回頭
   //  */
   // static bool convertRotationModeToBool(const std::string& stringParameter);
+
+
+  static int stoi(const std::string& str, std::size_t* idx = nullptr, int base = 10);
+  static int stoi(const std::wstring& str, std::size_t* idx = nullptr, int base = 10);
+
+  static double stod(const std::string& str, std::size_t* idx = nullptr);
+  static double stod(const std::wstring& str, std::size_t* idx = nullptr);
 };
 
 #endif

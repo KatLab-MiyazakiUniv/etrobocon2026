@@ -1,6 +1,6 @@
 /**
  * @file MileageTest.cpp
- * @brief 走行距離の測定用クラスのテスト
+ * @brief Mileageクラスをテストする
  * @author migaku2645
  */
 

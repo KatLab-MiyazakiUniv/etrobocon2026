@@ -1,6 +1,6 @@
 /**
  * @file DistanceConditionTest.cpp
- * @brief 直進動作の継続条件のテスト
+ * @brief DistanceConditionクラスをテストする
  * @author migaku2645
  */
 

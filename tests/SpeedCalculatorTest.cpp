@@ -1,6 +1,6 @@
 /**
  * @file SpeedCalculatorTest.cpp
- * @brief SpeedCalculatorクラスのテスト
+ * @brief SpeedCalculatorクラスをテストする
  * @author migaku2645
  */
 

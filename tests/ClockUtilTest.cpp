@@ -1,6 +1,6 @@
 /**
  * @file ClockUtilTest.cpp
- * @brief 時刻取得用クラスのテスト
+ * @brief ClockUtilクラスをテストする
  * @author migaku2645
  */
 

@@ -1,11 +1,11 @@
 /**
- * @file StraitTest.cpp
- * @brief 直進制御用クラスのテスト
+ * @file StraightTest.cpp
+ * @brief Straightクラスをテストする
  * @author migaku2645
  */
 
 #include <gtest/gtest.h>
-#include "Strait.h"
+#include "Straight.h"
 
 namespace etrobocon2026_test {
   // StraightクラスのexecuteStep()のテスト
@@ -61,4 +61,5 @@ namespace etrobocon2026_test {
     EXPECT_NEAR(mockRobot.leftPowerSet, 100.0, 10.0);   // 許容誤差10.0
   }
   {
-  }  // namespace etrobocon2026_test
+  }
+}  // namespace etrobocon2026_test

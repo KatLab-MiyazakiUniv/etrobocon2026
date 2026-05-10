@@ -8,7 +8,6 @@
 #define BOUNDING_BOX_DETECTOR_H
 
 #include "ImageRecoginationResult.h"
-
 #include <string>
 #include <opencv2/opencv.hpp>
 

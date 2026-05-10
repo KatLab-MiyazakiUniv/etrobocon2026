@@ -36,7 +36,7 @@ enable_testing()
 include(GoogleTest)
 
 ## 走行システム ##
-
+find_package(OpenCV REQUIRED)
 # 必要なインクルードディレクトリの設定 (適宜登録)
 set(RUNNING_INCLUDE_DIRS
   ${RUNNING_MODULE_DIR}
@@ -44,6 +44,7 @@ set(RUNNING_INCLUDE_DIRS
   ${RUNNING_MODULE_DIR}/API
   ${RUNNING_MODULE_DIR}/motions
   ${RUNNING_MODULE_DIR}/motions/continuation_conditions
+  ${RUNNING_MODULE_DIR}/motions/Client
   ${PROJECT_SOURCE_DIR}/common
   ${RUNNING_TEST_DIR}
   ${RUNNING_TEST_DIR}/dummy
@@ -57,7 +58,9 @@ file(GLOB_RECURSE RUNNING_SOURCES
 
 # ライブラリターゲットを作成
 add_library(running_impl STATIC ${RUNNING_SOURCES})
-target_include_directories(running_impl PUBLIC ${RUNNING_INCLUDE_DIRS})
+target_include_directories(running_impl PUBLIC 
+${RUNNING_INCLUDE_DIRS}
+${OpenCV_INCLUDE_DIRS})
 
 # tests ディレクトリ内の *Test.cpp をすべてテストソースとして登録
 file(GLOB RUNNING_TEST_SOURCES
@@ -98,7 +101,9 @@ if(ENABLE_CAMERA_TESTS)
   # ライブラリターゲットを作成
   add_library(camera_server_impl STATIC ${CAMERA_SOURCES})
   target_include_directories(camera_server_impl PUBLIC ${CAMERA_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
-  target_link_libraries(camera_server_impl ${OpenCV_LIBS})
+  target_link_libraries(
+    camera_server_impl ${OpenCV_LIBS}
+    running_impl ${OpenCV_LIBS})
 
   # camera_server/tests ディレクトリ内の *Test.cpp をすべてテストソースとして登録
   file(GLOB CAMERA_TEST_SOURCES

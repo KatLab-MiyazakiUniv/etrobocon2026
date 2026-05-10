@@ -8,7 +8,7 @@
 #include <gtest/gtest.h>
 #include "Mileage.h"
 
-namespace etrobocon2025_test {
+namespace etrobocon2026_test {
   TEST(MileageTest, CalculateMileagePlus)
   {
     int32_t rightAngle = 30;
@@ -57,4 +57,4 @@ namespace etrobocon2025_test {
     double actual = Mileage::calculateMileage(rightAngle, leftAngle);
     EXPECT_DOUBLE_EQ(expected, actual);
   }
-}  // namespace etrobocon2025_test
+}  // namespace etrobocon2026_test

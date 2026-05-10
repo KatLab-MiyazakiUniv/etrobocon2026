@@ -1,13 +1,13 @@
 /**
  * @file   BoundingBoxDetector.h
  * @brief  バウンディングボックス検出処理の親クラス
- * @author takuchi17 miyahara046 HaruArima08
+ * @author okuyama0528 sadomiya
  */
 
 #ifndef BOUNDING_BOX_DETECTOR_H
 #define BOUNDING_BOX_DETECTOR_H
 
-#include "ImageRecognitionResults.h"
+#include "ImageRecoginationResult.h"
 
 #include <string>
 #include <opencv2/opencv.hpp>

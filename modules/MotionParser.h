@@ -10,6 +10,7 @@
 constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字として、カンマを定義
 
 #include <vector>
+#include <array>
 #include <string>
 #include <iostream>
 #include <fstream>

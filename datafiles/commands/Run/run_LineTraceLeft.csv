@@ -5,3 +5,5 @@ EXAMPLE, 101, abc, 1.5, left
 EXAMPLE, 102, 100, xyz, left
 EXAMPLE, 103, 100, 1.5, center
 EXAMPLE, 104, 100, 1.5
+DS,田中,3
+DCL,A,50

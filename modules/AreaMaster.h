@@ -11,7 +11,6 @@
 #include <array>
 #include "Area.h"
 #include "MotionParser.h"
-//Robot.hとBaseMotion.hはAreaMaster.hでincludeしないとエラーが出た。
 #include "Robot.h"     
 #include "BaseMotion.h"
 
@@ -46,7 +45,7 @@ class AreaMaster {
    * @param motionList 実行する動作リスト
    */
   void executeMotions(std::vector<BaseMotion*>& motionList);
-  
+
 };
 
 #endif

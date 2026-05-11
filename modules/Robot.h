@@ -35,12 +35,12 @@ class Robot {
    * @brief IMUControllerのインスタンスの参照を返す
    * @return メンバ変数 imuController(IMUController のインスタンス) の参照
    */
-  // IMUController& getIMUControllerInstance();
+  IMUController& getIMUControllerInstance();
 
  private:
   WheelMotorController wheelMotorController;  // WheelMotorController インスタンス
   ArmMotorController armMotorController;      // ArmMotorController インスタンス
-  // IMUController imuController;                // IMUController インスタンス
+  IMUController imuController;                // IMUController インスタンス
 };
 
 #endif

@@ -18,7 +18,7 @@ ArmMotorController& Robot::getArmMotorControllerInstance()
   return armMotorController;
 }
 
-// IMUController& Robot::getIMUControllerInstance()
-// {
-//   return imuController;
-// }
+IMUController& Robot::getIMUControllerInstance()
+{
+  return imuController;
+}

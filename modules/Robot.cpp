@@ -6,7 +6,7 @@
 
 #include "Robot.h"
 
-Robot::Robot() : wheelMotorController(), armMotorController() /*, imuController()*/ {}
+Robot::Robot() : wheelMotorController(), armMotorController(), imuController() {}
 
 WheelMotorController& Robot::getWheelMotorControllerInstance()
 {

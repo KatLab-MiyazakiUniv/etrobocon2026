@@ -43,9 +43,3 @@ void AreaMaster::executeMotions(vector<BaseMotion*>& motionList)
     motion = motionList.erase(motion);  // リストから削除
   }
 }
-
-// string AreaMaster::getConditionalFilePath(const string& suffix)
-// {
-//   return basePath + areaCommandNames[static_cast<int>(area)] + (isLeftCourse ? "Left" : "Right")
-//          + suffix + ".csv";
-// }

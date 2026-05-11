@@ -1,20 +1,21 @@
 /*
  * @file ColorRegionDetector.cpp
  * @brief 色領域検出用の画像処理クラス
- * @author okuyama0528 sadomiya
+ * @author okuyama0528 sadomiya-sousi
  */
 
 #include "ColorRegionDetector.h"
 
-// ROIと解像度を指定するコンストラクタ
-ColorRegionDetector::ColorRegionDetector(const std::vector<cv::Scalar>& _lowerHSV,
-                                         const std::vector<cv::Scalar>& _upperHSV,
-                                         const cv::Rect& _roi, const cv::Size& _resolution)
-  : lowerHSV(_lowerHSV), upperHSV(_upperHSV), roi(_roi), resolution(_resolution)
+// 構造体を受け取るコンストラクタ
+ColorRegionDetector::ColorRegionDetector(const ColorRegionDetectorConfig& config)
+  : lowerHSV(config.lowerHSV),
+    upperHSV(config.upperHSV),
+    roi(config.roi),
+    resolution(config.resolution)
 {
   validateParameters();
 }
-// 解像度が小さすぎたり大きすぎたりしたら修正する
+// 解像度が範囲外なら修正,ROIが画像外に出ないように補正と調節
 void ColorRegionDetector::validateParameters()
 {
   if(resolution.width < MIN_WIDTH) resolution.width = MIN_WIDTH;

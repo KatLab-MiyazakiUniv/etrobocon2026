@@ -1,13 +1,13 @@
 /**
  * @file   BoundingBoxDetector.h
- * @brief  バウンディングボックス検出処理の親クラス
- * @author okuyama0528 sadomiya
+ * @brief  BoundingBox検出処理の親クラス
+ * @author okuyama0528 sadomiya-sousi
  */
 
 #ifndef BOUNDING_BOX_DETECTOR_H
 #define BOUNDING_BOX_DETECTOR_H
 
-#include "ImageRecoginationResult.h"
+#include "ImageRecognitionResults.h"
 #include <string>
 #include <opencv2/opencv.hpp>
 
@@ -25,9 +25,6 @@ class BoundingBoxDetector {
    * @param result 結果を格納するBoundingBoxDetectionResult構造体の参照
    */
 
-  // 純粋仮想関数>子クラスが強制的に上書きしなければけないメンバー関数＞=0;
-  // 参照渡しにすること画像のデータ数MBをcopyせずに値を渡す
-  // cv::Mat>cvはopen cv libraly>Mat>行列
   virtual void detect(const cv::Mat& frame, BoundingBoxDetectionResult& result) = 0;
 };
 

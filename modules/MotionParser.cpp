@@ -86,6 +86,10 @@ void MotionParser::createRunCSV(Robot& robot, Area area, bool isLeftCourse)
     // 改行制御フラグ
     bool firstWrite = true;
 
+    // 1行目（カラム名）をスキップ
+    string headerLine;
+    getline(commandAreaFile, headerLine);
+
     string areaFileLine;
 
     while (getline(commandAreaFile, areaFileLine)) {
@@ -131,6 +135,10 @@ void MotionParser::createRunCSV(Robot& robot, Area area, bool isLeftCourse)
             continue;
         }
 
+        // 1行目（カラム名）をスキップ
+        string motionsHeaderLine;
+        getline(commandMotionsFile, motionsHeaderLine);
+
         string motionsFileLine;
 
         while (getline(commandMotionsFile, motionsFileLine)) {
@@ -152,6 +160,15 @@ void MotionParser::createRunCSV(Robot& robot, Area area, bool isLeftCourse)
 
             while (getline(ssMotions, token, SEPARATOR)) {
                 trim(token);
+                // ★ トークン内にまだ # が残っていれば除去（念のため）
+                // size_t hashPos = token.find('#');
+                // if (hashPos != string::npos) {
+                //     token = token.substr(0, hashPos);
+                //     trim(token);
+                // }
+                // if (!token.empty()) {  // ★ 空トークンを除外
+                //     motionParams.push_back(token);
+                // }
                 motionParams.push_back(token);
             }
 
@@ -185,20 +202,22 @@ void MotionParser::createRunCSV(Robot& robot, Area area, bool isLeftCourse)
  * @param commandFilePath 読み込むcsvファイルのファイルパス
  * @return すべてのコマンドの型が一致していればtrue、不一致があればfalse
  */
+
+
+
 bool MotionParser::checkType(string& commandFilePath)
 {
-    // 1. 指定されたファイルパスのファイルを開く
-    ifstream file(commandFilePath);
-    if (!file) {
-        cerr << "実行用コマンドファイルを開けないため、型チェックは行いません: " << commandFilePath << endl;
-        return false;
-    }
+    string areaPath = "../etrobocon2026/datafiles/commands/Area/";
+    string motionsPath = "../etrobocon2026/datafiles/commands/Motions/";
+    string runPath = "../etrobocon2026/datafiles/commands/Run/";
 
-    string line;
-    int lineNum = 1;
-    bool allValid = true;
+    // string areaName = areaCommandNames[static_cast<int>(area)];
+    // string course = isLeftCourse ? "Left" : "Right";
 
-    // 文字列の先頭と末尾の空白を削除するラムダ式
+    // string commandAreaFilePath = areaPath + areaName + course + ".csv";
+    // string commandRunFilePath = runPath + "run_" + areaName + course + ".csv";
+  
+  // 文字列の先頭と末尾の空白を削除するラムダ式
     auto trim = [](string& s) {
         size_t start = s.find_first_not_of(" \t");
         if (start == string::npos) {
@@ -209,92 +228,232 @@ bool MotionParser::checkType(string& commandFilePath)
         s = s.substr(start, end - start + 1);
     };
 
-    // 2. csvファイルを1行ずつ読み込む
-    while (getline(file, line)) {
-        // csvファイル内の「#」以降はコメントとして扱うため削除する
+  // 1. 指定されたファイルパスのファイルを開く
+    cout << "型チェックを開始します" << endl;
+    ifstream runFile(commandFilePath);
+    if (!runFile) {
+        cerr << "実行用コマンドファイルを開けません: " << commandFilePath << endl;
+        return false;
+    }
+
+    string line;
+    int lineNum = 1;
+    bool allValid = true;
+
+    while (getline(runFile, line)) {
+
+        // コメント除去
         size_t pos = line.find('#');
         if (pos != string::npos) {
             line = line.substr(0, pos);
         }
 
+        // trim
         trim(line);
-        // 空行はスキップ
+
         if (line.empty()) {
             lineNum++;
             continue;
         }
 
-        // 3. カンマ区切りでコマンド名とその引数を1つずつ取り出して params に追加
+        // --- runParams ---
         stringstream ss(line);
-        vector<string> params;
+        vector<string> runParams;
         string token;
+
         while (getline(ss, token, SEPARATOR)) {
             trim(token);
-            params.push_back(token);
+            runParams.push_back(token);
         }
 
-        if (params.empty()) {
+        if (runParams.empty()) {
             lineNum++;
             continue;
         }
 
-        string commandName = params[0];
-        // 4. params[1] はIDであるため、型チェックのときは考慮しない
+        string commandName = runParams[0];
 
-        // 5. 各コマンドに対応する関数で定義している引数の型とパラメータの値が一致しているかチェックする
-        //
-        // =====================================================================
-        // 【新しいコマンドを追加するときのガイド】
-        //
-        //   下の if (commandName == ...) のブロックを追加してください。
-        //
-        //   ＜ARコマンドを例に＞　AR=去年の角度指定回頭(AngleRotation)
-        //   ARコマンドのcsvの書式は以下の通りです:
-        //     AR, <ID>, <角度(int)>, <速度(double)>, <方向(string)>
-        //   params[0]=コマンド名, params[1]=ID, params[2]以降が実際の引数です
-        //   ※ params[1] はIDのため型チェックでは考慮しない
-        //
-        //   必要な引数の数（ARなら5つ）を params.size() で事前にチェックし、
-        //   tryParse<T>() によって整数や小数が正しい形式か例外(throw)を使わずにチェックします。
-        // =====================================================================
+        // --- Motions CSVを開く ---
+        string motionFilePath = motionsPath + commandName + ".csv";
+        ifstream motionFile(motionFilePath);
 
-        if (commandName == "EXAMPLE") {
-            char lineBuf[32];
-            sprintf(lineBuf, "%d", lineNum);
-            
-            // EXAMPLE: テスト用コマンド (int パラメータ, double パラメータ, string パラメータ("left" or "right"))
-            if (params.size() < 5) {
-                cerr << commandFilePath << ":" << lineBuf << "行目 (" << commandName << "): 引数の数が足りません" << endl;
-                allValid = false;
-            } else {
-                if (!tryParse<int>(params[2])) {
-                    cerr << commandFilePath << ":" << lineBuf << "行目 (" << commandName << "): 引数の型が不正です (intであるべき場所に文字が含まれています)" << endl;
-                    allValid = false;
-                }
-                if (!tryParse<double>(params[3])) {
-                    cerr << commandFilePath << ":" << lineBuf << "行目 (" << commandName << "): 引数の型が不正です (doubleであるべき場所に文字が含まれています)" << endl;
-                    allValid = false;
-                }
-                if (params[4] != "left" && params[4] != "right") {
-                    cerr << commandFilePath << ":" << lineBuf << "行目 (" << commandName << "): 'left' か 'right' を指定してください" << endl;
+        char lineBuf[32];
+        sprintf(lineBuf, "%d", lineNum);
+
+        if (!motionFile) {
+            cerr << lineBuf << "行目: 対応するMotionsファイルが存在しません: "
+                 << motionFilePath << endl;
+            allValid = false;
+            lineNum++;
+            continue;
+        }
+
+        // --- 1行目（定義）取得 ---
+        string headerLine;
+        if (!getline(motionFile, headerLine)) {
+            cerr << lineBuf << "行目: Motionsファイルが空です" << endl;
+            allValid = false;
+            lineNum++;
+            continue;
+        }
+
+        // --- checkParams ---
+        stringstream ss2(headerLine);
+        vector<string> checkParams;
+
+        while (getline(ss2, token, SEPARATOR)) {
+            checkParams.push_back(token);
+        }
+
+        // --- 引数数チェック ---
+        if (runParams.size() != checkParams.size()) {
+            cerr << lineBuf << "行目 (" << commandName
+                 << "): 引数の数が一致しません" << endl;
+            allValid = false;
+            lineNum++;
+            continue;
+        }
+
+
+        char paramBuf[32];
+
+        // --- 型チェック ---
+        for (size_t i = 2; i < checkParams.size(); i++) {
+
+            string type = checkParams[i];
+            string value = runParams[i];
+            sprintf(paramBuf, "%d", i - 1);
+            if (type == "int") {
+                if (!tryParse<int>(value)) {
+                    cerr << lineBuf << "行目 (" << commandName
+                         << "): 第" << paramBuf << "引数はint型である必要があります" << endl;
                     allValid = false;
                 }
             }
+            else if (type == "double") {
+                if (!tryParse<double>(value)) {
+                    cerr << lineBuf << "行目 (" << commandName
+                         << "): 第" << paramBuf << "引数はdouble型である必要があります" << endl;
+                    allValid = false;
+                }
+            }
+            else if (type == "string") {
+                // OK（必要なら制約追加）
+            }
+            else {
+                cerr << lineBuf << "行目 (" << commandName
+                     << "): 未対応の型 " << type << endl;
+                allValid = false;
+            }
         }
-        // ↓ 新しいコマンドはここに追加していく
-        // else if (commandName == "コマンド名") { ... }
 
         lineNum++;
     }
 
-    // 6. 全ての行のチェックが完了したら、最終結果をサマリーとして出力して返す
-    if (allValid) {
-        cout << "型チェック完了: 「" << commandFilePath << "」に問題はありませんでした" << endl;
-    } else {
-        cout << "型チェック完了: 「" << commandFilePath << "」に問題が見つかりました。上記のエラーを確認してください" << endl;
-    }
     return allValid;
 }
+
+
+
+
+
+
+
+
+// bool MotionParser::checkType(string& commandFilePath)
+// {
+//     // 1. 指定されたファイルパスのファイルを開く
+//     ifstream file(commandFilePath);
+//     if (!file) {
+//         cerr << "実行用コマンドファイルを開けないため、型チェックは行いません: " << commandFilePath << endl;
+//         return false;
+//     }
+
+//     string line;
+//     int lineNum = 1;
+//     bool allValid = true;
+
+//     // 文字列の先頭と末尾の空白を削除するラムダ式
+//     auto trim = [](string& s) {
+//         size_t start = s.find_first_not_of(" \t");
+//         if (start == string::npos) {
+//             s.clear();
+//             return;
+//         }
+//         size_t end = s.find_last_not_of(" \t");
+//         s = s.substr(start, end - start + 1);
+//     };
+
+//     // 2. csvファイルを1行ずつ読み込む
+//     while (getline(file, line)) {
+//         // csvファイル内の「#」以降はコメントとして扱うため削除する
+//         size_t pos = line.find('#');
+//         if (pos != string::npos) {
+//             line = line.substr(0, pos);
+//         }
+
+//         trim(line);
+//         // 空行はスキップ
+//         if (line.empty()) {
+//             lineNum++;
+//             continue;
+//         }
+
+//         // 3. カンマ区切りでコマンド名とその引数を1つずつ取り出して params に追加
+//         stringstream ss(line);
+//         vector<string> runParams;
+//         string token;
+//         while (getline(ss, token, SEPARATOR)) {
+//             trim(token);
+//             runParams.push_back(token);
+//         }
+
+//         if (runParams.empty()) {
+//             lineNum++;
+//             continue;
+//         }
+
+//         string commandName = runParams[0];
+
+
+
+//         if (commandName == "EXAMPLE") {
+//             char lineBuf[32];
+//             sprintf(lineBuf, "%d", lineNum);
+            
+//             // EXAMPLE: テスト用コマンド (int パラメータ, double パラメータ, string パラメータ("left" or "right"))
+//             if (params.size() < 5) {
+//                 cerr << commandFilePath << ":" << lineBuf << "行目 (" << commandName << "): 引数の数が足りません" << endl;
+//                 allValid = false;
+//             } else {
+//                 if (!tryParse<int>(params[2])) {
+//                     cerr << commandFilePath << ":" << lineBuf << "行目 (" << commandName << "): 引数の型が不正です (intであるべき場所に文字が含まれています)" << endl;
+//                     allValid = false;
+//                 }
+//                 if (!tryParse<double>(params[3])) {
+//                     cerr << commandFilePath << ":" << lineBuf << "行目 (" << commandName << "): 引数の型が不正です (doubleであるべき場所に文字が含まれています)" << endl;
+//                     allValid = false;
+//                 }
+//                 if (params[4] != "left" && params[4] != "right") {
+//                     cerr << commandFilePath << ":" << lineBuf << "行目 (" << commandName << "): 'left' か 'right' を指定してください" << endl;
+//                     allValid = false;
+//                 }
+//             }
+//         }
+//         // ↓ 新しいコマンドはここに追加していく
+//         // else if (commandName == "コマンド名") { ... }
+
+//         lineNum++;
+//     }
+
+//     // 6. 全ての行のチェックが完了したら、最終結果をサマリーとして出力して返す
+//     if (allValid) {
+//         cout << "型チェック完了: 「" << commandFilePath << "」に問題はありませんでした" << endl;
+//     } else {
+//         cout << "型チェック完了: 「" << commandFilePath << "」に問題が見つかりました。上記のエラーを確認してください" << endl;
+//     }
+//     return allValid;
+// }
 
 
 

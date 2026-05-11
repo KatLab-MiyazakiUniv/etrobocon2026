@@ -33,8 +33,6 @@ void AreaMaster::run()
   executeMotions(motionList);
 }
 
-
-
 void AreaMaster::executeMotions(vector<BaseMotion*>& motionList)
 {
   for(auto motion = motionList.begin(); motion != motionList.end();) {

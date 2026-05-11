@@ -4,7 +4,6 @@
  * @author nishijima515
  */
 
-
 // AreaMasterにAreaを定義するとMotionParserで使えなかった
 // AreaMasterとMotionParserで共有できるようにする
 #ifndef AREA_H

@@ -11,7 +11,7 @@
 #include <array>
 #include "Area.h"
 #include "MotionParser.h"
-#include "Robot.h"     
+#include "Robot.h"
 #include "BaseMotion.h"
 
 class AreaMaster {
@@ -30,9 +30,9 @@ class AreaMaster {
   void run();
 
  private:
-  Robot& robot;          // Robotインスタンスの参照
-  Area area;             // エリアの指定(Enum型のArea)
-  bool isLeftCourse;     // コースのLR判定(true:Lコース, false:Rコース)
+  Robot& robot;       // Robotインスタンスの参照
+  Area area;          // エリアの指定(Enum型のArea)
+  bool isLeftCourse;  // コースのLR判定(true:Lコース, false:Rコース)
 
   // 各エリアのコマンドファイルベースパス
   static const std::string basePath;
@@ -45,7 +45,6 @@ class AreaMaster {
    * @param motionList 実行する動作リスト
    */
   void executeMotions(std::vector<BaseMotion*>& motionList);
-
 };
 
 #endif

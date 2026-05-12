@@ -1,7 +1,5 @@
-#!/bin/bash
-# 使い方: etrobocon2026/ ルートから実行する
-#   ./scripts/merge_commands.sh <Area名> <L|R>
-#   例: ./scripts/merge_commands.sh LineTrace L
+# 使い方: etrobocon2026/ ルートから ./scripts/merge_commands.sh [<Area名> <L|R>]
+# 例: ./scripts/merge_commands.sh LineTrace L
 
 set -e
 

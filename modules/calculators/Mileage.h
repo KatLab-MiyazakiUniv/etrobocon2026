@@ -13,7 +13,7 @@
 class Mileage {
  public:
   /**
-  ** @brief タイヤの累計走行距離を計算する
+  ** @brief １つのタイヤの累計走行距離を計算する
   ** @param angle タイヤの回転角度[deg]
   ** @return タイヤの累計走行距離[mm]
   **/

@@ -1,7 +1,7 @@
 /**
  * @file SpeedCalculator.h
- * @brief 目標速度に対応するPWM値を算出するクラス
- * @author miyahara046 HaruArima08
+ * @brief 目標速度に対応するpower値を算出するクラス
+ * @author migaku2645
  */
 
 #ifndef SPEED_CALCULATOR_H
@@ -33,13 +33,13 @@ class SpeedCalculator {
   double calculateLeftMotorPower();
 
  private:
-  const double targetSpeed;  // 目標速度
+  const double targetSpeed;  // 目標速度(mm/秒)
   Pid rightPid;              // 目標速度に対する右車輪のPID制御を行うクラスのインスタンス
   Pid leftPid;               // 目標速度に対する左車輪のPID制御を行うクラスのインスタンス
   double rightMotorPower;    // 右車輪のPower値
   double leftMotorPower;     // 左車輪のPower値
-  double prevRightTime;      // 前回の右車輪の速度計算を行った時間
-  double prevLeftTime;       // 前回の左車輪の速度計算を行った時間
+  double prevRightTime;      // 前回の右車輪の速度計算を行った時間(秒)
+  double prevLeftTime;       // 前回の左車輪の速度計算を行った時間(秒)
   Robot& robot;              // Robotクラスのインスタンスの参照
   // PIDゲイン
   static constexpr double RIGHT_K_P = 0.00535;

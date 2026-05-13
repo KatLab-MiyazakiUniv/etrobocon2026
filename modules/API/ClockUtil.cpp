@@ -8,8 +8,8 @@
 
 int ClockUtil::now()
 {
-  // マイクロ秒をミリ秒になおしてreturn
-  return static_cast<int>(getClockInstance().now() / 1000);
+  // マイクロ秒を秒になおしてreturn
+  return static_cast<int>(getClockInstance().now() / 1000000);
 }
 
 void ClockUtil::sleep(int milliSec)

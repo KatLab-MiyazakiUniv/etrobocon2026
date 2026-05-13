@@ -22,7 +22,7 @@ class DistanceCondition : public BaseContinuationCondition {
   DistanceCondition(Robot& _robot, double _targetDistance);
 
   /**
-   * @brief 継続条件の事前準備を行う (デフォルトは何もしない)
+   * @brief ここは具体的に書く。
    */
   void prepare() override;
 

@@ -35,7 +35,6 @@ class DistanceCondition : public BaseContinuationCondition {
  private:
   double targetDistance;   // 目標距離
   double initDistance;     // 開始時の累計走行距離
-  double currentDistance;  // 開始時からの移動距離
 };
 
 #endif

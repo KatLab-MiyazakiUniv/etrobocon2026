@@ -3,8 +3,8 @@
  * @brief クロック操作に用いる関数をまとめたユーティリティクラス
  * @author migaku2645
  */
-#ifndef TIMER_H
-#define TIMER_H
+#ifndef CLOCK_UTIL_H
+#define CLOCK_UTIL_H
 
 #include "Clock.h"
 

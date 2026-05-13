@@ -18,7 +18,7 @@ class Straight : public BaseMotion {
    * @brief メンバ変数 Straight を初期化する
    * @param _robot Straight クラスのインスタンスの参照
    * @param _continuationCondition 動作を継続する条件を判定するクラスのインスタンス
-   * @param _targetSpeed 目標とするタイヤ走行速度[mm/s]
+   * @param _targetSpeed 目標とするタイヤ走行速度(mm/秒)
    */
 
   Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
@@ -35,7 +35,7 @@ class Straight : public BaseMotion {
   void wait() override;
 
  private:
-  double targetSpeed;  // 目標速度
+  double targetSpeed;  // 目標速度(mm/秒)
   SpeedCalculator
       speedCalculator;  // 目標速度に相当するモーターのPower値を算出するクラスのインスタンス;
 };

@@ -3,8 +3,8 @@
  * @brief クロック操作に用いる関数をまとめたユーティリティクラス
  * @author migaku2645
  */
-#ifndef TIMER_H
-#define TIMER_H
+#ifndef CLOCK_UTIL_H
+#define CLOCK_UTIL_H
 
 #include "Clock.h"
 
@@ -21,6 +21,12 @@ class ClockUtil {
    * @param milliSec スリープ時間(ミリ秒)
    */
   static void sleep(int milliSec = 10);
+
+  /**
+   * @brief 自タスクウェイト（デフォルトは10ミリ秒）
+   * @param milliSec ウェイト時間(ミリ秒)
+   */
+  static void wait(int milliSec = 10);
 
  private:
   ClockUtil();  // インスタンス化を禁止する

@@ -16,8 +16,7 @@ Straight::Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _co
 
 void Straight::executeStep()
 {
-  double currentRightPower = speedCalculator.calculateRightMotorPower();
-  double currentLeftPower = speedCalculator.calculateLeftMotorPower();
+requiredRightPower
 
   // モーターにPower値をセット
   robot.getWheelMotorControllerInstance().setRightPower(currentRightPower);

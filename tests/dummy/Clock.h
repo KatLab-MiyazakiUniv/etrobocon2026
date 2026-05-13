@@ -1,3 +1,9 @@
+/**
+ * @file Clock.h
+ * @brief spikeapi::Clock クラスのモッククラス
+ * @author migaku2645
+ */
+
 #ifndef MOCK_CLOCK_H
 #define MOCK_CLOCK_H
 

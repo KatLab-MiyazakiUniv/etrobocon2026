@@ -1,6 +1,6 @@
 /**
  * @file SpeedCalculator.h
- * @brief 目標速度に対応するPWM値を算出するクラス
+ * @brief 目標速度に対応するPower値を算出するクラス
  * @author miyahara046 HaruArima08
  */
 

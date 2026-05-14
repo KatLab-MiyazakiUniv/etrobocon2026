@@ -1,3 +1,4 @@
+コマンド名,ID,int,double,string
 EXAMPLE,ID,int,double,string
 # EXAMPLE.csv
 # 書式: EXAMPLE, <ID>, <int型パラメータ>, <double型パラメータ>, <string型パラメータ("left" or "right")>

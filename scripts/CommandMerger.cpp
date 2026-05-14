@@ -137,6 +137,7 @@ void createRunCSV(Area area, bool isLeftCourse, const std::string& label)
 
     std::string motionsHeaderLine;
     std::getline(commandMotionsFile, motionsHeaderLine);
+    std::getline(commandMotionsFile, motionsHeaderLine);
 
     bool found = false;
     std::string motionsFileLine;
@@ -240,6 +241,13 @@ bool checkType(const std::string& commandFilePath, const std::string& label)
       if(!std::getline(motionFile, motionHeaderLine)) {
         std::cerr << "[" << label << "] " << lineBuf
                   << "行目: Motionsファイルが空です: " << motionFilePath << std::endl;
+        allValid = false;
+        lineNum++;
+        continue;
+      }
+      if(!std::getline(motionFile, motionHeaderLine)) {
+        std::cerr << "[" << label << "] " << lineBuf
+                  << "行目: Motionsファイルの2行目(型)が存在しません: " << motionFilePath << std::endl;
         allValid = false;
         lineNum++;
         continue;

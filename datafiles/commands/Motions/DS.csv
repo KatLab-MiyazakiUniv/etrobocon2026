@@ -1,4 +1,5 @@
-DS,int,int
+コマンド名,ID,引数1,引数2
+DS,ID,int
 DS,1,456
 DS,2,789
 DS,3

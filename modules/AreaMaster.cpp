@@ -9,7 +9,7 @@
 #include <iostream>
 
 using namespace std;
-const string AreaMaster::basePath = "etrobocon2026/datafiles/commands/Run";
+const string AreaMaster::basePath = "etrobocon2026/datafiles/commands/Run/";
 const array<string, 2> AreaMaster::areaCommandNames = { "LineTrace", "Area2" };
 
 AreaMaster::AreaMaster(Robot& _robot, Area _area, bool _isLeftCourse)

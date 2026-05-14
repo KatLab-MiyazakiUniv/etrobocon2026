@@ -7,10 +7,10 @@
 #include "ClockUtil.h"
 #include <iostream>
 
-double ClockUtil::now()
+int ClockUtil::now()
 {
-  // マイクロ秒を秒になおしてreturn
-  return (getClockInstance().now() / 1000000);
+  // マイクロ秒をミリ秒になおしてreturn
+  return static_cast<int>(getClockInstance().now() / 1000);
 }
 
 void ClockUtil::sleep(int milliSec)

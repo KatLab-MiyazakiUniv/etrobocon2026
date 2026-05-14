@@ -6,8 +6,6 @@
 
 #include "Logger.h"
 
-#include <filesystem>
-
 // ログの初期化
 void Logger::init()
 {

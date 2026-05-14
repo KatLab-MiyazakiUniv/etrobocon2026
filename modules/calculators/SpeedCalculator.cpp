@@ -12,7 +12,7 @@ SpeedCalculator::SpeedCalculator(Robot& _robot, double _targetSpeed)
     rightPid(RIGHT_K_P, RIGHT_K_I, RIGHT_K_D, _targetSpeed),
     leftPid(LEFT_K_P, LEFT_K_I, LEFT_K_D, _targetSpeed)
 {
-  double currentTime = ClockUtil::now();  // 現在の時間を取得(秒)
+  double currentTime = ClockUtil::now();  // 現在の時間を取得(ミリ秒)
   prevRightTime = currentTime;
   prevLeftTime = currentTime;
 }
@@ -22,7 +22,7 @@ double SpeedCalculator::calculateRightMotorPower()
   rightMotorPower
       = robot.getWheelMotorControllerInstance().getRightPower();  // rightMotorPowerの初期化
   // 走行時間を算出
-  double currentRightTime = ClockUtil::now();  // 現在の時間を取得(秒)
+  double currentRightTime = ClockUtil::now();  // 現在の時間を取得(ミリ秒)
   double diffRightTime = currentRightTime - prevRightTime;
   // 右タイヤの走行速度を算出
   double currentRightSpeed = robot.getWheelMotorControllerInstance().getRightSpeed();
@@ -39,7 +39,7 @@ double SpeedCalculator::calculateLeftMotorPower()
   leftMotorPower
       = robot.getWheelMotorControllerInstance().getLeftPower();  // leftMotorPowerの初期化
   // 走行時間を算出
-  double currentLeftTime = ClockUtil::now();  // 現在の時間を取得(秒)
+  double currentLeftTime = ClockUtil::now();  // 現在の時間を取得(ミリ秒)
   double diffLeftTime = currentLeftTime - prevLeftTime;
   // 左タイヤの走行速度を算出
   double currentLeftSpeed = robot.getWheelMotorControllerInstance().getLeftSpeed();

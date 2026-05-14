@@ -16,7 +16,7 @@ class SpeedCalculator {
   /**
    * @brief speedCalculatorのコンストラクタ
    * @param _robot Robotクラスのインスタンス
-   * @param _targetSpeed 目標とするタイヤ走行速度[mm/s]
+   * @param _targetSpeed 目標とするタイヤ走行速度(mm/秒)
    */
   SpeedCalculator(Robot& _robot, double _targetSpeed);
 

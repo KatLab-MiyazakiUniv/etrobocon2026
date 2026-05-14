@@ -28,7 +28,8 @@ namespace etrobocon2026_test {
   // 空フレームを渡したとき wasDetected == false になるかのテスト
   TEST_F(ColorRegionDetectorTest, EmptyFrameNotDetected)
   {
-    ColorRegionDetector detector(blackRanges, defaultROI, defaultRes);
+    // ColorRegionDetector detector(blackRanges, defaultROI, defaultRes);
+    ColorRegionDetector detector(blackRanges, defaultROI);
     BoundingBoxDetectionResult result;
     detector.detect(cv::Mat(), result);
     EXPECT_FALSE(result.wasDetected);
@@ -37,7 +38,8 @@ namespace etrobocon2026_test {
   // 対象色が存在しない白フレームのとき wasDetected == false になるかのテスト
   TEST_F(ColorRegionDetectorTest, NoTargetColorNotDetected)
   {
-    ColorRegionDetector detector(blackRanges, defaultROI, defaultRes);
+    // ColorRegionDetector detector(blackRanges, defaultROI, defaultRes);
+    ColorRegionDetector detector(blackRanges, defaultROI);
     cv::Mat frame(defaultRes, CV_8UC3, cv::Scalar(255, 255, 255));
     BoundingBoxDetectionResult result;
     detector.detect(frame, result);
@@ -47,7 +49,8 @@ namespace etrobocon2026_test {
   // ROI内に十分な面積の対象色の色領域があるとき wasDetected == true になるかのテスト
   TEST_F(ColorRegionDetectorTest, ColorInROIDetected)
   {
-    ColorRegionDetector detector(blackRanges, defaultROI, defaultRes);
+    // ColorRegionDetector detector(blackRanges, defaultROI, defaultRes);
+    ColorRegionDetector detector(blackRanges, defaultROI);
     // defaultROI = (50, 240, 540, 240) の内側に黒色矩形を配置
     cv::Mat frame = makeFrameWithBlackRect(defaultRes, cv::Rect(200, 300, 200, 100));
     BoundingBoxDetectionResult result;
@@ -58,7 +61,8 @@ namespace etrobocon2026_test {
   // ROI外に対象色の色領域があるとき wasDetected == false になるかのテスト
   TEST_F(ColorRegionDetectorTest, ColorOutsideROINotDetected)
   {
-    ColorRegionDetector detector(blackRanges, defaultROI, defaultRes);
+    // ColorRegionDetector detector(blackRanges, defaultROI, defaultRes);
+    ColorRegionDetector detector(blackRanges, defaultROI);
     // ROI の y 開始 240 より上（y=50）に黒色矩形を配置
     cv::Mat frame = makeFrameWithBlackRect(defaultRes, cv::Rect(200, 50, 200, 100));
     BoundingBoxDetectionResult result;
@@ -69,7 +73,8 @@ namespace etrobocon2026_test {
   // MIN_CONTOUR_AREA(=50) 未満の色領域は wasDetected == false になるかのテスト
   TEST_F(ColorRegionDetectorTest, TinyColorAreaNotDetected)
   {
-    ColorRegionDetector detector(blackRanges, defaultROI, defaultRes);
+    // ColorRegionDetector detector(blackRanges, defaultROI, defaultRes);
+    ColorRegionDetector detector(blackRanges, defaultROI);
     // 5×5=25px はモルフォロジー後も面積閾値50を下回る
     cv::Mat frame = makeFrameWithBlackRect(defaultRes, cv::Rect(200, 300, 5, 5));
     BoundingBoxDetectionResult result;
@@ -80,7 +85,8 @@ namespace etrobocon2026_test {
   // バウンディングボックスの座標がフレーム全体基準（ROIオフセット加算済み）の値で返るかのテスト
   TEST_F(ColorRegionDetectorTest, BoundingBoxCoordinatesIncludeROIOffset)
   {
-    ColorRegionDetector detector(blackRanges, defaultROI, defaultRes);
+    // ColorRegionDetector detector(blackRanges, defaultROI, defaultRes);
+    ColorRegionDetector detector(blackRanges, defaultROI);
     cv::Rect targetRect(200, 300, 100, 80);
     cv::Mat frame = makeFrameWithBlackRect(defaultRes, targetRect);
     BoundingBoxDetectionResult result;
@@ -100,7 +106,8 @@ namespace etrobocon2026_test {
   // 複数の色領域があるとき、最大面積の輪郭に対するバウンディングボックスが返るかのテスト
   TEST_F(ColorRegionDetectorTest, LargestContourIsSelected)
   {
-    ColorRegionDetector detector(blackRanges, defaultROI, defaultRes);
+    // ColorRegionDetector detector(blackRanges, defaultROI, defaultRes);
+    ColorRegionDetector detector(blackRanges, defaultROI);
     cv::Mat frame(defaultRes, CV_8UC3, cv::Scalar(255, 255, 255));
 
     cv::Rect largeRect(100, 280, 200, 100);
@@ -126,7 +133,8 @@ namespace etrobocon2026_test {
     std::vector<HSVRange> ranges = blackRanges;
     ranges.push_back({ cv::Scalar(110, 200, 200), cv::Scalar(130, 255, 255) });
 
-    ColorRegionDetector detector(ranges, defaultROI, defaultRes);
+    // ColorRegionDetector detector(ranges, defaultROI, defaultRes);
+    ColorRegionDetector detector(ranges, defaultROI);
 
     cv::Mat frame(defaultRes, CV_8UC3, cv::Scalar(255, 255, 255));
 

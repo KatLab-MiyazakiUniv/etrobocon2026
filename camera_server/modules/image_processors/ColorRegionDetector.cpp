@@ -8,37 +8,19 @@
 
 // 全てのパラメータを個別に指定する
 ColorRegionDetector::ColorRegionDetector(const std::vector<HSVRange>& _hsvRanges,
-                                         const cv::Rect& _roi, const cv::Size& _resolution)
-  : hsvRanges(_hsvRanges), roi(_roi), resolution(_resolution)
+                                         const cv::Rect& _roi)
+  : hsvRanges(_hsvRanges), roi(_roi)
 {
   validateParameters();
 }
 
-// 解像度がデフォルトのコンストラクタ
-ColorRegionDetector::ColorRegionDetector(const std::vector<HSVRange>& _hsvRanges,
-                                         const cv::Rect& _roi)
-  : ColorRegionDetector(_hsvRanges, _roi, cv::Size(640, 480))
-{
-}
-
-// デフォルトのROIおよび解像度のコンストラクタ
-ColorRegionDetector::ColorRegionDetector(const std::vector<HSVRange>& _hsvRanges)
-  : ColorRegionDetector(_hsvRanges, cv::Rect(50, 240, 540, 240))
-{
-}
-
-// 解像度の調節後にROIをフレーム内に収める補正
+// ROIをフレーム内に収める補正
 void ColorRegionDetector::validateParameters()
 {
-  // ROIがフレームサイズ内か確認し、必要に応じて補正
-  if(resolution.width < MIN_WIDTH) resolution.width = MIN_WIDTH;
-  if(resolution.width > MAX_WIDTH) resolution.width = MAX_WIDTH;
-  if(resolution.height < MIN_HEIGHT) resolution.height = MIN_HEIGHT;
-  if(resolution.height > MAX_HEIGHT) resolution.height = MAX_HEIGHT;
   if(roi.x < 0) roi.x = 0;
   if(roi.y < 0) roi.y = 0;
-  if(roi.x + roi.width > resolution.width) roi.width = resolution.width - roi.x;
-  if(roi.y + roi.height > resolution.height) roi.height = resolution.height - roi.y;
+  if(roi.x + roi.width > CAM_MAX_WIDTH) roi.width = CAM_MAX_WIDTH - roi.x;
+  if(roi.y + roi.height > CAM_MAX_HEIGHT) roi.height = CAM_MAX_HEIGHT - roi.y;
 }
 
 void ColorRegionDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& result)
@@ -50,19 +32,17 @@ void ColorRegionDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResul
     return;
   }
 
-  // フレームサイズを統一する
   cv::Mat frameProcessed;
-  if(frame.size() != resolution) {
-    cv::resize(frame, frameProcessed, resolution);
-  } else {
-    frameProcessed = frame.clone();
-  }
+  frameProcessed = frame.clone();
 
   // ROI切り出し
   cv::Rect roiRect = roi;
   roiRect = roiRect & cv::Rect(0, 0, frameProcessed.cols, frameProcessed.rows);
 
-  if(roiRect.empty()) return;
+  if(roiRect.empty()) {
+    std::cerr << "Error: roiRect frame is empty." << std::endl;
+    return;
+  }
 
   cv::Mat roiFrame = frameProcessed(roiRect);
 

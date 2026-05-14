@@ -21,17 +21,8 @@ struct HSVRange {
 // 色領域検出クラス
 class ColorRegionDetector : public BoundingBoxDetector {
  public:
-  // デフォルト引数では無く,コンストラクタのオーバーロードで複数の初期化方法を提供する設計
-  // 1. 全てのパラメータを個別に指定する
-  ColorRegionDetector(const std::vector<HSVRange>& hsvRanges, const cv::Rect& roi,
-                      const cv::Size& resolution);
-
-  // 2. 複数色の範囲とROIを指定する (解像度はデフォルト 640x480)
+  // 全てのパラメータを個別に指定する
   ColorRegionDetector(const std::vector<HSVRange>& hsvRanges, const cv::Rect& roi);
-
-  // 3. 複数色の範囲のみ指定する (デフォルトのROI 50,240,540,240 および解像度 640x480 を使用)
-  explicit ColorRegionDetector(const std::vector<HSVRange>& hsvRanges);
-
   // フレームから色を検出する
   void detect(const cv::Mat& frame, BoundingBoxDetectionResult& result) override;
 
@@ -42,8 +33,6 @@ class ColorRegionDetector : public BoundingBoxDetector {
   std::vector<HSVRange> hsvRanges;
   // 注目領域
   cv::Rect roi;
-  // 解像度
-  cv::Size resolution;
 
   void validateParameters();
 };

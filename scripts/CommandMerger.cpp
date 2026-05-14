@@ -247,7 +247,8 @@ bool checkType(const std::string& commandFilePath, const std::string& label)
       }
       if(!std::getline(motionFile, motionHeaderLine)) {
         std::cerr << "[" << label << "] " << lineBuf
-                  << "行目: Motionsファイルの2行目(型)が存在しません: " << motionFilePath << std::endl;
+                  << "行目: Motionsファイルの2行目(型)が存在しません: " << motionFilePath
+                  << std::endl;
         allValid = false;
         lineNum++;
         continue;

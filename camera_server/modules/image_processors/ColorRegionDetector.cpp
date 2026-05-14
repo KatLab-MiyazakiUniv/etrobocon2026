@@ -1,46 +1,56 @@
 /*
  * @file ColorRegionDetector.cpp
  * @brief 色領域検出用の画像処理クラス
- * @author okuyama0528 sadomiya-sousi
+ * @author okuyama0528, sadomiya-sousi
  */
 
 #include "ColorRegionDetector.h"
 
-// 構造体を受け取るコンストラクタ
-ColorRegionDetector::ColorRegionDetector(const ColorRegionDetectorConfig& config)
-  : lowerHSV(config.lowerHSV),
-    upperHSV(config.upperHSV),
-    roi(config.roi),
-    resolution(config.resolution)
+// 全てのパラメータを個別に指定する
+ColorRegionDetector::ColorRegionDetector(const std::vector<HSVRange>& _hsvRanges,
+                                         const cv::Rect& _roi, const cv::Size& _resolution)
+  : hsvRanges(_hsvRanges), roi(_roi), resolution(_resolution)
 {
   validateParameters();
 }
-// 解像度が範囲外なら修正,ROIが画像外に出ないように補正と調節
+
+// 解像度がデフォルトのコンストラクタ
+ColorRegionDetector::ColorRegionDetector(const std::vector<HSVRange>& _hsvRanges,
+                                         const cv::Rect& _roi)
+  : ColorRegionDetector(_hsvRanges, _roi, cv::Size(640, 480))
+{
+}
+
+// デフォルトのROIおよび解像度のコンストラクタ
+ColorRegionDetector::ColorRegionDetector(const std::vector<HSVRange>& _hsvRanges)
+  : ColorRegionDetector(_hsvRanges, cv::Rect(50, 240, 540, 240))
+{
+}
+
+// 解像度の調節後にROIをフレーム内に収める補正
 void ColorRegionDetector::validateParameters()
 {
+  // ROIがフレームサイズ内か確認し、必要に応じて補正
   if(resolution.width < MIN_WIDTH) resolution.width = MIN_WIDTH;
   if(resolution.width > MAX_WIDTH) resolution.width = MAX_WIDTH;
   if(resolution.height < MIN_HEIGHT) resolution.height = MIN_HEIGHT;
   if(resolution.height > MAX_HEIGHT) resolution.height = MAX_HEIGHT;
-  // ROIが画像外に出ないように補正
   if(roi.x < 0) roi.x = 0;
   if(roi.y < 0) roi.y = 0;
-  // ROIが画像サイズを超えないように調整
   if(roi.x + roi.width > resolution.width) roi.width = resolution.width - roi.x;
-
   if(roi.y + roi.height > resolution.height) roi.height = resolution.height - roi.y;
 }
 
 void ColorRegionDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& result)
 {
   result.wasDetected = false;
-  // 画像が壊れていたら処理中止
+  // 入力フレームが空の場合は処理を中断する
   if(frame.empty()) {
     std::cerr << "Error: Input frame is empty." << std::endl;
     return;
   }
 
-  // 画像サイズを統一する
+  // フレームサイズを統一する
   cv::Mat frameProcessed;
   if(frame.size() != resolution) {
     cv::resize(frame, frameProcessed, resolution);
@@ -63,16 +73,17 @@ void ColorRegionDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResul
   // 複数色マスク統合
   cv::Mat combinedMask = cv::Mat::zeros(hsvFrame.size(), CV_8UC1);
 
-  for(size_t i = 0; i < lowerHSV.size(); i++) {
+  for(const auto& range : hsvRanges) {
     cv::Mat mask;
-    cv::inRange(hsvFrame, lowerHSV[i], upperHSV[i], mask);
+    cv::inRange(hsvFrame, range.lower, range.upper, mask);
     combinedMask |= mask;
   }
 
-  // ノイズ除去
-  // つながっていない部分をつなぐ
+  // 画像処理のモルフォロジー処理でノイズを減らす
   cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
+  // オープニングで小さなノイズを除去
   cv::morphologyEx(combinedMask, combinedMask, cv::MORPH_OPEN, kernel);
+  // クロージングで小さな穴を埋める
   cv::morphologyEx(combinedMask, combinedMask, cv::MORPH_CLOSE, kernel);
 
   // 輪郭検出
@@ -84,13 +95,15 @@ void ColorRegionDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResul
 
   for(const auto& contour : contours) {
     double area = cv::contourArea(contour);
-    if(area > MIN_LINE_CONTOUR_AREA && area > maxArea) {
+    if(area > MIN_CONTOUR_AREA && area > maxArea) {
       maxArea = area;
+      // 最大輪郭が同面積の場合は更新しない
       largestContour = contour;
     }
   }
   // 色が見つからなかった
   if(largestContour.empty()) {
+    std::cout << "指定された色領域が見つかりませんでした。" << std::endl;
     return;
   }
   result.wasDetected = true;
@@ -98,7 +111,7 @@ void ColorRegionDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResul
   cv::Rect boundingBox = cv::boundingRect(largestContour);
 
   result.topLeft = cv::Point(boundingBox.x + roiRect.x, boundingBox.y + roiRect.y);
-  // ROI補正
+  // ROIのオフセットを加算してフレーム全体基準の座標に変換
   result.topRight
       = cv::Point(boundingBox.x + boundingBox.width + roiRect.x, boundingBox.y + roiRect.y);
 

@@ -1,7 +1,7 @@
 /**
  * @file   ColorRegionDetectorTest.cpp
  * @brief  色領域検出用の画像処理クラスのテスト
- * @author HaruArima08
+ * @author HaruArima08, okuyama0528, sadomiya-sousi
  */
 
 #include <gtest/gtest.h>
@@ -12,12 +12,11 @@ namespace etrobocon2026_test {
   class ColorRegionDetectorTest : public ::testing::Test {
    protected:
     // 黒色を検出する設定
-    std::vector<cv::Scalar> lowerBlack = { cv::Scalar(0, 0, 0) };
-    std::vector<cv::Scalar> upperBlack = { cv::Scalar(180, 255, 50) };
+    std::vector<HSVRange> blackRanges = { { cv::Scalar(0, 0, 0), cv::Scalar(180, 255, 50) } };
     cv::Rect defaultROI = cv::Rect(50, 240, 540, 240);
     cv::Size defaultRes = cv::Size(640, 480);
 
-    // 白フレームの指定領域に黒色矩形を描画した合成画像を返す
+    // 白フレームの指定領域に黒色矩形を描画した合成フレームを返す
     cv::Mat makeFrameWithBlackRect(cv::Size frameSize, cv::Rect rect)
     {
       cv::Mat frame(frameSize, CV_8UC3, cv::Scalar(255, 255, 255));  // 白背景
@@ -29,7 +28,7 @@ namespace etrobocon2026_test {
   // 空フレームを渡したとき wasDetected == false になるかのテスト
   TEST_F(ColorRegionDetectorTest, EmptyFrameNotDetected)
   {
-    ColorRegionDetector detector(lowerBlack, upperBlack, defaultROI, defaultRes);
+    ColorRegionDetector detector(blackRanges, defaultROI, defaultRes);
     BoundingBoxDetectionResult result;
     detector.detect(cv::Mat(), result);
     EXPECT_FALSE(result.wasDetected);
@@ -38,7 +37,7 @@ namespace etrobocon2026_test {
   // 対象色が存在しない白フレームのとき wasDetected == false になるかのテスト
   TEST_F(ColorRegionDetectorTest, NoTargetColorNotDetected)
   {
-    ColorRegionDetector detector(lowerBlack, upperBlack, defaultROI, defaultRes);
+    ColorRegionDetector detector(blackRanges, defaultROI, defaultRes);
     cv::Mat frame(defaultRes, CV_8UC3, cv::Scalar(255, 255, 255));
     BoundingBoxDetectionResult result;
     detector.detect(frame, result);
@@ -48,7 +47,7 @@ namespace etrobocon2026_test {
   // ROI内に十分な面積の対象色の色領域があるとき wasDetected == true になるかのテスト
   TEST_F(ColorRegionDetectorTest, ColorInROIDetected)
   {
-    ColorRegionDetector detector(lowerBlack, upperBlack, defaultROI, defaultRes);
+    ColorRegionDetector detector(blackRanges, defaultROI, defaultRes);
     // defaultROI = (50, 240, 540, 240) の内側に黒色矩形を配置
     cv::Mat frame = makeFrameWithBlackRect(defaultRes, cv::Rect(200, 300, 200, 100));
     BoundingBoxDetectionResult result;
@@ -59,7 +58,7 @@ namespace etrobocon2026_test {
   // ROI外に対象色の色領域があるとき wasDetected == false になるかのテスト
   TEST_F(ColorRegionDetectorTest, ColorOutsideROINotDetected)
   {
-    ColorRegionDetector detector(lowerBlack, upperBlack, defaultROI, defaultRes);
+    ColorRegionDetector detector(blackRanges, defaultROI, defaultRes);
     // ROI の y 開始 240 より上（y=50）に黒色矩形を配置
     cv::Mat frame = makeFrameWithBlackRect(defaultRes, cv::Rect(200, 50, 200, 100));
     BoundingBoxDetectionResult result;
@@ -67,10 +66,10 @@ namespace etrobocon2026_test {
     EXPECT_FALSE(result.wasDetected);
   }
 
-  // MIN_LINE_CONTOUR_AREA(=50) 未満の色領域は wasDetected == false になるかのテスト
+  // MIN_CONTOUR_AREA(=50) 未満の色領域は wasDetected == false になるかのテスト
   TEST_F(ColorRegionDetectorTest, TinyColorAreaNotDetected)
   {
-    ColorRegionDetector detector(lowerBlack, upperBlack, defaultROI, defaultRes);
+    ColorRegionDetector detector(blackRanges, defaultROI, defaultRes);
     // 5×5=25px はモルフォロジー後も面積閾値50を下回る
     cv::Mat frame = makeFrameWithBlackRect(defaultRes, cv::Rect(200, 300, 5, 5));
     BoundingBoxDetectionResult result;
@@ -81,7 +80,7 @@ namespace etrobocon2026_test {
   // バウンディングボックスの座標がフレーム全体基準（ROIオフセット加算済み）の値で返るかのテスト
   TEST_F(ColorRegionDetectorTest, BoundingBoxCoordinatesIncludeROIOffset)
   {
-    ColorRegionDetector detector(lowerBlack, upperBlack, defaultROI, defaultRes);
+    ColorRegionDetector detector(blackRanges, defaultROI, defaultRes);
     cv::Rect targetRect(200, 300, 100, 80);
     cv::Mat frame = makeFrameWithBlackRect(defaultRes, targetRect);
     BoundingBoxDetectionResult result;
@@ -101,7 +100,7 @@ namespace etrobocon2026_test {
   // 複数の色領域があるとき、最大面積の輪郭に対するバウンディングボックスが返るかのテスト
   TEST_F(ColorRegionDetectorTest, LargestContourIsSelected)
   {
-    ColorRegionDetector detector(lowerBlack, upperBlack, defaultROI, defaultRes);
+    ColorRegionDetector detector(blackRanges, defaultROI, defaultRes);
     cv::Mat frame(defaultRes, CV_8UC3, cv::Scalar(255, 255, 255));
 
     cv::Rect largeRect(100, 280, 200, 100);
@@ -124,12 +123,10 @@ namespace etrobocon2026_test {
   TEST_F(ColorRegionDetectorTest, MultipleColorRangesAreORed)
   {
     // 黒色と青色を検出する設定
-    std::vector<cv::Scalar> lowers = lowerBlack;
-    lowers.emplace_back(110, 200, 200);
-    std::vector<cv::Scalar> uppers = upperBlack;
-    uppers.emplace_back(130, 255, 255);
+    std::vector<HSVRange> ranges = blackRanges;
+    ranges.push_back({ cv::Scalar(110, 200, 200), cv::Scalar(130, 255, 255) });
 
-    ColorRegionDetector detector(lowers, uppers, defaultROI, defaultRes);
+    ColorRegionDetector detector(ranges, defaultROI, defaultRes);
 
     cv::Mat frame(defaultRes, CV_8UC3, cv::Scalar(255, 255, 255));
 

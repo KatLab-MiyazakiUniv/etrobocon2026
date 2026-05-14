@@ -1,13 +1,13 @@
 /**
  * @file   BoundingBoxDetector.h
  * @brief  BoundingBox検出処理の親クラス
- * @author okuyama0528 sadomiya-sousi
+ * @author okuyama0528, sadomiya-sousi
  */
-
 #ifndef BOUNDING_BOX_DETECTOR_H
 #define BOUNDING_BOX_DETECTOR_H
 
 #include "ImageRecognitionResults.h"
+#include <iostream>
 #include <string>
 #include <opencv2/opencv.hpp>
 
@@ -21,7 +21,7 @@ class BoundingBoxDetector {
 
   /**
    * @brief 物体検出を実行する純粋仮想関数
-   * @param frame 処理対象の画像フレーム
+   * @param frame 処理対象のフレーム
    * @param result 結果を格納するBoundingBoxDetectionResult構造体の参照
    */
 

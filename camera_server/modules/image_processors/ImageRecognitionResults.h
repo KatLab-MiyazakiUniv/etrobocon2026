@@ -7,7 +7,6 @@
 #ifndef IMAGE_RECOGNITION_RESULTS_H
 #define IMAGE_RECOGNITION_RESULTS_H
 
-#include <cstdint>
 #include <opencv2/core/types.hpp>
 
 struct BoundingBoxDetectionResult {

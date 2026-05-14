@@ -6,92 +6,86 @@
 
 #include <gtest/gtest.h>
 #include "ClockUtil.h"
+#include <iostream>
 
 namespace etrobocon2026_test {
-  // now()がsleep()で待機した時間だけ増加するかのテスト
+  // sleep()語に取得した時間が指定した待機時間以上増加するかテスト
   TEST(ClockUtilTest, NowSleep)
   {
-    double start = ClockUtil::now();
+    int start = ClockUtil::now();
+    int sleepTime = 10;
 
-    ClockUtil::sleep(10);
+    ClockUtil::sleep(sleepTime);
 
-    double end = ClockUtil::now();
+    int end = ClockUtil::now();
+    int expected = start + sleepTime;
 
-    EXPECT_GE(end, start + 0.01);
+    std::cout << "start: " << start << "ms, end: " << end << "ms, expected: " << expected << "ms"
+              << std::endl;
+
+    EXPECT_LE(expected, end);
   }
 
   // now()がwait()で待機した時間だけ増加するかのテスト
   TEST(ClockUtilTest, NowWait)
   {
-    double start = ClockUtil::now();
+    int start = ClockUtil::now();
+    int waitTime = 20;
 
-    ClockUtil::wait(20);
+    ClockUtil::wait(waitTime);
 
-    double end = ClockUtil::now();
-    EXPECT_GE(end, start + 0.02);
-  }
+    int end = ClockUtil::now();
+    int expected = start + waitTime;
 
-  // now()が小数点以下の値を返すかのテスト
-  TEST(ClockUtilTest, NowHasFraction)
-  {
-    double start = ClockUtil::now();
-
-    ClockUtil::sleep(1);
-
-    double end = ClockUtil::now();
-
-    double diff = end - start;
-
-    EXPECT_GT(diff, 0.0);
-    EXPECT_LT(diff, 1.0);
+    EXPECT_LE(expected, end);
   }
 
   // sleep()に0を渡したときに、now()がほとんど増加しないことを確認するテスト
   TEST(ClockUtilTest, SleepZero)
   {
-    double start = ClockUtil::now();
+    int start = ClockUtil::now();
 
     ClockUtil::sleep(0);
 
-    double end = ClockUtil::now();
+    int end = ClockUtil::now();
 
-    EXPECT_LT(end - start, 0.01);
+    EXPECT_LE(end - start, 1);
   }
 
   // sleep()に負の値を渡したときに、now()がほとんど増加しないことを確認するテスト
   TEST(ClockUtilTest, SleepNegative)
   {
-    double start = ClockUtil::now();
+    int start = ClockUtil::now();
 
     ClockUtil::sleep(-10);
 
-    double end = ClockUtil::now();
+    int end = ClockUtil::now();
 
-    EXPECT_LT(end - start, 0.01);
+    EXPECT_LE(end - start, 1);
   }
 
   // wait()に0を渡したときに、now()がほとんど増加しないことを確認するテスト
   TEST(ClockUtilTest, WaitZero)
   {
-    double start = ClockUtil::now();
+    int start = ClockUtil::now();
 
     ClockUtil::wait(0);
 
-    double end = ClockUtil::now();
+    int end = ClockUtil::now();
 
-    EXPECT_LT(end - start, 0.01);
+    EXPECT_LE(end - start, 1);
   }
 
   // wait()に負の値を渡したときに、now()がほとんど増加しないことを確認するテスト
   TEST(ClockUtilTest, WaitNegative)
   {
-    double start = ClockUtil::now();
+    int start = ClockUtil::now();
 
     ClockUtil::wait(-20);
 
-    double end = ClockUtil::now();
+    int end = ClockUtil::now();
 
-    EXPECT_LT(end - start, 0.01);
+    EXPECT_LE(end - start, 1);
   }
 
 }  // namespace etrobocon2026_test

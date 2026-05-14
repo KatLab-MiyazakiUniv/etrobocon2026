@@ -12,9 +12,9 @@ class ClockUtil {
  public:
   /**
    * @brief 走行時間を取得
-   * @return 走行時間(ミリ秒)
+   * @return 走行時間(秒)
    */
-  static int now();
+  static double now();
 
   /**
    * @brief 自タスクスリープ（デフォルトは10ミリ秒）

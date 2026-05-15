@@ -18,12 +18,20 @@ struct HSVRange {
   cv::Scalar upper;
 };
 
-// 色領域検出クラス
 class ColorRegionDetector : public BoundingBoxDetector {
  public:
-  // 全てのパラメータを個別に指定する
+  /**
+   * @brief コンストラクタ
+   * @param hsvRanges 検出したい色のHSV範囲
+   * @param roi 注目領域
+   */
   ColorRegionDetector(const std::vector<HSVRange>& hsvRanges, const cv::Rect& roi);
   // フレームから色を検出する
+  /**
+   * @brief フレームから色領域を検出
+   * @param frame 入力フレーム
+   * @param result 検出結果
+   */
   void detect(const cv::Mat& frame, BoundingBoxDetectionResult& result) override;
 
  private:
@@ -33,7 +41,9 @@ class ColorRegionDetector : public BoundingBoxDetector {
   std::vector<HSVRange> hsvRanges;
   // 注目領域
   cv::Rect roi;
-
+  /**
+   * @brief ROIがフレーム内に収まるように補正する
+   */
   void validateParameters();
 };
 

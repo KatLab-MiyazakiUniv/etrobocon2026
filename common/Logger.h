@@ -87,9 +87,8 @@ class Logger {
 
   static constexpr int LOG_BUFFER_SIZE = 65536;    // ログ全体のバッファサイズ
   static constexpr int MESSAGE_BUFFER_SIZE = 256;  // 1メッセージのバッファサイズ
-
-  inline static char logs[LOG_BUFFER_SIZE] = {};  // ログ全体のバッファ
-  inline static int currentIndex = 0;             // 現在のログの末尾のインデックス
+  static char logs[LOG_BUFFER_SIZE];               // ログのバッファ
+  static int currentIndex;                         // ログの現在のインデックス
 
   static constexpr const char* fileName = "datafiles/logfiles/logfile.txt";  // ログファイルのパス
 };

@@ -11,7 +11,6 @@ void Logger::init()
 {
   logs[0] = '\0';
   currentIndex = 0;
-  currentTimeMs = 0;
 }
 
 // 標準ログの出力
@@ -45,7 +44,7 @@ void Logger::printfLog(Level level, const char* format, ...)
 
   va_list args;
 
-  start(args, format);
+  va_start(args, format);
 
   vsnprintf(buffer, sizeof(buffer), format, args);
 

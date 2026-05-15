@@ -91,8 +91,6 @@ void Logger::write(Level level, const char* message)
 // ログファイルの出力
 void Logger::outputToFile()
 {
-  // ディレクトリ生成
-  std::filesystem::create_directories("datafiles/logfiles");
 
   FILE* file = fopen(fileName, "w");
 

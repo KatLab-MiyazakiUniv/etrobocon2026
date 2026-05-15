@@ -72,9 +72,6 @@ void CsvLogger::add(int brightness,
 // 記録した走行ログをファイル出力する
 void CsvLogger::outputToFile()
 {
-  // ディレクトリ生成
-  std::filesystem::create_directories(
-      "datafiles/logfiles");
 
   FILE* outputFile =
       fopen(csvFileName, "w");

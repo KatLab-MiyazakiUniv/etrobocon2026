@@ -83,7 +83,7 @@ void ColorRegionDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResul
   }
   // 色が見つからなかった
   if(largestContour.empty()) {
-    std::cout << "指定された色領域が見つかりませんでした。" << std::endl;
+    std::cerr << "指定された色領域が見つかりませんでした。" << std::endl;
     return;
   }
   result.wasDetected = true;

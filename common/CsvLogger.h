@@ -27,12 +27,10 @@ class CsvLogger {
   /**
    * @brief 各種値を追加する
    * @param brightness 輝度値
-   * @param rightPwm 右PWM
-   * @param leftPwm 左PWM
+   * @param rightPwm 右Power値
+   * @param leftPwm 左Power値
    */
-  static void add(int brightness,
-                  int rightPwm,
-                  int leftPwm);
+  static void add(int brightness, int rightPwm, int leftPwm);
 
   /**
    * @brief 記録した走行ログをファイル出力する
@@ -40,15 +38,12 @@ class CsvLogger {
   static void outputToFile();
 
  private:
-  static constexpr int LOG_BUFFER_SIZE = 65536;
-  static constexpr int LINE_BUFFER_SIZE = 128;
+  static constexpr int LOG_BUFFER_SIZE = 65536;  // ログ全体のバッファサイズ
+  static constexpr int LINE_BUFFER_SIZE = 128;   // 1メッセージのバッファサイズ
+  static char logs[LOG_BUFFER_SIZE];             // ログのバッファ
+  static int currentIndex;                       // ログの現在のインデックス
 
-  static char logs[LOG_BUFFER_SIZE];
-
-  static int currentIndex;
-
-  static constexpr const char* csvFileName =
-      "datafiles/logfiles/runlog.csv";
+  static constexpr const char* csvFileName = "datafiles/logfiles/runlog.csv";  // CSVファイルのパス
 };
 
 #endif

@@ -6,6 +6,10 @@
 
 #include "Logger.h"
 
+// ログのバッファとインデックスの初期化
+char Logger::logs[LOG_BUFFER_SIZE] = "";
+int Logger::currentIndex = 0;
+
 // ログの初期化
 void Logger::init()
 {
@@ -42,6 +46,7 @@ void Logger::printfLog(Level level, const char* format, ...)
 {
   char buffer[MESSAGE_BUFFER_SIZE];
 
+  // 可変引数の処理
   va_list args;
 
   va_start(args, format);
@@ -91,7 +96,6 @@ void Logger::write(Level level, const char* message)
 // ログファイルの出力
 void Logger::outputToFile()
 {
-
   FILE* file = fopen(fileName, "w");
 
   if(file == NULL) {

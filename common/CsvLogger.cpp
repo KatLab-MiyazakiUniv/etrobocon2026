@@ -6,8 +6,8 @@
 
 #include "CsvLogger.h"
 
+// CSVログのバッファとインデックスの初期化
 char CsvLogger::logs[LOG_BUFFER_SIZE] = "";
-
 int CsvLogger::currentIndex = 0;
 
 // CSVログの初期化
@@ -20,17 +20,13 @@ void CsvLogger::init()
 // CSVヘッダを書き込む
 void CsvLogger::writeHeader()
 {
-  int remainBuffer =
-      LOG_BUFFER_SIZE - currentIndex - 1;
+  int remainBuffer = LOG_BUFFER_SIZE - currentIndex - 1;
 
   if(remainBuffer <= 0) {
     return;
   }
 
-  int written =
-      snprintf(&logs[currentIndex],
-               remainBuffer,
-               "time,brightness,rightPwm,leftPwm\n");
+  int written = snprintf(&logs[currentIndex], remainBuffer, "time,brightness,rightPwm,leftPwm\n");
 
   if(written >= remainBuffer) {
     currentIndex = LOG_BUFFER_SIZE - 1;
@@ -40,27 +36,20 @@ void CsvLogger::writeHeader()
 }
 
 // 各種値を追加する
-void CsvLogger::add(int brightness,
-                    int rightPwm,
-                    int leftPwm)
+void CsvLogger::add(int brightness, int rightPwm, int leftPwm)
 {
-  int remainBuffer =
-      LOG_BUFFER_SIZE - currentIndex - 1;
+  int remainBuffer = LOG_BUFFER_SIZE - currentIndex - 1;
 
   if(remainBuffer <= 0) {
     return;
   }
 
-  int written =
-      snprintf(&logs[currentIndex],
-               remainBuffer,
-               "%d,%d,%d\n",
-              //  "%d,%d,%d,%d\n",
-              //  ClockUtil::now(),
-               brightness,
-               rightPwm,
-               leftPwm
-              );
+  // int time = ClockUtil::now();
+
+  int written = snprintf(&logs[currentIndex], remainBuffer, "%d,%d,%d\n",
+                         //  "%d,%d,%d,%d\n",
+                         //  time,
+                         brightness, rightPwm, leftPwm);
 
   if(written >= remainBuffer) {
     currentIndex = LOG_BUFFER_SIZE - 1;
@@ -72,9 +61,7 @@ void CsvLogger::add(int brightness,
 // 記録した走行ログをファイル出力する
 void CsvLogger::outputToFile()
 {
-
-  FILE* outputFile =
-      fopen(csvFileName, "w");
+  FILE* outputFile = fopen(csvFileName, "w");
 
   if(outputFile == NULL) {
     printf("cannot open csv file\n");

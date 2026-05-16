@@ -15,8 +15,8 @@ class DistanceCondition : public BaseContinuationCondition {
  public:
   /**
    * コンストラクタ
-   * @brief メンバ変数 DistanceCondition を初期化する
-   * @param _robot DistanceCondition クラスのインスタンスの参照
+   * @brief DistanceCondition を初期化する
+   * @param _robot robotクラスのインスタンスの参照
    * @param _targetDistance 目標距離(mm)
    */
   DistanceCondition(Robot& _robot, double _targetDistance);

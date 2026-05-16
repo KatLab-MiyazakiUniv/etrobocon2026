@@ -17,6 +17,8 @@ class Straight : public BaseMotion {
    * @brief Straight を初期化する
    * @param _robot ロボットクラスのインスタンス
    * @param _continuationCondition 動作を継続する条件を判定するクラスのインスタンス
+   * @param _rightPid 右タイヤのPIDゲイン
+   * @param _leftPid 左タイヤのPIDゲイン
    * @param _targetSpeed 目標速度(mm/秒)
    */
 

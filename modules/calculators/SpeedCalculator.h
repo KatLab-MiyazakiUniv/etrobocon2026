@@ -16,6 +16,8 @@ class SpeedCalculator {
   /**
    * @brief speedCalculatorのコンストラクタ
    * @param _robot Robotクラスのインスタンス
+   * @param _rightPid 右タイヤのPIDゲイン
+   * @param _leftPid 左タイヤのPIDゲイン
    * @param _targetSpeed 目標とするタイヤ走行速度(mm/ミリ秒)
    */
   SpeedCalculator(Robot& _robot, Pid::PidGain rightPid, Pid::PidGain leftPid, double _targetSpeed);

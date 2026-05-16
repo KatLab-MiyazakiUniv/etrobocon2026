@@ -34,9 +34,8 @@ class Straight : public BaseMotion {
   void finish() override;
 
  private:
-  double targetSpeed;  // 目標速度(mm/秒)
-  SpeedCalculator
-      speedCalculator;  // 目標速度に相当するモーターのPower値を算出するクラスのインスタンス;
+  double targetSpeed;               // 目標速度(mm/ミリ秒)
+  SpeedCalculator speedCalculator;  // SpeedCalculatorクラスのインスタンス;
 };
 
 #endif

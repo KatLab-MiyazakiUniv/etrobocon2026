@@ -16,7 +16,7 @@ class SpeedCalculator {
   /**
    * @brief speedCalculatorのコンストラクタ
    * @param _robot Robotクラスのインスタンス
-   * @param _targetSpeed 目標とするタイヤ走行速度(mm/秒)
+   * @param _targetSpeed 目標とするタイヤ走行速度(mm/ミリ秒)
    */
   SpeedCalculator(Robot& _robot, double _targetSpeed);
 
@@ -33,18 +33,19 @@ class SpeedCalculator {
   double calculateLeftMotorPower();
 
  private:
-  const double targetSpeed;  // 目標速度(mm/秒)
-  Pid rightPid;  // 目標速度に対する右車輪のPID制御を行うクラスのインスタンス
-  Pid leftPid;  // 目標速度に対する左車輪のPID制御を行うクラスのインスタンス
-  double rightMotorPower;  // 右車輪のPower値
-  double leftMotorPower;   // 左車輪のPower値
-  double prevRightTime;    // 前回の右車輪の速度計算を行った時間(秒)
-  double prevLeftTime;     // 前回の左車輪の速度計算を行った時間(秒)
-  Robot& robot;            // Robotクラスのインスタンスの参照
-  // PIDゲイン
+  const double targetSpeed;  // 目標速度(mm/ミリ秒)
+  Pid rightPid;              // 目標速度に対する右車輪のPID制御を行うクラスのインスタンス
+  Pid leftPid;               // 目標速度に対する左車輪のPID制御を行うクラスのインスタンス
+  double rightMotorPower;    // 右車輪のPower値
+  double leftMotorPower;     // 左車輪のPower値
+  double prevRightTime;      // 前回の右車輪の速度計算を行った時間(ミリ秒)
+  double prevLeftTime;       // 前回の左車輪の速度計算を行った時間(ミリ秒)
+  Robot& robot;              // Robotクラスのインスタンスの参照
+  // 右モーターのPIDゲイン
   static constexpr double RIGHT_K_P = 0.00535;
   static constexpr double RIGHT_K_I = 0.00115;
   static constexpr double RIGHT_K_D = 0.000;
+  // 左モーターのPIDゲイン
   static constexpr double LEFT_K_P = 0.00578;
   static constexpr double LEFT_K_I = 0.0008535;
   static constexpr double LEFT_K_D = 0.000;

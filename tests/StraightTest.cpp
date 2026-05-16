@@ -11,9 +11,15 @@
 #include <iostream>
 
 namespace etrobocon2026_test {
+  class StraightTest : public ::testing::Test {
+   protected:
+    // テスト用のPidゲイン
+    Pid::PidGain rightPid = { 0.00535, 0.00115, 0.000 };
+    Pid::PidGain leftPid = { 0.00578, 0.0008535, 0.000 };
+  };
 
   // 目標距離が正の時、run()で直進後、走行距離が目標距離だけ増加するかテスト（誤差あり）
-  TEST(StraightTest, Run)
+  TEST_F(StraightTest, Run)
   {
     Robot robot;
     double targetSpeed = 1000.0;   // 目標速度
@@ -26,7 +32,7 @@ namespace etrobocon2026_test {
 
     // 直進動作を実行
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                      targetSpeed);
+                      targetSpeed, rightPid, leftPid);
     straight.run();
     robot.getWheelMotorControllerInstance().stopBoth();
 
@@ -43,7 +49,7 @@ namespace etrobocon2026_test {
   }
 
   // 目標距離が0の時、runで直進後、走行距離が増加しないことをテスト
-  TEST(StraightTest, RunZero)
+  TEST_F(StraightTest, RunZero)
   {
     Robot robot;
     double targetSpeed = 50.0;    // 目標速度
@@ -56,7 +62,7 @@ namespace etrobocon2026_test {
 
     // 直進動作を実行
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                      targetSpeed);
+                      targetSpeed, rightPid, leftPid);
     straight.run();
     robot.getWheelMotorControllerInstance().stopBoth();
 
@@ -70,7 +76,7 @@ namespace etrobocon2026_test {
   }
 
   // 目標距離が負の時、runで直進後、走行距離が増加しないことをテスト
-  TEST(StraightTest, RunNegative)
+  TEST_F(StraightTest, RunNegative)
   {
     Robot robot;
     double targetSpeed = 50.0;       // 目標速度
@@ -83,7 +89,7 @@ namespace etrobocon2026_test {
 
     // 直進動作を実行
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                      targetSpeed);
+                      targetSpeed, rightPid, leftPid);
     straight.run();
     robot.getWheelMotorControllerInstance().stopBoth();
 

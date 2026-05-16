@@ -20,13 +20,10 @@ namespace etrobocon2026_test {
     int end = ClockUtil::now();
     int expected = start + sleepTime;
 
-    std::cout << "start: " << start << "ms, end: " << end << "ms, expected: " << expected << "ms"
-              << std::endl;
-
     EXPECT_LE(expected, end);
   }
 
-  // now()がwait()で待機した時間だけ増加するかのテスト
+  // wait()後に取得した時間がwait()で待機した時間以上増加するかテスト
   TEST(ClockUtilTest, NowWait)
   {
     int start = ClockUtil::now();

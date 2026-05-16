@@ -6,7 +6,10 @@
 
 #include "Robot.h"
 
-Robot::Robot() : wheelMotorController(), armMotorController(), imuController() {}
+Robot::Robot()
+  : wheelMotorController(), armMotorController(), imuController(), colorSensorController()
+{
+}
 
 WheelMotorController& Robot::getWheelMotorControllerInstance()
 {
@@ -21,4 +24,9 @@ ArmMotorController& Robot::getArmMotorControllerInstance()
 IMUController& Robot::getIMUControllerInstance()
 {
   return imuController;
+}
+
+ColorSensorController& Robot::getColorSensorControllerInstance()
+{
+  return colorSensorController;
 }

@@ -10,7 +10,7 @@
 #include "WheelMotorController.h"
 #include "ArmMotorController.h"
 #include "IMUController.h"
-
+#include "ColorSensorController.h"
 class Robot {
  public:
   /**
@@ -37,10 +37,13 @@ class Robot {
    */
   IMUController& getIMUControllerInstance();
 
+  ColorSensorController& getColorSensorControllerInstance();
+
  private:
-  WheelMotorController wheelMotorController;  // WheelMotorController インスタンス
-  ArmMotorController armMotorController;      // ArmMotorController インスタンス
-  IMUController imuController;                // IMUController インスタンス
+  WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
+  ArmMotorController armMotorController;        // ArmMotorController インスタンス
+  IMUController imuController;                  // IMUController インスタンス
+  ColorSensorController colorSensorController;  // ColorSensorController インスタンス
 };
 
 #endif

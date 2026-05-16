@@ -9,6 +9,8 @@
 
 #include "ColorSensor.h"
 
+using namespace spikeapi;
+
 class ColorSensorController {
  public:
   /**
@@ -33,13 +35,13 @@ class ColorSensorController {
    * @brief 生のRGB値を取得する
    * @param rgb [out] RGB値を格納する構造体
    */
-  void getRawRGB(spikeapi::ColorSensor::RGB& rgb);
+  void getRawRGB(ColorSensor::RGB& rgb);
 
   /**
    * @brief HSV値を取得する (近似なし)
    * @param hsv [out] HSV値を格納する構造体
    */
-  void getRawHSV(spikeapi::ColorSensor::HSV& hsv);
+  void getRawHSV(ColorSensor::HSV& hsv);
 
   /**
    * @brief ライトを点灯する (標準の白)
@@ -60,7 +62,7 @@ class ColorSensorController {
   void setLightColor(int r, int g, int b);
 
  private:
-  spikeapi::ColorSensor colorSensor;  // カラーセンサインスタンス
+  ColorSensor colorSensor;  // カラーセンサインスタンス
 };
 
 #endif

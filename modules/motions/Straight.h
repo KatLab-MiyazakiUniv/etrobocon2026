@@ -23,7 +23,7 @@ class Straight : public BaseMotion {
    */
 
   Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-           double _targetSpeed, Pid::PidGain _rightPid, Pid::PidGain _leftPid);
+           double _targetSpeed, const Pid::PidGain& _rightPid, const Pid::PidGain& _leftPid);
 
  protected:
   /**

@@ -6,8 +6,8 @@
 #include "SpeedCalculator.h"
 #include "ClockUtil.h"
 
-SpeedCalculator::SpeedCalculator(Robot& _robot, Pid::PidGain _rightPid, Pid::PidGain _leftPid,
-                                 double _targetSpeed)
+SpeedCalculator::SpeedCalculator(Robot& _robot, const Pid::PidGain& _rightPid,
+                                 const Pid::PidGain& _leftPid, double _targetSpeed)
   : robot(_robot),
     rightPid(_rightPid.kp, _rightPid.ki, _rightPid.kd, _targetSpeed),
     leftPid(_leftPid.kp, _leftPid.ki, _leftPid.kd, _targetSpeed),

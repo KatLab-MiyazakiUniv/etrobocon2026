@@ -6,7 +6,6 @@
 
 #include <gtest/gtest.h>
 #include "ClockUtil.h"
-#include <iostream>
 
 namespace etrobocon2026_test {
   // sleep()後に取得した時間が指定した待機時間以上増加するかテスト

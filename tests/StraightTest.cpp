@@ -12,98 +12,89 @@
 
 namespace etrobocon2026_test {
 
-  //目標速度が正の時、executeStep()がモータにpower値を入力するかテスト
+  // 目標速度が正の時、executeStep()がモータにpower値を入力するかテスト
   TEST(StraightTest, executeStep)
   {
     Robot robot;
-    double targetSpeed = 1000.0;     // 目標速度
+    double targetSpeed = 1000.0;   // 目標速度
     double targetDistance = 10.0;  // 目標距離
 
-    //executeStep()前のpower値をゲット
+    // executeStep()前のpower値をゲット
     double beforeRightPower = robot.getWheelMotorControllerInstance().getRightPower();
     double beforeLeftPower = robot.getWheelMotorControllerInstance().getLeftPower();
 
-    //executeStep()でモータにpower値をセット
+    // executeStep()でモータにpower値をセット
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
                       targetSpeed);
     straight.executeStep();
 
-    //セットされたpower値をゲット
+    // セットされたpower値をゲット
     double afterRightPower = robot.getWheelMotorControllerInstance().getRightPower();
     double afterLeftPower = robot.getWheelMotorControllerInstance().getLeftPower();
 
-    
     // 左右ともに新たなpower値がセットされているか確認
-    EXPECT_NE(beforeRightPower,afterRightPower);
-    EXPECT_NE(beforeLeftPower,afterLeftPower);
-
+    EXPECT_NE(beforeRightPower, afterRightPower);
+    EXPECT_NE(beforeLeftPower, afterLeftPower);
   }
 
-  //目標速度が0の時、executeStep()がモータにpower値(0)を入力するかテスト
+  // 目標速度が0の時、executeStep()がモータにpower値(0)を入力するかテスト
   TEST(StraightTest, executeStepTargetSpeedzero)
   {
     Robot robot;
-    double targetSpeed = 0.0;     // 目標速度
+    double targetSpeed = 0.0;      // 目標速度
     double targetDistance = 10.0;  // 目標距離
 
-
-    //executeStep()でモータにpower値をセット
+    // executeStep()でモータにpower値をセット
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
                       targetSpeed);
-    
 
-    //executeStep(robot,targetSpeed = 0.0)前のpower値をゲット
+    // executeStep(robot,targetSpeed = 0.0)前のpower値をゲット
     double beforeRightPower = robot.getWheelMotorControllerInstance().getRightPower();
     double beforeLeftPower = robot.getWheelMotorControllerInstance().getLeftPower();
 
     straight.executeStep();
 
-    //executeStep(robot,targetSpeed = 0.0)後のpower値をゲット
+    // executeStep(robot,targetSpeed = 0.0)後のpower値をゲット
     double afterRightPower = robot.getWheelMotorControllerInstance().getRightPower();
     double afterLeftPower = robot.getWheelMotorControllerInstance().getLeftPower();
 
-    
     // 左右ともに0がセットされているか確認
-    EXPECT_EQ(0.0,beforeRightPower);
-    EXPECT_EQ(0.0,beforeLeftPower);
-    EXPECT_EQ(0.0,afterRightPower);
-    EXPECT_EQ(0.0,afterLeftPower);
-
+    EXPECT_EQ(0.0, beforeRightPower);
+    EXPECT_EQ(0.0, beforeLeftPower);
+    EXPECT_EQ(0.0, afterRightPower);
+    EXPECT_EQ(0.0, afterLeftPower);
   }
 
-  //目標速度が負の時、executeStep()がモータにpower値を入力するかテスト
+  // 目標速度が負の時、executeStep()がモータにpower値を入力するかテスト
   TEST(StraightTest, executeStepTargetDistanceNegative)
   {
     Robot robot;
-    double targetSpeed = -1000.0;     // 目標速度
+    double targetSpeed = -1000.0;  // 目標速度
     double targetDistance = 10.0;  // 目標距離
 
-    //executeStep()前のpower値をゲット
+    // executeStep()前のpower値をゲット
     double beforeRightPower = robot.getWheelMotorControllerInstance().getRightPower();
     double beforeLeftPower = robot.getWheelMotorControllerInstance().getLeftPower();
 
-    //executeStep()でモータにpower値をセット
+    // executeStep()でモータにpower値をセット
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
                       targetSpeed);
     straight.executeStep();
 
-    //セットされたpower値をゲット
+    // セットされたpower値をゲット
     double afterRightPower = robot.getWheelMotorControllerInstance().getRightPower();
     double afterLeftPower = robot.getWheelMotorControllerInstance().getLeftPower();
 
-    
     // 左右ともに新たなpower値がセットされているか確認
-    EXPECT_NE(beforeRightPower,afterRightPower);
-    EXPECT_NE(beforeLeftPower,afterLeftPower);
-
+    EXPECT_NE(beforeRightPower, afterRightPower);
+    EXPECT_NE(beforeLeftPower, afterLeftPower);
   }
-
 
   // 目標距離が正の時、run()で直進後、走行距離が目標距離だけ増加するかテスト（誤差あり）
   TEST(StraightTest, Run)
   {
     Robot robot;
-    double targetSpeed = 1000.0;     // 目標速度
+    double targetSpeed = 1000.0;   // 目標速度
     double targetDistance = 10.0;  // 目標距離
 
     // 直進前の走行距離を計算
@@ -122,11 +113,11 @@ namespace etrobocon2026_test {
     leftCount = robot.getWheelMotorControllerInstance().getLeftCount();
     double endMileage = Mileage::calculateMileage(rightCount, leftCount);
 
-    //走行距離と目標距離との誤差
+    // 走行距離と目標距離との誤差
     double diviation = 0.5;
 
     // 走行距離が目標距離の誤差の範囲にあることテスト
-    EXPECT_NEAR(targetDistance, endMileage - startMileage,diviation);
+    EXPECT_NEAR(targetDistance, endMileage - startMileage, diviation);
   }
 
   // 目標距離が0の時、runで直進後、走行距離が増加しないことをテスト
@@ -140,7 +131,6 @@ namespace etrobocon2026_test {
     int32_t rightCount = robot.getWheelMotorControllerInstance().getRightCount();
     int32_t leftCount = robot.getWheelMotorControllerInstance().getLeftCount();
     double startMileage = Mileage::calculateMileage(rightCount, leftCount);
-  
 
     // 直進動作を実行
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
@@ -152,7 +142,7 @@ namespace etrobocon2026_test {
     rightCount = robot.getWheelMotorControllerInstance().getRightCount();
     leftCount = robot.getWheelMotorControllerInstance().getLeftCount();
     double endMileage = Mileage::calculateMileage(rightCount, leftCount);
-  
+
     // 目標距離と走行距離が等しいことをテスト
     EXPECT_EQ(targetDistance, endMileage - startMileage);
   }
@@ -168,7 +158,6 @@ namespace etrobocon2026_test {
     int32_t rightCount = robot.getWheelMotorControllerInstance().getRightCount();
     int32_t leftCount = robot.getWheelMotorControllerInstance().getLeftCount();
     double startMileage = Mileage::calculateMileage(rightCount, leftCount);
-  
 
     // 直進動作を実行
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
@@ -180,7 +169,7 @@ namespace etrobocon2026_test {
     rightCount = robot.getWheelMotorControllerInstance().getRightCount();
     leftCount = robot.getWheelMotorControllerInstance().getLeftCount();
     double endMileage = Mileage::calculateMileage(rightCount, leftCount);
-    
+
     // 走行距離が0であることをテスト
     double expected = 0.0;
     EXPECT_EQ(expected, endMileage - startMileage);
@@ -190,7 +179,7 @@ namespace etrobocon2026_test {
   TEST(StraightTest, finish)
   {
     Robot robot;
-    double targetSpeed = 1000.0;     // 目標速度
+    double targetSpeed = 1000.0;   // 目標速度
     double targetDistance = 10.0;  // 目標距離
 
     // 直進前の走行距離を計算
@@ -209,11 +198,11 @@ namespace etrobocon2026_test {
     leftCount = robot.getWheelMotorControllerInstance().getLeftCount();
     double endMileage = Mileage::calculateMileage(rightCount, leftCount);
 
-    //走行距離と目標距離との誤差
+    // 走行距離と目標距離との誤差
     double diviation = 0.5;
 
     // 実際の走行距離が目標距離の誤差の範囲にあることテスト
-    EXPECT_NEAR(targetDistance, endMileage - startMileage,diviation);
+    EXPECT_NEAR(targetDistance, endMileage - startMileage, diviation);
   }
 
 }  // namespace etrobocon2026_test

@@ -34,13 +34,13 @@ class SpeedCalculator {
 
  private:
   const double targetSpeed;  // 目標速度(mm/秒)
-  Pid rightPid;              // 目標速度に対する右車輪のPID制御を行うクラスのインスタンス
-  Pid leftPid;               // 目標速度に対する左車輪のPID制御を行うクラスのインスタンス
-  double rightMotorPower;    // 右車輪のPower値
-  double leftMotorPower;     // 左車輪のPower値
-  double prevRightTime;      // 前回の右車輪の速度計算を行った時間(秒)
-  double prevLeftTime;       // 前回の左車輪の速度計算を行った時間(秒)
-  Robot& robot;              // Robotクラスのインスタンスの参照
+  Pid rightPid;  // 目標速度に対する右車輪のPID制御を行うクラスのインスタンス
+  Pid leftPid;  // 目標速度に対する左車輪のPID制御を行うクラスのインスタンス
+  double rightMotorPower;  // 右車輪のPower値
+  double leftMotorPower;   // 左車輪のPower値
+  double prevRightTime;    // 前回の右車輪の速度計算を行った時間(秒)
+  double prevLeftTime;     // 前回の左車輪の速度計算を行った時間(秒)
+  Robot& robot;            // Robotクラスのインスタンスの参照
   // PIDゲイン
   static constexpr double RIGHT_K_P = 0.00535;
   static constexpr double RIGHT_K_I = 0.00115;

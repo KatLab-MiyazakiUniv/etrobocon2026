@@ -33,7 +33,6 @@ class Straight : public BaseMotion {
    */
   void finish() override;
 
-
  private:
   double targetSpeed;  // 目標速度(mm/秒)
   SpeedCalculator

@@ -23,7 +23,9 @@ void Straight::executeStep()
   robot.getWheelMotorControllerInstance().setRightPower(requiredRightPower);
   robot.getWheelMotorControllerInstance().setLeftPower(requiredLeftPower);
 }
-void Straight::wait()
+
+void Straight::finish()
 {
-  ClockUtil::sleep();  // 10ミリ秒待機
+  robot.getWheelMotorControllerInstance().stopBoth();
 }
+

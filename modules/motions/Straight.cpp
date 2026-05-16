@@ -16,13 +16,15 @@ Straight::Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _co
 
 void Straight::executeStep()
 {
-requiredRightPower
+  double requiredRightPower = speedCalculator.calculateRightMotorPower();
+  double requiredLeftPower = speedCalculator.calculateLeftMotorPower();
 
   // モーターにPower値をセット
-  robot.getWheelMotorControllerInstance().setRightPower(currentRightPower);
-  robot.getWheelMotorControllerInstance().setLeftPower(currentLeftPower);
+  robot.getWheelMotorControllerInstance().setRightPower(requiredRightPower);
+  robot.getWheelMotorControllerInstance().setLeftPower(requiredLeftPower);
 }
-void Straight::wait()
+
+void Straight::finish()
 {
-  ClockUtil::sleep();  // 10ミリ秒待機
+  robot.getWheelMotorControllerInstance().stopBoth();
 }

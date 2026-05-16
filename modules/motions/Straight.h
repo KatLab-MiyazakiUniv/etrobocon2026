@@ -9,16 +9,15 @@
 
 #include "BaseMotion.h"
 #include "SpeedCalculator.h"
-#include "ClockUtil.h"
 
 class Straight : public BaseMotion {
  public:
   /**
    * コンストラクタ
-   * @brief メンバ変数 Straight を初期化する
-   * @param _robot Straight クラスのインスタンスの参照
+   * @brief Straight を初期化する
+   * @param _robot ロボットクラスのインスタンス
    * @param _continuationCondition 動作を継続する条件を判定するクラスのインスタンス
-   * @param _targetSpeed 目標とするタイヤ走行速度[mm/s]
+   * @param _targetSpeed 目標速度(mm/秒)
    */
 
   Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
@@ -30,12 +29,13 @@ class Straight : public BaseMotion {
   void executeStep() override;
 
   /**
-   * @brief 1周期分の待機を行う (デフォルトは何もしない)
+   * @brief 両タイヤモータを停止する
    */
-  void wait() override;
+  void finish() override;
+
 
  private:
-  double targetSpeed;  // 目標速度
+  double targetSpeed;  // 目標速度(mm/秒)
   SpeedCalculator
       speedCalculator;  // 目標速度に相当するモーターのPower値を算出するクラスのインスタンス;
 };

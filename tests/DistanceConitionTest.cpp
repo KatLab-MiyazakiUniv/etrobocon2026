@@ -9,73 +9,135 @@
 
 namespace etrobocon2026_test {
 
-  // DistanceCondition::shouldContinue()のテスト
-  TEST(DistanceConditionTest, ShouldContinue)
+  /**
+   * prepare()直後は移動距離が0なので継続判定になることを確認
+   */
+  TEST(DistanceConditionTest, ContinueImmediatelyAfterPrepare)
   {
-    // テスト用のRobotクラスのモックを作成
-    class MockRobot : public Robot {
-     public:
-      MockRobot() : Robot() {}
+    Robot robot;
 
-      // モーターのカウントを外部から操作するための変数
-      int32_t rightCount = 0;
-      int32_t leftCount = 0;
+    DistanceCondition condition(robot, 100.0);
 
-      // WheelMotorControllerのモッククラス
-      class MockWheelMotorController : public WheelMotorController {
-       public:
-        /**
-         * 修正ポイント:
-         * 1. 親クラス WheelMotorController は引数なしで呼び出す
-         * 2. 参照メンバ parent は初期化リストで p を代入して初期化する
-         */
-        MockWheelMotorController(MockRobot& p) : WheelMotorController(), parent(p) {}
+    condition.prepare();
 
-        /**
-         * 修正ポイント:
-         * 基底クラスのメソッドに virtual が付いていないため、
-         * 'override' キーワードを削除して「関数隠蔽」の形で定義します。
-         */
-        int32_t getRightCount() { return parent.rightCount; }
-        int32_t getLeftCount() { return parent.leftCount; }
+    EXPECT_TRUE(condition.shouldContinue());
+  }
 
-       private:
-        MockRobot& parent;
-      };
+  /**
+   * 目標距離に到達していない場合は継続判定になることを確認
+   */
+  TEST(DistanceConditionTest, ContinueBeforeTargetDistance)
+  {
+    Robot robot;
 
-      /**
-       * Robot.h 側の getWheelMotorControllerInstance が virtual であれば
-       * ここは override 可能です。
-       */
-      WheelMotorController& getWheelMotorControllerInstance() { return mockWheelMotorController; }
+    DistanceCondition condition(robot, 1000.0);
 
-     private:
-      // 自分自身 (*this) を渡して MockWheelMotorController を初期化
-      MockWheelMotorController mockWheelMotorController{ *this };
-    };
+    condition.prepare();
 
-    // --- テスト実行 ---
-    MockRobot mockRobot;
+    // 目標値に到達しない程度に前進
+    robot.getWheelMotorControllerInstance().setRightSpeed(10);
+    robot.getWheelMotorControllerInstance().setLeftSpeed(10);
 
-    // 目標距離を 100.0 mm に設定
-    DistanceCondition distanceCondition(mockRobot, 100.0);
-    distanceCondition.prepare();
+    EXPECT_TRUE(condition.shouldContinue());
+  }
 
-    // 1. 初期状態 (カウント0) では走行を継続すべき
-    EXPECT_TRUE(distanceCondition.shouldContinue());
+  /**
+   * 走行距離が目標距離に到達した場合は停止判定になることを確認
+   */
+  TEST(DistanceConditionTest, StopAtTargetDistance)
+  {
+    Robot robot;
 
-    // 2. 走行距離が目標に達していない状態
-    mockRobot.rightCount = 10;
-    mockRobot.leftCount = 10;
-    EXPECT_TRUE(distanceCondition.shouldContinue());
+    double targetDistance = 10.0;
 
-    // 3. 走行距離が目標を超えるようにカウントを更新
-    // (タイヤ径等によりますが、大きな値を入れて確実に停止させる例)
-    mockRobot.rightCount = 1000;
-    mockRobot.leftCount = 1000;
+    DistanceCondition condition(robot, targetDistance);
 
-    // 走行終了を検知して false を返すはず
-    EXPECT_FALSE(distanceCondition.shouldContinue());
+    condition.prepare();
+
+    // 目標距離に到達するまで前進
+    while(condition.shouldContinue()) {
+      robot.getWheelMotorControllerInstance().setRightSpeed(50);
+      robot.getWheelMotorControllerInstance().setLeftSpeed(50);
+    }
+
+    // 実際の走行距離を計算
+    double actualMileage
+        = fabs(Mileage::calculateMileage(robot.getWheelMotorControllerInstance().getRightCount(),
+                                         robot.getWheelMotorControllerInstance().getLeftCount()));
+
+    // 走行距離が目標距離以上であることを確認
+    EXPECT_LE(targetDistance, actualMileage);
+  }
+
+  /**
+   * 後退方向に移動した場合でも距離差分で停止判定できることを確認
+   */
+  TEST(DistanceConditionTest, StopAtTargetDistance2)
+  {
+    Robot robot;
+
+    double targetDistance = 10.0;
+
+    DistanceCondition condition(robot, targetDistance);
+
+    condition.prepare();
+
+    // 目標距離に到達するまで後退
+    while(condition.shouldContinue()) {
+      robot.getWheelMotorControllerInstance().setRightSpeed(-50);
+      robot.getWheelMotorControllerInstance().setLeftSpeed(-50);
+    }
+
+    // 実際の走行距離を計算
+    double actualMileage
+        = fabs(Mileage::calculateMileage(robot.getWheelMotorControllerInstance().getRightCount(),
+                                         robot.getWheelMotorControllerInstance().getLeftCount()));
+
+    // 走行距離が目標距離以上であることを確認
+    EXPECT_LE(targetDistance, actualMileage);
+  }
+  /**
+   * 目標距離が0の場合は即停止判定になることを確認
+   */
+  TEST(DistanceConditionTest, ZeroTargetDistance)
+  {
+    Robot robot;
+
+    DistanceCondition condition(robot, 0.0);
+
+    condition.prepare();
+
+    EXPECT_FALSE(condition.shouldContinue());
+  }
+
+  /**
+   * 負の目標距離を指定した場合は即停止判定になることを確認
+   */
+  TEST(DistanceConditionTest, NegativeTargetDistance)
+  {
+    Robot robot;
+
+    DistanceCondition condition(robot, -100.0);
+
+    condition.prepare();
+
+    EXPECT_FALSE(condition.shouldContinue());
+  }
+
+  /**
+   * shouldContinue()を連続呼び出ししても異常終了しないことを確認
+   */
+  TEST(DistanceConditionTest, ContinuousCallStable)
+  {
+    Robot robot;
+
+    DistanceCondition condition(robot, 100.0);
+
+    condition.prepare();
+
+    for(int i = 0; i < 100; i++) {
+      EXPECT_NO_THROW(condition.shouldContinue());
+    }
   }
 
 }  // namespace etrobocon2026_test

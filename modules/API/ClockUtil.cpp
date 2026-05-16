@@ -5,6 +5,7 @@
  */
 
 #include "ClockUtil.h"
+#include <iostream>
 
 int ClockUtil::now()
 {
@@ -14,7 +15,22 @@ int ClockUtil::now()
 
 void ClockUtil::sleep(int milliSec)
 {
+  if(milliSec <= 0) {
+    std::cerr << "ClockUtil::sleep() was called with non-positive milliSec: " << milliSec
+              << std::endl;
+    milliSec = 0;  // 負の値は0に補正
+  }
   // spikeapi::Clock::sleep() はマイクロ秒指定なので、単位を合わせて呼び出す
+  getClockInstance().sleep(milliSec * 1000);
+}
+
+void ClockUtil::wait(int milliSec)
+{
+  if(milliSec <= 0) {
+    std::cerr << "ClockUtil::wait() was called with non-positive milliSec: " << milliSec
+              << std::endl;
+    milliSec = 0;  // 負の値は0に補正
+  }
   getClockInstance().sleep(milliSec * 1000);
 }
 

@@ -9,6 +9,7 @@
 
 #include "Robot.h"
 #include "BaseContinuationCondition.h"
+#include "ClockUtil.h"
 #include <memory>
 
 class BaseMotion {
@@ -52,7 +53,7 @@ class BaseMotion {
   virtual void executeStep() = 0;
 
   /**
-   * @brief 1周期分の待機を行う (デフォルトは何もしない)
+   * @brief 1周期分の待機を行う (デフォルトは10ミリ秒待機)
    */
   virtual void wait();
 

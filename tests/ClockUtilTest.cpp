@@ -6,23 +6,83 @@
 
 #include <gtest/gtest.h>
 #include "ClockUtil.h"
+#include <iostream>
 
 namespace etrobocon2026_test {
-  // ClockUtil::now()のテスト
-  TEST(ClockUtilTest, Now)
+  // sleep()語に取得した時間が指定した待機時間以上増加するかテスト
+  TEST(ClockUtilTest, NowSleep)
   {
-    int before = ClockUtil::now();
-    ClockUtil::sleep(100);  // 100ミリ秒待機
-    int after = ClockUtil::now();
-    EXPECT_GE(after, before + 100);
+    int start = ClockUtil::now();
+    int sleepTime = 10;
+
+    ClockUtil::sleep(sleepTime);
+
+    int end = ClockUtil::now();
+    int expected = start + sleepTime;
+
+    EXPECT_LE(expected, end);
   }
 
-  // ClockUtil::sleep() のテスト
-  TEST(ClockUtilTest, Sleep)
+  // wait()後に取得した時間がwait()で待機した時間以上増加するかテスト
+  TEST(ClockUtilTest, NowWait)
   {
-    int before = ClockUtil::now();
-    ClockUtil::sleep(200);  // 200ミリ秒待機
-    int after = ClockUtil::now();
-    EXPECT_GE(after, before + 200);
+    int start = ClockUtil::now();
+    int waitTime = 20;
+
+    ClockUtil::wait(waitTime);
+
+    int end = ClockUtil::now();
+    int expected = start + waitTime;
+
+    EXPECT_LE(expected, end);
   }
+
+  // sleep()に0を渡したときに、now()がほとんど増加しないことを確認するテスト
+  TEST(ClockUtilTest, SleepZero)
+  {
+    int start = ClockUtil::now();
+
+    ClockUtil::sleep(0);
+
+    int end = ClockUtil::now();
+
+    EXPECT_LE(end - start, 1);
+  }
+
+  // sleep()に負の値を渡したときに、now()がほとんど増加しないことを確認するテスト
+  TEST(ClockUtilTest, SleepNegative)
+  {
+    int start = ClockUtil::now();
+
+    ClockUtil::sleep(-10);
+
+    int end = ClockUtil::now();
+
+    EXPECT_LE(end - start, 1);
+  }
+
+  // wait()に0を渡したときに、now()がほとんど増加しないことを確認するテスト
+  TEST(ClockUtilTest, WaitZero)
+  {
+    int start = ClockUtil::now();
+
+    ClockUtil::wait(0);
+
+    int end = ClockUtil::now();
+
+    EXPECT_LE(end - start, 1);
+  }
+
+  // wait()に負の値を渡したときに、now()がほとんど増加しないことを確認するテスト
+  TEST(ClockUtilTest, WaitNegative)
+  {
+    int start = ClockUtil::now();
+
+    ClockUtil::wait(-20);
+
+    int end = ClockUtil::now();
+
+    EXPECT_LE(end - start, 1);
+  }
+
 }  // namespace etrobocon2026_test

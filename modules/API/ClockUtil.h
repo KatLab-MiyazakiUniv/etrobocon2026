@@ -22,6 +22,12 @@ class ClockUtil {
    */
   static void sleep(int milliSec = 10);
 
+  /**
+   * @brief 自タスクウェイト（デフォルトは10ミリ秒）
+   * @param milliSec ウェイト時間(ミリ秒)
+   */
+  static void wait(int milliSec = 10);
+
  private:
   ClockUtil();  // インスタンス化を禁止する
 

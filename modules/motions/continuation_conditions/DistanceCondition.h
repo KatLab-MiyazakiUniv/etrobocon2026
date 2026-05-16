@@ -1,6 +1,6 @@
 /**
  * @file   DistanceCondition.cpp
- * @brief  直進動作の継続条件を判定するクラス
+ * @brief  目標距離を基準に動作を継続すべきかを判定するクラス
  * @author migaku2645
  */
 
@@ -17,24 +17,24 @@ class DistanceCondition : public BaseContinuationCondition {
    * コンストラクタ
    * @brief メンバ変数 DistanceCondition を初期化する
    * @param _robot DistanceCondition クラスのインスタンスの参照
-   * @param _targetDistance 目標距離
+   * @param _targetDistance 目標距離(mm)
    */
   DistanceCondition(Robot& _robot, double _targetDistance);
 
   /**
-   * @brief ここは具体的に書く。
+   * @brief 開始時の累計走行距離を取得して initDistance に保存する
    */
   void prepare() override;
 
   /**
-   * @brief 動作を継続するかを判定する
+   * @brief 開始時からの移動距離が目標距離に達した場合、動作を継続しないと判定する
    * @return true/動作を継続する、false/動作を継続しない
    */
   bool shouldContinue() override;
 
  private:
-  double targetDistance;   // 目標距離
-  double initDistance;     // 開始時の累計走行距離
+  double targetDistance;  // 目標距離(mm)
+  double initDistance;    // 開始時の累計走行距離(mm)
 };
 
 #endif

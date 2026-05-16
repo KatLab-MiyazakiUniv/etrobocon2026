@@ -21,8 +21,9 @@ class Straight : public BaseMotion {
    */
 
   Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-           double _targetSpeed);
+           double _targetSpeed, Pid::PidGain _rightPid, Pid::PidGain _leftPid);
 
+ protected:
   /**
    * @brief 1周期分の動作を実行する
    */

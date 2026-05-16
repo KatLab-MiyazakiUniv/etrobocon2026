@@ -6,11 +6,13 @@
 #include "SpeedCalculator.h"
 #include "ClockUtil.h"
 
-SpeedCalculator::SpeedCalculator(Robot& _robot, double _targetSpeed)
+SpeedCalculator::SpeedCalculator(Robot& _robot, Pid::PidGain _rightPid, Pid::PidGain _leftPid,
+                                 double _targetSpeed)
   : robot(_robot),
-    targetSpeed(_targetSpeed),
-    rightPid(RIGHT_K_P, RIGHT_K_I, RIGHT_K_D, _targetSpeed),
-    leftPid(LEFT_K_P, LEFT_K_I, LEFT_K_D, _targetSpeed)
+    rightPid(_rightPid.kp, _rightPid.ki, _rightPid.kd, _targetSpeed),
+    leftPid(_leftPid.kp, _leftPid.ki, _leftPid.kd, _targetSpeed),
+    targetSpeed(_targetSpeed)
+
 {
   double currentTime = ClockUtil::now();  // 現在の時間を取得(ミリ秒)
   prevRightTime = currentTime;

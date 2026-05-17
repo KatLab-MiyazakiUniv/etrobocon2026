@@ -19,7 +19,7 @@ class Straight : public BaseMotion {
    * @param _continuationCondition 動作を継続する条件を判定するクラスのインスタンス
    * @param _rightPid 右タイヤのPIDゲイン
    * @param _leftPid 左タイヤのPIDゲイン
-   * @param _targetSpeed 目標速度(mm/秒)
+   * @param _targetSpeed 目標速度(mm/ミリ秒)
    */
 
   Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,

@@ -11,20 +11,20 @@
 class ClockUtil {
  public:
   /**
-   * @brief 走行時間を取得
-   * @return 走行時間(ミリ秒)
+   * @brief 開始時間からの経過時間取得
+   * @return 経過時間(ミリ秒)
    */
   static int now();
 
   /**
-   * @brief 自タスクスリープ（デフォルトは10ミリ秒）
+   * @brief 自タスクススリープ（デフォルトは10ミリ秒）
    * @param milliSec スリープ時間(ミリ秒)
    */
   static void sleep(int milliSec = 10);
 
   /**
-   * @brief 自タスクウェイト（デフォルトは10ミリ秒）
-   * @param milliSec ウェイト時間(ミリ秒)
+   * @brief 自タスク遅延（デフォルトは10ミリ秒）
+   * @param milliSec 遅延時間(ミリ秒)
    */
   static void wait(int milliSec = 10);
 

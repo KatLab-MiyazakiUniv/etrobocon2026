@@ -16,9 +16,9 @@ namespace spikeapi {
     Clock() { microTime = 0; }
 
     // ClockUtil が使用する可能性のあるメソッドを定義
+    uint64_t now() { return microTime += 1000; }
     void sleep(unsigned int duration) { microTime += static_cast<uint64_t>(duration); }
     void wait(unsigned int duration) { microTime += static_cast<uint64_t>(duration); }
-    uint64_t now() { return microTime += 1000; }
 
    private:
     uint64_t microTime;

@@ -34,7 +34,6 @@ namespace etrobocon2026_test {
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
                       targetSpeed, rightPid, leftPid);
     straight.run();
-    robot.getWheelMotorControllerInstance().stopBoth();
 
     // 直進後の走行距離を計算
     rightCount = robot.getWheelMotorControllerInstance().getRightCount();
@@ -42,10 +41,10 @@ namespace etrobocon2026_test {
     double endMileage = Mileage::calculateMileage(rightCount, leftCount);
 
     // 走行距離と目標距離との誤差
-    double diviation = 0.5;
+    double deviation = 0.5;
 
     // 走行距離が目標距離の誤差の範囲にあることテスト
-    EXPECT_NEAR(targetDistance, endMileage - startMileage, diviation);
+    EXPECT_NEAR(targetDistance, endMileage - startMileage, deviation);
   }
 
   // 目標距離が0の時、runで直進後、走行距離が増加しないことをテスト
@@ -64,7 +63,6 @@ namespace etrobocon2026_test {
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
                       targetSpeed, rightPid, leftPid);
     straight.run();
-    robot.getWheelMotorControllerInstance().stopBoth();
 
     // 直進後の走行距離を計算
     rightCount = robot.getWheelMotorControllerInstance().getRightCount();
@@ -91,7 +89,6 @@ namespace etrobocon2026_test {
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
                       targetSpeed, rightPid, leftPid);
     straight.run();
-    robot.getWheelMotorControllerInstance().stopBoth();
 
     // 直進後の走行距離を計算
     rightCount = robot.getWheelMotorControllerInstance().getRightCount();

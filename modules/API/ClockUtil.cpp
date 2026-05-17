@@ -31,7 +31,7 @@ void ClockUtil::wait(int milliSec)
               << std::endl;
     milliSec = 0;  // 負の値は0に補正
   }
-  getClockInstance().sleep(milliSec * 1000);
+  getClockInstance().wait(milliSec * 1000);
 }
 
 spikeapi::Clock& ClockUtil::getClockInstance()

@@ -15,7 +15,6 @@ void EtRobocon2026::start()
  * @brief  EtRobocon2026クラスのテスト
  */
 
-#include <gtest/gtest.h>
 #include "EtRobocon2026.h"
 
 namespace etrobocon2026_test {

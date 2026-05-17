@@ -6,7 +6,6 @@ MODULE_DIRS := $(mkfile_path)modules/
 COMMON_DIRS := $(mkfile_path)common/
 
 SRCS := $(foreach dir,$(MODULE_DIRS),$(shell find $(dir) -name '*.cpp'))
-SRCS += $(foreach dir,$(COMMON_DIRS),$(shell find $(dir) -name '*.cpp'))
 SRCS += $(shell find ${mkfile_path}../../common/library/libcpp-spike/src -name '*.cpp')
 OBJS := $(notdir $(SRCS:.cpp=.o))
 APPL_CXXOBJS += $(OBJS)

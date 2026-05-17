@@ -46,18 +46,25 @@ namespace etrobocon2026_test {
     EXPECT_GT(expected, actualRightPower);
   }
 
-  // 左右のモータ―にPower値が入っていないかのテスト
-  TEST_F(SpeedCalculatorTest, CalculateMotorPowerFromZeroSpeed)
+  // 目標速度が大きい場合に、モーターのPower値も大きくなるかのテスト
+  TEST_F(SpeedCalculatorTest, CalculateMotorPowerComparison)
   {
     Robot robot;
+    double smallTargetSpeed = 300.0;
+    double largeTargetSpeed = 500.0;
     // Powerの初期化
     robot.getWheelMotorControllerInstance().setRightPower(0.0);
     robot.getWheelMotorControllerInstance().setLeftPower(0.0);
-    SpeedCalculator speedCalculator(robot, rightPid, leftPid, 0.0);
-    double actualLeftPower = speedCalculator.calculateLeftMotorPower();
-    double actualRightPower = speedCalculator.calculateRightMotorPower();
-    double expected = 0.0;
-    EXPECT_EQ(expected, actualLeftPower);
-    EXPECT_EQ(expected, actualRightPower);
+    SpeedCalculator speedCalculatorSmall(robot, rightPid, leftPid, smallTargetSpeed);
+    double actualLeftPower = speedCalculatorSmall.calculateLeftMotorPower();
+    double actualRightPower = speedCalculatorSmall.calculateRightMotorPower();
+
+    SpeedCalculator speedCalculatorLarge(robot, rightPid, leftPid, largeTargetSpeed);
+    double actualLeftPowerB = speedCalculatorLarge.calculateLeftMotorPower();
+    double actualRightPowerB = speedCalculatorLarge.calculateRightMotorPower();
+
+    EXPECT_LT(actualLeftPower, actualLeftPowerB);
+    EXPECT_LT(actualRightPower, actualRightPowerB);
   }
+
 }  // namespace etrobocon2026_test

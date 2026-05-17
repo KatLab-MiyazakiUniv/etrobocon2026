@@ -1,5 +1,5 @@
 /**
- * @file   Straight.h
+ * @file   Straight.cpp
  * @brief  直進動作を実行するクラス
  * @author migaku2645
  */

@@ -26,6 +26,8 @@ namespace etrobocon2026_test {
   TEST(CsvLoggerTest, WriteHeaderAndAddEntriesToFile)
   {
     const std::string logPath = "/tests/datafiles/logfiles/runlog.csv";
+    const std::string expectedPath
+        = "/RasPike-ART/sdk/workspace/etrobocon2026/tests/datafiles/logfiles/runlog.csv";
 
     // CSV ログを初期化して出力先を設定する
     CsvLogger::init();
@@ -36,8 +38,7 @@ namespace etrobocon2026_test {
     CsvLogger::add(42, 100, -100);
     CsvLogger::outputToFile();
 
-    const std::string contents = ReadFileContents(
-        "/RasPike-ART/sdk/workspace/etrobocon2026/tests/datafiles/logfiles/runlog.csv");
+    const std::string contents = ReadFileContents(expectedPath);
     EXPECT_EQ(contents, "time,brightness,rightPwm,leftPwm\n42,100,-100\n");
   }
 
@@ -45,7 +46,8 @@ namespace etrobocon2026_test {
   TEST(CsvLoggerTest, MultipleAddCallsAppendLines)
   {
     const std::string logPath = "/tests/datafiles/logfiles/runlog.csv";
-
+    const std::string expectedPath
+        = "/RasPike-ART/sdk/workspace/etrobocon2026/tests/datafiles/logfiles/runlog.csv";
     // CSV ログを初期化して出力先を設定する
     CsvLogger::init();
     CsvLogger::setFileName(logPath.c_str());
@@ -56,8 +58,7 @@ namespace etrobocon2026_test {
     CsvLogger::add(4, 5, 6);
     CsvLogger::outputToFile();
 
-    const std::string contents = ReadFileContents(
-        "/RasPike-ART/sdk/workspace/etrobocon2026/tests/datafiles/logfiles/runlog.csv");
+    const std::string contents = ReadFileContents(expectedPath);
     EXPECT_EQ(contents, "time,brightness,rightPwm,leftPwm\n1,2,3\n4,5,6\n");
   }
 }  // namespace etrobocon2026_test

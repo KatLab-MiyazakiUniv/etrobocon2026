@@ -11,10 +11,10 @@
 Rotation::Rotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                    const Pid::PidGain& _anglePidGain)
   : BaseMotion(_robot, std::move(_continuationCondition)),
+    targetAngle(0.0),
     anglePid(_anglePidGain.kp, _anglePidGain.ki, _anglePidGain.kd, 0.0),
     currentRightPower(0),
-    currentLeftPower(0),
-    targetAngle(0.0)
+    currentLeftPower(0)
 {
 }
 

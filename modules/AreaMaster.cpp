@@ -9,11 +9,11 @@
 #include <iostream>
 
 using namespace std;
-const string AreaMaster::basePath = "etrobocon2026/datafiles/commands/Run/";
-const array<string, 2> AreaMaster::areaCommandNames = { "LineTrace", "Area2" };
+const string AreaMaster::basePath = "etrobocon2026/datafiles/commands/Run/"; //実行用のCSVファイルを置いているディレクトリのパス
+const array<string, 2> AreaMaster::areaCommandNames = { "LineTrace", "Area2" }; //エリア名の配列
 
-AreaMaster::AreaMaster(Robot& _robot, Area _area, bool _isLeftCourse)
-  : robot(_robot), area(_area), isLeftCourse(_isLeftCourse)
+AreaMaster::AreaMaster(Robot& _robot, Area _area)
+  : robot(_robot), area(_area)
 {
 }
 
@@ -24,7 +24,7 @@ void AreaMaster::run()
 
   // コマンドファイルパスを作成する
   string commandFilePath = basePath + "run_" + areaCommandNames[static_cast<int>(area)]
-                           + (isLeftCourse ? "Left" : "Right") + ".csv";
+                           + (robot.getCourse() == Course::Left ? "Left" : "Right") + ".csv";
 
   // 動作インスタンスのリストを生成する
   motionList = MotionParser::createMotionList(robot, commandFilePath);

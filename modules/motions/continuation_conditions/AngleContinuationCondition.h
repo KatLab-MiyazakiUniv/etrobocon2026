@@ -5,19 +5,16 @@
 
 class AngleContinuationCondition : public BaseContinuationCondition {
  public:
-  AngleContinuationCondition(Robot& robot, double _targetAngle, double _tolerance = 2.0);
+  AngleContinuationCondition(Robot& robot, double _tolerance = 2.0);
 
-  void prepare() override;
   bool shouldContinue() override;
 
- private:
+ protected:
   double targetAngle;
-  double tolerance;
-
-  double initialAngle;
-  double currentAngle;
-
   double normalizeAngle(double angle);
+
+ private:
+  double tolerance;
 };
 
 #endif

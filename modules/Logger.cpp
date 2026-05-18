@@ -152,19 +152,19 @@ const char* Logger::levelToColor(Level level)
 {
   switch(level) {
     case INFO:
-      // 空色(日向坂)
-      return "\x1b[36m";
-
-    case WARNING:
-      // 白色(櫻坂)
+      // 白色(櫻坂46)
       return "\x1b[37m";
 
+    case WARNING:
+      // 空色(日向坂46)
+      return "\x1b[36m";
+
     case ERROR:
-      // 紫色(乃木坂)
+      // 紫色(乃木坂46)
       return "\x1b[35m";
 
     case DEBUG:
-      // 緑色(欅坂)
+      // 緑色(欅坂46)
       return "\x1b[32m";
 
     // その他の色コード:

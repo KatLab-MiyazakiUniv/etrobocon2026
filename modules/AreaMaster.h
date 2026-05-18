@@ -29,8 +29,8 @@ class AreaMaster {
   void run();
 
  private:
-  Robot& robot;       // Robotインスタンスの参照
-  Area area;          // エリアの指定(Enum型のArea)
+  Robot& robot;  // Robotインスタンスの参照
+  Area area;     // エリアの指定(Enum型のArea)
 
   // 各エリアのコマンドファイルベースパス
   static const std::string basePath;

@@ -9,13 +9,11 @@
 #include <iostream>
 
 using namespace std;
-const string AreaMaster::basePath = "etrobocon2026/datafiles/commands/Run/"; //実行用のCSVファイルを置いているディレクトリのパス
-const array<string, 2> AreaMaster::areaCommandNames = { "LineTrace", "Area2" }; //エリア名の配列
+const string AreaMaster::basePath
+    = "etrobocon2026/datafiles/commands/Run/";  // 実行用のCSVファイルを置いているディレクトリのパス
+const array<string, 2> AreaMaster::areaCommandNames = { "LineTrace", "Area2" };  // エリア名の配列
 
-AreaMaster::AreaMaster(Robot& _robot, Area _area)
-  : robot(_robot), area(_area)
-{
-}
+AreaMaster::AreaMaster(Robot& _robot, Area _area) : robot(_robot), area(_area) {}
 
 void AreaMaster::run()
 {

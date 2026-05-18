@@ -38,7 +38,7 @@ class CsvLogger {
    */
   static void outputToFile();
 
-    /**
+  /**
    * @brief ログファイルの出力先を変更
    * @param path 出力先パス
    */
@@ -50,12 +50,12 @@ class CsvLogger {
   static char logs[LOG_BUFFER_SIZE];             // ログのバッファ
   static int currentIndex;                       // ログの現在のインデックス
 
-    // デフォルトのログファイルパス
-  static constexpr const char* DEFAULT_CSV_NAME =
-      "/RasPike-ART/sdk/workspace/etrobocon2026/datafiles/logfiles/runlog.csv";
+  // デフォルトのログファイルパス
+  static constexpr const char* DEFAULT_CSV_NAME
+      = "/RasPike-ART/sdk/workspace/etrobocon2026/datafiles/logfiles/runlog.csv";
 
   // 現在使用しているログファイルパス
-   static std::string fileName;
+  static std::string fileName;
 };
 
 #endif

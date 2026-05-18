@@ -9,6 +9,8 @@
 // CSVログのバッファとインデックスの初期化
 char CsvLogger::logs[LOG_BUFFER_SIZE] = "";
 int CsvLogger::currentIndex = 0;
+// 現在のログファイルパス
+std::string CsvLogger::fileName = CsvLogger::DEFAULT_CSV_NAME;
 
 // CSVログの初期化
 void CsvLogger::init()
@@ -58,10 +60,20 @@ void CsvLogger::add(int brightness, int rightPwm, int leftPwm)
   }
 }
 
+// ログファイルの出力先変更
+void CsvLogger::setFileName(const char* path)
+{
+  if(path != nullptr) {
+    fileName =
+        std::string("/RasPike-ART/sdk/workspace/etrobocon2026/")
+        + path;
+  }
+}
+
 // 記録した走行ログをファイル出力する
 void CsvLogger::outputToFile()
 {
-  FILE* outputFile = fopen(csvFileName, "w");
+  FILE* outputFile = fopen(fileName.c_str(), "w");
 
   if(outputFile == NULL) {
     printf("cannot open csv file\n");

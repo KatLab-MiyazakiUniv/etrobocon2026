@@ -12,7 +12,10 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <filesystem>
+#include <string>
+
 // #include"ClockUtil.h"
+
 class Logger {
  public:
   /**
@@ -65,6 +68,12 @@ class Logger {
    */
   static void outputToFile();
 
+  /**
+   * @brief ログファイルの出力先を変更
+   * @param path 出力先パス
+   */
+  static void setFileName(const char* path);
+
  private:
   /**
    * @brief 出力するログを整形して保存する
@@ -87,10 +96,16 @@ class Logger {
 
   static constexpr int LOG_BUFFER_SIZE = 65536;    // ログ全体のバッファサイズ
   static constexpr int MESSAGE_BUFFER_SIZE = 256;  // 1メッセージのバッファサイズ
-  static char logs[LOG_BUFFER_SIZE];               // ログのバッファ
-  static int currentIndex;                         // ログの現在のインデックス
 
-  static constexpr const char* fileName = "datafiles/logfiles/logfile.txt";  // ログファイルのパス
+  static char logs[LOG_BUFFER_SIZE];  // ログのバッファ
+  static int currentIndex;            // ログの現在のインデックス
+
+  // デフォルトのログファイルパス
+  static constexpr const char* DEFAULT_FILE_NAME =
+      "/RasPike-ART/sdk/workspace/etrobocon2026/datafiles/logfiles/logfile.txt";
+
+  // 現在使用しているログファイルパス
+   static std::string fileName;
 };
 
 #endif

@@ -11,8 +11,9 @@
 class RelativeRotation : public Rotation {
  public:
   RelativeRotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                   double _deltaAngle);
+                   const Pid::PidGain& _anglePidGain, double _deltaAngle);
 
+ protected:
   void prepare() override;
 
  private:

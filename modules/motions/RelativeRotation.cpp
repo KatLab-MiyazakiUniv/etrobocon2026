@@ -7,14 +7,13 @@
 
 RelativeRotation::RelativeRotation(
     Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-    double _deltaAngle)
-  : Rotation(_robot, std::move(_continuationCondition)), deltaAngle(_deltaAngle)
+    const Pid::PidGain& _anglePidGain, double _deltaAngle)
+  : Rotation(_robot, std::move(_continuationCondition), _anglePidGain), deltaAngle(_deltaAngle)
 {
 }
 
 void RelativeRotation::prepare()
 {
-  Rotation::prepare();
-
+  double initialAngle = getCurrentAngle();
   targetAngle = normalizeAngle(initialAngle + deltaAngle);
 }

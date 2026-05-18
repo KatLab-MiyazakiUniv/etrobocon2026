@@ -87,12 +87,15 @@ if(ENABLE_CAMERA_TESTS)
   set(CAMERA_INCLUDE_DIRS
     ${CAMERA_MODULE_DIR}/camera
     ${CAMERA_MODULE_DIR}/utils
+    ${CAMERA_MODULE_DIR}/image_processors
+    ${PROJECT_SOURCE_DIR}/common
   )
 
   # ソースファイルの登録 (適宜登録)
   file(GLOB_RECURSE CAMERA_SOURCES
     "${CAMERA_MODULE_DIR}/camera/*.cpp"
     "${CAMERA_MODULE_DIR}/utils/*.cpp"
+    "${CAMERA_MODULE_DIR}/image_processors/*.cpp"
   )
 
   # ライブラリターゲットを作成

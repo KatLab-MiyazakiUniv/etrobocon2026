@@ -21,6 +21,7 @@ TEST(LoggerTest, InfoWritesInfoLineToFile)
 
   std::filesystem::create_directories(logDir);
   Logger::init();
+  Logger::setFileName(logPath.c_str());
   Logger::info("test message");
   Logger::outputToFile();
 
@@ -35,6 +36,7 @@ TEST(LoggerTest, PrintfLogFormatsMessageCorrectly)
 
   std::filesystem::create_directories(logDir);
   Logger::init();
+  Logger::setFileName(logPath.c_str());
   Logger::printfLog(Logger::DEBUG, "value=%d", 123);
   Logger::outputToFile();
 
@@ -49,6 +51,7 @@ TEST(LoggerTest, OutputsAllLogLevelsToFile)
 
   std::filesystem::create_directories(logDir);
   Logger::init();
+  Logger::setFileName(logPath.c_str());
   Logger::info("info");
   Logger::warning("warning");
   Logger::error("error");

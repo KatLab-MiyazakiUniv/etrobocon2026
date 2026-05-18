@@ -10,6 +10,9 @@
 char Logger::logs[LOG_BUFFER_SIZE] = "";
 int Logger::currentIndex = 0;
 
+// 現在のログファイルパス
+std::string Logger::fileName = Logger::DEFAULT_FILE_NAME;
+
 // ログの初期化
 void Logger::init()
 {
@@ -93,10 +96,20 @@ void Logger::write(Level level, const char* message)
   }
 }
 
+// ログファイルの出力先変更
+void Logger::setFileName(const char* path)
+{
+  if(path != nullptr) {
+    fileName =
+        std::string("/RasPike-ART/sdk/workspace/etrobocon2026/")
+        + path;
+  }
+}
+
 // ログファイルの出力
 void Logger::outputToFile()
 {
-  FILE* file = fopen(fileName, "w");
+  FILE* file = fopen(fileName.c_str(), "w");
 
   if(file == NULL) {
     warning("Failed to open log file");
@@ -143,8 +156,8 @@ const char* Logger::levelToColor(Level level)
       return "\x1b[36m";
 
     case WARNING:
-      // 桜色(櫻坂)
-      return "\x1b[95m";
+      // 白色(櫻坂)
+      return "\x1b[37m";
 
     case ERROR:
       // 紫色(乃木坂)

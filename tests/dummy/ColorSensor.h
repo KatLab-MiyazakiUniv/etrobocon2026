@@ -32,10 +32,9 @@ namespace spikeapi {
      * コンストラクタ
      * @param port PUPポートID
      */
-    ColorSensor(EPort port) : mPort(port), mReflection(0), mAmbient(0)
+    ColorSensor(EPort port) : mPort(port)
     {
-      mRGB = { 0, 0, 0 };
-      mHSV = { 0, 0, 0 };
+      // 静的メンバは一度だけ初期化されるため、ここでは何もしない
     }
 
     /**
@@ -43,7 +42,7 @@ namespace spikeapi {
      * @param rgb 値を設定するRGB構造体
      * @return -
      */
-    void getRGB(RGB& rgb) const { rgb = mRGB; }
+    void getRGB(RGB& rgb) const { rgb = sRGB; }
 
     /**
      * @brief カラーセンサで色を測定する
@@ -51,7 +50,7 @@ namespace spikeapi {
      * @param surface trueならば表面の色から、falseならば他の光源の色を検出する
      * @return -
      */
-    void getColor(HSV& hsv, bool surface = true) const { hsv = mHSV; }
+    void getColor(HSV& hsv, bool surface = true) const { hsv = sHSV; }
 
     /**
      * @brief カラーセンサで色を測定する（近似なし）
@@ -59,19 +58,19 @@ namespace spikeapi {
      * @param surface trueならば表面の色から、falseならば他の光源の色を検出する
      * @return -
      */
-    void getHSV(HSV& hsv, bool surface = true) const { hsv = mHSV; }
+    void getHSV(HSV& hsv, bool surface = true) const { hsv = sHSV; }
 
     /**
      * @brief センサーの発する光を表面がどの程度反射するかを測定する
      * @return どの程度反射しているか（％）
      */
-    int32_t getReflection() const { return mReflection; }
+    int32_t getReflection() const { return sReflection; }
 
     /**
      * @brief 周囲の光の強度を測定する
      * @return 周囲の光の強度（％）
      */
-    int32_t getAmbient() const { return mAmbient; }
+    int32_t getAmbient() const { return sAmbient; }
 
     /**
      * @brief カラーセンサのライトを設定する
@@ -108,13 +107,20 @@ namespace spikeapi {
     /**
      * @brief インスタンス生成が正常にできたかどうかを確認するための共通メソッド
      */
-    bool hasError() { return false; }
+    bool hasError() { return sHasError; }
 
     // テスト用メンバ（値を外部から操作可能にする）
-    RGB mRGB;
-    HSV mHSV;
-    int32_t mReflection;
-    int32_t mAmbient;
+    static RGB sRGB;
+    static HSV sHSV;
+    static int32_t sReflection;
+    static int32_t sAmbient;
+    static bool sHasError; //hasError()の戻り値を制御するため
+
+    static void setRGB(RGB rgb) { sRGB = rgb; }
+    static void setHSV(HSV hsv) { sHSV = hsv; }
+    static void setReflection(int32_t reflection) { sReflection = reflection; }
+    static void setAmbient(int32_t ambient) { sAmbient = ambient; }
+    static void setHasError(bool hasError) { sHasError = hasError; }
 
    private:
     EPort mPort;

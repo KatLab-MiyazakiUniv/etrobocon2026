@@ -8,11 +8,29 @@
 #define COLOR_SENSOR_CONTROLLER_H
 
 #include "ColorSensor.h"
-
-using namespace spikeapi;
+#include <cstdint> // uint16_t, uint8_tを使用するため
+#include <iostream> // エラー出力用
 
 class ColorSensorController {
  public:
+  /**
+   * @brief RGB値を保持する構造体
+   */
+  struct RGB {
+    uint16_t r;
+    uint16_t g;
+    uint16_t b;
+  };
+
+  /**
+   * @brief HSV値を保持する構造体
+   */
+  struct HSV {
+    uint16_t h;
+    uint8_t  s;
+    uint8_t  v;
+  };
+
   /**
    * コンストラクタ
    * @param port 接続ポート
@@ -35,13 +53,21 @@ class ColorSensorController {
    * @brief 生のRGB値を取得する
    * @param rgb [out] RGB値を格納する構造体
    */
-  void getRawRGB(ColorSensor::RGB& rgb);
+  void getRawRGB(RGB& rgb);
 
   /**
    * @brief HSV値を取得する (近似なし)
    * @param hsv [out] HSV値を格納する構造体
+   * @param surface [in] trueならば表面の色から、falseならば他の光源の色を検出する
    */
-  void getRawHSV(ColorSensor::HSV& hsv);
+  void getRawHSV(HSV& hsv, bool surface = true);
+
+  /**
+   * @brief カラーセンサで色を測定する
+   * @param hsv [out] HSV値を格納する構造体
+   * @param surface [in] trueならば表面の色から、falseならば他の光源の色を検出する
+   */
+  void getColor(HSV& hsv, bool surface = true);
 
   /**
    * @brief ライトを点灯する (標準の白)
@@ -61,8 +87,24 @@ class ColorSensorController {
    */
   void setLightColor(int r, int g, int b);
 
+  /*
+   * @brief カラーセンサが検知する色を設定する
+   * @note 現在は未実装だが実装予定のためコメントアウト
+   * @param size カラーの配列のサイズ
+   * @param colors カラーの配列
+   * @return -
+   */
+  // void setDetectableColors(int32_t size, pup_color_hsv_t *colors);
+
+  /**
+   * @brief インスタンス生成が正常にできたかどうかを確認する
+   * @retval true 正常に生成できなかった
+   * @retval false 正常に生成できた
+   */
+  bool hasError();
+
  private:
-  ColorSensor colorSensor;  // カラーセンサインスタンス
+  spikeapi::ColorSensor colorSensor;  // カラーセンサインスタンス
 };
 
 #endif

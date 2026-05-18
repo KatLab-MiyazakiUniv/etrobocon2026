@@ -11,6 +11,7 @@
 #include "ArmMotorController.h"
 #include "IMUController.h"
 #include "ColorSensorController.h"
+
 class Robot {
  public:
   /**
@@ -37,6 +38,10 @@ class Robot {
    */
   IMUController& getIMUControllerInstance();
 
+  /**
+   * @brief ColorSensorControllerのインスタンスの参照を返す
+   * @return メンバ変数 colorSensorController(ColorSensorController のインスタンス) の参照
+   */
   ColorSensorController& getColorSensorControllerInstance();
 
  private:

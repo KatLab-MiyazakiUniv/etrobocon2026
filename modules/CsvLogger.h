@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <filesystem>
+#include <string.h>
 // #include "ClockUtil.h"
 
 class CsvLogger {
@@ -37,13 +38,24 @@ class CsvLogger {
    */
   static void outputToFile();
 
+    /**
+   * @brief ログファイルの出力先を変更
+   * @param path 出力先パス
+   */
+  static void setFileName(const char* path);
+
  private:
   static constexpr int LOG_BUFFER_SIZE = 65536;  // ログ全体のバッファサイズ
   static constexpr int LINE_BUFFER_SIZE = 128;   // 1メッセージのバッファサイズ
   static char logs[LOG_BUFFER_SIZE];             // ログのバッファ
   static int currentIndex;                       // ログの現在のインデックス
 
-  static constexpr const char* csvFileName = "datafiles/logfiles/runlog.csv";  // CSVファイルのパス
+    // デフォルトのログファイルパス
+  static constexpr const char* DEFAULT_CSV_NAME =
+      "/RasPike-ART/sdk/workspace/etrobocon2026/datafiles/logfiles/runlog.csv";
+
+  // 現在使用しているログファイルパス
+   static std::string fileName;
 };
 
 #endif

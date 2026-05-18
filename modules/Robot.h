@@ -10,7 +10,7 @@
 #include "WheelMotorController.h"
 #include "ArmMotorController.h"
 #include "IMUController.h"
-#include "Area.h"
+#include "Course.h"
 
 class Robot {
  public:

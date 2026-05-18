@@ -8,12 +8,13 @@
 RelativeRotation::RelativeRotation(
     Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
     double _deltaAngle)
-  : Rotation(_robot, std::move(_continuationCondition)), deltaAngle(_deltaAngle), initialAngle(0.0)
+  : Rotation(_robot, std::move(_continuationCondition)), deltaAngle(_deltaAngle)
 {
-  initialAngle = robot.getIMUControllerInstance().getAzimuth();
 }
 
-double RelativeRotation::getTargetAngle()
+void RelativeRotation::prepare()
 {
-  return initialAngle + deltaAngle;
+  Rotation::prepare();
+
+  targetAngle = normalizeAngle(initialAngle + deltaAngle);
 }

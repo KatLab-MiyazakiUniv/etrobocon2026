@@ -13,17 +13,21 @@ class Rotation : public BaseMotion {
  public:
   Rotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition);
 
+  void prepare() override;
+
  protected:
   void executeStep() override;
   void finish() override;
 
-  virtual double getTargetAngle() = 0;
-  double getCurrentAngle();
+  double normalizeAngle(double angle);
 
  protected:
   Pid pid;
   double currentRightPower;
   double currentLeftPower;
+  double initialAngle;
+  double targetAngle;
+  double getCurrentAngle();
 };
 
 #endif

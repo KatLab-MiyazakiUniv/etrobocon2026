@@ -13,12 +13,10 @@ class RelativeRotation : public Rotation {
   RelativeRotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                    double _deltaAngle);
 
- protected:
-  double getTargetAngle() override;
+  void prepare() override;
 
  private:
   double deltaAngle;
-  double initialAngle;
 };
 
 #endif

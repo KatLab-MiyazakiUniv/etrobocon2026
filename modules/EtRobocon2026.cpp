@@ -25,6 +25,7 @@ void EtRobocon2026::start()
   // 条件を満たすまで回転
   while(rotation.shouldContinue()) {
     rotation.executeStep();
+    std::cout << robot.getIMUControllerInstance().getAzimuth() << std::endl;
   }
 
   // 終了処理

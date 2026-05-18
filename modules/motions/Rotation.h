@@ -28,6 +28,8 @@ class Rotation : public BaseMotion {
   double initialAngle;
   double targetAngle;
   double getCurrentAngle();
+
+  bool isFinished();
 };
 
 #endif

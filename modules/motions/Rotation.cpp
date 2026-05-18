@@ -4,6 +4,12 @@
  * @author okuyama0528 yutaro-1214
  */
 
+/**
+ * @file   Rotation.cpp
+ * @brief  その場回転動作を実行するクラス
+ * @author okuyama0528 yutaro-1214
+ */
+
 #include "Rotation.h"
 #include <cmath>
 #include <algorithm>
@@ -13,6 +19,7 @@ Rotation::Rotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _co
     pid(0.8, 0.0, 0.05, 0.0),
     currentRightPower(0),
     currentLeftPower(0),
+    initialAngle(0.0),
     targetAngle(0.0)
 {
 }
@@ -23,7 +30,7 @@ double Rotation::getCurrentAngle()
   return robot.getIMUControllerInstance().getAzimuth();
 }
 
-// 準備（必要なら派生側でtargetAngleを確定させる）
+// 準備（動作開始時）
 void Rotation::prepare()
 {
   initialAngle = getCurrentAngle();
@@ -38,7 +45,6 @@ void Rotation::executeStep()
 
   double turn = pid.calculatePid(error, 0.0);
 
-  // 出力制限
   turn = std::clamp(turn, -60.0, 60.0);
 
   currentRightPower = -turn;
@@ -53,6 +59,13 @@ void Rotation::finish()
 {
   robot.getWheelMotorControllerInstance().setRightPower(0);
   robot.getWheelMotorControllerInstance().setLeftPower(0);
+}
+bool Rotation::isFinished()
+{
+  double currentAngle = getCurrentAngle();
+  double error = normalizeAngle(targetAngle - currentAngle);
+
+  return std::fabs(error) < 2.0;
 }
 
 // 角度正規化（-180〜180）

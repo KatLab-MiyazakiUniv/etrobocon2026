@@ -37,7 +37,7 @@ namespace etrobocon2026_test {
     Logger::outputToFile();
 
     const std::string contents = ReadFileContents(expectedPath);
-    EXPECT_EQ(contents.find("[INFO] test message\n"), std::string::npos);
+    EXPECT_NE(contents.find("[INFO] test message\n"), std::string::npos);
   }
 
   // printfLog() がフォーマット済みメッセージを正しく書き出すことを確認する
@@ -56,7 +56,7 @@ namespace etrobocon2026_test {
     Logger::outputToFile();
 
     const std::string contents = ReadFileContents(expectedPath);
-    EXPECT_EQ(contents.find("[DEBUG] value=123\n"), std::string::npos);
+    EXPECT_NE(contents.find("[DEBUG] value=123\n"), std::string::npos);
   }
 
   // 4 種類のログレベルがそれぞれファイルに出力されることを確認する
@@ -79,9 +79,9 @@ namespace etrobocon2026_test {
 
     // 各出力がファイルに書き込まれていることを確認する
     const std::string contents = ReadFileContents(expectedPath);
-    EXPECT_EQ(contents.find("[INFO] info\n"), std::string::npos);
-    EXPECT_EQ(contents.find("[WARNING] warning\n"), std::string::npos);
-    EXPECT_EQ(contents.find("[ERROR] error\n"), std::string::npos);
-    EXPECT_EQ(contents.find("[DEBUG] debug\n"), std::string::npos);
+    EXPECT_NE(contents.find("[INFO] info\n"), std::string::npos);
+    EXPECT_NE(contents.find("[WARNING] warning\n"), std::string::npos);
+    EXPECT_NE(contents.find("[ERROR] error\n"), std::string::npos);
+    EXPECT_NE(contents.find("[DEBUG] debug\n"), std::string::npos);
   }
 }  // namespace etrobocon2026_test

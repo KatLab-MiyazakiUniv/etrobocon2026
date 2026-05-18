@@ -31,10 +31,8 @@ void Rotation::executeStep()
 
   double turn = anglePid.calculatePid(error, 0.0);
 
-  turn = std::clamp(turn, -60.0, 60.0);
-
-  currentRightPower = -turn;
-  currentLeftPower = turn;
+  currentRightPower = turn;
+  currentLeftPower = -turn;
 
   robot.getWheelMotorControllerInstance().setRightPower(currentRightPower);
   robot.getWheelMotorControllerInstance().setLeftPower(currentLeftPower);

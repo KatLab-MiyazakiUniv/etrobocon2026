@@ -72,7 +72,7 @@ class Logger {
    * @brief ログファイルの出力先を変更
    * @param path 出力先パス
    */
-  static void setFileName(const char* path);
+  static void setFileName(const std::string& path);
 
  private:
   /**
@@ -99,10 +99,6 @@ class Logger {
 
   static char logs[LOG_BUFFER_SIZE];  // ログのバッファ
   static int currentIndex;            // ログの現在のインデックス
-
-  // デフォルトのログファイルパス
-  static constexpr const char* DEFAULT_FILE_NAME
-      = "/RasPike-ART/sdk/workspace/etrobocon2026/datafiles/logfiles/logfile.txt";
 
   // 現在使用しているログファイルパス
   static std::string fileName;

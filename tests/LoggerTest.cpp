@@ -24,13 +24,13 @@ namespace etrobocon2026_test {
   // info() で出力したログがファイルに保存されることを確認する
   TEST(LoggerTest, InfoWritesInfoLineToFile)
   {
-    const std::string logPath = "/tests/datafiles/logfiles/logfile.txt";
-    const std::string expectedPath
-        = "/RasPike-ART/sdk/workspace/etrobocon2026/tests/datafiles/logfiles/logfile.txt";
+    const std::string logPath =
+    "../tests/datafiles/logfiles/logfile.txt";
+    const std::string expectedPath = logPath;
 
     // ログを初期化して、出力先ファイル名を設定する
     Logger::init();
-    Logger::setFileName(logPath.c_str());
+    Logger::setFileName(logPath);
 
     // INFO レベルのメッセージをログバッファに追加し、ファイルへ保存する
     Logger::info("test message");
@@ -43,13 +43,13 @@ namespace etrobocon2026_test {
   // printfLog() がフォーマット済みメッセージを正しく書き出すことを確認する
   TEST(LoggerTest, PrintfLogFormatsMessageCorrectly)
   {
-    const std::string logPath = "/tests/datafiles/logfiles/logfile.txt";
-    const std::string expectedPath
-        = "/RasPike-ART/sdk/workspace/etrobocon2026/tests/datafiles/logfiles/logfile.txt";
+    const std::string logPath =
+    "../tests/datafiles/logfiles/logfile.txt";
+    const std::string expectedPath = logPath;
 
     // ログを初期化して出力先を設定する
     Logger::init();
-    Logger::setFileName(logPath.c_str());
+    Logger::setFileName(logPath);
 
     // DEBUG メッセージをフォーマット出力する
     Logger::printfLog(Logger::DEBUG, "value=%d", 123);
@@ -62,13 +62,13 @@ namespace etrobocon2026_test {
   // 4 種類のログレベルがそれぞれファイルに出力されることを確認する
   TEST(LoggerTest, OutputsAllLogLevelsToFile)
   {
-    const std::string logPath = "/tests/datafiles/logfiles/logfile2.txt";
+    const std::string logPath =
+    "../tests/datafiles/logfiles/logfile2.txt";;
     const std::string expectedPath
-        = "/RasPike-ART/sdk/workspace/etrobocon2026/tests/datafiles/logfiles/logfile2.txt";
-
+        = "etrobocon2026/tests/datafiles/logfiles/logfile2.txt";
     // ログを初期化して、出力先ファイル名を設定する
     Logger::init();
-    Logger::setFileName(logPath.c_str());
+    Logger::setFileName(logPath);
 
     // 4 種類のログレベルを順に出力する
     Logger::info("info");
@@ -78,7 +78,7 @@ namespace etrobocon2026_test {
     Logger::outputToFile();
 
     // 各出力がファイルに書き込まれていることを確認する
-    const std::string contents = ReadFileContents(expectedPath);
+    const std::string contents = ReadFileContents(logPath);
     EXPECT_NE(contents.find("[INFO] info\n"), std::string::npos);
     EXPECT_NE(contents.find("[WARNING] warning\n"), std::string::npos);
     EXPECT_NE(contents.find("[ERROR] error\n"), std::string::npos);

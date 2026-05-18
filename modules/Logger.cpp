@@ -5,13 +5,16 @@
  */
 
 #include "Logger.h"
+#include <fstream>
+#include <iostream>
+
+using namespace std;
 
 // ログのバッファとインデックスの初期化
 char Logger::logs[LOG_BUFFER_SIZE] = "";
 int Logger::currentIndex = 0;
 
-// 現在のログファイルパス
-std::string Logger::fileName = Logger::DEFAULT_FILE_NAME;
+string Logger::fileName = "datafiles/logfiles/logfile.txt";
 
 // ログの初期化
 void Logger::init()
@@ -97,26 +100,52 @@ void Logger::write(Level level, const char* message)
 }
 
 // ログファイルの出力先変更
-void Logger::setFileName(const char* path)
+void Logger::setFileName(const std::string& path)
 {
-  if(path != nullptr) {
-    fileName = std::string("/RasPike-ART/sdk/workspace/etrobocon2026/") + path;
+  if(!path.empty()) {
+    Logger::fileName = path;
   }
 }
 
 // ログファイルの出力
 void Logger::outputToFile()
 {
-  FILE* file = fopen(fileName.c_str(), "w");
-
-  if(file == NULL) {
-    warning("Failed to open log file");
+  if(Logger::fileName.empty()) {
+    warning("Log file name is empty");
     return;
   }
 
-  fprintf(file, "%s", logs);
+  std::filesystem::path outputPath(Logger::fileName);
 
-  fclose(file);
+  std::cout << "Current path: "
+            << std::filesystem::current_path() << std::endl;
+
+  std::cout << "Output path: "
+            << std::filesystem::absolute(outputPath) << std::endl;
+
+  if(!outputPath.parent_path().empty()) {
+    try {
+      std::filesystem::create_directories(outputPath.parent_path());
+    } catch(...) {
+      warning("Failed to create log directory");
+      return;
+    }
+  }
+
+  std::ofstream file(outputPath, std::ios::binary | std::ios::trunc);
+
+  if(!file.is_open()) {
+    warning("Failed to open or create log file");
+    return;
+  }
+
+  file.write(logs, currentIndex);
+
+  file.flush();
+
+  if(!file.good()) {
+    warning("Failed to write log file");
+  }
 }
 
 // ログレベルを文字列に変換

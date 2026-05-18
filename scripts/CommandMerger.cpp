@@ -15,7 +15,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include "../modules/Area.h"
+#include "../modules/Course.h"
 
 // CSVの区切り文字
 constexpr char SEPARATOR = ',';

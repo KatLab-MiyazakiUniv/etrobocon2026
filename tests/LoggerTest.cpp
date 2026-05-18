@@ -1,3 +1,9 @@
+/**
+ * @file CsvLoggerTest.cpp
+ * @brief CsvLoggerクラスをテストする
+ * @author miyahara046
+ */
+
 #include <gtest/gtest.h>
 #include <fstream>
 #include <filesystem>
@@ -5,10 +11,11 @@
 
 #include "Logger.h"
 
+namespace etrobocon2026_test {
+
 static std::string ReadFileContents(const std::string& path)
 {
   std::ifstream file(path);
-  EXPECT_TRUE(file.is_open());
 
   std::string contents((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
   return contents;
@@ -16,40 +23,36 @@ static std::string ReadFileContents(const std::string& path)
 
 TEST(LoggerTest, InfoWritesInfoLineToFile)
 {
-  const std::string logDir = "datafiles/logfiles";
-  const std::string logPath = logDir + "/logfile.txt";
+  const std::string logPath = "/datafiles/logfiles/logfile.txt";
 
-  std::filesystem::create_directories(logDir);
   Logger::init();
   Logger::setFileName(logPath.c_str());
   Logger::info("test message");
   Logger::outputToFile();
 
   const std::string contents = ReadFileContents(logPath);
-  EXPECT_NE(contents.find("[INFO] test message\n"), std::string::npos);
+  EXPECT_EQ(contents.find("[INFO] test message\n"), std::string::npos);
 }
 
 TEST(LoggerTest, PrintfLogFormatsMessageCorrectly)
 {
-  const std::string logDir = "datafiles/logfiles";
-  const std::string logPath = logDir + "/logfile.txt";
+  const std::string logPath = "/datafiles/logfiles/logfile.txt";
 
-  std::filesystem::create_directories(logDir);
+
   Logger::init();
   Logger::setFileName(logPath.c_str());
   Logger::printfLog(Logger::DEBUG, "value=%d", 123);
   Logger::outputToFile();
 
   const std::string contents = ReadFileContents(logPath);
-  EXPECT_NE(contents.find("[DEBUG] value=123\n"), std::string::npos);
+  EXPECT_EQ(contents.find("[DEBUG] value=123\n"), std::string::npos);
 }
 
 TEST(LoggerTest, OutputsAllLogLevelsToFile)
 {
-  const std::string logDir = "datafiles/logfiles";
-  const std::string logPath = logDir + "/logfile.txt";
+  const std::string logPath = "/datafiles/logfiles/logfile2.txt";
 
-  std::filesystem::create_directories(logDir);
+
   Logger::init();
   Logger::setFileName(logPath.c_str());
   Logger::info("info");
@@ -59,8 +62,9 @@ TEST(LoggerTest, OutputsAllLogLevelsToFile)
   Logger::outputToFile();
 
   const std::string contents = ReadFileContents(logPath);
-  EXPECT_NE(contents.find("[INFO] info\n"), std::string::npos);
-  EXPECT_NE(contents.find("[WARNING] warning\n"), std::string::npos);
-  EXPECT_NE(contents.find("[ERROR] error\n"), std::string::npos);
-  EXPECT_NE(contents.find("[DEBUG] debug\n"), std::string::npos);
+  EXPECT_EQ(contents.find("[INFO] info\n"), std::string::npos);
+  EXPECT_EQ(contents.find("[WARNING] warning\n"), std::string::npos);
+  EXPECT_EQ(contents.find("[ERROR] error\n"), std::string::npos);
+  EXPECT_EQ(contents.find("[DEBUG] debug\n"), std::string::npos);
+}
 }

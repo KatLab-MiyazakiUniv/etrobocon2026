@@ -1,35 +1,52 @@
 /**
  * @file   Rotation.cpp
- * @brief  IMU方位角を用いたその場回転動作を実行するクラス
- * @author yutaro-1214
+ * @brief  その場回転動作を実行するクラス
+ * @author okuyama0528 yutaro-1214
  */
 
 #include "Rotation.h"
+#include <cmath>
+#include <algorithm>
 
 Rotation::Rotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                   float _targetTurnPower)
-  : BaseMotion(_robot, std::move(_continuationCondition)), targetTurnPower(_targetTurnPower)
+                   const Pid::PidGain& _anglePidGain)
+  : BaseMotion(_robot, std::move(_continuationCondition)),
+    targetAngle(0.0),
+    anglePid(_anglePidGain.kp, _anglePidGain.ki, _anglePidGain.kd, 0.0),
+    currentRightPower(0),
+    currentLeftPower(0)
 {
+}
+
+double Rotation::getCurrentAngle()
+{
+  return robot.getIMUControllerInstance().getAzimuth();
 }
 
 void Rotation::executeStep()
 {
-  // その場回転
-  // 正値:
-  //   右車輪前進
-  //   左車輪後退
-  //
-  // 負値:
-  //   右車輪後退
-  //   左車輪前進
+  double currentAngle = getCurrentAngle();
 
-  robot.getWheelMotorControllerInstance().setRightPower(targetTurnPower);
+  double error = normalizeAngle(targetAngle - currentAngle);
 
-  robot.getWheelMotorControllerInstance().setLeftPower(-targetTurnPower);
+  double turn = anglePid.calculatePid(error, 0.0);
+
+  currentRightPower = turn;
+  currentLeftPower = -turn;
+
+  robot.getWheelMotorControllerInstance().setRightPower(currentRightPower);
+  robot.getWheelMotorControllerInstance().setLeftPower(currentLeftPower);
 }
 
 void Rotation::finish()
 {
-  // 両モータ停止
-  robot.getWheelMotorControllerInstance().stopBoth();
+  robot.getWheelMotorControllerInstance().setRightPower(0);
+  robot.getWheelMotorControllerInstance().setLeftPower(0);
+}
+
+double Rotation::normalizeAngle(double angle)
+{
+  while(angle > 180.0) angle -= 360.0;
+  while(angle < -180.0) angle += 360.0;
+  return angle;
 }

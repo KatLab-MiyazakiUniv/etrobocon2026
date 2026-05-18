@@ -1,34 +1,31 @@
 /**
  * @file   EtRobocon2026.cpp
  * @brief  全体を制御するクラス
- * @author yutaro-1214
+ * @author HaruArima08
  */
-
 #include "EtRobocon2026.h"
-
+#include "RelativeRotation.h"
+#include "AbsoluteRotation.h"
+#include "RelativeAngleContinuationCondition.h"
+#include "AbsoluteAngleContinuationCondition.h"
 #include <iostream>
 #include <memory>
 
-#include "Rotation.h"
-#include "motions/continuation_conditions/AbsoluteAngleCondition.h"
-
 void EtRobocon2026::start()
 {
+  std::cout << "Hello KATLAB" << std::endl;
+
   Robot robot;
 
-  std::cout << "Rotation Test Start" << std::endl;
+  Pid::PidGain anglePidGain(0.8, 0.0, 0.05);
 
-  // 方位角リセット
-  robot.getIMUControllerInstance().resetAzimuth();
+  // 相対角度回頭（現在角度から80度回転）
+  auto relCondition = std::make_unique<RelativeAngleContinuationCondition>(robot, 80.0);
+  RelativeRotation relRotation(robot, std::move(relCondition), anglePidGain, 80.0);
+  relRotation.run();
 
-  // 30度回転条件
-  auto condition = std::make_unique<AbsoluteAngleCondition>(robot, 30.0f);
-
-  // 回転動作生成
-  Rotation rotation(robot, std::move(condition), 30.0f);
-
-  // 実行
-  rotation.run();
-
-  std::cout << "Rotation Test End" << std::endl;
+  // 絶対角度回頭（北を0度として90度の方向を向く）
+  // auto absCondition = std::make_unique<AbsoluteAngleContinuationCondition>(robot, 90.0);
+  // AbsoluteRotation absRotation(robot, std::move(absCondition), anglePidGain, 90.0);
+  // absRotation.run();
 }

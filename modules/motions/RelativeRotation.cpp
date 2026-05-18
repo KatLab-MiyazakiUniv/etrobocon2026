@@ -5,8 +5,10 @@
  */
 #include "RelativeRotation.h"
 
-RelativeRotation::RelativeRotation(Robot& _robot, double _deltaAngle)
-  : Rotation(_robot), deltaAngle(_deltaAngle)
+RelativeRotation::RelativeRotation(
+    Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+    double _deltaAngle)
+  : Rotation(_robot, std::move(_continuationCondition)), deltaAngle(_deltaAngle)
 {
 }
 

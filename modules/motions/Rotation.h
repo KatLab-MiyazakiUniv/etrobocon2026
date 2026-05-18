@@ -15,11 +15,10 @@ class Rotation : public BaseMotion {
 
   void prepare() override;
 
- protected:
+ public:
   void executeStep() override;
   void finish() override;
-
-  double normalizeAngle(double angle);
+  bool isFinished();
 
  protected:
   Pid pid;
@@ -28,8 +27,7 @@ class Rotation : public BaseMotion {
   double initialAngle;
   double targetAngle;
   double getCurrentAngle();
-
-  bool isFinished();
+  double normalizeAngle(double angle);
 };
 
 #endif

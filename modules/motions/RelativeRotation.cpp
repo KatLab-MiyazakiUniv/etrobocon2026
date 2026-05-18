@@ -3,18 +3,21 @@
  * @brief  相対角度で回頭動作を実行するクラス
  * @author okuyama0528
  */
+#include "EtRobocon2026.h"
 #include "RelativeRotation.h"
+#include <iostream>
 
-RelativeRotation::RelativeRotation(
-    Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-    double _deltaAngle)
-  : Rotation(_robot, std::move(_continuationCondition)), deltaAngle(_deltaAngle)
+void EtRobocon2026::start()
 {
-}
+  std::cout << "Hello KATLAB" << std::endl;
 
-void RelativeRotation::prepare()
-{
-  Rotation::prepare();
+  RelativeRotation rotation(robot, 80.0);
 
-  targetAngle = normalizeAngle(initialAngle + deltaAngle);
+  rotation.prepare();
+
+  while(!rotation.isFinished()) {
+    rotation.executeStep();
+  }
+
+  rotation.finish();
 }

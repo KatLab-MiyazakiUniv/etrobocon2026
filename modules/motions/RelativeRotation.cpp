@@ -1,7 +1,7 @@
 /**
  * @file   RelativeRotation.cpp
  * @brief  相対角度で回頭動作を実行するクラス
- * @author okuyama0528
+ * @author okuyama0528　yutaro-1214
  */
 #include "RelativeRotation.h"
 
@@ -14,6 +14,8 @@ RelativeRotation::RelativeRotation(
 
 void RelativeRotation::prepare()
 {
+  // 現在のロボットの角度を取得する
   double initialAngle = getCurrentAngle();
+  // 現在角度に回頭したい相対角度（deltaAngle)を足して目標角度を決定する
   targetAngle = normalizeAngle(initialAngle + deltaAngle);
 }

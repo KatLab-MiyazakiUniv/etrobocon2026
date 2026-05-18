@@ -22,3 +22,8 @@ IMUController& Robot::getIMUControllerInstance()
 {
   return imuController;
 }
+
+Course& Robot::getCourse()
+{
+  return course;
+}

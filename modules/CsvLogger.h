@@ -8,9 +8,11 @@
 #define CSV_LOGGER_HPP
 
 #include <stdio.h>
+#include <string.h>
+#include <stdarg.h>
 #include <stdint.h>
 #include <filesystem>
-#include <string.h>
+#include <string>
 // #include "ClockUtil.h"
 
 class CsvLogger {
@@ -42,17 +44,13 @@ class CsvLogger {
    * @brief ログファイルの出力先を変更
    * @param path 出力先パス
    */
-  static void setFileName(const char* path);
+  static void setFileName(const std::string& path);
 
  private:
   static constexpr int LOG_BUFFER_SIZE = 65536;  // ログ全体のバッファサイズ
   static constexpr int LINE_BUFFER_SIZE = 128;   // 1メッセージのバッファサイズ
   static char logs[LOG_BUFFER_SIZE];             // ログのバッファ
   static int currentIndex;                       // ログの現在のインデックス
-
-  // デフォルトのログファイルパス
-  static constexpr const char* DEFAULT_CSV_NAME
-      = "/RasPike-ART/sdk/workspace/etrobocon2026/datafiles/logfiles/runlog.csv";
 
   // 現在使用しているログファイルパス
   static std::string fileName;

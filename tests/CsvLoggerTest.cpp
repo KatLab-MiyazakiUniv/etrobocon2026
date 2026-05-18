@@ -11,6 +11,8 @@
 
 #include "CsvLogger.h"
 
+using namespace std;
+
 namespace etrobocon2026_test {
 
   // テスト用 CSV ファイルの内容を読み取るユーティリティ関数
@@ -25,9 +27,9 @@ namespace etrobocon2026_test {
   // writeHeader() と add() の呼び出し結果が CSV ファイルへ正しく書き込まれることを確認する
   TEST(CsvLoggerTest, WriteHeaderAndAddEntriesToFile)
   {
-    const std::string logPath = "/tests/datafiles/logfiles/runlog.csv";
-    const std::string expectedPath
-        = "/RasPike-ART/sdk/workspace/etrobocon2026/tests/datafiles/logfiles/runlog.csv";
+     const std::string logPath =
+    "../tests/datafiles/logfiles/runlog.csv";
+    const std::string expectedPath = logPath;
 
     // CSV ログを初期化して出力先を設定する
     CsvLogger::init();
@@ -45,9 +47,9 @@ namespace etrobocon2026_test {
   // 複数回 add() を呼び出したときに、CSV ファイルに各行が連続して保存されることを確認する
   TEST(CsvLoggerTest, MultipleAddCallsAppendLines)
   {
-    const std::string logPath = "/tests/datafiles/logfiles/runlog.csv";
-    const std::string expectedPath
-        = "/RasPike-ART/sdk/workspace/etrobocon2026/tests/datafiles/logfiles/runlog.csv";
+        const std::string logPath =
+    "../tests/datafiles/logfiles/runlog.csv";
+    const std::string expectedPath = logPath;
     // CSV ログを初期化して出力先を設定する
     CsvLogger::init();
     CsvLogger::setFileName(logPath.c_str());

@@ -5,12 +5,14 @@
  */
 
 #include "CsvLogger.h"
+#include <fstream>
+#include <iostream>
 
 // CSVログのバッファとインデックスの初期化
 char CsvLogger::logs[LOG_BUFFER_SIZE] = "";
 int CsvLogger::currentIndex = 0;
 // 現在のログファイルパス
-std::string CsvLogger::fileName = CsvLogger::DEFAULT_CSV_NAME;
+std::string CsvLogger::fileName = "datafiles/logfiles/runlog.csv";
 
 // CSVログの初期化
 void CsvLogger::init()
@@ -61,26 +63,48 @@ void CsvLogger::add(int brightness, int rightPwm, int leftPwm)
 }
 
 // ログファイルの出力先変更
-void CsvLogger::setFileName(const char* path)
+void CsvLogger::setFileName(const std::string& path)
 {
-  if(path != nullptr) {
-    fileName = std::string("/RasPike-ART/sdk/workspace/etrobocon2026/") + path;
+  if(!path.empty()) {
+    CsvLogger::fileName = path;
   }
 }
 
-// 記録した走行ログをファイル出力する
+// ログファイルの出力
 void CsvLogger::outputToFile()
 {
-  FILE* outputFile = fopen(fileName.c_str(), "w");
-
-  if(outputFile == NULL) {
-    printf("cannot open csv file\n");
+  if(CsvLogger::fileName.empty()) {
+    std::cerr << "CsvLogger: file name is empty" << std::endl;
     return;
   }
 
-  printf("csv file open\n");
+  std::filesystem::path outputPath(CsvLogger::fileName);
 
-  fprintf(outputFile, "%s", logs);
+  std::cout << "Current path: "
+            << std::filesystem::current_path() << std::endl;
 
-  fclose(outputFile);
+  std::cout << "Output path: "
+            << std::filesystem::absolute(outputPath) << std::endl;
+
+  if(!outputPath.parent_path().empty()) {
+    try {
+      std::filesystem::create_directories(outputPath.parent_path());
+    } catch(...) {
+      std::cerr << "CsvLogger: failed to create csv directory" << std::endl;
+      return;
+    }
+  }
+
+  std::ofstream file(outputPath, std::ios::binary | std::ios::trunc);
+
+  if(!file.is_open()) {
+    std::cerr << "CsvLogger: failed to open or create csv file" << std::endl;
+    return;
+  }
+
+  file << logs;
+  file.flush();
+  if(!file.good()) {
+    std::cerr << "CsvLogger: failed to write csv file" << std::endl;
+  }
 }

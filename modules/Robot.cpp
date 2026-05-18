@@ -27,3 +27,8 @@ Course& Robot::getCourse()
 {
   return course;
 }
+
+void Robot::setCourse(Course course)
+{
+  this->course = course;
+}

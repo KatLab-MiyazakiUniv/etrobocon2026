@@ -101,11 +101,11 @@ class Logger {
   static int currentIndex;            // ログの現在のインデックス
 
   // デフォルトのログファイルパス
-  static constexpr const char* DEFAULT_FILE_NAME =
-      "/RasPike-ART/sdk/workspace/etrobocon2026/datafiles/logfiles/logfile.txt";
+  static constexpr const char* DEFAULT_FILE_NAME
+      = "/RasPike-ART/sdk/workspace/etrobocon2026/datafiles/logfiles/logfile.txt";
 
   // 現在使用しているログファイルパス
-   static std::string fileName;
+  static std::string fileName;
 };
 
 #endif

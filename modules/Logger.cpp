@@ -100,9 +100,7 @@ void Logger::write(Level level, const char* message)
 void Logger::setFileName(const char* path)
 {
   if(path != nullptr) {
-    fileName =
-        std::string("/RasPike-ART/sdk/workspace/etrobocon2026/")
-        + path;
+    fileName = std::string("/RasPike-ART/sdk/workspace/etrobocon2026/") + path;
   }
 }
 

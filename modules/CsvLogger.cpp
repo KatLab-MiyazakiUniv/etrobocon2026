@@ -64,9 +64,7 @@ void CsvLogger::add(int brightness, int rightPwm, int leftPwm)
 void CsvLogger::setFileName(const char* path)
 {
   if(path != nullptr) {
-    fileName =
-        std::string("/RasPike-ART/sdk/workspace/etrobocon2026/")
-        + path;
+    fileName = std::string("/RasPike-ART/sdk/workspace/etrobocon2026/") + path;
   }
 }
 

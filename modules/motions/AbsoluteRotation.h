@@ -10,8 +10,7 @@
 
 class AbsoluteRotation : public Rotation {
  public:
-  AbsoluteRotation(Robot& _robot,
-                   std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+  AbsoluteRotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                    const Pid::PidGain& _anglePidGain, double _specifiedTargetAngle);
 
  protected:

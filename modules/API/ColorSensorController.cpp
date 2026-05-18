@@ -5,26 +5,27 @@
  */
 
 #include "ColorSensorController.h"
-#include <iostream> // エラー出力用
+#include <iostream>  // エラー出力用
+#include <stdint.h>  // エラー出力用
 
 ColorSensorController::ColorSensorController(EPort port) : colorSensor(port)
 {
-  if (colorSensor.hasError()) {
+  if(colorSensor.hasError()) {
     std::cerr << "ColorSensorController: Failed to initialize color sensor on port "
               << static_cast<int>(port) << std::endl;
   }
 }
 
 // 反射光強度を取得する
-int ColorSensorController::getReflection()
+int32_t ColorSensorController::getReflection()
 {
-  return static_cast<int>(colorSensor.getReflection());
+  return (colorSensor.getReflection());
 }
 
 // 周囲の明るさを取得する
-int ColorSensorController::getAmbient()
+int32_t ColorSensorController::getAmbient()
 {
-  return static_cast<int>(colorSensor.getAmbient());
+  return (colorSensor.getAmbient());
 }
 
 // 生のRGB値を取得する

@@ -8,8 +8,8 @@
 #define COLOR_SENSOR_CONTROLLER_H
 
 #include "ColorSensor.h"
-#include <cstdint> // uint16_t, uint8_tを使用するため
-#include <iostream> // エラー出力用
+#include <cstdint>   // uint16_t, uint8_tを使用するため
+#include <iostream>  // エラー出力用
 
 class ColorSensorController {
  public:
@@ -27,8 +27,8 @@ class ColorSensorController {
    */
   struct HSV {
     uint16_t h;
-    uint8_t  s;
-    uint8_t  v;
+    uint8_t s;
+    uint8_t v;
   };
 
   /**
@@ -41,7 +41,7 @@ class ColorSensorController {
    * @brief 反射光強度を取得する (0-100)
    * @return 反射光強度
    */
-  int getReflection();
+  int getReflectance();
 
   /**
    * @brief 周囲の明るさを取得する (0-100)
@@ -75,7 +75,7 @@ class ColorSensorController {
   void lightOn();
 
   /**
-   * @brief ライトを消灯する
+   * @brief ライトを消灯する(動作しない)
    */
   void lightOff();
 
@@ -89,7 +89,7 @@ class ColorSensorController {
 
   /*
    * @brief カラーセンサが検知する色を設定する
-   * @note 現在は未実装だが実装予定のためコメントアウト
+   * @note 現在は公式apiの未実装だが実装予定のためコメントアウト
    * @param size カラーの配列のサイズ
    * @param colors カラーの配列
    * @return -
@@ -97,9 +97,9 @@ class ColorSensorController {
   // void setDetectableColors(int32_t size, pup_color_hsv_t *colors);
 
   /**
-   * @brief インスタンス生成が正常にできたかどうかを確認する
-   * @retval true 正常に生成できなかった
-   * @retval false 正常に生成できた
+   * @brief インスタンス生成が成功:0/失敗:1を返す
+   * @retval 0 成功
+   * @retval 1 失敗
    */
   bool hasError();
 

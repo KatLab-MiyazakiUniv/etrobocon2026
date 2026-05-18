@@ -1,18 +1,18 @@
+/**
+ * @file ColorSensorControllerTest.cpp
+ * @brief カラーセンサを制御するラッパークラスのテスト
+ * @author sadomiya-sousi
+ */
+
 #include "gtest/gtest.h"
 #include "ColorSensorController.h"
 #include "ColorSensor.h"  // For dummy spikeapi::ColorSensor
-
-// using namespace spikeapi; // spikeapi名前空間への依存をなくしたため不要
 
 namespace spikeapi {
 
   // 静的メンバの定義
   ColorSensor::RGB ColorSensor::sRGB = { 0, 0, 0 };
-  ColorSensor::HSV ColorSensor::sHSV = {
-    0,
-    0,
-    0,
-  };
+  ColorSensor::HSV ColorSensor::sHSV = { 0, 0, 0 };
   int32_t ColorSensor::sReflection = 0;
   int32_t ColorSensor::sAmbient = 0;
   bool ColorSensor::sHasError = false;
@@ -34,12 +34,12 @@ namespace etrobocon2026_test {
   }
 
   // 反射光強度を取得できるかのテスト
-  TEST(ColorSensorControllerTest, GetReflection)
+  TEST(ColorSensorControllerTest, GetReflectance)
   {
     ColorSensorController colorController;
     // ダミーの値をセット
     spikeapi::ColorSensor::setReflection(50);
-    EXPECT_EQ(50, colorController.getReflection());
+    EXPECT_EQ(50, colorController.getReflectance());
   }
 
   // 環境光強度を取得できるかのテスト

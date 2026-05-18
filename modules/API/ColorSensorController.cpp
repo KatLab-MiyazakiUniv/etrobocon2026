@@ -5,30 +5,30 @@
  */
 
 #include "ColorSensorController.h"
-#include <iostream>  // エラー出力用
-#include <stdint.h>  // エラー出力用
+#include <iostream>
+#include <stdint.h>
 
 ColorSensorController::ColorSensorController(EPort port) : colorSensor(port)
 {
   if(colorSensor.hasError()) {
-    std::cerr << "ColorSensorController: Failed to initialize color sensor on port "
-              << static_cast<int>(port) << std::endl;
+    std::cerr << "ColorSensorController: インスタンス化失敗。ポート: " << static_cast<int>(port)
+              << std::endl;
   }
 }
 
-// 反射光強度を取得する
-int32_t ColorSensorController::getReflection()
+// 反射光強度を0~100の範囲で取得
+int32_t ColorSensorController::getReflectance()
 {
   return (colorSensor.getReflection());
 }
 
-// 周囲の明るさを取得する
+// 消灯して環境光を取得(0-100)
 int32_t ColorSensorController::getAmbient()
 {
   return (colorSensor.getAmbient());
 }
 
-// 生のRGB値を取得する
+// RGB値を取得する(近似なし)
 void ColorSensorController::getRawRGB(RGB& rgb)
 {
   spikeapi::ColorSensor::RGB rawRgb;
@@ -48,7 +48,7 @@ void ColorSensorController::getRawHSV(HSV& hsv, bool surface)
   hsv.v = rawHsv.v;
 }
 
-// カラーセンサで色を測定する
+// HSV値を取得(特定色への近似あり)
 void ColorSensorController::getColor(HSV& hsv, bool surface)
 {
   spikeapi::ColorSensor::HSV rawHsv;
@@ -64,7 +64,7 @@ void ColorSensorController::lightOn()
   colorSensor.lightOn();
 }
 
-// ライトを消灯する
+// ライトを消灯する(動作しない)
 void ColorSensorController::lightOff()
 {
   colorSensor.lightOff();
@@ -76,7 +76,7 @@ void ColorSensorController::setLightColor(int r, int g, int b)
   colorSensor.setLight(r, g, b);
 }
 
-// インスタンス生成が正常にできたかどうかを確認する
+// インスタンス生成が正常ならば0、異常ならば1を返す
 bool ColorSensorController::hasError()
 {
   return colorSensor.hasError();

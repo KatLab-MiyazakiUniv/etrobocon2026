@@ -102,6 +102,9 @@ class Logger {
 
   // 現在使用しているログファイルパス
   static std::string fileName;
+
+  Logger(); // インスタンス化禁止
+
 };
 
 // インスタンスの生死を記録

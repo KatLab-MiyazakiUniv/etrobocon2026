@@ -59,7 +59,7 @@ namespace etrobocon2026_test {
   TEST(LoggerTest, OutputsAllLogLevelsToFile)
   {
     const std::string logPath = "../tests/datafiles/logfiles/logfile2.txt";
-    
+
     // ログを初期化して、出力先ファイル名を設定する
     Logger::init();
     Logger::setFileName(logPath);
@@ -78,4 +78,42 @@ namespace etrobocon2026_test {
     EXPECT_NE(contents.find("[ERROR] error\n"), std::string::npos);
     EXPECT_NE(contents.find("[DEBUG] debug\n"), std::string::npos);
   }
+
+// 異常なファイルパスでのエラーハンドリング
+TEST(LoggerTest, OutputToFileHandlesInvalidPathGracefully)
+{
+  const std::string logPath = "../tests/datafiles/logfiles/logfileerror.txt";
+  Logger::init();
+  Logger::setFileName(logPath);
+  
+  // 空文字列をファイル名に設定して、出力処理が例外を投げずに安全にリターンするかを検証
+  Logger::setFileName(""); 
+
+  Logger::info("Test error handling");
+  
+  // 出力先が無効な場合でも、例外が発生せずに処理が完了することを確認
+  EXPECT_NO_THROW({
+    Logger::outputToFile();
+  });
+}
+
+// LOG_CREATE / LOG_DESTROY マクロの展開結果がファイルに正しく出力されることを確認する
+TEST(LoggerTest, MacrosWriteExpectedLogs)
+{
+  const std::string logPath = "../tests/datafiles/logfiles/macro_test.txt";
+  Logger::init();
+  Logger::setFileName(logPath);
+
+  // マクロを呼び出す
+  LOG_CREATE();
+  LOG_DESTROY();
+  
+  Logger::outputToFile();
+  const std::string contents = ReadFileContents(logPath);
+
+  // マクロが展開され、関数名(TestBodyなど)や "created", "destroyed" が含まれているか検証
+  EXPECT_NE(contents.find("created"), std::string::npos);
+  EXPECT_NE(contents.find("destroyed"), std::string::npos);
+}
+
 }  // namespace etrobocon2026_test

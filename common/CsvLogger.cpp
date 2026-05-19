@@ -15,9 +15,8 @@ std::string CsvLogger::fileName
     = std::string(DEFAULT_CSV_LOG_FILE_PATH) + DEFAULT_CSV_LOG_FILE_NAME;
 
 // CSVヘッダーの定義
-const std::vector<std::string> CsvLogger::HEADERS = {
-  "time", "brightness", "rightPower", "leftPower"
-};
+const std::vector<std::string> CsvLogger::HEADERS
+    = { "time", "brightness", "rightPower", "leftPower" };
 
 // CSVログの初期化
 void CsvLogger::init()
@@ -113,7 +112,8 @@ void CsvLogger::outputToFile()
   }
 
   // ファイルが既に存在するかチェック
-  bool isNewFile = !std::filesystem::exists(outputPath) || std::filesystem::file_size(outputPath) == 0;
+  bool isNewFile
+      = !std::filesystem::exists(outputPath) || std::filesystem::file_size(outputPath) == 0;
 
   // CSVファイルをバイナリモードで開く
   std::ofstream file(outputPath, std::ios::binary | std::ios::app);

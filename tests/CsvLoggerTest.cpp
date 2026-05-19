@@ -19,7 +19,7 @@ namespace etrobocon2026_test {
   static std::string ReadFileContents(const std::string& path)
   {
     std::ifstream file(path);
-    if (!file.is_open()) return "";
+    if(!file.is_open()) return "";
     std::string contents((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
     return contents;
   }
@@ -27,7 +27,7 @@ namespace etrobocon2026_test {
   // テスト実行前に過去のテストファイルを削除するユーティリティ関数
   static void CleanUpTestFile(const std::string& fullPath)
   {
-    if (std::filesystem::exists(fullPath)) {
+    if(std::filesystem::exists(fullPath)) {
       std::filesystem::remove(fullPath);
     }
   }
@@ -51,7 +51,7 @@ namespace etrobocon2026_test {
 
     // 構造体に値をセットしてデータを追加する
     LogData data;
-    data.time = 0; // コメントアウトされていたtimeに対応できるように定義
+    data.time = 0;  // コメントアウトされていたtimeに対応できるように定義
     data.brightness = 42;
     data.rightPower = 100;
     data.leftPower = -100;
@@ -80,11 +80,11 @@ namespace etrobocon2026_test {
     CsvLogger::writeHeader();
 
     // 1件目のデータ
-    LogData data1{1, 2, 3, 4};
+    LogData data1{ 1, 2, 3, 4 };
     CsvLogger::add(data1);
 
     // 2件目のデータ
-    LogData data2{5, 6, 7, 8};
+    LogData data2{ 5, 6, 7, 8 };
     CsvLogger::add(data2);
 
     CsvLogger::outputToFile();
@@ -118,7 +118,6 @@ namespace etrobocon2026_test {
 
     const std::string contents = ReadFileContents(fullPath);
     // 期待される出力: "time,brightness,rightPower,leftPower\n,60,,35\n"
-    EXPECT_NE(contents.find("time,brightness,rightPower,leftPower\n,60,,35\n"),
-              std::string::npos);
+    EXPECT_NE(contents.find("time,brightness,rightPower,leftPower\n,60,,35\n"), std::string::npos);
   }
 }  // namespace etrobocon2026_test

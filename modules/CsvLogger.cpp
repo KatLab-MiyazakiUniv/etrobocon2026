@@ -5,8 +5,6 @@
  */
 
 #include "CsvLogger.h"
-#include <fstream>
-#include <iostream>
 
 // CSVログのバッファとインデックスの初期化
 char CsvLogger::logs[LOG_BUFFER_SIZE] = "";

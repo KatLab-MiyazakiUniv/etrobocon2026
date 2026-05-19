@@ -4,15 +4,14 @@
  * @author miyahara046
  */
 
-#ifndef CSV_LOGGER_HPP
-#define CSV_LOGGER_HPP
+#ifndef CSV_LOGGER_H
+#define CSV_LOGGER_H
 
 #include <stdio.h>
-#include <string.h>
-#include <stdarg.h>
-#include <stdint.h>
 #include <filesystem>
 #include <string>
+#include <fstream>
+#include <iostream>
 // #include "ClockUtil.h"
 
 class CsvLogger {

@@ -53,7 +53,7 @@ class CsvLogger {
   // 現在使用しているログファイルパス
   static std::string fileName;
 
-  CsvLogge(); // インスタンス化を禁止する
+  CsvLogger();  // インスタンス化禁止
 };
 
 #endif

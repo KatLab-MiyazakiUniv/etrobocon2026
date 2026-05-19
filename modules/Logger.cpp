@@ -174,16 +174,16 @@ const char* Logger::levelToColor(Level level)
       return "\x1b[37m";
 
     case WARNING:
-      // 空色(日向坂46)
-      return "\x1b[36m";
+      // 黄色(日向坂46:ハッピーオーラ)
+      return "\x1b[33m";
 
     case ERROR:
-      // 紫色(乃木坂46)
-      return "\x1b[35m";
+      // 赤色(欅坂46:不協和音)
+      return "\x1b[31m";
 
     case DEBUG:
-      // 緑色(欅坂46)
-      return "\x1b[32m";
+      // 紫色(乃木坂46)
+      return "\x1b[35m";
 
     // その他の色コード:
     // \x1b[30m(黒)

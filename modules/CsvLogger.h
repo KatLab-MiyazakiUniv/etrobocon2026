@@ -29,10 +29,10 @@ class CsvLogger {
   /**
    * @brief 各種値を追加する
    * @param brightness 輝度値
-   * @param rightPwm 右Power値
-   * @param leftPwm 左Power値
+   * @param rightPower 右Power値
+   * @param leftPower 左Power値
    */
-  static void add(int brightness, int rightPwm, int leftPwm);
+  static void add(int brightness, int rightPower, int leftPower);
 
   /**
    * @brief 記録した走行ログをファイル出力する

@@ -40,7 +40,7 @@ namespace etrobocon2026_test {
     CsvLogger::outputToFile();
 
     const std::string contents = ReadFileContents(expectedPath);
-    EXPECT_NE(contents.find("time,brightness,rightPwm,leftPwm\n42,100,-100\n"), std::string::npos);
+    EXPECT_NE(contents.find("time,brightness,rightPower,leftPower\n42,100,-100\n"), std::string::npos);
   }
 
   // 複数回 add() を呼び出したときに、CSV ファイルに各行が連続して保存されることを確認する
@@ -59,6 +59,6 @@ namespace etrobocon2026_test {
     CsvLogger::outputToFile();
 
     const std::string contents = ReadFileContents(expectedPath);
-    EXPECT_NE(contents.find("time,brightness,rightPwm,leftPwm\n1,2,3\n4,5,6\n"), std::string::npos);
+    EXPECT_NE(contents.find("time,brightness,rightPower,leftPower\n1,2,3\n4,5,6\n"), std::string::npos);
   }
 }  // namespace etrobocon2026_test

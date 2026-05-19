@@ -3,7 +3,6 @@
  * @brief  EtRobocon2026クラスのテスト
  * @author miyahara046
  */
-
 #include <gtest/gtest.h>
 #include "EtRobocon2026.h"
 

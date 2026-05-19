@@ -16,13 +16,7 @@
 
 // #include"ClockUtil.h"
 
-// ログの作成と破棄を簡略化するマクロ
-#define LOG_CREATE()
-Logger::printfLog(Logger::INFO, "%s created", __PRETTY_FUNCTION__, )
-#define LOG_DESTROY()
-    Logger::printfLog(Logger::INFO, "%s destroyed ", __PRETTY_FUNCTION__)
-
-        class Logger {
+class Logger {
  public:
   /**
    * @brief ログの分類分け用enumクラス
@@ -109,5 +103,10 @@ Logger::printfLog(Logger::INFO, "%s created", __PRETTY_FUNCTION__, )
   // 現在使用しているログファイルパス
   static std::string fileName;
 };
+
+// インスタンスの生死を記録
+#define LOG_CREATE() Logger::printfLog(Logger::INFO, "%s created", __PRETTY_FUNCTION__)
+
+#define LOG_DESTROY() Logger::printfLog(Logger::INFO, "%s destroyed", __PRETTY_FUNCTION__)
 
 #endif

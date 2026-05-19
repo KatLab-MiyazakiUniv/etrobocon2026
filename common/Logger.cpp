@@ -136,6 +136,9 @@ void Logger::outputToFile()
   if(!file.good()) {
     warning("Logger:Failed to write log file");
   }
+
+  Logger::setFileName("../datafiles/logfiles/logfile.txt");
+
 }
 
 // ログレベルを文字列に変換

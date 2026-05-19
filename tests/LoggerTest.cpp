@@ -24,7 +24,7 @@ namespace etrobocon2026_test {
   // テスト実行前に古いファイルを消す関数
   static void CleanUpTestFile(const std::string& fullPath)
   {
-    if (std::filesystem::exists(fullPath)) {
+    if(std::filesystem::exists(fullPath)) {
       std::filesystem::remove(fullPath);
     }
   }

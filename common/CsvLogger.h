@@ -29,7 +29,8 @@ struct LogData {
   std::optional<int> brightness;  // 輝度値
   std::optional<int> rightPower;  // 右Power値
   std::optional<int> leftPower;   // 左Power値
-  // 今後新しいセンサー値（例: gyro）を追加したい場合は、ここに std::optional<int> gyro; を足すだけでOK
+  // 今後新しいセンサー値（例: gyro）を追加したい場合は、ここに std::optional<int> gyro;
+  // を足すだけでOK
 };
 
 class CsvLogger {

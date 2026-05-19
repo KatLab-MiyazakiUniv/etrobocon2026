@@ -28,7 +28,7 @@ void CsvLogger::writeHeader()
     return;
   }
 
-  int written = snprintf(&logs[currentIndex], remainBuffer, "time,brightness,rightPwm,leftPwm\n");
+  int written = snprintf(&logs[currentIndex], remainBuffer, "time,brightness,rightPower,leftPower\n");
 
   if(written >= remainBuffer) {
     currentIndex = LOG_BUFFER_SIZE - 1;
@@ -38,7 +38,7 @@ void CsvLogger::writeHeader()
 }
 
 // 各種値を追加する
-void CsvLogger::add(int brightness, int rightPwm, int leftPwm)
+void CsvLogger::add(int brightness, int rightPower, int leftPower)
 {
   int remainBuffer = LOG_BUFFER_SIZE - currentIndex - 1;
 
@@ -51,7 +51,7 @@ void CsvLogger::add(int brightness, int rightPwm, int leftPwm)
   int written = snprintf(&logs[currentIndex], remainBuffer, "%d,%d,%d\n",
                          //  "%d,%d,%d,%d\n",
                          //  time,
-                         brightness, rightPwm, leftPwm);
+                         brightness, rightPower, leftPower);
 
   if(written >= remainBuffer) {
     currentIndex = LOG_BUFFER_SIZE - 1;

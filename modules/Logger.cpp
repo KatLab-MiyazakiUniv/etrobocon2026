@@ -108,7 +108,6 @@ void Logger::setFileName(const std::string& path)
 // ログファイルの出力
 void Logger::outputToFile()
 {
-
   std::filesystem::path outputPath(Logger::fileName);
 
   // 出力先のディレクトリが存在しない場合は作成する

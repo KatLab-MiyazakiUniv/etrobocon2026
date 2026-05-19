@@ -28,7 +28,8 @@ void CsvLogger::writeHeader()
     return;
   }
 
-  int written = snprintf(&logs[currentIndex], remainBuffer, "time,brightness,rightPower,leftPower\n");
+  int written
+      = snprintf(&logs[currentIndex], remainBuffer, "time,brightness,rightPower,leftPower\n");
 
   if(written >= remainBuffer) {
     currentIndex = LOG_BUFFER_SIZE - 1;
@@ -71,7 +72,6 @@ void CsvLogger::setFileName(const std::string& path)
 // ログファイルの出力
 void CsvLogger::outputToFile()
 {
-
   std::filesystem::path outputPath(CsvLogger::fileName);
 
   // 出力先のディレクトリが存在しない場合は作成する

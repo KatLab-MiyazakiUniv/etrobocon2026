@@ -24,8 +24,7 @@ namespace etrobocon2026_test {
   // info() で出力したログがファイルに保存されることを確認する
   TEST(LoggerTest, InfoWritesInfoLineToFile)
   {
-    const std::string logPath =
-    "../tests/datafiles/logfiles/logfile.txt";
+    const std::string logPath = "../tests/datafiles/logfiles/logfile.txt";
     const std::string expectedPath = logPath;
 
     // ログを初期化して、出力先ファイル名を設定する
@@ -43,8 +42,7 @@ namespace etrobocon2026_test {
   // printfLog() がフォーマット済みメッセージを正しく書き出すことを確認する
   TEST(LoggerTest, PrintfLogFormatsMessageCorrectly)
   {
-    const std::string logPath =
-    "../tests/datafiles/logfiles/logfile.txt";
+    const std::string logPath = "../tests/datafiles/logfiles/logfile.txt";
     const std::string expectedPath = logPath;
 
     // ログを初期化して出力先を設定する
@@ -62,10 +60,9 @@ namespace etrobocon2026_test {
   // 4 種類のログレベルがそれぞれファイルに出力されることを確認する
   TEST(LoggerTest, OutputsAllLogLevelsToFile)
   {
-    const std::string logPath =
-    "../tests/datafiles/logfiles/logfile2.txt";;
-    const std::string expectedPath
-        = "etrobocon2026/tests/datafiles/logfiles/logfile2.txt";
+    const std::string logPath = "../tests/datafiles/logfiles/logfile2.txt";
+    ;
+    const std::string expectedPath = "etrobocon2026/tests/datafiles/logfiles/logfile2.txt";
     // ログを初期化して、出力先ファイル名を設定する
     Logger::init();
     Logger::setFileName(logPath);

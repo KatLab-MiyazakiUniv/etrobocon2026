@@ -80,11 +80,9 @@ void CsvLogger::outputToFile()
 
   std::filesystem::path outputPath(CsvLogger::fileName);
 
-  std::cout << "Current path: "
-            << std::filesystem::current_path() << std::endl;
+  std::cout << "Current path: " << std::filesystem::current_path() << std::endl;
 
-  std::cout << "Output path: "
-            << std::filesystem::absolute(outputPath) << std::endl;
+  std::cout << "Output path: " << std::filesystem::absolute(outputPath) << std::endl;
 
   if(!outputPath.parent_path().empty()) {
     try {

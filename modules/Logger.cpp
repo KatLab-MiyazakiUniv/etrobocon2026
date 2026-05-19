@@ -117,11 +117,9 @@ void Logger::outputToFile()
 
   std::filesystem::path outputPath(Logger::fileName);
 
-  std::cout << "Current path: "
-            << std::filesystem::current_path() << std::endl;
+  std::cout << "Current path: " << std::filesystem::current_path() << std::endl;
 
-  std::cout << "Output path: "
-            << std::filesystem::absolute(outputPath) << std::endl;
+  std::cout << "Output path: " << std::filesystem::absolute(outputPath) << std::endl;
 
   if(!outputPath.parent_path().empty()) {
     try {

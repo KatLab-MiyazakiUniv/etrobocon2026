@@ -11,8 +11,7 @@ using namespace std;
 // ログのバッファとインデックスの初期化
 char Logger::logs[LOG_BUFFER_SIZE] = "";
 int Logger::currentIndex = 0;
-
-string Logger::fileName = "etrobocon2026/datafiles/logfiles/logfile.txt";
+string Logger::fileName = string(DEFAULT_LOG_FILE_PATH) + DEFAULT_LOG_FILE_NAME;
 
 // ログの初期化
 void Logger::init()
@@ -98,11 +97,13 @@ void Logger::write(Level level, const char* message)
 }
 
 // ログファイルの出力先変更
-void Logger::setFileName(const std::string& path)
+void Logger::setFileName(const std::string& name, const std::string& path)
 {
-  if(!path.empty()) {
-    Logger::fileName = path;
-  }
+  if(!name.empty()) {
+    Logger::fileName = path + name;
+  } else if(!path.empty() && !name.empty()) {
+    Logger::fileName = path + name;
+  } 
 }
 
 // ログファイルの出力
@@ -137,7 +138,7 @@ void Logger::outputToFile()
     warning("Logger:Failed to write log file");
   }
 
-  Logger::setFileName("../datafiles/logfiles/logfile.txt");
+  Logger::setFileName();
 
 }
 

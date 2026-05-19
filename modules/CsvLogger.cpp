@@ -71,26 +71,20 @@ void CsvLogger::setFileName(const std::string& path)
 // ログファイルの出力
 void CsvLogger::outputToFile()
 {
-  if(CsvLogger::fileName.empty()) {
-    std::cerr << "CsvLogger: file name is empty" << std::endl;
-    return;
-  }
 
   std::filesystem::path outputPath(CsvLogger::fileName);
 
-  std::cout << "Current path: " << std::filesystem::current_path() << std::endl;
-
-  std::cout << "Output path: " << std::filesystem::absolute(outputPath) << std::endl;
-
+  // 出力先のディレクトリが存在しない場合は作成する
   if(!outputPath.parent_path().empty()) {
     try {
       std::filesystem::create_directories(outputPath.parent_path());
     } catch(...) {
-      std::cerr << "CsvLogger: failed to create csv directory" << std::endl;
+      std::cerr << "CsvLogger:failed to create csv directory" << std::endl;
       return;
     }
   }
 
+  // CSVファイルをバイナリモードで開く
   std::ofstream file(outputPath, std::ios::binary | std::ios::trunc);
 
   if(!file.is_open()) {
@@ -98,6 +92,7 @@ void CsvLogger::outputToFile()
     return;
   }
 
+  // ログをCSVファイルに書き込む
   file << logs;
   file.flush();
   if(!file.good()) {

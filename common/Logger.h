@@ -75,6 +75,15 @@ class Logger {
   static void setFileName(const std::string& path);
 
  private:
+  static constexpr int LOG_BUFFER_SIZE = 65536;    // ログ全体のバッファサイズ
+  static constexpr int MESSAGE_BUFFER_SIZE = 256;  // 1メッセージのバッファサイズ
+
+  static char logs[LOG_BUFFER_SIZE];  // ログのバッファ
+  static int currentIndex;            // ログの現在のインデックス
+
+  // 現在使用しているログファイルパス
+  static std::string fileName;
+
   /**
    * @brief 出力するログを整形して保存する
    * @param level ログレベル
@@ -94,17 +103,7 @@ class Logger {
    */
   static const char* levelToColor(Level level);
 
-  static constexpr int LOG_BUFFER_SIZE = 65536;    // ログ全体のバッファサイズ
-  static constexpr int MESSAGE_BUFFER_SIZE = 256;  // 1メッセージのバッファサイズ
-
-  static char logs[LOG_BUFFER_SIZE];  // ログのバッファ
-  static int currentIndex;            // ログの現在のインデックス
-
-  // 現在使用しているログファイルパス
-  static std::string fileName;
-
-  Logger(); // インスタンス化禁止
-
+  Logger();  // インスタンス化禁止
 };
 
 // インスタンスの生死を記録

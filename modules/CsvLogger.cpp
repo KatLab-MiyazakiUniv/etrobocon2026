@@ -10,7 +10,7 @@
 char CsvLogger::logs[LOG_BUFFER_SIZE] = "";
 int CsvLogger::currentIndex = 0;
 // 現在のログファイルパス
-std::string CsvLogger::fileName = "datafiles/logfiles/runlog.csv";
+std::string CsvLogger::fileName = "etrobocon2026/datafiles/logfiles/runlog.csv";
 
 // CSVログの初期化
 void CsvLogger::init()

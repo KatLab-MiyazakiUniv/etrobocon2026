@@ -108,39 +108,34 @@ void Logger::setFileName(const std::string& path)
 // ログファイルの出力
 void Logger::outputToFile()
 {
-  if(Logger::fileName.empty()) {
-    warning("Log file name is empty");
-    return;
-  }
 
   std::filesystem::path outputPath(Logger::fileName);
 
-  std::cout << "Current path: " << std::filesystem::current_path() << std::endl;
-
-  std::cout << "Output path: " << std::filesystem::absolute(outputPath) << std::endl;
-
+  // 出力先のディレクトリが存在しない場合は作成する
   if(!outputPath.parent_path().empty()) {
     try {
       std::filesystem::create_directories(outputPath.parent_path());
     } catch(...) {
-      warning("Failed to create log directory");
+      warning("Logger:Failed to create log directory");
       return;
     }
   }
 
+  // ログファイルをバイナリモードで開く
   std::ofstream file(outputPath, std::ios::binary | std::ios::trunc);
 
   if(!file.is_open()) {
-    warning("Failed to open or create log file");
+    warning("Logger:Failed to open or create log file");
     return;
   }
 
+  // ログをファイルに書き込む
   file.write(logs, currentIndex);
 
   file.flush();
 
   if(!file.good()) {
-    warning("Failed to write log file");
+    warning("Logger:Failed to write log file");
   }
 }
 

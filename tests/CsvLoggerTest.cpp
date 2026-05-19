@@ -29,10 +29,10 @@ namespace etrobocon2026_test {
   {
     const std::string logPath = "../tests/datafiles/logfiles/";
     const std::string logFileName = "runlog.csv";
-    
+
     // CSV ログを初期化して出力先を設定する
     CsvLogger::init();
-    CsvLogger::setFileName(logFileName ,logPath);
+    CsvLogger::setFileName(logFileName, logPath);
 
     // ヘッダ行を書き込み、1 件のデータを追加してファイルへ保存する
     CsvLogger::writeHeader();
@@ -49,10 +49,10 @@ namespace etrobocon2026_test {
   {
     const std::string logPath = "../tests/datafiles/logfiles/";
     const std::string logFileName = "runlog2.csv";
-    
+
     // CSV ログを初期化して出力先を設定する
     CsvLogger::init();
-    CsvLogger::setFileName(logFileName , logPath);
+    CsvLogger::setFileName(logFileName, logPath);
 
     // ヘッダ行を書き込み、2 件のデータを書き込む
     CsvLogger::writeHeader();
@@ -60,7 +60,7 @@ namespace etrobocon2026_test {
     CsvLogger::add(4, 5, 6);
     CsvLogger::outputToFile();
 
-    const std::string contents = ReadFileContents(logPath+logFileName);
+    const std::string contents = ReadFileContents(logPath + logFileName);
     EXPECT_NE(contents.find("time,brightness,rightPower,leftPower\n1,2,3\n4,5,6\n"),
               std::string::npos);
   }

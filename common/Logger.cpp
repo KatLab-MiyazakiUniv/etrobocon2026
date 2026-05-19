@@ -103,7 +103,7 @@ void Logger::setFileName(const std::string& name, const std::string& path)
     Logger::fileName = path + name;
   } else if(!path.empty() && !name.empty()) {
     Logger::fileName = path + name;
-  } 
+  }
 }
 
 // ログファイルの出力
@@ -139,7 +139,6 @@ void Logger::outputToFile()
   }
 
   Logger::setFileName();
-
 }
 
 // ログレベルを文字列に変換

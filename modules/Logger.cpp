@@ -12,7 +12,7 @@ using namespace std;
 char Logger::logs[LOG_BUFFER_SIZE] = "";
 int Logger::currentIndex = 0;
 
-string Logger::fileName = "datafiles/logfiles/logfile.txt";
+string Logger::fileName = "etrobocon2026/datafiles/logfiles/logfile.txt";
 
 // ログの初期化
 void Logger::init()

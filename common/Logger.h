@@ -16,6 +16,7 @@
 
 // #include"ClockUtil.h"
 
+// デフォルトのログファイルパスとファイル名
 #define DEFAULT_LOG_FILE_PATH "etrobocon2026/datafiles/logfiles/"
 #define DEFAULT_LOG_FILE_NAME "logfile.txt"
 
@@ -73,6 +74,7 @@ class Logger {
 
   /**
    * @brief ログファイルの出力先を変更
+   * @param name 出力するファイル名
    * @param path 出力先パス
    */
   static void setFileName(const std::string& name = DEFAULT_LOG_FILE_NAME , const std::string& path = DEFAULT_LOG_FILE_PATH);

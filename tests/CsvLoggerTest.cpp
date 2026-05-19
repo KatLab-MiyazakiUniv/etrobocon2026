@@ -27,18 +27,19 @@ namespace etrobocon2026_test {
   // writeHeader() と add() の呼び出し結果が CSV ファイルへ正しく書き込まれることを確認する
   TEST(CsvLoggerTest, WriteHeaderAndAddEntriesToFile)
   {
-    const std::string logPath = "../tests/datafiles/logfiles/runlog.csv";
-
+    const std::string logPath = "../tests/datafiles/logfiles/";
+    const std::string logFileName = "runlog.csv";
+    
     // CSV ログを初期化して出力先を設定する
     CsvLogger::init();
-    CsvLogger::setFileName(logPath.c_str());
+    CsvLogger::setFileName(logFileName ,logPath);
 
     // ヘッダ行を書き込み、1 件のデータを追加してファイルへ保存する
     CsvLogger::writeHeader();
     CsvLogger::add(42, 100, -100);
     CsvLogger::outputToFile();
 
-    const std::string contents = ReadFileContents(logPath);
+    const std::string contents = ReadFileContents(logPath + logFileName);
     EXPECT_NE(contents.find("time,brightness,rightPower,leftPower\n42,100,-100\n"),
               std::string::npos);
   }
@@ -46,11 +47,12 @@ namespace etrobocon2026_test {
   // 複数回 add() を呼び出したときに、CSV ファイルに各行が連続して保存されることを確認する
   TEST(CsvLoggerTest, MultipleAddCallsAppendLines)
   {
-    const std::string logPath = "../tests/datafiles/logfiles/runlog.csv";
+    const std::string logPath = "../tests/datafiles/logfiles/";
+    const std::string logFileName = "runlog2.csv";
     
     // CSV ログを初期化して出力先を設定する
     CsvLogger::init();
-    CsvLogger::setFileName(logPath.c_str());
+    CsvLogger::setFileName(logFileName , logPath);
 
     // ヘッダ行を書き込み、2 件のデータを書き込む
     CsvLogger::writeHeader();
@@ -58,7 +60,7 @@ namespace etrobocon2026_test {
     CsvLogger::add(4, 5, 6);
     CsvLogger::outputToFile();
 
-    const std::string contents = ReadFileContents(logPath);
+    const std::string contents = ReadFileContents(logPath+logFileName);
     EXPECT_NE(contents.find("time,brightness,rightPower,leftPower\n1,2,3\n4,5,6\n"),
               std::string::npos);
   }

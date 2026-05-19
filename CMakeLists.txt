@@ -54,6 +54,7 @@ set(RUNNING_INCLUDE_DIRS
 file(GLOB_RECURSE RUNNING_SOURCES
   "${RUNNING_MODULE_DIR}/*.cpp"
   "${RUNNING_TEST_DIR}/dummy/utils/*.cpp"
+  "${PROJECT_SOURCE_DIR}/common/*.cpp"
 )
 
 # ライブラリターゲットを作成

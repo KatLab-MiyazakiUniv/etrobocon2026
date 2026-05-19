@@ -48,7 +48,8 @@ class CsvLogger {
    * @param name 出力するファイル名
    * @param path 出力先パス
    */
-  static void setFileName(const std::string& name = DEFAULT_CSV_LOG_FILE_NAME,const std::string& path = DEFAULT_CSV_LOG_FILE_PATH);
+  static void setFileName(const std::string& name = DEFAULT_CSV_LOG_FILE_NAME,
+                          const std::string& path = DEFAULT_CSV_LOG_FILE_PATH);
 
  private:
   static constexpr int LOG_BUFFER_SIZE = 65536;  // ログ全体のバッファサイズ

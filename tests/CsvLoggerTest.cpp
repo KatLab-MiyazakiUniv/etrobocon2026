@@ -28,7 +28,6 @@ namespace etrobocon2026_test {
   TEST(CsvLoggerTest, WriteHeaderAndAddEntriesToFile)
   {
     const std::string logPath = "../tests/datafiles/logfiles/runlog.csv";
-    const std::string expectedPath = logPath;
 
     // CSV ログを初期化して出力先を設定する
     CsvLogger::init();
@@ -39,7 +38,7 @@ namespace etrobocon2026_test {
     CsvLogger::add(42, 100, -100);
     CsvLogger::outputToFile();
 
-    const std::string contents = ReadFileContents(expectedPath);
+    const std::string contents = ReadFileContents(logPath);
     EXPECT_NE(contents.find("time,brightness,rightPower,leftPower\n42,100,-100\n"),
               std::string::npos);
   }
@@ -48,7 +47,7 @@ namespace etrobocon2026_test {
   TEST(CsvLoggerTest, MultipleAddCallsAppendLines)
   {
     const std::string logPath = "../tests/datafiles/logfiles/runlog.csv";
-    const std::string expectedPath = logPath;
+    
     // CSV ログを初期化して出力先を設定する
     CsvLogger::init();
     CsvLogger::setFileName(logPath.c_str());
@@ -59,7 +58,7 @@ namespace etrobocon2026_test {
     CsvLogger::add(4, 5, 6);
     CsvLogger::outputToFile();
 
-    const std::string contents = ReadFileContents(expectedPath);
+    const std::string contents = ReadFileContents(logPath);
     EXPECT_NE(contents.find("time,brightness,rightPower,leftPower\n1,2,3\n4,5,6\n"),
               std::string::npos);
   }

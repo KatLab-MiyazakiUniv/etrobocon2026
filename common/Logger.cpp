@@ -65,13 +65,10 @@ void Logger::printfLog(Level level, const char* format, ...)
 void Logger::write(Level level, const char* message)
 {
   char output[MESSAGE_BUFFER_SIZE];
-  // int time =  ClockUtil::now();
+  int time = ClockUtil::now();
 
   // ログレベルとメッセージを整形する
-  snprintf(output, sizeof(output),
-           "[%s] %s\n",  //"[%d ms][%s] %s\n",
-           // time,
-           levelToString(level), message);
+  snprintf(output, sizeof(output), "[%d ms][%s] %s\n", time, levelToString(level), message);
 
   // ターミナルへの出力
   printf("%s", levelToColor(level));

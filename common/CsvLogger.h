@@ -14,7 +14,7 @@
 #include <iostream>
 #include <optional>
 #include <vector>
-// #include "ClockUtil.h"
+#include "ClockUtil.h"
 
 // デフォルトのログファイルパスとファイル名
 #define DEFAULT_CSV_LOG_FILE_PATH "etrobocon2026/datafiles/logfiles/"
@@ -25,12 +25,13 @@
  * @brief ロガーに渡す走行データをまとめた構造体
  */
 struct LogData {
-  std::optional<int> time;        // 将来的にClockUtil::now()を入れる用
-  std::optional<int> brightness;  // 輝度値
-  std::optional<int> rightPower;  // 右Power値
-  std::optional<int> leftPower;   // 左Power値
+  std::optional<int> time;           // 将来的にClockUtil::now()を入れる用
+  std::optional<int> brightness;     // 輝度値
+  std::optional<int> rightPower;     // 右Power値
+  std::optional<int> leftPower;      // 左Power値
+  std::optional<double> rightSpeed;  // 右Speed値
+  std::optional<double> leftSpeed;   // 左Speed値
   // 今後新しいセンサー値（例: gyro）を追加したい場合は、ここに std::optional<int> gyro;
-  // を足すだけでOK
 };
 
 class CsvLogger {

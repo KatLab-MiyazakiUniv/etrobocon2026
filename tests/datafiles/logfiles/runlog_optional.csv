@@ -1,2 +1,2 @@
-time,brightness,rightPower,leftPower
-,60,,35
+time,brightness,rightPower,leftPower,rightSpeed,leftSpeed
+,60,,35,,

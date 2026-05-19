@@ -16,7 +16,7 @@ std::string CsvLogger::fileName
 
 // CSVヘッダーの定義
 const std::vector<std::string> CsvLogger::HEADERS
-    = { "time", "brightness", "rightPower", "leftPower" };
+    = { "time", "brightness", "rightPower", "leftPower", "rightSpeed", "leftSpeed" };
 
 // CSVログの初期化
 void CsvLogger::init()
@@ -55,27 +55,43 @@ void CsvLogger::writeHeader()
 // 各種値を追加する
 void CsvLogger::add(const LogData& data)
 {
+  LogData localData = data;
+
+  if(!localData.time.has_value()) {
+    localData.time = ClockUtil::now();
+  }
+
   int remainBuffer = LOG_BUFFER_SIZE - currentIndex - 1;
   if(remainBuffer <= 0) {
     return;
   }
 
   // optionalの値を判定して、あれば数値、なければ空文字にするラムダ関数
-  auto appendField = [](std::string& row, const std::optional<int>& field, bool isLast) {
+  auto appendField = [](std::string& row, const auto& field, bool isLast) {
     if(field.has_value()) {
-      row += std::to_string(field.value());
+      // 浮動小数点（double）の余分な末尾の0を抑制するための簡易処理
+      std::string valStr = std::to_string(field.value());
+      if(valStr.find('.') != std::string::npos) {
+        // 小数点以下の末尾の0と、残った小数点を取り除く
+        valStr.erase(valStr.find_last_not_of('0') + 1, std::string::npos);
+        if(valStr.back() == '.') {
+          valStr.pop_back();
+        }
+      }
+      row += valStr;
     }
     if(!isLast) {
       row += ",";
     }
   };
-
   // 一行分のCSVデータを構築
   std::string rowStr = "";
   appendField(rowStr, data.time, false);
   appendField(rowStr, data.brightness, false);
   appendField(rowStr, data.rightPower, false);
-  appendField(rowStr, data.leftPower, true);
+  appendField(rowStr, data.leftPower, false);
+  appendField(rowStr, localData.rightSpeed, false);
+  appendField(rowStr, localData.leftSpeed, true);
   rowStr += "\n";
 
   int written = snprintf(&logs[currentIndex], remainBuffer, "%s", rowStr.c_str());

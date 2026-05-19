@@ -13,8 +13,7 @@
 #include <string>
 #include <fstream>
 #include <iostream>
-
-// #include"ClockUtil.h"
+#include "ClockUtil.h"
 
 // デフォルトのログファイルパスとファイル名
 #define DEFAULT_LOG_FILE_PATH "etrobocon2026/datafiles/logfiles/"

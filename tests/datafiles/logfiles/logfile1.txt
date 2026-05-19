@@ -1,1 +1,1 @@
-[DEBUG] value=123
+[45 ms][DEBUG] value=123

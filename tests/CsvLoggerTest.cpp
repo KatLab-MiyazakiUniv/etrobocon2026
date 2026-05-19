@@ -51,17 +51,20 @@ namespace etrobocon2026_test {
 
     // 構造体に値をセットしてデータを追加する
     LogData data;
-    data.time = 0;  // コメントアウトされていたtimeに対応できるように定義
-    data.brightness = 42;
+    data.time = 42;
+    data.brightness = 100;
     data.rightPower = 100;
     data.leftPower = -100;
+    data.rightSpeed = 50.53;
+    data.leftSpeed = -50.50;
     CsvLogger::add(data);
 
     // ファイルへ保存する
     CsvLogger::outputToFile();
 
     const std::string contents = ReadFileContents(fullPath);
-    EXPECT_NE(contents.find("time,brightness,rightPower,leftPower\n0,42,100,-100\n"),
+    EXPECT_NE(contents.find("time,brightness,rightPower,leftPower,rightSpeed,leftSpeed\n"
+                            "42,100,100,-100,50.53,-50.5\n"),
               std::string::npos);
   }
 
@@ -80,17 +83,19 @@ namespace etrobocon2026_test {
     CsvLogger::writeHeader();
 
     // 1件目のデータ
-    LogData data1{ 1, 2, 3, 4 };
+    LogData data1{ 1, 2, 3, 4, 5.5, 6.5 };
     CsvLogger::add(data1);
 
     // 2件目のデータ
-    LogData data2{ 5, 6, 7, 8 };
+    LogData data2{ 7, 8, 9, 10, 11.123, 12.0 };
     CsvLogger::add(data2);
 
     CsvLogger::outputToFile();
 
     const std::string contents = ReadFileContents(fullPath);
-    EXPECT_NE(contents.find("time,brightness,rightPower,leftPower\n1,2,3,4\n5,6,7,8\n"),
+    EXPECT_NE(contents.find("time,brightness,rightPower,leftPower,rightSpeed,leftSpeed\n"
+                            "1,2,3,4,5.5,6.5\n"
+                            "7,8,9,10,11.123,12\n"),
               std::string::npos);
   }
 
@@ -118,6 +123,8 @@ namespace etrobocon2026_test {
 
     const std::string contents = ReadFileContents(fullPath);
     // 期待される出力: "time,brightness,rightPower,leftPower\n,60,,35\n"
-    EXPECT_NE(contents.find("time,brightness,rightPower,leftPower\n,60,,35\n"), std::string::npos);
+    EXPECT_NE(contents.find("time,brightness,rightPower,leftPower,rightSpeed,leftSpeed\n"
+                            ",60,,35,,\n"),
+              std::string::npos);
   }
 }  // namespace etrobocon2026_test

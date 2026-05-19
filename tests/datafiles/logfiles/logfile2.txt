@@ -1,4 +1,4 @@
-[INFO] info
-[WARNING] warning
-[ERROR] error
-[DEBUG] debug
+[46 ms][INFO] info
+[47 ms][WARNING] warning
+[48 ms][ERROR] error
+[49 ms][DEBUG] debug

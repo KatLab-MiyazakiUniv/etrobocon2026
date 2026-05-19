@@ -13,7 +13,7 @@
 
 namespace etrobocon2026_test {
 
-  // テスト用ログファイルの内容を読み取るユーティリティ関数
+  // テスト用ログファイルの内容を読み取る関数
   static std::string ReadFileContents(const std::string& path)
   {
     std::ifstream file(path);
@@ -21,11 +21,22 @@ namespace etrobocon2026_test {
     return contents;
   }
 
+  // テスト実行前に古いファイルを消す関数
+  static void CleanUpTestFile(const std::string& fullPath)
+  {
+    if (std::filesystem::exists(fullPath)) {
+      std::filesystem::remove(fullPath);
+    }
+  }
+
   // info() で出力したログがファイルに保存されることを確認する
   TEST(LoggerTest, InfoWritesInfoLineToFile)
   {
     const std::string logPath = "../tests/datafiles/logfiles/";
     const std::string fileName = "logfile.txt";
+
+    CleanUpTestFile(logPath + fileName);
+
     // ログを初期化
     Logger::init();
 
@@ -44,6 +55,8 @@ namespace etrobocon2026_test {
     const std::string logPath = "../tests/datafiles/logfiles/";
     const std::string fileName = "logfile1.txt";
 
+    CleanUpTestFile(logPath + fileName);
+
     // ログを初期化して出力先を設定する
     Logger::init();
     Logger::setFileName(fileName, logPath);
@@ -61,6 +74,8 @@ namespace etrobocon2026_test {
   {
     const std::string logPath = "../tests/datafiles/logfiles/";
     const std::string fileName = "logfile2.txt";
+
+    CleanUpTestFile(logPath + fileName);
 
     // ログを初期化して、出力先ファイル名を設定する
     Logger::init();
@@ -89,8 +104,8 @@ namespace etrobocon2026_test {
     Logger::init();
     Logger::setFileName(fileName, logPath);
 
-    // 空文字列をファイル名に設定して、出力処理が例外を投げずに安全にリターンするかを検証
-    Logger::setFileName("");
+    // 出力処理が例外を投げずに安全にリターンするかを検証
+    Logger::setFileName("invalid_file_???", "/invalid_dir_***/");
 
     Logger::info("Test error handling");
 
@@ -103,6 +118,9 @@ namespace etrobocon2026_test {
   {
     const std::string logPath = "../tests/datafiles/logfiles/";
     const std::string fileName = "macrotestlog.txt";
+
+    CleanUpTestFile(logPath + fileName);
+
     Logger::init();
     Logger::setFileName(fileName, logPath);
 

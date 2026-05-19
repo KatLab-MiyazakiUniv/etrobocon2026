@@ -99,11 +99,10 @@ void Logger::write(Level level, const char* message)
 // ログファイルの出力先変更
 void Logger::setFileName(const std::string& name, const std::string& path)
 {
-  if(!name.empty()) {
-    Logger::fileName = path + name;
-  } else if(!path.empty() && !name.empty()) {
-    Logger::fileName = path + name;
-  }
+  std::string finalName = name.empty() ? DEFAULT_LOG_FILE_NAME : name;
+  std::string finalPath = path.empty() ? DEFAULT_LOG_FILE_PATH : path;
+
+  Logger::fileName = finalPath + finalName;
 }
 
 // ログファイルの出力
@@ -122,7 +121,7 @@ void Logger::outputToFile()
   }
 
   // ログファイルをバイナリモードで開く
-  std::ofstream file(outputPath, std::ios::binary | std::ios::trunc);
+  std::ofstream file(outputPath, std::ios::binary | std::ios::app);
 
   if(!file.is_open()) {
     warning("Logger:Failed to open or create log file");
@@ -138,7 +137,7 @@ void Logger::outputToFile()
     warning("Logger:Failed to write log file");
   }
 
-  Logger::setFileName();
+  init();
 }
 
 // ログレベルを文字列に変換

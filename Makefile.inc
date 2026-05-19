@@ -3,6 +3,7 @@ USE_RASPIKE_ART=1
 mkfile_path := $(dir $(lastword $(MAKEFILE_LIST)))
 
 MODULE_DIRS := $(mkfile_path)modules/
+COMMON_DIRS := $(mkfile_path)common/
 
 SRCS := $(foreach dir,$(MODULE_DIRS),$(shell find $(dir) -name '*.cpp'))
 SRCS += $(shell find ${mkfile_path}../../common/library/libcpp-spike/src -name '*.cpp')

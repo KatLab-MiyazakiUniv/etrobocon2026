@@ -14,6 +14,10 @@
 #include <iostream>
 // #include "ClockUtil.h"
 
+// デフォルトのログファイルパスとファイル名
+#define DEFAULT_CSV_LOG_FILE_PATH "etrobocon2026/datafiles/logfiles/"
+#define DEFAULT_CSV_LOG_FILE_NAME "runlog.csv"
+
 class CsvLogger {
  public:
   /**
@@ -41,9 +45,10 @@ class CsvLogger {
 
   /**
    * @brief ログファイルの出力先を変更
+   * @param name 出力するファイル名
    * @param path 出力先パス
    */
-  static void setFileName(const std::string& path);
+  static void setFileName(const std::string& name = DEFAULT_CSV_LOG_FILE_NAME,const std::string& path = DEFAULT_CSV_LOG_FILE_PATH);
 
  private:
   static constexpr int LOG_BUFFER_SIZE = 65536;  // ログ全体のバッファサイズ

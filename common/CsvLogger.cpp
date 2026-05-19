@@ -10,7 +10,7 @@
 char CsvLogger::logs[LOG_BUFFER_SIZE] = "";
 int CsvLogger::currentIndex = 0;
 // 現在のログファイルパス
-std::string CsvLogger::fileName = "etrobocon2026/datafiles/logfiles/runlog.csv";
+std::string CsvLogger::fileName = std::string(DEFAULT_CSV_LOG_FILE_PATH) + DEFAULT_CSV_LOG_FILE_NAME;
 
 // CSVログの初期化
 void CsvLogger::init()
@@ -62,11 +62,13 @@ void CsvLogger::add(int brightness, int rightPower, int leftPower)
 }
 
 // ログファイルの出力先変更
-void CsvLogger::setFileName(const std::string& path)
+void CsvLogger::setFileName(const std::string& name,const std::string& path)
 {
-  if(!path.empty()) {
-    CsvLogger::fileName = path;
-  }
+  if(!name.empty()) {
+    CsvLogger::fileName = path + name;
+  } else if(!path.empty() && !name.empty()) {
+    CsvLogger::fileName = path + name;
+  } 
 }
 
 // ログファイルの出力

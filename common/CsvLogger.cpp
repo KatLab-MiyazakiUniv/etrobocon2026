@@ -9,9 +9,15 @@
 // CSVログのバッファとインデックスの初期化
 char CsvLogger::logs[LOG_BUFFER_SIZE] = "";
 int CsvLogger::currentIndex = 0;
+
 // 現在のログファイルパス
 std::string CsvLogger::fileName
     = std::string(DEFAULT_CSV_LOG_FILE_PATH) + DEFAULT_CSV_LOG_FILE_NAME;
+
+// CSVヘッダーの定義
+const std::vector<std::string> CsvLogger::HEADERS = {
+  "time", "brightness", "rightPower", "leftPower"
+};
 
 // CSVログの初期化
 void CsvLogger::init()
@@ -24,13 +30,21 @@ void CsvLogger::init()
 void CsvLogger::writeHeader()
 {
   int remainBuffer = LOG_BUFFER_SIZE - currentIndex - 1;
-
   if(remainBuffer <= 0) {
     return;
   }
 
-  int written
-      = snprintf(&logs[currentIndex], remainBuffer, "time,brightness,rightPower,leftPower\n");
+  // 配列からカンマ区切りのヘッダー文字列を構築
+  std::string headerStr = "";
+  for(size_t i = 0; i < HEADERS.size(); ++i) {
+    headerStr += HEADERS[i];
+    if(i < HEADERS.size() - 1) {
+      headerStr += ",";
+    }
+  }
+  headerStr += "\n";
+
+  int written = snprintf(&logs[currentIndex], remainBuffer, "%s", headerStr.c_str());
 
   if(written >= remainBuffer) {
     currentIndex = LOG_BUFFER_SIZE - 1;
@@ -40,20 +54,32 @@ void CsvLogger::writeHeader()
 }
 
 // 各種値を追加する
-void CsvLogger::add(int brightness, int rightPower, int leftPower)
+void CsvLogger::add(const LogData& data)
 {
   int remainBuffer = LOG_BUFFER_SIZE - currentIndex - 1;
-
   if(remainBuffer <= 0) {
     return;
   }
 
-  // int time = ClockUtil::now();
+  // optionalの値を判定して、あれば数値、なければ空文字にするラムダ関数
+  auto appendField = [](std::string& row, const std::optional<int>& field, bool isLast) {
+    if(field.has_value()) {
+      row += std::to_string(field.value());
+    }
+    if(!isLast) {
+      row += ",";
+    }
+  };
 
-  int written = snprintf(&logs[currentIndex], remainBuffer, "%d,%d,%d\n",
-                         //  "%d,%d,%d,%d\n",
-                         //  time,
-                         brightness, rightPower, leftPower);
+  // 一行分のCSVデータを構築
+  std::string rowStr = "";
+  appendField(rowStr, data.time, false);
+  appendField(rowStr, data.brightness, false);
+  appendField(rowStr, data.rightPower, false);
+  appendField(rowStr, data.leftPower, true);
+  rowStr += "\n";
+
+  int written = snprintf(&logs[currentIndex], remainBuffer, "%s", rowStr.c_str());
 
   if(written >= remainBuffer) {
     currentIndex = LOG_BUFFER_SIZE - 1;
@@ -65,11 +91,10 @@ void CsvLogger::add(int brightness, int rightPower, int leftPower)
 // ログファイルの出力先変更
 void CsvLogger::setFileName(const std::string& name, const std::string& path)
 {
-  if(!name.empty()) {
-    CsvLogger::fileName = path + name;
-  } else if(!path.empty() && !name.empty()) {
-    CsvLogger::fileName = path + name;
-  }
+  std::string finalName = name.empty() ? DEFAULT_CSV_LOG_FILE_NAME : name;
+  std::string finalPath = path.empty() ? DEFAULT_CSV_LOG_FILE_PATH : path;
+
+  CsvLogger::fileName = finalPath + finalName;
 }
 
 // ログファイルの出力
@@ -87,8 +112,11 @@ void CsvLogger::outputToFile()
     }
   }
 
+  // ファイルが既に存在するかチェック
+  bool isNewFile = !std::filesystem::exists(outputPath) || std::filesystem::file_size(outputPath) == 0;
+
   // CSVファイルをバイナリモードで開く
-  std::ofstream file(outputPath, std::ios::binary | std::ios::trunc);
+  std::ofstream file(outputPath, std::ios::binary | std::ios::app);
 
   if(!file.is_open()) {
     std::cerr << "CsvLogger: failed to open or create csv file" << std::endl;
@@ -101,4 +129,7 @@ void CsvLogger::outputToFile()
   if(!file.good()) {
     std::cerr << "CsvLogger: failed to write csv file" << std::endl;
   }
+
+  // ファイルに書き出し終えたら、メモリ上のバッファをクリアして次の走行ログに備える
+  init();
 }

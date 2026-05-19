@@ -5,8 +5,6 @@
  */
 
 #include "EtRobocon2026.h"
-#include "Logger.h"
-#include "CsvLogger.h"
 
 void EtRobocon2026::start()
 {

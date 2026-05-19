@@ -93,7 +93,7 @@ void CsvLogger::outputToFile()
   }
 
   // ログをCSVファイルに書き込む
-  file << logs;
+  file.write(logs, currentIndex);
   file.flush();
   if(!file.good()) {
     std::cerr << "CsvLogger: failed to write csv file" << std::endl;

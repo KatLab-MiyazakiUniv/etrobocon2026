@@ -25,7 +25,6 @@ namespace etrobocon2026_test {
   TEST(LoggerTest, InfoWritesInfoLineToFile)
   {
     const std::string logPath = "../tests/datafiles/logfiles/logfile.txt";
-    const std::string expectedPath = logPath;
 
     // ログを初期化して、出力先ファイル名を設定する
     Logger::init();
@@ -35,7 +34,7 @@ namespace etrobocon2026_test {
     Logger::info("test message");
     Logger::outputToFile();
 
-    const std::string contents = ReadFileContents(expectedPath);
+    const std::string contents = ReadFileContents(logPath);
     EXPECT_NE(contents.find("[INFO] test message\n"), std::string::npos);
   }
 
@@ -43,7 +42,6 @@ namespace etrobocon2026_test {
   TEST(LoggerTest, PrintfLogFormatsMessageCorrectly)
   {
     const std::string logPath = "../tests/datafiles/logfiles/logfile.txt";
-    const std::string expectedPath = logPath;
 
     // ログを初期化して出力先を設定する
     Logger::init();
@@ -53,7 +51,7 @@ namespace etrobocon2026_test {
     Logger::printfLog(Logger::DEBUG, "value=%d", 123);
     Logger::outputToFile();
 
-    const std::string contents = ReadFileContents(expectedPath);
+    const std::string contents = ReadFileContents(logPath);
     EXPECT_NE(contents.find("[DEBUG] value=123\n"), std::string::npos);
   }
 
@@ -61,8 +59,7 @@ namespace etrobocon2026_test {
   TEST(LoggerTest, OutputsAllLogLevelsToFile)
   {
     const std::string logPath = "../tests/datafiles/logfiles/logfile2.txt";
-    ;
-    const std::string expectedPath = "etrobocon2026/tests/datafiles/logfiles/logfile2.txt";
+    
     // ログを初期化して、出力先ファイル名を設定する
     Logger::init();
     Logger::setFileName(logPath);

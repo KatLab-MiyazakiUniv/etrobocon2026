@@ -16,6 +16,9 @@
 
 // #include"ClockUtil.h"
 
+#define DEFAULT_LOG_FILE_PATH "etrobocon2026/datafiles/logfiles/"
+#define DEFAULT_LOG_FILE_NAME "logfile.txt"
+
 class Logger {
  public:
   /**
@@ -72,7 +75,7 @@ class Logger {
    * @brief ログファイルの出力先を変更
    * @param path 出力先パス
    */
-  static void setFileName(const std::string& path);
+  static void setFileName(const std::string& name = DEFAULT_LOG_FILE_NAME , const std::string& path = DEFAULT_LOG_FILE_PATH);
 
  private:
   static constexpr int LOG_BUFFER_SIZE = 65536;    // ログ全体のバッファサイズ

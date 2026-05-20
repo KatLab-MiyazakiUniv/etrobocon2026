@@ -86,10 +86,10 @@ void CsvLogger::add(const LogData& data)
   };
   // 一行分のCSVデータを構築
   std::string rowStr = "";
-  appendField(rowStr, data.time, false);
-  appendField(rowStr, data.brightness, false);
-  appendField(rowStr, data.rightPower, false);
-  appendField(rowStr, data.leftPower, false);
+  appendField(rowStr, localData.time, false);
+  appendField(rowStr, localData.brightness, false);
+  appendField(rowStr, localData.rightPower, false);
+  appendField(rowStr, localData.leftPower, false);
   appendField(rowStr, localData.rightSpeed, false);
   appendField(rowStr, localData.leftSpeed, true);
   rowStr += "\n";
@@ -126,10 +126,6 @@ void CsvLogger::outputToFile()
       return;
     }
   }
-
-  // ファイルが既に存在するかチェック
-  bool isNewFile
-      = !std::filesystem::exists(outputPath) || std::filesystem::file_size(outputPath) == 0;
 
   // CSVファイルをバイナリモードで開く
   std::ofstream file(outputPath, std::ios::binary | std::ios::app);

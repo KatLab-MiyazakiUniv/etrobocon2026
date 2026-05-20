@@ -112,11 +112,11 @@ namespace etrobocon2026_test {
     CsvLogger::setFileName(logFileName, logPath);
     CsvLogger::writeHeader();
 
-    // 輝度(brightness)と左パワー(leftPower)だけ値があり、他が欠けている場合
+    // 時間（time）と輝度(brightness)、左パワー(leftPower)だけ値があり、他が欠けている場合
     LogData partialData;
+    partialData.time = 90;  // time は欠けている
     partialData.brightness = 60;
     partialData.leftPower = 35;
-    // time と rightPower は std::nullopt のまま
 
     CsvLogger::add(partialData);
     CsvLogger::outputToFile();
@@ -124,7 +124,7 @@ namespace etrobocon2026_test {
     const std::string contents = ReadFileContents(fullPath);
     // 期待される出力: "time,brightness,rightPower,leftPower\n,60,,35\n"
     EXPECT_NE(contents.find("time,brightness,rightPower,leftPower,rightSpeed,leftSpeed\n"
-                            ",60,,35,,\n"),
+                            "90,60,,35,,\n"),
               std::string::npos);
   }
 }  // namespace etrobocon2026_test

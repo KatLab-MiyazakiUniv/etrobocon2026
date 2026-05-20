@@ -46,6 +46,9 @@ bool BaseMotion::canStart()
 
 void BaseMotion::prepare() {}
 
-void BaseMotion::wait() {}
+void BaseMotion::wait()
+{
+  ClockUtil::sleep();  // 10ミリ秒待機
+}
 
 void BaseMotion::finish() {}

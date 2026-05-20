@@ -10,6 +10,7 @@
 #include "WheelMotorController.h"
 #include "ArmMotorController.h"
 #include "IMUController.h"
+#include "Course.h"
 
 class Robot {
  public:
@@ -37,10 +38,23 @@ class Robot {
    */
   IMUController& getIMUControllerInstance();
 
+  /**
+   * @brief コースの参照を返す
+   * @return メンバ変数 course(Course のインスタンス) の参照
+   */
+  Course& getCourse();
+
+  /**
+   * @brief コースを設定する
+   * @param course コース
+   */
+  void setCourse(Course course);
+
  private:
   WheelMotorController wheelMotorController;  // WheelMotorController インスタンス
   ArmMotorController armMotorController;      // ArmMotorController インスタンス
   IMUController imuController;                // IMUController インスタンス
+  Course course;                              // コース(Left or Right)
 };
 
 #endif

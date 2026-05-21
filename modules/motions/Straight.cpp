@@ -29,8 +29,10 @@ bool Straight::canStart()
 
 void Straight::prepare()
 {
-  // 走行前の角度を目標角度に設定
-  targetAngle = robot.getIMUControllerInstance().getAzimuth();
+  // IMU有りの場合、走行前の角度を目標角度に設定
+  if(shouldUseIMU) {
+    targetAngle = robot.getIMUControllerInstance().getAzimuth();
+  }
 }
 
 void Straight::executeStep()

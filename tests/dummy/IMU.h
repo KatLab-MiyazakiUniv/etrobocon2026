@@ -92,7 +92,20 @@ namespace spikeapi {
      * IMUの方位角を取得する
      * @return 方位角 [°]
      */
-    float getHeading() { return azimuth; }
+    float getHeading()
+    {
+      azimuth += 1;  // 方位角を1度ずつ増加させる
+
+      /**
+       * 角度が360度を超えた場合、0〜360度の範囲に正規化する
+       * fmodを使って余りを取り、角度を1周以内に収める
+       */
+      if(azimuth >= 360.0f) {
+        azimuth = fmod(azimuth, 360.0f);
+      }
+
+      return azimuth;
+    }
 
     /**
      * IMUの方位角をリセットする

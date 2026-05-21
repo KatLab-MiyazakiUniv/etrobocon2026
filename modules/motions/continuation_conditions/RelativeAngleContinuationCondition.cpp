@@ -6,9 +6,9 @@
 #include "RelativeAngleContinuationCondition.h"
 
 RelativeAngleContinuationCondition::RelativeAngleContinuationCondition(Robot& robot,
-                                                                       double _deltaAngle,
+                                                                       double _relativeAngle,
                                                                        double _tolerance)
-  : AngleContinuationCondition(robot, _tolerance), deltaAngle(_deltaAngle)
+  : AngleContinuationCondition(robot, _tolerance), relativeAngle(_relativeAngle)
 {
 }
 
@@ -20,8 +20,8 @@ void RelativeAngleContinuationCondition::prepare()
   /**
    * @brief 目標角度の設定
    * @details
-   * 現在角度に相対角度(deltaAngle)を加算して目標角度(targetAngle)を算出する。
+   * 現在角度に相対角度(relativeAngle)を加算して目標角度(targetAngle)を算出する。
    * このtargetAngleを基準に、動作を継続すべきかを判定される。
    */
-  targetAngle = initialAngle + deltaAngle;
+  targetAngle = initialAngle + relativeAngle;
 }

@@ -7,8 +7,9 @@
 
 RelativeRotation::RelativeRotation(
     Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-    const Pid::PidGain& _anglePidGain, double _deltaAngle)
-  : Rotation(_robot, std::move(_continuationCondition), _anglePidGain), deltaAngle(_deltaAngle)
+    const Pid::PidGain& _anglePidGain, double _relativeAngle)
+  : Rotation(_robot, std::move(_continuationCondition), _anglePidGain),
+    relativeAngle(_relativeAngle)
 {
 }
 
@@ -17,10 +18,10 @@ void RelativeRotation::prepare()
   /**
    * @brief 現在角度の取得と目標角度の算出
    * @details
-   * 現在のロボットの角度を取得し、相対角度(deltaAngle)を加算して
+   * 現在のロボットの角度を取得し、相対角度(relativeAngle)を加算して
    * 正規化した目標角度(targetAngle)を設定する
    */
 
   double initialAngle = getCurrentAngle();  // 現在の走行体角度を取得する
-  targetAngle = normalizeAngle(initialAngle + deltaAngle);
+  targetAngle = normalizeAngle(initialAngle + relativeAngle);
 }

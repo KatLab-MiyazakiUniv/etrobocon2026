@@ -10,17 +10,17 @@
 
 class RelativeAngleContinuationCondition : public AngleContinuationCondition {
  public:
-  RelativeAngleContinuationCondition(Robot& robot, double _deltaAngle, double _tolerance = 2.0);
+  RelativeAngleContinuationCondition(Robot& robot, double _relativeAngle, double _tolerance = 2.0);
   /**
    * @brief 判定開始前の準備処理
    * @details
-   * 現在角度を取得し、相対角度(deltaAngle)を加算して
+   * 現在角度を取得し、相対角度(relativeAngle)を加算して
    * 目標角度(targetAngle)を算出する
    */
   void prepare() override;
 
  private:
-  double deltaAngle;  // 回頭したい相対角度
+  double relativeAngle;  // 回頭したい相対角度
 };
 
 #endif

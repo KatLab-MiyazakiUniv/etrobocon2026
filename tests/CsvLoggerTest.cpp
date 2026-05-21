@@ -52,6 +52,7 @@ namespace etrobocon2026_test {
     // 構造体に値をセットしてデータを追加する
     LogData data;
     data.time = 42;
+    data.id = "CDL";
     data.brightness = 100;
     data.rightPower = 100;
     data.leftPower = -100;
@@ -63,8 +64,8 @@ namespace etrobocon2026_test {
     CsvLogger::outputToFile();
 
     const std::string contents = ReadFileContents(fullPath);
-    EXPECT_NE(contents.find("time,brightness,rightPower,leftPower,rightSpeed,leftSpeed\n"
-                            "42,100,100,-100,50.53,-50.5\n"),
+    EXPECT_NE(contents.find("time,comand:id,brightness,rightPower,leftPower,rightSpeed,leftSpeed\n"
+                            "42,CDL,100,100,-100,50.53,-50.5\n"),
               std::string::npos);
   }
 
@@ -83,19 +84,19 @@ namespace etrobocon2026_test {
     CsvLogger::writeHeader();
 
     // 1件目のデータ
-    LogData data1{ 1, 2, 3, 4, 5.5, 6.5 };
+    LogData data1{ 1, "CDL", 2, 3, 4, 5.5, 6.5 };
     CsvLogger::add(data1);
 
     // 2件目のデータ
-    LogData data2{ 7, 8, 9, 10, 11.123, 12.0 };
+    LogData data2{ 7, "CDL", 8, 9, 10, 11.123, 12.0 };
     CsvLogger::add(data2);
 
     CsvLogger::outputToFile();
 
     const std::string contents = ReadFileContents(fullPath);
-    EXPECT_NE(contents.find("time,brightness,rightPower,leftPower,rightSpeed,leftSpeed\n"
-                            "1,2,3,4,5.5,6.5\n"
-                            "7,8,9,10,11.123,12\n"),
+    EXPECT_NE(contents.find("time,comand:id,brightness,rightPower,leftPower,rightSpeed,leftSpeed\n"
+                            "1,CDL,2,3,4,5.5,6.5\n"
+                            "7,CDL,8,9,10,11.123,12\n"),
               std::string::npos);
   }
 
@@ -114,7 +115,7 @@ namespace etrobocon2026_test {
 
     // 時間（time）と輝度(brightness)、左パワー(leftPower)だけ値があり、他が欠けている場合
     LogData partialData;
-    partialData.time = 90;  // time は欠けている
+    partialData.time = 90;  
     partialData.brightness = 60;
     partialData.leftPower = 35;
 
@@ -123,8 +124,8 @@ namespace etrobocon2026_test {
 
     const std::string contents = ReadFileContents(fullPath);
     // 期待される出力: "time,brightness,rightPower,leftPower\n,60,,35\n"
-    EXPECT_NE(contents.find("time,brightness,rightPower,leftPower,rightSpeed,leftSpeed\n"
-                            "90,60,,35,,\n"),
+    EXPECT_NE(contents.find("time,comand:id,brightness,rightPower,leftPower,rightSpeed,leftSpeed\n"
+                            "90,,60,,35,,\n"),
               std::string::npos);
   }
 }  // namespace etrobocon2026_test

@@ -89,6 +89,8 @@ class Logger {
   // 現在使用しているログファイルパス
   static std::string fileName;
 
+  Logger();  // インスタンス化禁止
+
   /**
    * @brief 出力するログを整形して保存する
    * @param level ログレベル
@@ -107,8 +109,6 @@ class Logger {
    * @param level ログレベル
    */
   static const char* levelToColor(Level level);
-
-  Logger();  // インスタンス化禁止
 };
 
 // インスタンスの生死を記録

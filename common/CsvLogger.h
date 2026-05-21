@@ -15,6 +15,7 @@
 #include <optional>
 #include <vector>
 #include "ClockUtil.h"
+#include "Logger.h"
 
 // デフォルトのログファイルパスとファイル名
 #define DEFAULT_CSV_LOG_FILE_PATH "etrobocon2026/datafiles/logfiles/"
@@ -25,7 +26,7 @@
  * @brief ロガーに渡す走行データをまとめた構造体
  */
 struct LogData {
-  std::optional<int> time;           // 将来的にClockUtil::now()を入れる用
+  std::optional<int> time;           // 走行経過時間
   std::optional<int> brightness;     // 輝度値
   std::optional<int> rightPower;     // 右Power値
   std::optional<int> leftPower;      // 左Power値

@@ -1,6 +1,6 @@
 /**
  * @file CsvLogger.cpp
- * @brief 走行中の各種値可視化のためのcsvファイル作成に関するクラス
+ * @brief 走行中の実測値をcsvファイルに出力するためのクラス
  * @author miyahara046
  */
 
@@ -122,7 +122,7 @@ void CsvLogger::outputToFile()
     try {
       std::filesystem::create_directories(outputPath.parent_path());
     } catch(...) {
-      std::cerr << "CsvLogger:failed to create csv directory" << std::endl;
+      Logger::error("CsvLogger:failed to create csv directory");
       return;
     }
   }
@@ -131,7 +131,7 @@ void CsvLogger::outputToFile()
   std::ofstream file(outputPath, std::ios::binary | std::ios::app);
 
   if(!file.is_open()) {
-    std::cerr << "CsvLogger: failed to open or create csv file" << std::endl;
+    Logger::error("CsvLogger: failed to open or create csv file");
     return;
   }
 
@@ -139,7 +139,7 @@ void CsvLogger::outputToFile()
   file.write(logs, currentIndex);
   file.flush();
   if(!file.good()) {
-    std::cerr << "CsvLogger: failed to write csv file" << std::endl;
+    Logger::error("CsvLogger: failed to write csv file");
   }
 
   // ファイルに書き出し終えたら、メモリ上のバッファをクリアして次の走行ログに備える

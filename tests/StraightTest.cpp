@@ -124,10 +124,10 @@ namespace etrobocon2026_test {
     double endMileage = Mileage::calculateMileage(rightCount, leftCount);
 
     // 走行距離と目標距離との誤差
-    double diviation = 0.5;
+    double deviation = 0.5;
 
     // 走行距離が目標距離の誤差の範囲にあることテスト
-    EXPECT_NEAR(targetDistance, endMileage - startMileage, diviation);
+    EXPECT_NEAR(targetDistance, endMileage - startMileage, deviation);
   }
 
   // IMU有りの場合、目標距離が0の時、runで直進後、走行距離が増加しないことをテスト

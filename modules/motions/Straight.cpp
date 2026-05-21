@@ -42,7 +42,7 @@ void Straight::executeStep()
   double turningPower = 0.0;
 
   if(shouldUseIMU) {
-    // 角度のズレを補正する
+    // 目標角度と現在角度の差
     double currentAngle = robot.getIMUControllerInstance().getAzimuth();
     double angleDeviation = targetAngle - currentAngle;
 

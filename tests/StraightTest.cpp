@@ -49,7 +49,7 @@ namespace etrobocon2026_test {
   }
 
   // IMU無しの場合、目標距離が0の時、runで直進後、走行距離が増加しないことをテスト
-  TEST_F(StraightTest, RunZero)
+  TEST_F(StraightTest, RunWithZeroDistance)
   {
     Robot robot;
     double targetSpeed = 50.0;    // 目標速度
@@ -75,7 +75,7 @@ namespace etrobocon2026_test {
   }
 
   // IMU無しの場合、目標距離が負の時、runで直進後、走行距離が増加しないことをテスト
-  TEST_F(StraightTest, RunNegative)
+  TEST_F(StraightTest, RunWithNegativeDistance)
   {
     Robot robot;
     double targetSpeed = 50.0;       // 目標速度
@@ -101,8 +101,35 @@ namespace etrobocon2026_test {
     EXPECT_EQ(expected, endMileage - startMileage);
   }
 
+  // IMU無しの場合、目標距離が正、目標速度が0の場合、走行距離0でrun()が終了するか確認
+  TEST_F(StraightTest, RunWithZeroSpeed)
+  {
+    Robot robot;
+    double targetSpeed = 0.0;      // 目標速度
+    double targetDistance = 10.0;  // 目標距離
+
+    // 直進前の走行距離を計算
+    int32_t rightCount = robot.getWheelMotorControllerInstance().getRightCount();
+    int32_t leftCount = robot.getWheelMotorControllerInstance().getLeftCount();
+    double startMileage = Mileage::calculateMileage(rightCount, leftCount);
+
+    // 直進動作を実行
+    Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
+                      targetSpeed, rightPid, leftPid, anglePid, false);
+    straight.run();
+
+    // 直進後の走行距離を計算
+    rightCount = robot.getWheelMotorControllerInstance().getRightCount();
+    leftCount = robot.getWheelMotorControllerInstance().getLeftCount();
+    double endMileage = Mileage::calculateMileage(rightCount, leftCount);
+
+    // 走行距離が0であることをテスト
+    double expected = 0.0;
+    EXPECT_EQ(expected, endMileage - startMileage);
+  }
+
   // IMU有りの場合、目標距離が正の時、run()で直進後、走行距離が目標距離だけ増加するかテスト（誤差あり）
-  TEST_F(StraightTest, RunWithImu)
+  TEST_F(StraightTest, ImuRun)
   {
     Robot robot;
     double targetSpeed = 1000.0;   // 目標速度
@@ -131,7 +158,7 @@ namespace etrobocon2026_test {
   }
 
   // IMU有りの場合、目標距離が0の時、runで直進後、走行距離が増加しないことをテスト
-  TEST_F(StraightTest, RunZeroWithImu)
+  TEST_F(StraightTest, ImuRunZeroDistance)
   {
     Robot robot;
     double targetSpeed = 50.0;    // 目標速度
@@ -157,11 +184,38 @@ namespace etrobocon2026_test {
   }
 
   // IMU有りの場合、目標距離が負の時、runで直進後、走行距離が増加しないことをテスト
-  TEST_F(StraightTest, RunNegativeWithImu)
+  TEST_F(StraightTest, ImuRunNegativeDistance)
   {
     Robot robot;
     double targetSpeed = 50.0;       // 目標速度
     double targetDistance = -100.0;  // 目標距離
+
+    // 直進前の走行距離を計算
+    int32_t rightCount = robot.getWheelMotorControllerInstance().getRightCount();
+    int32_t leftCount = robot.getWheelMotorControllerInstance().getLeftCount();
+    double startMileage = Mileage::calculateMileage(rightCount, leftCount);
+
+    // 直進動作を実行
+    Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
+                      targetSpeed, rightPid, leftPid, anglePid, true);
+    straight.run();
+
+    // 直進後の走行距離を計算
+    rightCount = robot.getWheelMotorControllerInstance().getRightCount();
+    leftCount = robot.getWheelMotorControllerInstance().getLeftCount();
+    double endMileage = Mileage::calculateMileage(rightCount, leftCount);
+
+    // 走行距離が0であることをテスト
+    double expected = 0.0;
+    EXPECT_EQ(expected, endMileage - startMileage);
+  }
+
+  // IMU有りの場合、目標距離が正、目標速度が0の場合、走行距離0でrun()が終了するか確認
+  TEST_F(StraightTest, ImuRunWithZeroSpeed)
+  {
+    Robot robot;
+    double targetSpeed = 0.0;      // 目標速度
+    double targetDistance = 10.0;  // 目標距離
 
     // 直進前の走行距離を計算
     int32_t rightCount = robot.getWheelMotorControllerInstance().getRightCount();

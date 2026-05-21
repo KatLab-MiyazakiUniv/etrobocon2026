@@ -1,29 +1,40 @@
 /**
- * @file   AngleContinuationCondition.h
- * @brief  目標角度との誤差に基づいて動作の継続/終了を判定するクラス
- * @author okuyama0528 yutaro-1214
- */
+ * @file   AngleContinuationCondition.h
+ * @brief  目標角度との誤差に基づいて動作を継続するかを判定するクラス
+ * @author okuyama0528 yutaro-1214
+ */
 #ifndef ANGLE_CONTINUATION_CONDITION_H
 #define ANGLE_CONTINUATION_CONDITION_H
 
 #include "BaseContinuationCondition.h"
+#include <cmath>
 
 class AngleContinuationCondition : public BaseContinuationCondition {
  public:
+  /**
+   * @brief コンストラクタ
+   * @param robot ロボット本体への参照
+   * @param _tolerance 許容誤差（デフォルト: 2.0度）
+   * @details ロボットと許容誤差を設定し、角度判定の初期化を行う
+   */
+
   AngleContinuationCondition(Robot& robot, double _tolerance = 2.0);
-  // 動作を継続するかどうかを判定する関数
-  // 目標角度との誤差が許容範囲を超えていれば継続、収まっていれば終了
-  bool shouldContinue() override;
+
+  bool shouldContinue()
+      override;  // 目標角度との誤差が許容範囲を超えていれば継続、収まっていれば終了
 
  protected:
-  // 目標角度
-  double targetAngle;
-  // 角度を-180〜180の範囲に正規化する関数
+  double targetAngle;  // 目標角度
+
+  /**
+   * @brief 角度を-180〜180の範囲に正規化する関数
+   * @param angle 正規化前の角度
+   * @return 正規化した角度
+   */
   double normalizeAngle(double angle);
 
  private:
-  // 許容誤差（この範囲内なら到達とみなす）
-  double tolerance;
+  double tolerance;  // 許容誤差（この範囲内なら到達とみなす）
 };
 
 #endif

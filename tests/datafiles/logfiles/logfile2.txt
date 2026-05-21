@@ -2,3 +2,7 @@
 [46 ms][WARNING] warning
 [47 ms][ERROR] error
 [48 ms][DEBUG] debug
+[49 ms][INFO] formatted info
+[50 ms][WARNING] formatted warning
+[51 ms][ERROR] formatted error
+[52 ms][DEBUG] formatted debug

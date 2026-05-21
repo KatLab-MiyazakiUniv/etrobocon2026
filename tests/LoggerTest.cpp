@@ -86,6 +86,10 @@ namespace etrobocon2026_test {
     Logger::warning("warning");
     Logger::error("error");
     Logger::debug("debug");
+    Logger::printfLog(Logger::INFO, "formatted %s", "info");
+    Logger::printfLog(Logger::WARNING, "formatted %s", "warning");
+    Logger::printfLog(Logger::ERROR, "formatted %s", "error");
+    Logger::printfLog(Logger::DEBUG, "formatted %s", "debug");
     Logger::outputToFile();
 
     // 各出力がファイルに書き込まれていることを確認する

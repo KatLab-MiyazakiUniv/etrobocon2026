@@ -23,7 +23,7 @@
 
 /**
  * @struct LogData
- * @brief ロガーに渡す走行データをまとめた構造体
+ * @brief CsvLoggerで記録する走行データをまとめた構造体
  */
 struct LogData {
   std::optional<int> time;           // 走行経過時間

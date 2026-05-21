@@ -14,8 +14,13 @@ RelativeRotation::RelativeRotation(
 
 void RelativeRotation::prepare()
 {
-  // 現在のロボットの角度を取得する
-  double initialAngle = getCurrentAngle();
-  // 現在角度に回頭したい相対角度（deltaAngle)を足して目標角度を決定する
+  /**
+   * @brief 現在角度の取得と目標角度の算出
+   * @details
+   * 現在のロボットの角度を取得し、相対角度(deltaAngle)を加算して
+   * 正規化した目標角度(targetAngle)を設定する
+   */
+
+  double initialAngle = getCurrentAngle();  // 現在の走行体角度を取得する
   targetAngle = normalizeAngle(initialAngle + deltaAngle);
 }

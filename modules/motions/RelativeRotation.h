@@ -10,16 +10,24 @@
 
 class RelativeRotation : public Rotation {
  public:
+  /**
+   * @brief コンストラクタ
+   * @param _robot ロボット本体への参照
+   * @param _continuationCondition 動作の継続条件（終了判定）
+   * @param _anglePidGain 角度制御用のPIDゲイン
+   * @param _deltaAngle 回転したい相対角度
+   * @details
+   * ロボット、継続条件、PIDゲイン、および相対角度を受け取り、
+   * 相対回転動作の初期設定を行う
+   */
   RelativeRotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                    const Pid::PidGain& _anglePidGain, double _deltaAngle);
 
  protected:
-  // 現在角度にdeltaAngleを加算し、目標角度を算出する
-  void prepare() override;
+  void prepare() override;  // 現在角度にdeltaAngleを加算し、目標角度を算出する
 
  private:
-  // 回頭したい相対角度
-  double deltaAngle;
+  double deltaAngle;  // 回頭したい相対角度
 };
 
 #endif

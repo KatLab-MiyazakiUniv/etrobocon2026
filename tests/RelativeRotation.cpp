@@ -1,6 +1,6 @@
 /**
- * @file AngleContinuationConditionTest.cpp
- * @brief AngleContinuationConditionクラスをテストする
+ * @file RelativeAngleContinuationConditionTest.cpp
+ * @brief RelativeAngleContinuationConditionクラスをテストする
  * @author okuyama0528 yutaro-1214
  */
 

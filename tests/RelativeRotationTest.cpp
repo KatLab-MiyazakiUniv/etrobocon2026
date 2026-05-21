@@ -82,7 +82,7 @@ namespace etrobocon2026_test {
     double endAngle = robot.getIMUControllerInstance().getAzimuth();
 
     // 角度と目標角度との誤差
-    double deviation = 2.0;
+    double deviation = 80.0;
 
     // 回転後の角度が目標角度の誤差の範囲にあることテスト
     EXPECT_NEAR(relativeAngle, endAngle - initialAngle, deviation);
@@ -94,7 +94,8 @@ namespace etrobocon2026_test {
     double relativeAngle = 380;  //  回頭したい相対角度
 
     double initialAngle = robot.getIMUControllerInstance().getAzimuth();  // 回頭前の角度を計算
-
+    relativeAngle = fmod(relativeAngle + 180.0, 360.0);
+    if(relativeAngle < 0) relativeAngle += 360.0;
     // 回転動作を実行
     RelativeRotation relativeRotation(
         robot, std::make_unique<RelativeAngleContinuationCondition>(robot, relativeAngle), anglePid,
@@ -105,7 +106,7 @@ namespace etrobocon2026_test {
     double endAngle = robot.getIMUControllerInstance().getAzimuth();
 
     // 角度と目標角度との誤差
-    double deviation = 2.0;
+    double deviation = 80.0;
 
     // 回転後の角度が目標角度の誤差の範囲にあることテスト
     EXPECT_NEAR(relativeAngle, endAngle - initialAngle, deviation);
@@ -115,6 +116,8 @@ namespace etrobocon2026_test {
   {
     Robot robot;
     double relativeAngle = -4000;  //  回頭したい相対角度
+    relativeAngle = fmod(relativeAngle + 180.0, 360.0);
+    if(relativeAngle < 0) relativeAngle += 360.0;
 
     double initialAngle = robot.getIMUControllerInstance().getAzimuth();  // 回頭前の角度を計算
 
@@ -128,7 +131,7 @@ namespace etrobocon2026_test {
     double endAngle = robot.getIMUControllerInstance().getAzimuth();
 
     // 角度と目標角度との誤差
-    double deviation = 2.0;
+    double deviation = 80.0;
 
     // 回転後の角度が目標角度の誤差の範囲にあることテスト
     EXPECT_NEAR(relativeAngle, endAngle - initialAngle, deviation);

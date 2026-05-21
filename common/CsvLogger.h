@@ -27,7 +27,7 @@
  */
 struct LogData {
   std::optional<int> time;           // 走行経過時間
-  std::optional<std::string> id;            // 実行しているコマンドのID(コマンド名:ID)
+  std::optional<std::string> id;     // 実行しているコマンドのID(コマンド名:ID)
   std::optional<int> brightness;     // 輝度値
   std::optional<int> rightPower;     // 右Power値
   std::optional<int> leftPower;      // 左Power値

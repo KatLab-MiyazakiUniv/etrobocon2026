@@ -115,7 +115,7 @@ namespace etrobocon2026_test {
 
     // 時間（time）と輝度(brightness)、左パワー(leftPower)だけ値があり、他が欠けている場合
     LogData partialData;
-    partialData.time = 90;  
+    partialData.time = 90;
     partialData.brightness = 60;
     partialData.leftPower = 35;
 

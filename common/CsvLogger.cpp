@@ -67,27 +67,27 @@ void CsvLogger::add(const LogData& data)
   }
 
   // optionalの値を判定して、あれば数値、なければ空文字にするラムダ関数
-auto appendField = [](std::string& row, const auto& field, bool isLast) {
-  if(field.has_value()) {
-    using FieldType = std::decay_t<decltype(field.value())>;
-    // 元々文字列のものはそのままで、数値の場合は文字列化する    
-    if constexpr (std::is_same_v<FieldType, std::string>) {
-      row += field.value();
-    } else {
-      std::string valStr = std::to_string(field.value());
-      if(valStr.find('.') != std::string::npos) {
-        valStr.erase(valStr.find_last_not_of('0') + 1, std::string::npos);
-        if(valStr.back() == '.') {
-          valStr.pop_back();
+  auto appendField = [](std::string& row, const auto& field, bool isLast) {
+    if(field.has_value()) {
+      using FieldType = std::decay_t<decltype(field.value())>;
+      // 元々文字列のものはそのままで、数値の場合は文字列化する
+      if constexpr(std::is_same_v<FieldType, std::string>) {
+        row += field.value();
+      } else {
+        std::string valStr = std::to_string(field.value());
+        if(valStr.find('.') != std::string::npos) {
+          valStr.erase(valStr.find_last_not_of('0') + 1, std::string::npos);
+          if(valStr.back() == '.') {
+            valStr.pop_back();
+          }
         }
+        row += valStr;
       }
-      row += valStr;
     }
-  }
-  if(!isLast) {
-    row += ",";
-  }
-};
+    if(!isLast) {
+      row += ",";
+    }
+  };
   // 一行分のCSVデータを構築
   std::string rowStr = "";
   appendField(rowStr, localData.time, false);

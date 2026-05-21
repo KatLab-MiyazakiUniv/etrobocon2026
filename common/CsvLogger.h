@@ -68,7 +68,7 @@ class CsvLogger {
                           const std::string& path = DEFAULT_CSV_LOG_FILE_PATH);
 
  private:
-  static constexpr int LOG_BUFFER_SIZE = 65536;  // ログ全体のバッファサイズ
+  static constexpr int LOG_BUFFER_SIZE = 65536 * 5;  // ログ全体のバッファサイズ
   static char logs[LOG_BUFFER_SIZE];             // ログのバッファ
   static int currentIndex;                       // ログの現在のインデックス
 

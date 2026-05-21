@@ -8,12 +8,12 @@
 
 Straight::Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                    double _targetSpeed, const Pid::PidGain& _rightPid, const Pid::PidGain& _leftPid,
-                   const Pid::PidGain& _anglePidGain, bool _isUsingIMU)
+                   const Pid::PidGain& _anglePidGain, bool _shouldUseIMU)
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
     speedCalculator(_robot, _rightPid, _leftPid, _targetSpeed),
     anglePid(_anglePidGain.kp, _anglePidGain.ki, _anglePidGain.kd, 0.0),
-    isUsingIMU(_isUsingIMU),
+    shouldUseIMU(_shouldUseIMU),
     targetAngle(0.0)
 {
 }
@@ -39,7 +39,7 @@ void Straight::executeStep()
   double requiredLeftPower = speedCalculator.calculateLeftMotorPower();
   double turningPower = 0.0;
 
-  if(isUsingIMU) {
+  if(shouldUseIMU) {
     // 角度のズレを補正する
     double currentAngle = robot.getIMUControllerInstance().getAzimuth();
     double angleDeviation = targetAngle - currentAngle;

@@ -22,12 +22,12 @@ class Straight : public BaseMotion {
    * @param _rightPid 右タイヤのPIDゲイン
    * @param _leftPid 左タイヤのPIDゲイン
    * @param _anglePidGain 角度制御用PIDゲイン
-   * @param _isUsingIMU IMUを使用するかどうか
+   * @param _shouldUseIMU IMUを使用するかどうか
    */
 
   Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
            double _targetSpeed, const Pid::PidGain& _rightPid, const Pid::PidGain& _leftPid,
-           const Pid::PidGain& _anglePidGain, bool _isUsingIMU);
+           const Pid::PidGain& _anglePidGain, bool _shouldUseIMU);
 
  protected:
   /**
@@ -51,11 +51,11 @@ class Straight : public BaseMotion {
   void finish() override;
 
  private:
-  double targetSpeed;               // 目標速度(mm/ミリ秒)
+  double targetSpeed;               // 目標速度(mm/秒)
   double targetAngle;               // 目標角度(度)
   SpeedCalculator speedCalculator;  // SpeedCalculatorクラスのインスタンス
   Pid anglePid;                     // 角度制御用PID
-  bool isUsingIMU;                  // IMUを使用するかどうか
+  bool shouldUseIMU;                // IMUを使用するかどうか
 };
 
 #endif

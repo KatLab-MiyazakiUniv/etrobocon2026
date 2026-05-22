@@ -102,7 +102,7 @@ void ColorSensorController::getRawHSV(HSV& hsv, bool surface)
 //   hsv.v = rawhsv.v;
 // }
 
-const char* colorsensorcontroller::getColor(ColorSensorController::HSV& hsv)
+const char* ColorSensorController::getColor(ColorSensorController::HSV& hsv)
 {
   return ColorSensorController::convertColorToString(ColorSensorController::convertHsvToColor(hsv));
 }

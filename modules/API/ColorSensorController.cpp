@@ -117,5 +117,5 @@ void ColorSensorController::lightOff()
 // ライトの輝度を個別に設定する
 void ColorSensorController::setLightBrightness(int left, int center, int right)
 {
-  colorSensor.setLight(left, center, righ / t);
+  colorSensor.setLight(left, center, right);
 }

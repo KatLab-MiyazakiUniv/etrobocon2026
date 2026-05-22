@@ -114,8 +114,8 @@ void ColorSensorController::lightOff()
   colorSensor.lightOff();
 }
 
-// ライトの色を個別に設定する
-void ColorSensorController::setLightColor(int r, int g, int b)
+// ライトの輝度を個別に設定する
+void ColorSensorController::setLightBrightness(int left, int center, int right)
 {
-  colorSensor.setLight(r, g, b);
+  colorSensor.setLight(left, center, righ / t);
 }

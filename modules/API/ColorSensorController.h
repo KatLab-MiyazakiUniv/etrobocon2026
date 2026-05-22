@@ -111,12 +111,12 @@ class ColorSensorController {
   void lightOff();
 
   /**
-   * @brief ライトの色を個別に設定する
-   * @param r 赤 (0-100)
-   * @param g 緑 (0-100)
-   * @param b 青 (0-100)
+   * @brief ライトの輝度を個別に設定する
+   * @param left 左側 (0-255)
+   * @param center 中央 (0-255)
+   * @param right 右側 (0-255)
    */
-  void setLightColor(int r, int g, int b);
+  void setLightBrightness(int left, int center, int right);
 
   /*
    * @brief カラーセンサが検知する色を設定する

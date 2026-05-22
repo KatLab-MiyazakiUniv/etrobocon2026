@@ -121,7 +121,7 @@ namespace etrobocon2026_test {
     // コンパイルが通ることを確認するのみ。
     colorController.lightOn();
     colorController.lightOff();
-    colorController.setLightColor(10, 20, 30);
+    colorController.setLightBrightness(10, 20, 30);
     SUCCEED();
   }
 

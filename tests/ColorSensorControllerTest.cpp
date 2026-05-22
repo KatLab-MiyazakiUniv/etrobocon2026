@@ -84,36 +84,6 @@ namespace etrobocon2026_test {
     EXPECT_EQ(60, hsv.v);
   }
 
-  // 色を測定できるかのテスト (getColor, surface = true)
-  TEST(ColorSensorControllerTest, GetColor_SurfaceTrue)
-  {
-    ColorSensorController colorController;
-    ColorSensorController::HSV hsv;
-    // ダミーの値をセット
-    spikeapi::ColorSensor::HSV dummyHsv = { 300, 70, 85 };
-    spikeapi::ColorSensor::setHSV(dummyHsv);
-
-    colorController.getColor(hsv);
-    EXPECT_EQ(300, hsv.h);
-    EXPECT_EQ(70, hsv.s);
-    EXPECT_EQ(85, hsv.v);
-  }
-
-  // 色を測定できるかのテスト (getColor, surface = false)
-  TEST(ColorSensorControllerTest, GetColor_SurfaceFalse)
-  {
-    ColorSensorController colorController;
-    ColorSensorController::HSV hsv;
-    // ダミーの値をセット
-    spikeapi::ColorSensor::HSV dummyHsv = { 60, 40, 70 };
-    spikeapi::ColorSensor::setHSV(dummyHsv);
-
-    colorController.getColor(hsv);
-    EXPECT_EQ(60, hsv.h);
-    EXPECT_EQ(40, hsv.s);
-    EXPECT_EQ(70, hsv.v);
-  }
-
   // ライトを点灯/消灯するテスト
   TEST(ColorSensorControllerTest, LightControl)
   {

@@ -104,7 +104,7 @@ void ColorSensorController::getRawHSV(HSV& hsv, bool surface)
 
 const char* colorsensorcontroller::getColor(ColorSensorController::HSV& hsv)
 {
-  return convertColorToString(convertHsvToColor(hsv));
+  return colorsensorcontroller::convertColorToString(colorsensorcontroller::convertHsvToColor(hsv));
 }
 
 // ライトを点灯する

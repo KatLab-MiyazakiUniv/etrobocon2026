@@ -15,23 +15,11 @@ namespace spikeapi {
   ColorSensor::HSV ColorSensor::sHSV = { 0, 0, 0 };
   int32_t ColorSensor::sReflection = 0;
   int32_t ColorSensor::sAmbient = 0;
-  bool ColorSensor::sHasError = false;
+  // bool ColorSensor::sHasError = false;
 
 }  // namespace spikeapi
 
 namespace etrobocon2026_test {
-
-  // ColorSensorControllerのインスタンス生成失敗時のテスト
-  TEST(ColorSensorControllerTest, ConstructorErrorHandling)
-  {
-    // hasError()がtrueを返すようにダミーを設定
-    spikeapi::ColorSensor::setHasError(true);
-    // コンストラクタでエラーメッセージが標準エラー出力に出ることを確認
-    // (具体的な出力内容はここでは検証せず、hasError()で状態を確認)
-    ColorSensorController colorController(EPort::PORT_E);
-    EXPECT_TRUE(colorController.hasError());
-    spikeapi::ColorSensor::setHasError(false);  // 設定をリセット
-  }
 
   // 反射光強度を取得できるかのテスト
   TEST(ColorSensorControllerTest, GetReflectance)
@@ -130,13 +118,11 @@ namespace etrobocon2026_test {
   TEST(ColorSensorControllerTest, LightControl)
   {
     ColorSensorController colorController;
-    // lightOn/lightOff/setLightColorはダミーでは動作を検証できないため、
     // コンパイルが通ることを確認するのみ。
-    // 実際のハードウェアテストでは、LEDの状態を読み取るなどの検証が必要。
     colorController.lightOn();
     colorController.lightOff();
     colorController.setLightColor(10, 20, 30);
-    SUCCEED();  // コンパイルが通り、実行できれば成功
+    SUCCEED();
   }
 
 }  // namespace etrobocon2026_test

@@ -114,13 +114,13 @@ namespace spikeapi {
     static HSV sHSV;
     static int32_t sReflection;
     static int32_t sAmbient;
-    static bool sHasError; //hasError()の戻り値を制御するため
+    static bool sHasError;  // hasError()の戻り値を制御するため
 
     static void setRGB(RGB rgb) { sRGB = rgb; }
     static void setHSV(HSV hsv) { sHSV = hsv; }
     static void setReflection(int32_t reflection) { sReflection = reflection; }
     static void setAmbient(int32_t ambient) { sAmbient = ambient; }
-    static void setHasError(bool hasError) { sHasError = hasError; }
+    // static void setHasError(bool hasError) { sHasError = hasError; }
 
    private:
     EPort mPort;

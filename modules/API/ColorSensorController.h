@@ -11,6 +11,16 @@
 #include <cstdint>   // uint16_t, uint8_tを使用するため
 #include <iostream>  // エラー出力用
 
+enum class COLOR : int {
+  NONE = 0,
+  BLACK = 1,
+  WHITE = 2,
+  BLUE = 3,
+  GREEN = 4,
+  YELLOW = 5,
+  RED = 6,
+};
+
 class ColorSensorController {
  public:
   /**
@@ -32,10 +42,31 @@ class ColorSensorController {
   };
 
   /**
+   * @brief 文字列を列挙型COLORに変換する
+   * @param str 変換する文字列
+   * @return 色
+   */
+  static COLOR convertStringToColor(std::string_view str);
+
+  /**
+   * @brief 列挙型COLORを文字列に変換する
+   * @param color 色
+   * @return 文字列の色
+   */
+  static const char* convertColorToString(const COLOR& color);
+
+  /**
+   * @brief カラーセンサーで色を測定する (近似なし)
+   * @param hsv値を設定するHSV構造体、h(16ビット)、s(8ビット)、v(8ビット)
+   * @return 色（hsvによる表現）
+   */
+  static COLOR convertHsvToColor(HSV& hsv);
+
+  /**
    * コンストラクタ
    * @param port 接続ポート
    */
-  ColorSensorController(EPort port = EPort::PORT_E);
+  ColorSensorController();
 
   /**
    * @brief 反射光強度を取得する (0-100)
@@ -51,21 +82,21 @@ class ColorSensorController {
 
   /**
    * @brief 生のRGB値を取得する
-   * @param rgb [out] RGB値を格納する構造体
+   * @param rgb RGB値を格納する構造体
    */
   void getRawRGB(RGB& rgb);
 
   /**
    * @brief HSV値を取得する (近似なし)
-   * @param hsv [out] HSV値を格納する構造体
-   * @param surface [in] trueならば表面の色から、falseならば他の光源の色を検出する
+   * @param hsv HSV値を格納する構造体
+   * @param surface trueならば表面の色から、falseならば他の光源の色を検出する
    */
   void getRawHSV(HSV& hsv, bool surface = true);
 
   /**
    * @brief カラーセンサで色を測定する
-   * @param hsv [out] HSV値を格納する構造体
-   * @param surface [in] trueならば表面の色から、falseならば他の光源の色を検出する
+   * @param hsv HSV値を格納する構造体
+   * @param surface trueならば表面の色から、falseならば他の光源の色を検出する
    */
   void getColor(HSV& hsv, bool surface = true);
 
@@ -96,15 +127,16 @@ class ColorSensorController {
    */
   // void setDetectableColors(int32_t size, pup_color_hsv_t *colors);
 
-  /**
-   * @brief インスタンス生成が成功:0/失敗:1を返す
-   * @retval 0 成功
-   * @retval 1 失敗
-   */
-  bool hasError();
-
  private:
-  spikeapi::ColorSensor colorSensor;  // カラーセンサインスタンス
+  static constexpr int SATURATION_BORDER = 47;    // 無彩色かどうかの彩度の境界
+  static constexpr int BLACK_LIMIT_BORDER = 10;   // 黒の明度の境界
+  static constexpr int WHITE_LIMIT_BORDER = 250;  // 白の明度の境界
+  static constexpr int BLACK_BORDER = 95;         // 無彩色の黒の明度の境界
+  static constexpr int RED_BORDER = 25;           // 赤の色相の境界
+  static constexpr int YELLOW_BORDER = 50;        // 黄の色相の境界
+  static constexpr int GREEN_BORDER = 170;        // 緑の色相の境界
+  static constexpr int BLUE_BORDER = 300;         // 青の色相の境界
+  spikeapi::ColorSensor colorSensor;              // カラーセンサインスタンス
 };
 
 #endif

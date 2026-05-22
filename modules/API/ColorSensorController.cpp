@@ -5,25 +5,69 @@
  */
 
 #include "ColorSensorController.h"
-#include <iostream>
-#include <stdint.h>
 
-ColorSensorController::ColorSensorController(EPort port) : colorSensor(port)
+ColorSensorController::ColorSensorController() : colorSensor(EPort::PORT_E) {}
+
+COLOR ColorSensorController::convertStringToColor(std::string_view str)
 {
-  if(colorSensor.hasError()) {
-    std::cerr << "ColorSensorController: インスタンス化失敗。ポート: " << static_cast<int>(port)
-              << std::endl;
+  if(str == "BLACK") return COLOR::BLACK;
+  if(str == "WHITE") return COLOR::WHITE;
+  if(str == "BLUE") return COLOR::BLUE;
+  if(str == "GREEN") return COLOR::GREEN;
+  if(str == "YELLOW") return COLOR::YELLOW;
+  if(str == "RED") return COLOR::RED;
+  return COLOR::NONE;
+}
+
+const char* ColorSensorController::convertColorToString(const COLOR& color)
+{
+  switch(color) {
+    case COLOR::BLACK:
+      return "BLACK";
+    case COLOR::WHITE:
+      return "WHITE";
+    case COLOR::BLUE:
+      return "BLUE";
+    case COLOR::GREEN:
+      return "GREEN";
+    case COLOR::YELLOW:
+      return "YELLOW";
+    case COLOR::RED:
+      return "RED";
+    default:
+      return "NONE";
   }
 }
 
+COLOR ColorSensorController::convertHsvToColor(HSV& hsv)
+{
+  // 明度が極端に低ければ、黒を返す
+  if(hsv.v < BLACK_LIMIT_BORDER) return COLOR::BLACK;
+  // 明度が極端に高ければ、白を返す
+  if(hsv.v > WHITE_LIMIT_BORDER) return COLOR::WHITE;
+  // 彩度が低い場合
+  if(hsv.s < SATURATION_BORDER) {
+    // 明度が低ければ、黒を返す
+    if(hsv.v < BLACK_BORDER) return COLOR::BLACK;
+    // 明度が高ければ、白を返す
+    return COLOR::WHITE;
+  }
+  // 各色相の境界によって、色を判別する
+  if(hsv.h < RED_BORDER) return COLOR::RED;
+  if(hsv.h < YELLOW_BORDER) return COLOR::YELLOW;
+  if(hsv.h < GREEN_BORDER) return COLOR::GREEN;
+  if(hsv.h < BLUE_BORDER) return COLOR::BLUE;
+  return COLOR::RED;
+}
+
 // 反射光強度を0~100の範囲で取得
-int32_t ColorSensorController::getReflectance()
+int ColorSensorController::getReflectance()
 {
   return (colorSensor.getReflection());
 }
 
 // 消灯して環境光を取得(0-100)
-int32_t ColorSensorController::getAmbient()
+int ColorSensorController::getAmbient()
 {
   return (colorSensor.getAmbient());
 }
@@ -74,10 +118,4 @@ void ColorSensorController::lightOff()
 void ColorSensorController::setLightColor(int r, int g, int b)
 {
   colorSensor.setLight(r, g, b);
-}
-
-// インスタンス生成が正常ならば0、異常ならば1を返す
-bool ColorSensorController::hasError()
-{
-  return colorSensor.hasError();
 }

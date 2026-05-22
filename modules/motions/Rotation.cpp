@@ -1,19 +1,11 @@
 /**
  * @file   Rotation.cpp
- * @brief  その場回転動作を実行するクラス
+ * @brief  回頭動作を実行するクラス
  * @author okuyama0528 yutaro-1214
  */
 
 #include "Rotation.h"
-#include <cmath>
-#include <algorithm>
 
-/**
- * @brief コンストラクタ
- * @param _robot                 ロボット本体への参照
- * @param _continuationCondition 動作継続条件
- * @param _anglePidGain          回頭制御用PIDゲイン
- */
 Rotation::Rotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                    const Pid::PidGain& _anglePidGain)
   : BaseMotion(_robot, std::move(_continuationCondition)),
@@ -25,15 +17,6 @@ Rotation::Rotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _co
 }
 
 /**
- * @brief 現在の機体角度を取得する
- * @return IMUから取得した現在の方位角
- */
-double Rotation::getCurrentAngle()
-{
-  return robot.getIMUControllerInstance().getAzimuth();
-}
-
-/**
  * @brief 回頭動作を1ステップ実行する
  *
  * 現在角度と目標角度の偏差を計算し、
@@ -41,34 +24,36 @@ double Rotation::getCurrentAngle()
  */
 void Rotation::executeStep()
 {
-  // 現在の機体角度を取得
+  // 現在の方位角を取得
   double currentAngle = getCurrentAngle();
 
   // 目標角度との差を計算し、-180～180度に正規化
-
   double error = normalizeAngle(targetAngle - currentAngle);
 
-  // PID制御によって旋回量を計算
+  // 旋回量を計算
   double turn = anglePid.calculatePid(error, 0.0);
 
-  // その場回転を行うため左右モータへ逆方向の出力を設定
-  currentRightPower = turn;
-  currentLeftPower = -turn;
-
-  // モータ出力を適用
-  robot.getWheelMotorControllerInstance().setRightPower(currentRightPower);
-  robot.getWheelMotorControllerInstance().setLeftPower(currentLeftPower);
+  // モータにPower値をセット
+  robot.getWheelMotorControllerInstance().setRightPower(turn);
+  robot.getWheelMotorControllerInstance().setLeftPower(-turn);
 }
 
 /**
- * @brief 回頭動作終了時の処理
- *
- * 左右モータを停止する。
+ * @brief 回頭動作終了時に左右モータを停止するための処理
  */
 void Rotation::finish()
 {
-  robot.getWheelMotorControllerInstance().setRightPower(0);
-  robot.getWheelMotorControllerInstance().setLeftPower(0);
+  robot.getWheelMotorControllerInstance().stopBoth();
+  robot.getWheelMotorControllerInstance().resetBothPower();
+}
+
+/**
+ * @brief 現在の機体角度を取得する
+ * @return IMUから取得した現在の方位角
+ */
+double Rotation::getCurrentAngle()
+{
+  return robot.getIMUControllerInstance().getAzimuth();
 }
 
 /**

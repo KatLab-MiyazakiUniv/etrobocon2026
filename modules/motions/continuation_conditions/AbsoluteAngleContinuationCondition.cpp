@@ -7,14 +7,14 @@
 
 /**
  * @brief コンストラクタ
- * @param robot                 ロボット本体への参照
- * @param _specifiedTargetAngle 目標となる絶対角度
- * @param _tolerance            角度判定の許容誤差
+ * @param robot           ロボット本体への参照
+ * @param _targetAbsAngle 目標となる絶対角度(°)
+ * @param _tolerance      角度判定の許容誤差(°)
  */
 AbsoluteAngleContinuationCondition::AbsoluteAngleContinuationCondition(Robot& robot,
-                                                                       double _specifiedTargetAngle,
+                                                                       double _targetAbsAngle,
                                                                        double _tolerance)
-  : AngleContinuationCondition(robot, _tolerance), specifiedTargetAngle(_specifiedTargetAngle)
+  : AngleContinuationCondition(robot, _tolerance), targetAbsAngle(_targetAbsAngle)
 {
 }
 
@@ -26,5 +26,5 @@ AbsoluteAngleContinuationCondition::AbsoluteAngleContinuationCondition(Robot& ro
  */
 void AbsoluteAngleContinuationCondition::prepare()
 {
-  targetAngle = specifiedTargetAngle;
+  targetAngle = targetAbsAngle;
 }

@@ -19,12 +19,11 @@ class AbsoluteAngleContinuationCondition : public AngleContinuationCondition {
  public:
   /**
    * @brief コンストラクタ
-   * @param robot                 ロボット本体への参照
-   * @param _specifiedTargetAngle 目標となる絶対角度
-   * @param _tolerance            角度判定の許容誤差
+   * @param robot           ロボット本体への参照
+   * @param _targetAbsAngle 目標となる絶対角度(°)
+   * @param _tolerance      角度判定の許容誤差(°)
    */
-  AbsoluteAngleContinuationCondition(Robot& robot, double _specifiedTargetAngle,
-                                     double _tolerance = 2.0);
+  AbsoluteAngleContinuationCondition(Robot& robot, double _targetAbsAngle, double _tolerance = 2.0);
 
   /**
    * @brief 継続条件の準備処理を行う
@@ -32,10 +31,7 @@ class AbsoluteAngleContinuationCondition : public AngleContinuationCondition {
   void prepare() override;
 
  private:
-  /**
-   * @brief 目標となる絶対角度
-   */
-  double specifiedTargetAngle;
+  double targetAbsAngle;  // 目標となる絶対角度(°)
 };
 
 #endif

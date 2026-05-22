@@ -92,14 +92,19 @@ void ColorSensorController::getRawHSV(HSV& hsv, bool surface)
   hsv.v = rawHsv.v;
 }
 
-// HSV値を取得(特定色への近似あり)
-void ColorSensorController::getColor(HSV& hsv, bool surface)
+// hsv値を取得(特定色への近似あり)
+// void colorsensorcontroller::getcolor(hsv& hsv, bool surface)
+// {
+//   spikeapi::colorsensor::hsv rawhsv;
+//   colorsensor.getcolor(rawhsv, surface);
+//   hsv.h = rawhsv.h;
+//   hsv.s = rawhsv.s;
+//   hsv.v = rawhsv.v;
+// }
+
+const char* colorsensorcontroller::getColor(HSV& hsv)
 {
-  spikeapi::ColorSensor::HSV rawHsv;
-  colorSensor.getColor(rawHsv, surface);
-  hsv.h = rawHsv.h;
-  hsv.s = rawHsv.s;
-  hsv.v = rawHsv.v;
+  return convertColorToString(convertHsvToColor(hsv));
 }
 
 // ライトを点灯する

@@ -8,9 +8,12 @@
 #define COLOR_SENSOR_CONTROLLER_H
 
 #include "ColorSensor.h"
-#include <cstdint>   // uint16_t, uint8_tを使用するため
-#include <iostream>  // エラー出力用
+#include <cstdint>
+#include <iostream>
 
+/**
+ *  @brief 色を表す列挙型
+ */
 enum class COLOR : int {
   NONE = 0,
   BLACK = 1,
@@ -42,22 +45,22 @@ class ColorSensorController {
   };
 
   /**
-   * @brief 文字列を列挙型COLORに変換する
+   * @brief 文字列を列挙型COLORに変換
    * @param str 変換する文字列
    * @return 色
    */
   static COLOR convertStringToColor(std::string_view str);
 
   /**
-   * @brief 列挙型COLORを文字列に変換する
+   * @brief 列挙型COLORを文字列に変換
    * @param color 色
    * @return 文字列の色
    */
   static const char* convertColorToString(const COLOR& color);
 
   /**
-   * @brief カラーセンサーで色を測定する (近似なし)
-   * @param hsv値を設定するHSV構造体、h(16ビット)、s(8ビット)、v(8ビット)
+   * @brief カラーセンサーでhsv値を測定
+   * @param hsv値を設定するHSV構造体
    * @return 色（hsvによる表現）
    */
   static COLOR convertHsvToColor(HSV& hsv);
@@ -69,19 +72,19 @@ class ColorSensorController {
   ColorSensorController();
 
   /**
-   * @brief 反射光強度を取得する (0-100)
+   * @brief 反射光強度を取得(0-100)
    * @return 反射光強度
    */
   int getReflectance();
 
   /**
-   * @brief 周囲の明るさを取得する (0-100)
+   * @brief 周囲の明るさを取得(0-100)
    * @return 周囲の明るさ
    */
   int getAmbient();
 
   /**
-   * @brief 生のRGB値を取得する
+   * @brief 生のRGB値を取得
    * @param rgb RGB値を格納する構造体
    */
   void getRawRGB(RGB& rgb);
@@ -94,11 +97,11 @@ class ColorSensorController {
   void getRawHSV(HSV& hsv, bool surface = true);
 
   /**
-   * @brief カラーセンサで色を測定する
+   * @brief カラーセンサで色を測定(自作)
    * @param hsv HSV値を格納する構造体
-   * @param surface trueならば表面の色から、falseならば他の光源の色を検出する
+   * @return 文字列で表現された色
    */
-  void getColor(HSV& hsv, bool surface = true);
+  const char* getColor(HSV& hsv);
 
   /**
    * @brief ライトを点灯する (標準の白)
@@ -136,7 +139,8 @@ class ColorSensorController {
   static constexpr int YELLOW_BORDER = 50;        // 黄の色相の境界
   static constexpr int GREEN_BORDER = 170;        // 緑の色相の境界
   static constexpr int BLUE_BORDER = 300;         // 青の色相の境界
-  spikeapi::ColorSensor colorSensor;              // カラーセンサインスタンス
+
+  spikeapi::ColorSensor colorSensor;  // カラーセンサインスタンス
 };
 
 #endif

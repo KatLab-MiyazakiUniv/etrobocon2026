@@ -93,7 +93,7 @@ namespace etrobocon2026_test {
     spikeapi::ColorSensor::HSV dummyHsv = { 300, 70, 85 };
     spikeapi::ColorSensor::setHSV(dummyHsv);
 
-    colorController.getColor(hsv, true);
+    colorController.getColor(hsv);
     EXPECT_EQ(300, hsv.h);
     EXPECT_EQ(70, hsv.s);
     EXPECT_EQ(85, hsv.v);
@@ -108,7 +108,7 @@ namespace etrobocon2026_test {
     spikeapi::ColorSensor::HSV dummyHsv = { 60, 40, 70 };
     spikeapi::ColorSensor::setHSV(dummyHsv);
 
-    colorController.getColor(hsv, false);
+    colorController.getColor(hsv);
     EXPECT_EQ(60, hsv.h);
     EXPECT_EQ(40, hsv.s);
     EXPECT_EQ(70, hsv.v);

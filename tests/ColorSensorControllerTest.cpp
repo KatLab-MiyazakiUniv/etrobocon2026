@@ -98,7 +98,7 @@ namespace etrobocon2026_test {
     EXPECT_EQ(expectedV, hsv.v);
   }
 
-  // カラーセンサで色を測定できるかのテスト (黒)
+  // カラーセンサで色を測定するテスト (黒)
   TEST(ColorSensorControllerTest, GetColor_Black)
   {
     ColorSensorController colorController;

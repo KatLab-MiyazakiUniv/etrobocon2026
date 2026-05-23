@@ -39,3 +39,8 @@ double AngleContinuationCondition::normalizeAngle(double angle)
   while(angle < -180.0) angle += 360.0;
   return angle;
 }
+
+double AngleContinuationCondition::getTargetAngle() const
+{
+  return targetAngle;
+}

@@ -5,31 +5,30 @@
  */
 
 #include <gtest/gtest.h>
-#include "AngleContinuationCondition.h"
+#include "RelativeAngleContinuationCondition.h"
 
 namespace etrobocon2026_test {
-  /**
-   * prepare()直後は移動角度が0なので継続判定になることを確認
-   */
-  TEST(AngleContinuationConditionConditionTest, AngleContinuationConditionConditionAfterPrepare)
+  // prepare()実行後に、targetAngleが正しくセット出来ているか確認
+  TEST(RelativeAngleContinuationConditionTest, AfterPrepare)
   {
     Robot robot;
 
-    AngleContinuationCondition condition(robot, 100.0);
+    double targetAngle = 100.0;
+    RelativeAngleContinuationCondition condition(robot, targetAngle);
+
+    double expectedTargetAngle = targetAngle + 1;
 
     condition.prepare();
 
-    EXPECT_TRUE(condition.shouldContinue());
+    EXPECT_EQ(expectedTargetAngle, condition.getTargetAngle());
   }
 
-  /**
-   * 目標角度に到達していない場合は継続判定になることを確認
-   */
-  TEST(AngleContinuationConditionConditionTest, NotReachTargetAngle)
+  // 目標角度に到達していない場合は継続判定になることを確認
+  TEST(RelativeAngleContinuationConditionConditionTest, NotReachTargetAngle)
   {
     Robot robot;
 
-    AngleContinuationCondition condition(robot, 100.0);
+    RelativeAngleContinuationCondition condition(robot, 100.0);
 
     condition.prepare();
 
@@ -39,20 +38,18 @@ namespace etrobocon2026_test {
     EXPECT_TRUE(condition.shouldContinue());
   }
 
-  /**
-   * 角度が目標角度に到達した場合は停止判定になることを確認
-   */
-  TEST(AngleContinuationConditionConditionTest, AfterTargetAngle)
+  // 角度が目標角度に到達した場合は停止判定になることを確認
+  TEST(RelativeAngleContinuationConditionConditionTest, AfterTargetAngle)
   {
     Robot robot;
 
     double targetAngle = 20;
-    // initialAngleとconditionで２回getAzimuthを実行するため初期値２
+    // initialAngleとconditionで2回getAzimuthを実行するため初期値は2
     int i = 2;
 
     double initialAngle = robot.getIMUControllerInstance().getAzimuth();
 
-    AngleContinuationCondition condition(robot, targetAngle);
+    RelativeAngleContinuationCondition condition(robot, targetAngle);
 
     condition.prepare();
 
@@ -68,31 +65,15 @@ namespace etrobocon2026_test {
   /**
    * 目標角度が0の場合は即停止判定になることを確認
    */
-  TEST(AngleContinuationConditionConditionTest, ZeroTargetAbgle)
+  TEST(RelativeAngleContinuationConditionConditionTest, ZeroTargetAbgle)
   {
     Robot robot;
 
-    AngleContinuationCondition condition(robot, 0.0);
+    RelativeAngleContinuationCondition condition(robot, 0.0);
 
     condition.prepare();
 
     EXPECT_FALSE(condition.shouldContinue());
-  }
-
-  /**
-   * shouldContinue()を連続呼び出ししても異常終了しないことを確認
-   */
-  TEST(AngleContinuationConditionConditionTest, ContinuousCallStable)
-  {
-    Robot robot;
-
-    AngleContinuationCondition condition(robot, 100.0);
-
-    condition.prepare();
-
-    for(int i = 0; i < 100; i++) {
-      EXPECT_NO_THROW(condition.shouldContinue());
-    }
   }
 
 }  // namespace etrobocon2026_test

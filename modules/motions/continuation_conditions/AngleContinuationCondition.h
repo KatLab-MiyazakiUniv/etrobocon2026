@@ -23,8 +23,7 @@ class AngleContinuationCondition : public BaseContinuationCondition {
   bool shouldContinue()
       override;  // 目標角度との誤差が許容範囲を超えていれば継続、収まっていれば終了
 
- protected:
-  double targetAngle;  // 目標角度
+  double getTargetAngle() const;
 
   /**
    * @brief 角度を-180〜180の範囲に正規化する関数
@@ -32,6 +31,9 @@ class AngleContinuationCondition : public BaseContinuationCondition {
    * @return 正規化した角度
    */
   double normalizeAngle(double angle);
+
+ protected:
+  double targetAngle;  // 目標角度
 
  private:
   double tolerance;  // 許容誤差（この範囲内なら到達とみなす）

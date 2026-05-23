@@ -32,7 +32,7 @@ namespace spikeapi {
 
     spikeapi::IMU::Acceleration accel = { 0, 0, 0 };
     spikeapi::IMU::AngularVelocity ang = { 0, 0, 0 };
-    float azimuth = 90;
+    float azimuth = 0;
     float tilt = 0;
     float angle = 0;
     bool is_stat = false;
@@ -90,19 +90,15 @@ namespace spikeapi {
 
     /**
      * IMUの方位角を取得する
+     * (このダミーでは実行するごとに1度ずつ回転もする)
      * @return 方位角 [°]
      */
     float getHeading()
     {
       azimuth += 1;  // 方位角を1度ずつ増加させる
 
-      /**
-       * 角度が360度を超えた場合、0〜360度の範囲に正規化する
-       * fmodを使って余りを取り、角度を1周以内に収める
-       */
-      if(azimuth >= 360.0f) {
-        azimuth = fmod(azimuth, 360.0f);
-      }
+      // 角度が360度を超えた場合、0〜360度の範囲に正規化する
+      if(azimuth >= 360.0f) azimuth = fmodf(azimuth, 360.0f);
 
       return azimuth;
     }

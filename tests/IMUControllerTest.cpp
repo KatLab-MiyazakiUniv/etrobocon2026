@@ -16,7 +16,8 @@ namespace IMUController_test {
   {
     IMUController imuController;
 
-    EXPECT_FLOAT_EQ(90, imuController.getAzimuth());
+    // ダミーではgetAzimuthで一度回転するので１度でテストする
+    EXPECT_FLOAT_EQ(1, imuController.getAzimuth());
   }
 
   // 方位角をリセットできるかのテスト
@@ -26,7 +27,8 @@ namespace IMUController_test {
 
     imuController.resetAzimuth();
 
-    EXPECT_FLOAT_EQ(0, imuController.getAzimuth());
+    // ダミーではgetAzimuthで一度回転するので１度でテストする
+    EXPECT_FLOAT_EQ(1, imuController.getAzimuth());
   }
 
   // 加速度を取得できるかのテスト

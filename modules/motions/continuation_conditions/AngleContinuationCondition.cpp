@@ -5,8 +5,9 @@
  */
 #include "AngleContinuationCondition.h"
 
-AngleContinuationCondition::AngleContinuationCondition(Robot& robot, double _tolerance)
-  : BaseContinuationCondition(robot), targetAngle(0.0), tolerance(_tolerance)
+AngleContinuationCondition::AngleContinuationCondition(Robot& robot, double _targetAngle,
+                                                       double _tolerance)
+  : BaseContinuationCondition(robot), targetAngle(_targetAngle), tolerance(_tolerance)
 {
 }
 

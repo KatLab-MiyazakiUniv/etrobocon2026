@@ -29,14 +29,13 @@ namespace etrobocon2026_test {
   {
     Robot robot;
 
-    AngleContinuationCondition condition(robot, 4000.0);
+    AngleContinuationCondition condition(robot, 100.0);
 
     condition.prepare();
 
-    // 目標値に到達しない程度に前進
-    robot.getWheelMotorControllerInstance().setRightSpeed(10);
-    robot.getWheelMotorControllerInstance().setLeftSpeed(-10);
-
+    for(int i = 0; i < 10; i++) {
+      robot.getIMUControllerInstance().getAzimuth();
+    }
     EXPECT_TRUE(condition.shouldContinue());
   }
 
@@ -47,7 +46,9 @@ namespace etrobocon2026_test {
   {
     Robot robot;
 
-    double targetAngle = 1;
+    double targetAngle = 20;
+    // initialAngleとconditionで２回getAzimuthを実行するため初期値２
+    int i = 2;
 
     double initialAngle = robot.getIMUControllerInstance().getAzimuth();
 
@@ -57,18 +58,11 @@ namespace etrobocon2026_test {
 
     // 目標角度に到達するまで回頭
     while(condition.shouldContinue()) {
-      robot.getWheelMotorControllerInstance().setRightSpeed(50);
-      robot.getWheelMotorControllerInstance().setLeftSpeed(-50);
+      i++;
     }
 
-    // 実際の回頭角度を取得
-    double endAngle = robot.getIMUControllerInstance().getAzimuth();
-
-    // 回頭量（どれだけ回ったか）
-    double actualAngle = fabs(endAngle - initialAngle);
-
-    // 目標角度以上回っていることを確認
-    EXPECT_GE(actualAngle, targetAngle);
+    // 目標角度付近まで回っていることを確認
+    EXPECT_NEAR(targetAngle, i, 2);
   }
 
   /**

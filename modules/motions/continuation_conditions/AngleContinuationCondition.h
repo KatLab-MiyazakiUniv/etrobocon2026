@@ -18,7 +18,7 @@ class AngleContinuationCondition : public BaseContinuationCondition {
    * @details ロボットと許容誤差を設定し、角度判定の初期化を行う
    */
 
-  AngleContinuationCondition(Robot& robot, double _tolerance = 2.0);
+  AngleContinuationCondition(Robot& robot, double _targetAngle, double _tolerance = 2.0);
 
   bool shouldContinue()
       override;  // 目標角度との誤差が許容範囲を超えていれば継続、収まっていれば終了

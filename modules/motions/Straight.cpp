@@ -47,11 +47,7 @@ void Straight::executeStep()
     double angleDeviation = targetAngle - currentAngle;
 
     // 角度の誤差を-180度から180度の範囲に正規化
-    if(angleDeviation > 180.0) {
-      angleDeviation -= 360.0;
-    } else if(angleDeviation < -180.0) {
-      angleDeviation += 360.0;
-    }
+    angleDeviation = AngleNormalizer::NormalizeAngle(angleDeviation);
 
     turningPower = anglePid.calculatePid(angleDeviation);
   }

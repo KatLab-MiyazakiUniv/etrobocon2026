@@ -10,6 +10,7 @@
 #include "BaseMotion.h"
 #include "SpeedCalculator.h"
 #include "Pid.h"
+#include "AngleNormalizer.h"
 
 class Straight : public BaseMotion {
  public:

@@ -121,15 +121,6 @@ class ColorSensorController {
    */
   void setLightBrightness(int left, int center, int right);
 
-  /*
-   * @brief カラーセンサが検知する色を設定する
-   * @note 現在は公式apiの未実装だが実装予定のためコメントアウト
-   * @param size カラーの配列のサイズ
-   * @param colors カラーの配列
-   * @return -
-   */
-  // void setDetectableColors(int32_t size, pup_color_hsv_t *colors);
-
  private:
   static constexpr int SATURATION_BORDER = 47;    // 無彩色かどうかの彩度の境界
   static constexpr int BLACK_LIMIT_BORDER = 10;   // 黒の明度の境界

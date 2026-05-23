@@ -60,19 +60,16 @@ COLOR ColorSensorController::convertHsvToColor(HSV& hsv)
   return COLOR::RED;
 }
 
-// 反射光強度を0~100の範囲で取得
 int ColorSensorController::getReflectance()
 {
   return (colorSensor.getReflection());
 }
 
-// 消灯して環境光を取得(0-100)
 int ColorSensorController::getAmbient()
 {
   return (colorSensor.getAmbient());
 }
 
-// RGB値を取得する(近似なし)
 void ColorSensorController::getRawRGB(RGB& rgb)
 {
   spikeapi::ColorSensor::RGB rawRgb;
@@ -82,7 +79,6 @@ void ColorSensorController::getRawRGB(RGB& rgb)
   rgb.b = rawRgb.b;
 }
 
-// HSV値を取得する (近似なし)
 void ColorSensorController::getRawHSV(HSV& hsv, bool surface)
 {
   spikeapi::ColorSensor::HSV rawHsv;
@@ -92,34 +88,21 @@ void ColorSensorController::getRawHSV(HSV& hsv, bool surface)
   hsv.v = rawHsv.v;
 }
 
-// hsv値を取得(特定色への近似あり)
-// void colorsensorcontroller::getcolor(hsv& hsv, bool surface)
-// {
-//   spikeapi::colorsensor::hsv rawhsv;
-//   colorsensor.getcolor(rawhsv, surface);
-//   hsv.h = rawhsv.h;
-//   hsv.s = rawhsv.s;
-//   hsv.v = rawhsv.v;
-// }
-
 const char* ColorSensorController::getColor(ColorSensorController::HSV& hsv)
 {
   return ColorSensorController::convertColorToString(ColorSensorController::convertHsvToColor(hsv));
 }
 
-// ライトを点灯する
 void ColorSensorController::lightOn()
 {
   colorSensor.lightOn();
 }
 
-// ライトを消灯する(動作しない)
 void ColorSensorController::lightOff()
 {
   colorSensor.lightOff();
 }
 
-// ライトの輝度を個別に設定する
 void ColorSensorController::setLightBrightness(int left, int center, int right)
 {
   colorSensor.setLight(left, center, right);

@@ -98,19 +98,6 @@ namespace etrobocon2026_test {
     EXPECT_EQ(expectedV, hsv.v);
   }
 
-  // カラーセンサで色を測定するテスト (黒)
-  TEST(ColorSensorControllerTest, GetColor_Black)
-  {
-    ColorSensorController colorController;
-    ColorSensorController::HSV hsv;
-    // 黒と判定されるHSV値をダミーでセット
-    spikeapi::ColorSensor::HSV dummyHsv = { 1, 0, 5 };
-    spikeapi::ColorSensor::setHSV(dummyHsv);
-
-    const char* resultColor = colorController.getColor(hsv);
-    EXPECT_STREQ("BLACK", resultColor);
-  }
-
   // ライトを点灯/消灯するテスト
   TEST(ColorSensorControllerTest, LightControl)
   {

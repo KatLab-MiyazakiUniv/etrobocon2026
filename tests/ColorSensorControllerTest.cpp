@@ -104,7 +104,7 @@ namespace etrobocon2026_test {
     ColorSensorController colorController;
     ColorSensorController::HSV hsv;
     // 黒と判定されるHSV値をダミーでセット
-    spikeapi::ColorSensor::HSV dummyHsv = { 0, 0, 5 };
+    spikeapi::ColorSensor::HSV dummyHsv = { 1, 0, 5 };
     spikeapi::ColorSensor::setHSV(dummyHsv);
 
     const char* resultColor = colorController.getColor(hsv);

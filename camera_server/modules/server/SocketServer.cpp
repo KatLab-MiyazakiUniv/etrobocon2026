@@ -14,14 +14,8 @@
 #define PORT 27015
 #define DEFAULT_BUFLEN 512
 
-SocketServer::SocketServer(CameraCaptureHandler& _cameraCaptureHandler,
-                           ColorRegionDetecorHandler& _colorRegionDetecorHandler,
-                           BoundingBoxDetectorHandler& _boundingBoxDetectorHandler)
-  : listenSocket(-1),
-    isRunning(false),
-    cameraCaptureHandler(_cameraCaptureHandler),
-    colorRegionDetecorHandler(_colorRegionDetecorHandler),
-    boundingBoxDetectorHandler(_boundingBoxDetectorHandler)
+SocketServer::SocketServer(ColorRegionDetecorHandler& _colorRegionDetecorHandler)
+  : listenSocket(-1), isRunning(false), colorRegionDetecorHandler(_colorRegionDetectorHandler),
 {
 }
 
@@ -101,19 +95,6 @@ void SocketServer::handle_connection(int clientSocket)
         CameraServer::Command cmd = *reinterpret_cast<CameraServer::Command*>(recvbuf);
 
         switch(cmd) {
-          case CameraServer::Command::CAMERA_CAPTURE_CAMERA_ACTION:
-            if(static_cast<size_t>(iResult) == sizeof(CameraServer::CameraCaptureRequest)) {
-              auto* request = reinterpret_cast<CameraServer::CameraCaptureRequest*>(recvbuf);
-              std::cout << "Executing CAMERA_CAPTURE_CAMERA_ACTION" << std::endl;
-
-              CameraServer::CameraCaptureResponse response;
-              cameraCaptureHandler.execute(*request, response);
-
-              send(clientSocket, reinterpret_cast<const char*>(&response), sizeof(response), 0);
-            } else {
-              std::cerr << "Invalid request size for CAMERA_CAPTURE_CAMERA_ACTION." << std::endl;
-            }
-            break;
           case CameraServer::Command::COLOR_REGION_DETECTION:
             if(static_cast<size_t>(iResult) == sizeof(CameraServer::ColorRegionDetectionRequest)) {
               auto* request = reinterpret_cast<CameraServer::ColorRegionDetectionRequest*>(recvbuf);
@@ -128,22 +109,6 @@ void SocketServer::handle_connection(int clientSocket)
 
             } else {
               std::cerr << "Invalid request size for COLOR_REGION_DETECTION." << std::endl;
-            }
-            break;
-          case CameraServer::Command::BOUNDING_BOX_DETECTION:
-            if(static_cast<size_t>(iResult) == sizeof(CameraServer::BoundingBoxDetectorRequest)) {
-              auto* request = reinterpret_cast<CameraServer::BoundingBoxDetectorRequest*>(recvbuf);
-
-              std::cout << "Executing BOUNDING_BOX_DETECTION" << std::endl;
-
-              CameraServer::BoundingBoxDetectorResponse response;
-
-              boundingBoxDetectorHandler.execute(*request, response);
-
-              send(clientSocket, reinterpret_cast<const char*>(&response), sizeof(response), 0);
-
-            } else {
-              std::cerr << "Invalid request size for BOUNDING_BOX_DETECTION." << std::endl;
             }
             break;
           case CameraServer::Command::SHUTDOWN:

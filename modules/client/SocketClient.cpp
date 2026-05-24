@@ -69,13 +69,6 @@ void SocketClient::disconnectFromServer()
   }
 }
 
-bool SocketClient::executeColorRegionDetection(
-    const CameraServer::BoundingBoxDetectorRequest& request,
-    CameraServer::BoundingBoxDetectorResponse& response)
-{
-  return executeAction(request, response);
-}
-
 template <typename Req, typename Res>
 bool SocketClient::executeAction(const Req& request, Res& response)
 {

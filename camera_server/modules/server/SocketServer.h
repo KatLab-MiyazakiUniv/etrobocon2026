@@ -7,16 +7,16 @@
 #ifndef SOCKET_SERVER_H
 #define SOCKET_SERVER_H
 
-#include "ColorRegionDetecorHandler.h"
 #include <vector>
 
 class SocketServer {
  public:
   /**
-   * @brief コンストラクタ
-   * @param ColorRegionDetecorHandler 色領域検出をするアクションハンドラ
+   * @brief SocketServerのコンストラクタ
+   * @details
+   * ソケットサーバーの初期状態を設定する
    */
-  SocketServer(ColorRegionDetecorHandler& colorRegionDetecorHandler);
+  SocketServer();
 
   /**
    * @brief サーバーを初期化する
@@ -38,7 +38,6 @@ class SocketServer {
  private:
   int listenSocket;
   bool isRunning;
-  ColorRegionDetecorHandler& colorRegionDetecorHandler;
 
   /**
    * @brief クライアントとの接続を処理する

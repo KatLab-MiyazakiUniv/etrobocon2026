@@ -10,14 +10,12 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include "SocketProtocol.h"
 
 #define PORT 27015
 #define DEFAULT_BUFLEN 512
 
-SocketServer::SocketServer(ColorRegionDetecorHandler& _colorRegionDetecorHandler)
-  : listenSocket(-1), isRunning(false), colorRegionDetecorHandler(_colorRegionDetectorHandler),
-{
-}
+SocketServer::SocketServer() : listenSocket(-1), isRunning(false) {}
 
 bool SocketServer::init()
 {
@@ -95,28 +93,12 @@ void SocketServer::handle_connection(int clientSocket)
         CameraServer::Command cmd = *reinterpret_cast<CameraServer::Command*>(recvbuf);
 
         switch(cmd) {
-          case CameraServer::Command::COLOR_REGION_DETECTION:
-            if(static_cast<size_t>(iResult) == sizeof(CameraServer::ColorRegionDetectionRequest)) {
-              auto* request = reinterpret_cast<CameraServer::ColorRegionDetectionRequest*>(recvbuf);
-
-              std::cout << "Executing COLOR_REGION_DETECTION" << std::endl;
-
-              CameraServer::ColorRegionDetectionResponse response;
-
-              colorRegionDetecorHandler.execute(*request, response);
-
-              send(clientSocket, reinterpret_cast<const char*>(&response), sizeof(response), 0);
-
-            } else {
-              std::cerr << "Invalid request size for COLOR_REGION_DETECTION." << std::endl;
-            }
-            break;
           case CameraServer::Command::SHUTDOWN:
             std::cout << "Received SHUTDOWN command." << std::endl;
             shutdown();
             break;
           default:
-            std::cerr << "Received unknown command." << std::endl;
+            std::cout << "Received command (ignored)." << std::endl;
             break;
         }
       } else {

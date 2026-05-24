@@ -1,3 +1,4 @@
+#include "SocketServer.h"
 #include <iostream>
 #include "Logger.h"
 

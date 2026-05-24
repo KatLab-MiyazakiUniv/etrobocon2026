@@ -10,21 +10,13 @@
 #include <cstdint>
 
 namespace CameraServer {
-
   /**
    * @brief サーバー側で実行可能なコマンド
    */
   enum class Command : uint8_t {
+    DISCONNECT = 254,      // クライアントからの切断要求
     SHUTDOWN = 255  // サーバーシャットダウン
   };
-
-  /**
-   * @brief シャットダウンコマンド（送信専用）
-   */
-  struct ShutdownRequest {
-    Command command = Command::SHUTDOWN;
-  };
-
 }  // namespace CameraServer
 
 #endif  // SOCKET_PROTOCOL_H

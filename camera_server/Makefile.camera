@@ -1,5 +1,5 @@
 # Debian/arm64向け カメラサーバー用Makefile
-	
+
 # コンパイラ
 CXX := g++
 
@@ -22,7 +22,7 @@ CXXFLAGS += $(OPENCV_CFLAGS)
 LIBS := $(OPENCV_LIBS)
 
 # インクルードパス
-INCLUDES := $(shell find $(INCLUDEDIR) -type d -printf '-I%p '-I../common)
+INCLUDES := $(shell find $(INCLUDEDIR) -type d -printf '-I%p ') -I../common
 
 # --- ビルドルール ---
 

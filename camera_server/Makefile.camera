@@ -1,5 +1,5 @@
 # Debian/arm64向け カメラサーバー用Makefile
-	
+
 # コンパイラ
 CXX := g++
 
@@ -27,7 +27,6 @@ INCLUDES := $(shell find $(INCLUDEDIR) -type d -printf '-I%p ') \
             -I../common \
 			-I../common/customs \
 			-I../modules/API \
-
 
 # --- ビルドルール ---
 

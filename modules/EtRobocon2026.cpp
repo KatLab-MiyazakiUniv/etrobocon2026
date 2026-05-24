@@ -1,6 +1,6 @@
 
 #include <iostream>
-#include <unistd.h>  // sleep関数用
+#include <unistd.h>
 
 #include "EtRobocon2026.h"
 #include "SocketClient.h"

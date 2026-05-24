@@ -97,6 +97,12 @@ void SocketServer::handle_connection(int clientSocket)
             std::cout << "Received SHUTDOWN command." << std::endl;
             shutdown();
             break;
+
+          case CameraServer::Command::DISCONNECT:
+            std::cout << "Received DISCONNECT command." << std::endl;
+            // クライアントからの切断要求なのでreturn
+            return;
+
           default:
             std::cout << "Received command (ignored)." << std::endl;
             break;

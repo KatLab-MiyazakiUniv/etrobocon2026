@@ -8,6 +8,7 @@
 
 #include "BaseMotion.h"
 #include "Pid.h"
+#include "AngleNormalizer.h"
 
 class Rotation : public BaseMotion {
  public:
@@ -16,9 +17,10 @@ class Rotation : public BaseMotion {
    * @param _robot                 ロボットクラスのインスタンス
    * @param _continuationCondition 動作継続条件を判定するクラスのインスタンス
    * @param _anglePidGain          回頭制御用PIDゲイン
+   * @param _basePower             回頭動作の基本出力値（正の値で指定、回頭方向はPID制御で決定）
    */
   Rotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-           const Pid::PidGain& _anglePidGain);
+           const Pid::PidGain& _anglePidGain, double _basePower);
 
  protected:
   /**
@@ -42,15 +44,10 @@ class Rotation : public BaseMotion {
    */
   double getCurrentAngle();
 
-  /**
-   * @brief 角度を-180～180度の範囲に正規化する
-   * @param angle 正規化前の角度(°)
-   * @return 正規化後の角度(°)
-   */
-  double normalizeAngle(double angle);
-
  private:
   Pid anglePid;  // 回頭制御用PIDコントローラ
+
+  double basePower;  // 回頭動作の基本出力値（正の値で指定、回頭方向はPID制御で決定）
 
   double currentRightPower;  // 現在の右モータ出力
 

@@ -6,6 +6,7 @@
 
 #include <gtest/gtest.h>
 #include "AngleContinuationCondition.h"
+#include "AngleNormalizer.h"
 
 namespace etrobocon2026_test {
   // 目標角度に到達していない場合は継続判定になることを確認
@@ -73,7 +74,7 @@ namespace etrobocon2026_test {
 
     double angle = 450;
 
-    EXPECT_EQ(EXPECTED, condition.normalizeAngle(angle));
+    EXPECT_EQ(EXPECTED, AngleNormalizer::NormalizeAngle(angle));
   }
 
   // 取得した方位角が-180°より小さいとき正しく正規化されるかのテスト
@@ -87,7 +88,7 @@ namespace etrobocon2026_test {
 
     double angle = -450;
 
-    EXPECT_EQ(EXPECTED, condition.normalizeAngle(angle));
+    EXPECT_EQ(EXPECTED, AngleNormalizer::NormalizeAngle(angle));
   }
 
   // 正しく誤差の判定がされるかのテスト

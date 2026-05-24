@@ -1,1 +1,1 @@
-[43 ms][INFO] test message
+[743 ms][INFO] test message

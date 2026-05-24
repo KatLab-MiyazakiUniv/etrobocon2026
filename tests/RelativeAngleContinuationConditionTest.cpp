@@ -6,6 +6,7 @@
 
 #include <gtest/gtest.h>
 #include "RelativeAngleContinuationCondition.h"
+#include "AngleNormalizer.h"
 
 namespace etrobocon2026_test {
   // prepare()実行後に、targetAngleが正しくセット出来ているか確認
@@ -16,7 +17,7 @@ namespace etrobocon2026_test {
     double targetAngle = 100.0;
     RelativeAngleContinuationCondition condition(robot, targetAngle);
 
-    double expectedTargetAngle = targetAngle + 1;
+    double expectedTargetAngle = AngleNormalizer::NormalizeAngle(targetAngle + 1);
 
     condition.prepare();
 

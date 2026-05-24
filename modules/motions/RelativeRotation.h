@@ -7,6 +7,7 @@
 #define RELATIVE_ROTATION_H
 
 #include "Rotation.h"
+#include "AngleNormalizer.h"
 
 class RelativeRotation : public Rotation {
  public:
@@ -21,7 +22,7 @@ class RelativeRotation : public Rotation {
    * 相対回転動作の初期設定を行う
    */
   RelativeRotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                   const Pid::PidGain& _anglePidGain, double _relativeAngle);
+                   const Pid::PidGain& _anglePidGain, double _relativeAngle, double _basePower);
 
  protected:
   void prepare() override;  // 現在角度にrelativeAngleを加算し、目標角度を算出する

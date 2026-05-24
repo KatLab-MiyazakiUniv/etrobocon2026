@@ -7,6 +7,7 @@
 #define ANGLE_CONTINUATION_CONDITION_H
 
 #include "BaseContinuationCondition.h"
+#include "AngleNormalizer.h"
 #include <cmath>
 
 class AngleContinuationCondition : public BaseContinuationCondition {
@@ -24,13 +25,6 @@ class AngleContinuationCondition : public BaseContinuationCondition {
       override;  // 目標角度との誤差が許容範囲を超えていれば継続、収まっていれば終了
 
   double getTargetAngle() const;
-
-  /**
-   * @brief 角度を-180〜180の範囲に正規化する関数
-   * @param angle 正規化前の角度
-   * @return 正規化した角度
-   */
-  double normalizeAngle(double angle);
 
  protected:
   double targetAngle;  // 目標角度

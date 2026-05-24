@@ -7,10 +7,11 @@
 #include "Rotation.h"
 
 Rotation::Rotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                   const Pid::PidGain& _anglePidGain)
+                   const Pid::PidGain& _anglePidGain, double _basePower)
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetAngle(0.0),
     anglePid(_anglePidGain.kp, _anglePidGain.ki, _anglePidGain.kd, 0.0),
+    basePower(_basePower),
     currentRightPower(0),
     currentLeftPower(0)
 {
@@ -24,14 +25,16 @@ Rotation::Rotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _co
  */
 void Rotation::executeStep()
 {
-  // 現在の方位角を取得
-  double currentAngle = getCurrentAngle();
+  double currentAngle = getCurrentAngle();  // 現在の方位角を取得
 
   // 目標角度との差を計算し、-180～180度に正規化
-  double error = normalizeAngle(targetAngle - currentAngle);
+  double error = AngleNormalizer::NormalizeAngle(targetAngle - currentAngle);
 
-  // 旋回量を計算
-  double turn = anglePid.calculatePid(error, 0.0);
+  double turn = anglePid.calculatePid(error, 0.0);  // 旋回量を計算
+
+  // PID制御で回頭方向を決定し、基本出力値を加減算して左右モータの出力を算出する
+  currentRightPower = basePower + turn;
+  currentLeftPower = basePower - turn;
 
   // モータにPower値をセット
   robot.getWheelMotorControllerInstance().setRightPower(turn);
@@ -54,19 +57,4 @@ void Rotation::finish()
 double Rotation::getCurrentAngle()
 {
   return robot.getIMUControllerInstance().getAzimuth();
-}
-
-/**
- * @brief 角度を-180～180度の範囲に正規化する
- * @param angle 正規化前の角度
- * @return 正規化後の角度
- */
-double Rotation::normalizeAngle(double angle)
-{
-  // 180度を超える場合は360度引く
-  while(angle > 180.0) angle -= 360.0;
-
-  // -180度未満の場合は360度足す
-  while(angle < -180.0) angle += 360.0;
-  return angle;
 }

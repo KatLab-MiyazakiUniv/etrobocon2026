@@ -18,7 +18,7 @@ class AbsoluteRotation : public Rotation {
    * @param _targetAbsAngle  目標となる絶対角度(°)
    */
   AbsoluteRotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                   const Pid::PidGain& _anglePidGain, double _targetAbsAngle);
+                   const Pid::PidGain& _anglePidGain, double _targetAbsAngle, double _basePower);
 
  protected:
   void prepare() override;  // 回頭動作の準備処理を行う

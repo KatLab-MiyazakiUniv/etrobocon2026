@@ -40,36 +40,6 @@ class SocketClient {
   virtual void disconnectFromServer();
 
   /**
-   * @brief ミニフィグ認識アクションを実行する
-   * @param request リクエスト
-   * @param response レスポンス
-   * @return true アクションの実行に成功した場合
-   * @return false アクションの実行に失敗した場合
-   */
-  virtual bool executeMiniFigAction(const CameraServer::MiniFigActionRequest& request,
-                                    CameraServer::MiniFigActionResponse& response);
-
-  /**
-   * @brief 背景のPLA認識アクションを実行する
-   * @param request リクエスト
-   * @param response レスポンス
-   * @return true アクションの実行に成功した場合
-   * @return false アクションの実行に失敗した場合
-   */
-  virtual bool executeBackgroundPlaAction(const CameraServer::BackgroundPlaActionRequest& request,
-                                          CameraServer::BackgroundPlaActionResponse& response);
-
-  /**
-   * @brief スナップショットアクションを実行する
-   * @param request リクエスト
-   * @param response レスポンス
-   * @return true アクションの実行に成功した場合
-   * @return false アクションの実行に失敗した場合
-   */
-  virtual bool executeSnapshotAction(const CameraServer::SnapshotActionRequest& request,
-                                     CameraServer::SnapshotActionResponse& response);
-
-  /**
    * @brief 色領域検出アクションを実行する
    * @param request リクエスト
    * @param response レスポンス
@@ -79,7 +49,7 @@ class SocketClient {
   virtual bool executeColorRegionDetection(const CameraServer::BoundingBoxDetectorRequest& request,
                                            CameraServer::BoundingBoxDetectorResponse& response);
 
-  protected:
+ protected:
   int sock;          // ソケットファイルディスクリプタ
   bool isConnected;  // サーバーへの接続状態
 

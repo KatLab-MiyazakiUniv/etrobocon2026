@@ -7,22 +7,16 @@
 #ifndef SOCKET_SERVER_H
 #define SOCKET_SERVER_H
 
-#include "CameraCaptureHandler.h"
 #include "ColorRegionDetecorHandler.h"
-#include "BoundingBoxDetectorHandler.h"
 #include <vector>
 
 class SocketServer {
  public:
   /**
    * @brief コンストラクタ
-   * @param CameraCaptureHandler カメラを制御するクラスアクションハンドラ
    * @param ColorRegionDetecorHandler 色領域検出をするアクションハンドラ
-   * @param BoundingBoxDetectorHandler バウンディングボックスを作成するアクションハンドラ
    */
-  SocketServer(CameraCaptureHandler& cameraCaptureHandler,
-               ColorRegionDetecorHandler& colorRegionDetecorHandler,
-               BoundingBoxDetectorHandler& boundingBoxDetectorHandler);
+  SocketServer(ColorRegionDetecorHandler& colorRegionDetecorHandler);
 
   /**
    * @brief サーバーを初期化する
@@ -44,9 +38,7 @@ class SocketServer {
  private:
   int listenSocket;
   bool isRunning;
-  CameraCaptureHandler& cameraCaptureHandler;
   ColorRegionDetecorHandler& colorRegionDetecorHandler;
-  BoundingBoxDetectorHandler& boundingBoxDetectorHandler;
 
   /**
    * @brief クライアントとの接続を処理する

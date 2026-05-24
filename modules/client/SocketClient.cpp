@@ -69,25 +69,6 @@ void SocketClient::disconnectFromServer()
   }
 }
 
-bool SocketClient::executeMiniFigAction(const CameraServer::MiniFigActionRequest& request,
-                                        CameraServer::MiniFigActionResponse& response)
-{
-  return executeAction(request, response);
-}
-
-bool SocketClient::executeBackgroundPlaAction(
-    const CameraServer::BackgroundPlaActionRequest& request,
-    CameraServer::BackgroundPlaActionResponse& response)
-{
-  return executeAction(request, response);
-}
-
-bool SocketClient::executeSnapshotAction(const CameraServer::SnapshotActionRequest& request,
-                                         CameraServer::SnapshotActionResponse& response)
-{
-  return executeAction(request, response);
-}
-
 bool SocketClient::executeColorRegionDetection(
     const CameraServer::BoundingBoxDetectorRequest& request,
     CameraServer::BoundingBoxDetectorResponse& response)

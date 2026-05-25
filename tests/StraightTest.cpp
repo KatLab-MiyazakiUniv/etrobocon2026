@@ -16,7 +16,7 @@ namespace etrobocon2026_test {
     // テスト用のPidゲイン
     Pid::PidGain rightPid = { 0.00535, 0.00115, 0.000 };
     Pid::PidGain leftPid = { 0.00578, 0.0008535, 0.000 };
-    Pid::PidGain anglePid = { 0.036, 0.012, 0.03 };
+    Pid::PidGain anglePid = { 0.0, 0.0, 0.0 };
   };
 
   // IMU無しの場合、目標距離が正の時、run()で直進後、走行距離が目標距離だけ増加するかテスト（誤差あり）

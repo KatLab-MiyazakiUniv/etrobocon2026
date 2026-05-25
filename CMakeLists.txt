@@ -42,6 +42,7 @@ set(RUNNING_INCLUDE_DIRS
   ${RUNNING_MODULE_DIR}
   ${RUNNING_MODULE_DIR}/calculators
   ${RUNNING_MODULE_DIR}/API
+  ${RUNNING_MODULE_DIR}/client
   ${RUNNING_MODULE_DIR}/motions
   ${RUNNING_MODULE_DIR}/motions/continuation_conditions
   ${PROJECT_SOURCE_DIR}/common
@@ -89,6 +90,7 @@ if(ENABLE_CAMERA_TESTS)
   set(CAMERA_INCLUDE_DIRS
     ${CAMERA_MODULE_DIR}/camera
     ${CAMERA_MODULE_DIR}/utils
+    ${CAMERA_MODULE_DIR}/server
     ${CAMERA_MODULE_DIR}/image_processors
     ${PROJECT_SOURCE_DIR}/common
   )
@@ -97,6 +99,7 @@ if(ENABLE_CAMERA_TESTS)
   file(GLOB_RECURSE CAMERA_SOURCES
     "${CAMERA_MODULE_DIR}/camera/*.cpp"
     "${CAMERA_MODULE_DIR}/utils/*.cpp"
+    "${CAMERA_MODULE_DIR}/server/*.cpp"
     "${CAMERA_MODULE_DIR}/image_processors/*.cpp"
   )
 

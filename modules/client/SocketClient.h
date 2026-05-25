@@ -33,7 +33,7 @@ class SocketClient {
    */
   virtual bool connectToServer(const char* server_ip = SERVER_IP);
 
-/**
+  /**
    * @brief サーバーから切断する
    *
    */

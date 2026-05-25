@@ -3,6 +3,7 @@
 
 int main()
 {
+  std::cout << "Hello KATLABBBBBB" << std::endl;
   SocketServer server;
 
   if(!server.init()) {

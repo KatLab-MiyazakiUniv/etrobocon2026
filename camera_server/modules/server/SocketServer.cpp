@@ -15,17 +15,8 @@
 #define PORT 27015
 #define DEFAULT_BUFLEN 512
 
-/**
- * コンストラクタ
- * @brief 初期状態としてソケット未生成・未起動に設定
- */
 SocketServer::SocketServer() : listenSocket(-1), isRunning(false) {}
 
-/**
- * サーバー初期化処理
- * @brief ソケット生成・bind・listenまでを行う
- * @return 成功:true / 失敗:false
- */
 bool SocketServer::init()
 {
   // サーバー用ソケット生成
@@ -58,7 +49,6 @@ bool SocketServer::init()
   }
 
   // 接続待ち状態にする
-
   if(listen(listenSocket, 3) < 0) {
     perror("listen failed");
     close(listenSocket);
@@ -69,10 +59,6 @@ bool SocketServer::init()
   return true;
 }
 
-/**
- * サーバー本体のループ処理
- * @brief クライアント接続を受け付け、1接続ごとに処理する
- */
 void SocketServer::run()
 {
   isRunning = true;
@@ -96,10 +82,6 @@ void SocketServer::run()
   }
 }
 
-/**
- * サーバー停止処理
- * @brief listenソケットを閉じてrunループを終了させる
- */
 void SocketServer::shutdown()
 {
   isRunning = false;
@@ -112,10 +94,6 @@ void SocketServer::shutdown()
   std::cout << "Socket server shutting down." << std::endl;
 }
 
-/**
- * クライアントとの通信処理
- * @brief 受信データを解析し、コマンドに応じて処理を行う
- */
 void SocketServer::handle_connection(int clientSocket)
 {
   char recvbuf[DEFAULT_BUFLEN];
@@ -129,7 +107,6 @@ void SocketServer::handle_connection(int clientSocket)
       if(static_cast<size_t>(iResult) >= sizeof(CameraServer::Command)) {
         // 先頭をコマンドとして解釈
         CameraServer::Command cmd = *reinterpret_cast<CameraServer::Command*>(recvbuf);
-
         switch(cmd) {
           case CameraServer::Command::SHUTDOWN:
             std::cout << "Received SHUTDOWN command." << std::endl;

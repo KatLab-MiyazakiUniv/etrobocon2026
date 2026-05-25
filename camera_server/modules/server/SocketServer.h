@@ -36,8 +36,8 @@ class SocketServer {
   void shutdown();
 
  private:
-  int listenSocket;
-  bool isRunning;
+  int listenSocket;  // サーバーのリッスンソケット
+  bool isRunning;    // 動作状態を管理
 
   /**
    * @brief クライアントとの接続を処理する

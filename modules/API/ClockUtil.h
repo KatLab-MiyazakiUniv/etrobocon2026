@@ -6,7 +6,11 @@
 #ifndef CLOCK_UTIL_H
 #define CLOCK_UTIL_H
 
+#ifdef USE_RASPIKE_ART
 #include "Clock.h"
+#else
+#include "customs/Clock.h"
+#endif
 
 class ClockUtil {
  public:
@@ -31,11 +35,19 @@ class ClockUtil {
  private:
   ClockUtil();  // インスタンス化を禁止する
 
+  #ifdef USE_RASPIKE_ART
   /**
    * @brief spikeapi::Clock のインスタンスの参照を返す（初回のみ生成を行う）
    * @return spikeapi::Clock のインスタンスの参照
    */
   static spikeapi::Clock& getClockInstance();
+  #else
+  /**
+    * @brief custom::Clock のインスタンスの参照を返す（初回のみ生成を行う）
+    * @return custom::Clock のインスタンスの参照
+    */
+  static custom::Clock& getClockInstance();
+  #endif
 };
 
 #endif

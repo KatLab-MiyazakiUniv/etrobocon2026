@@ -25,8 +25,7 @@ Pid::PidGain::PidGain(double _kp, double _ki, double _kd)
 {
   // Pidゲインのいずれかが負の場合、一括で警告を出す
   if(_kp < 0 || _ki < 0 || _kd < 0) {
-    std::cerr << "[Warning] PID gains cannot be negative. Negative values are clamped to 0.0."
-              << std::endl;
+    Logger::warning("PID gains cannot be negative. Negative values are clamped to 0.0.");
   }
 
   // 負の値は 0.0 に補正
@@ -39,7 +38,7 @@ void Pid::setPidGain(double _kp, double _ki, double _kd)
 {
   // Pidゲインのいずれかが負の場合、一括で警告を出す
   if(_kp < 0 || _ki < 0 || _kd < 0) {
-    std::cerr << "[Warning] Attempted to set negative PID gains. Clamped to 0.0." << std::endl;
+    Logger::warning("Attempted to set negative PID gains. Clamped to 0.0.");
   }
   // 負の値は 0.0 に補正
   pidGain.kp = (_kp < 0) ? 0.0 : _kp;

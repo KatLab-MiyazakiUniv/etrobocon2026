@@ -112,7 +112,7 @@ class Logger {
 };
 
 // インスタンスの生死を記録
-#define LOG_CREATE(name) Logger::printfLog(Logger::INFO, "%s created",name)
+#define LOG_CREATE(name) Logger::printfLog(Logger::INFO, "%s created", name)
 
 #define LOG_DESTROY(name) Logger::printfLog(Logger::INFO, "%s destroyed", name)
 

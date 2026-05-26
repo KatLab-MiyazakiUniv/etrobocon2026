@@ -1,1 +1,1 @@
-[44 ms][DEBUG] value=123
+[59 ms][DEBUG] value=123

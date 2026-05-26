@@ -31,7 +31,7 @@ namespace etrobocon2026_test {
     // エラーメッセージの確認
     string expectedMessage = "コマンドファイルを開けませんでした: " + csvPath + "\n";
 
-    EXPECT_EQ(expectedMessage, output);
+    EXPECT_NE(std::string::npos, output.find(expectedMessage));
   }
 
   // ファイルパスが存在するが、コマンドが未実装の場合のテスト

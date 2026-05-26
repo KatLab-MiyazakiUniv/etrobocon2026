@@ -11,6 +11,7 @@
 #include "SpeedCalculator.h"
 #include "Pid.h"
 #include "AngleNormalizer.h"
+#include "Logger.h"
 
 class Straight : public BaseMotion {
  public:
@@ -29,6 +30,10 @@ class Straight : public BaseMotion {
   Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
            double _targetSpeed, const Pid::PidGain& _rightPid, const Pid::PidGain& _leftPid,
            const Pid::PidGain& _anglePidGain, bool _shouldUseIMU);
+  /**
+   * デストラクタ
+   */
+  ~Straight() override;
 
  protected:
   /**

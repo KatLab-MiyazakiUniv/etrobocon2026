@@ -11,6 +11,7 @@
 #include "SystemInfo.h"
 #include <vector>
 #include <opencv2/opencv.hpp>
+#include "Logger.h"
 
 // HSVの範囲を保持する構造体
 struct HSVRange {

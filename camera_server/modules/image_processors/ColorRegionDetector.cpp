@@ -28,7 +28,7 @@ void ColorRegionDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResul
   result.wasDetected = false;
   // 入力フレームが空の場合は処理を中断する
   if(frame.empty()) {
-    std::cerr << "Error: Input frame is empty." << std::endl;
+    Logger::error("入力フレームが空です。");
     return;
   }
 
@@ -40,7 +40,7 @@ void ColorRegionDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResul
   roiRect = roiRect & cv::Rect(0, 0, frameProcessed.cols, frameProcessed.rows);
 
   if(roiRect.empty()) {
-    std::cerr << "Error: roiRect frame is empty." << std::endl;
+    Logger::error("ROIがフレーム内に収まっていません。");
     return;
   }
 
@@ -83,7 +83,7 @@ void ColorRegionDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResul
   }
   // 色が見つからなかった
   if(largestContour.empty()) {
-    std::cerr << "指定された色領域が見つかりませんでした。" << std::endl;
+    Logger::error("指定された色領域が見つかりませんでした。");
     return;
   }
   result.wasDetected = true;

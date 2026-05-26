@@ -10,6 +10,7 @@
 #include "BaseContinuationCondition.h"
 #include "Mileage.h"
 #include <cmath>
+#include "Logger.h"
 
 class DistanceCondition : public BaseContinuationCondition {
  public:
@@ -20,6 +21,11 @@ class DistanceCondition : public BaseContinuationCondition {
    * @param _targetDistance 目標距離(mm)
    */
   DistanceCondition(Robot& _robot, double _targetDistance);
+
+  /**
+   * デストラクタ
+   */
+  ~DistanceCondition() override;
 
   /**
    * @brief 開始時の累計走行距離を取得して initDistance に保存する

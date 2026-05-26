@@ -27,12 +27,15 @@ LIBS := $(OPENCV_LIBS)
 # インクルードパス
 INCLUDES := $(shell find $(INCLUDEDIR) -type d -printf '-I%p ') \
             -I../common \
+			-I../modules/API \
             -I../../common/library/libcpp-spike/include
+
 
 # --- ビルドルール ---
 
 # すべての .cpp ファイルを探す
 SOURCES := main.cpp $(shell find $(SRCDIR) -name '*.cpp')
+SOURCES += ../modules/API/ClockUtil.cpp
 OBJS := $(addprefix $(OBJDIR)/,$(SOURCES:.cpp=.o))
 
 # デフォルトターゲット

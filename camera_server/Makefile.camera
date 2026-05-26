@@ -28,7 +28,7 @@ LIBS := $(OPENCV_LIBS)
 INCLUDES := $(shell find $(INCLUDEDIR) -type d -printf '-I%p ') \
             -I../common \
 			-I../modules/API \
-            -I../../common/library/libcpp-spike/include
+            -I../../../common/library/libcpp-spike/include
 
 
 # --- ビルドルール ---

@@ -35,19 +35,19 @@ class ClockUtil {
  private:
   ClockUtil();  // インスタンス化を禁止する
 
-  #ifdef USE_RASPIKE_ART
+#ifdef USE_RASPIKE_ART
   /**
    * @brief spikeapi::Clock のインスタンスの参照を返す（初回のみ生成を行う）
    * @return spikeapi::Clock のインスタンスの参照
    */
   static spikeapi::Clock& getClockInstance();
-  #else
+#else
   /**
-    * @brief custom::Clock のインスタンスの参照を返す（初回のみ生成を行う）
-    * @return custom::Clock のインスタンスの参照
-    */
+   * @brief custom::Clock のインスタンスの参照を返す（初回のみ生成を行う）
+   * @return custom::Clock のインスタンスの参照
+   */
   static custom::Clock& getClockInstance();
-  #endif
+#endif
 };
 
 #endif

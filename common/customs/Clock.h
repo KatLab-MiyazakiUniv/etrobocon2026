@@ -12,48 +12,44 @@
 
 namespace custom {
 
-class Clock {
-public:
-/**
- * @brief コンストラクタ
- */  
-Clock()
-    : startTime(std::chrono::steady_clock::now())
-  {
-  }
-  
-  /**
-   * @brief 現在時刻をマイクロ秒で取得
-   */
-  uint64_t now() const
-  {
-    return std::chrono::duration_cast<std::chrono::microseconds>(
-               std::chrono::steady_clock::now() - startTime)
-        .count();
-  }
+  class Clock {
+   public:
+    /**
+     * @brief コンストラクタ
+     */
+    Clock() : startTime(std::chrono::steady_clock::now()) {}
 
-  /**
-   * @brief 指定時間スリープ
-   * @param microSec マイクロ秒
-   */
-  void sleep(uint64_t microSec) const
-  {
-    std::this_thread::sleep_for(std::chrono::microseconds(microSec));
-  }
+    /**
+     * @brief 現在時刻をマイクロ秒で取得
+     */
+    uint64_t now() const
+    {
+      return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now()
+                                                                   - startTime)
+          .count();
+    }
 
-  /**
-   * @brief wait互換
-   * @param microSec マイクロ秒
-   */
-  void wait(uint64_t microSec) const
-  {
-    std::this_thread::sleep_for(std::chrono::microseconds(microSec));
-  }
+    /**
+     * @brief 指定時間スリープ
+     * @param microSec マイクロ秒
+     */
+    void sleep(uint64_t microSec) const
+    {
+      std::this_thread::sleep_for(std::chrono::microseconds(microSec));
+    }
 
-private:
+    /**
+     * @brief wait互換
+     * @param microSec マイクロ秒
+     */
+    void wait(uint64_t microSec) const
+    {
+      std::this_thread::sleep_for(std::chrono::microseconds(microSec));
+    }
+
+   private:
     std::chrono::steady_clock::time_point startTime;  // クロックの開始時間
+  };
 
-};
-
-} // namespace custom
+}  // namespace custom
 #endif

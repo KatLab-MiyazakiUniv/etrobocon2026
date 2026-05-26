@@ -13,6 +13,9 @@ TARGET := camera_app
 # コンパイラとリンカのフラグ
 CXXFLAGS := -std=c++17 -Wall -Wextra -O2 -pthread
 
+# スパイクのAPIを取るためのフラグ
+CXXFLAGS += -DUSE_RASPIKE_ART=1
+
 # OpenCVのフラグを取得
 OPENCV_CFLAGS := $(shell pkg-config --cflags opencv4)
 OPENCV_LIBS := $(shell pkg-config --libs opencv4)
@@ -22,7 +25,9 @@ CXXFLAGS += $(OPENCV_CFLAGS)
 LIBS := $(OPENCV_LIBS)
 
 # インクルードパス
-INCLUDES := $(shell find $(INCLUDEDIR) -type d -printf '-I%p '-I../common)
+INCLUDES := $(shell find $(INCLUDEDIR) -type d -printf '-I%p ') \
+            -I../common \
+            -I../../common/library/libcpp-spike/include
 
 # --- ビルドルール ---
 

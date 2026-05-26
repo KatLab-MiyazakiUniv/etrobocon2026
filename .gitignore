@@ -2,6 +2,7 @@
 bin
 obj
 /test_build/
+tests/datafiles/
 
 # 実行ファイル
 camera_app

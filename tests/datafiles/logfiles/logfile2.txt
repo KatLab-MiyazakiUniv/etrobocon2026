@@ -1,8 +1,0 @@
-[60 ms][INFO] info
-[61 ms][WARNING] warning
-[62 ms][ERROR] error
-[63 ms][DEBUG] debug
-[64 ms][INFO] formatted info
-[65 ms][WARNING] formatted warning
-[66 ms][ERROR] formatted error
-[67 ms][DEBUG] formatted debug

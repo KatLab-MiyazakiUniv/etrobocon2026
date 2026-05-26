@@ -1,2 +1,0 @@
-[69 ms][INFO] Test created
-[70 ms][INFO] Test destroyed

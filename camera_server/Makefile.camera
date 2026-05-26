@@ -9,7 +9,6 @@ INCLUDEDIR := modules
 TARGET_DIR := bin
 OBJDIR := $(TARGET_DIR)/obj
 TARGET := camera_app
-COMMON := ../common
 
 # コンパイラとリンカのフラグ
 CXXFLAGS := -std=c++17 -Wall -Wextra -O2 -pthread
@@ -34,7 +33,7 @@ INCLUDES := $(shell find $(INCLUDEDIR) -type d -printf '-I%p ') \
 
 # すべての .cpp ファイルを探す
 SOURCES := main.cpp $(shell find $(SRCDIR) -name '*.cpp')
-SOURCES += $(foreach dir,$(COMMON_DIRS),$(shell find $(dir) -name '*.cpp'))
+SOURCES += ../common/Logger.cpp
 SOURCES += ../modules/API/ClockUtil.cpp
 OBJS := $(addprefix $(OBJDIR)/,$(SOURCES:.cpp=.o))
 

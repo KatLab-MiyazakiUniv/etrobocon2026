@@ -15,22 +15,25 @@ class AngleContinuationCondition : public BaseContinuationCondition {
   /**
    * @brief コンストラクタ
    * @param robot ロボット本体への参照
-   * @param _tolerance 許容誤差（デフォルト: 2.0度）
-   * @details ロボットと許容誤差を設定し、角度判定の初期化を行う
-   */
+   * @param _targrtAngle 目標角度(°)
+   * @param _tolerance 許容誤差(デフォルトは2.0°)
+   * */
 
   AngleContinuationCondition(Robot& robot, double _targetAngle, double _tolerance = 2.0);
 
-  bool shouldContinue()
-      override;  // 目標角度との誤差が許容範囲を超えていれば継続、収まっていれば終了
+  /**
+   *@brief 目標角度との誤差が許容範囲を超えていれば継続、収まっていれば終了
+   * @return true/動作を継続する、false/動作を継続しない
+   */
+  bool shouldContinue() override;
 
   double getTargetAngle() const;
 
  protected:
-  double targetAngle;  // 目標角度
+  double targetAngle;  // 目標角度(°)
 
  private:
-  double tolerance;  // 許容誤差（この範囲内なら到達とみなす）
+  double tolerance;  // 許容誤差(°)
 };
 
 #endif

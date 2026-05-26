@@ -8,6 +8,12 @@
 
 #include "AngleContinuationCondition.h"
 
+/**
+ * @brief 相対角度で回頭完了を判定するコンストラクタ
+ * @param robot 制御対象
+ * @param _relativeAngle 回頭する相対角度(°)
+ * @param _tolerance 許容誤差(°)
+ */
 class RelativeAngleContinuationCondition : public AngleContinuationCondition {
  public:
   RelativeAngleContinuationCondition(Robot& robot, double _relativeAngle, double _tolerance = 2.0);

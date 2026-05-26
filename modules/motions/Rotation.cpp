@@ -11,9 +11,7 @@ Rotation::Rotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _co
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetAngle(0.0),
     anglePid(_anglePidGain.kp, _anglePidGain.ki, _anglePidGain.kd, 0.0),
-    basePower(_basePower),
-    currentRightPower(0),
-    currentLeftPower(0)
+    basePower(_basePower)
 {
 }
 
@@ -30,30 +28,22 @@ void Rotation::executeStep()
   // 目標角度との差を計算し、-180～180度に正規化
   double error = AngleNormalizer::NormalizeAngle(targetAngle - currentAngle);
 
-  double turn = anglePid.calculatePid(error, 0.0);  // 旋回量を計算
-
+  double turn = anglePid.calculatePid(error);  // 旋回量を計算
   // PID制御で回頭方向を決定し、基本出力値を加減算して左右モータの出力を算出する
-  currentRightPower = basePower + turn;
-  currentLeftPower = basePower - turn;
+  double reqiredRightPower = basePower + turn;
+  double reqiredLeftPower = basePower - turn;
 
   // モータにPower値をセット
-  robot.getWheelMotorControllerInstance().setRightPower(turn);
-  robot.getWheelMotorControllerInstance().setLeftPower(-turn);
+  robot.getWheelMotorControllerInstance().setRightPower(requiredRightPower);
+  robot.getWheelMotorControllerInstance().setLeftPower(requiredLefttPower);
 }
 
-/**
- * @brief 回頭動作終了時に左右モータを停止するための処理
- */
 void Rotation::finish()
 {
   robot.getWheelMotorControllerInstance().stopBoth();
   robot.getWheelMotorControllerInstance().resetBothPower();
 }
 
-/**
- * @brief 現在の機体角度を取得する
- * @return IMUから取得した現在の方位角
- */
 double Rotation::getCurrentAngle()
 {
   return robot.getIMUControllerInstance().getAzimuth();

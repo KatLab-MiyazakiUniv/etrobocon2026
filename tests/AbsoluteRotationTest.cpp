@@ -5,9 +5,7 @@
  */
 
 #include <gtest/gtest.h>
-#include "Rotation.h"
 #include "AbsoluteRotation.h"
-#include "AngleContinuationCondition.h"
 #include "AbsoluteAngleContinuationCondition.h"
 
 namespace etrobocon2026_test {
@@ -21,7 +19,7 @@ namespace etrobocon2026_test {
   TEST_F(AbsoluteRotationTest, RunAngle)
   {
     Robot robot;
-    double AbsoluteAngle = 60;  //  回頭したい相対角度
+    double AbsoluteAngle = 60.0;  //  回頭したい相対角度
 
     double initialAngle = robot.getIMUControllerInstance().getAzimuth();  // 回頭前の角度を計算
 
@@ -35,7 +33,7 @@ namespace etrobocon2026_test {
     double endAngle = robot.getIMUControllerInstance().getAzimuth();
 
     // 角度と目標角度との誤差
-    double deviation = 2;
+    double deviation = 2.0;
 
     // 回転後の角度が目標角度の誤差の範囲にあることテスト
     EXPECT_NEAR(AbsoluteAngle, endAngle - initialAngle, deviation);

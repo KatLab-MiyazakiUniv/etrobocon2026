@@ -26,7 +26,7 @@ class AbsoluteAngleContinuationCondition : public AngleContinuationCondition {
   AbsoluteAngleContinuationCondition(Robot& robot, double _targetAbsAngle, double _tolerance = 2.0);
 
   /**
-   * @brief 継続条件の準備処理を行う
+   * @brief 指定された絶対角度を目標角度としてセットする
    */
   void prepare() override;
 

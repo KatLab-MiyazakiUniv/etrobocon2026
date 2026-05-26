@@ -19,12 +19,7 @@ bool AngleContinuationCondition::shouldContinue()
 
   // 目標角度との差を計算し、-180〜180の範囲に正規化
   double error = AngleNormalizer::NormalizeAngle(targetAngle - currentAngle);
-  /**
-   * @brief 誤差に基づく継続判定
-   * @details
-   * 目標角度との誤差が許容範囲を超えている場合は「未到達」として動作を継続し、
-   * 許容範囲内であれば「到達」とみなして動作を終了する
-   */
+
   return std::fabs(error) > tolerance;
 }
 

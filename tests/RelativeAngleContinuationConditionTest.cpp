@@ -33,9 +33,6 @@ namespace etrobocon2026_test {
 
     condition.prepare();
 
-    for(int i = 0; i < 10; i++) {
-      robot.getIMUControllerInstance().getAzimuth();
-    }
     EXPECT_TRUE(condition.shouldContinue());
   }
 

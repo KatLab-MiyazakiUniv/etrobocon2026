@@ -32,9 +32,6 @@ namespace etrobocon2026_test {
 
     condition.prepare();
 
-    for(int i = 0; i < 10; i++) {
-      robot.getIMUControllerInstance().getAzimuth();
-    }
     EXPECT_TRUE(condition.shouldContinue());
   }
 
@@ -56,7 +53,7 @@ namespace etrobocon2026_test {
     }
 
     // 目標角度付近まで回っていることを確認
-    EXPECT_NEAR(targetAngle, robot.getIMUControllerInstance().getAzimuth() - 1, 2);
+    EXPECT_NEAR(targetAngle, robot.getIMUControllerInstance().getAzimuth(), 2);
   }
 
 }  // namespace etrobocon2026_test

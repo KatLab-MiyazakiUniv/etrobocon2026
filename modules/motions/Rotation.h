@@ -40,18 +40,17 @@ class Rotation : public BaseMotion {
 
   /**
    * @brief 現在の方位角を取得する
-   *@return 現在の方位角(°)
+   * @return 現在の方位角(°)
    */
   double getCurrentAngle();
 
  private:
-  Pid anglePid;  // 回頭制御用PIDコントローラ
-
+  Pid anglePid;      // 回頭制御用PIDコントローラ
   double basePower;  // 回頭動作の基本出力値（正の値で指定、回頭方向はPID制御で決定）
 
-  double currentRightPower;  // 現在の右モータ出力
+  double requiredRightPower;  // 現在の右モータ出力
 
-  double currentLeftPower;  // 現在の左モータ出力
+  double requiredLefttPower;  // 現在の左モータ出力
 };
 
 #endif

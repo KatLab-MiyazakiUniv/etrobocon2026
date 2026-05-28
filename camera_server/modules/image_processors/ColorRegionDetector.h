@@ -27,6 +27,10 @@ class ColorRegionDetector : public BoundingBoxDetector {
    * @param roi 注目領域
    */
   ColorRegionDetector(const std::vector<HSVRange>& hsvRanges, const cv::Rect& roi);
+  /**
+   * @brief デストラクタ
+   */
+  ~ColorRegionDetector();
   // フレームから色を検出する
   /**
    * @brief フレームから色領域を検出

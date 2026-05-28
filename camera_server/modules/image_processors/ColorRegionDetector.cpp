@@ -12,6 +12,12 @@ ColorRegionDetector::ColorRegionDetector(const std::vector<HSVRange>& _hsvRanges
   : hsvRanges(_hsvRanges), roi(_roi)
 {
   validateParameters();
+  LOG_CREATE("ColorRegionDetector");
+}
+
+ColorRegionDetector::~ColorRegionDetector()
+{
+  LOG_DESTROY("ColorRegionDetector");
 }
 
 // ROIをフレーム内に収める補正

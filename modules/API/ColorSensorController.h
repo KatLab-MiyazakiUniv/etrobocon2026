@@ -11,21 +11,21 @@
 #include <cstdint>
 #include <iostream>
 
-/**
- *  @brief 色を表す列挙型
- */
-enum class COLOR : int {
-  NONE = 0,
-  BLACK = 1,
-  WHITE = 2,
-  BLUE = 3,
-  GREEN = 4,
-  YELLOW = 5,
-  RED = 6,
-};
-
 class ColorSensorController {
  public:
+  /**
+   *  @brief 色を表す列挙型
+   */
+  enum class COLOR : int {
+    NONE = 0,
+    BLACK = 1,
+    WHITE = 2,
+    BLUE = 3,
+    GREEN = 4,
+    YELLOW = 5,
+    RED = 6,
+  };
+
   /**
    * @brief RGB値を保持する構造体
    */
@@ -45,16 +45,21 @@ class ColorSensorController {
   };
 
   /**
+   * コンストラクタ
+   */
+  ColorSensorController();
+
+  /**
    * @brief 文字列を列挙型COLORに変換
    * @param str 変換する文字列
-   * @return 色
+   * @return 色を表す文字列
    */
   static COLOR convertStringToColor(std::string_view str);
 
   /**
    * @brief 列挙型COLORを文字列に変換
    * @param color 色
-   * @return 文字列の色
+   * @return 色を表す文字列
    */
   static const char* convertColorToString(const COLOR& color);
 
@@ -64,12 +69,6 @@ class ColorSensorController {
    * @return 色（hsvによる表現）
    */
   static COLOR convertHsvToColor(HSV& hsv);
-
-  /**
-   * コンストラクタ
-   * @param port 接続ポート
-   */
-  ColorSensorController();
 
   /**
    * @brief 反射光強度を取得(0-100)

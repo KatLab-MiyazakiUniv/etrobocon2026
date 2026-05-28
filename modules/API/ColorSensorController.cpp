@@ -8,7 +8,7 @@
 
 ColorSensorController::ColorSensorController() : colorSensor(EPort::PORT_E) {}
 
-COLOR ColorSensorController::convertStringToColor(std::string_view str)
+ColorSensorController::COLOR ColorSensorController::convertStringToColor(std::string_view str)
 {
   if(str == "BLACK") return COLOR::BLACK;
   if(str == "WHITE") return COLOR::WHITE;
@@ -39,7 +39,7 @@ const char* ColorSensorController::convertColorToString(const COLOR& color)
   }
 }
 
-COLOR ColorSensorController::convertHsvToColor(HSV& hsv)
+ColorSensorController::COLOR ColorSensorController::convertHsvToColor(HSV& hsv)
 {
   // 明度が極端に低ければ、黒を返す
   if(hsv.v < BLACK_LIMIT_BORDER) return COLOR::BLACK;
@@ -88,7 +88,7 @@ void ColorSensorController::getRawHSV(HSV& hsv, bool surface)
   hsv.v = rawHsv.v;
 }
 
-const char* ColorSensorController::getColor(ColorSensorController::HSV& hsv)
+const char* ColorSensorController::getColor(HSV& hsv)
 {
   return ColorSensorController::convertColorToString(ColorSensorController::convertHsvToColor(hsv));
 }

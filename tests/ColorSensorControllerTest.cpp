@@ -15,11 +15,94 @@ namespace spikeapi {
   ColorSensor::HSV ColorSensor::sHSV = { 0, 0, 0 };
   int32_t ColorSensor::sReflection = 0;
   int32_t ColorSensor::sAmbient = 0;
-  // bool ColorSensor::sHasError = false;
-
 }  // namespace spikeapi
 
 namespace etrobocon2026_test {
+
+  // 文字列を渡した時に列挙型COLORに変換出来るかを確認
+  TEST(ColorSensorControllerTest, ConvertStringToColor)
+  {
+    ColorSensorController::COLOR expectedColor = ColorSensorController::COLOR::BLACK;
+    EXPECT_EQ(expectedColor, ColorSensorController::convertStringToColor("BLACK"));
+
+    expectedColor = ColorSensorController::COLOR::WHITE;
+    EXPECT_EQ(expectedColor, ColorSensorController::convertStringToColor("WHITE"));
+
+    expectedColor = ColorSensorController::COLOR::BLUE;
+    EXPECT_EQ(expectedColor, ColorSensorController::convertStringToColor("BLUE"));
+
+    expectedColor = ColorSensorController::COLOR::GREEN;
+    EXPECT_EQ(expectedColor, ColorSensorController::convertStringToColor("GREEN"));
+
+    expectedColor = ColorSensorController::COLOR::YELLOW;
+    EXPECT_EQ(expectedColor, ColorSensorController::convertStringToColor("YELLOW"));
+
+    expectedColor = ColorSensorController::COLOR::NONE;
+    EXPECT_EQ(expectedColor, ColorSensorController::convertStringToColor("INVALIDCOLOR"));
+  }
+
+  // 引数の型として,string, string_view, const char*,const char* [6]を受け付けることを確認
+  TEST(ColorSensorControllerTest, ConverToStringTypecheck)
+  {
+    ColorSensorController::COLOR expectedColor = ColorSensorController::COLOR::BLACK;
+    std::string stringTypeBlack = "BLACK";
+    std::string_view stringViewTypeBlack = "BLACK";
+    const char* charPointaTypeBlack = "BLACK";
+
+    EXPECT_EQ(expectedColor, ColorSensorController::convertStringToColor(stringTypeBlack));
+    EXPECT_EQ(expectedColor, ColorSensorController::convertStringToColor(stringViewTypeBlack));
+    EXPECT_EQ(expectedColor, ColorSensorController::convertStringToColor(charPointaTypeBlack));
+    EXPECT_EQ(expectedColor, ColorSensorController::convertStringToColor("BLACK"));
+  }
+
+  // ColorSensorControllerのCOLORのメンバ変数を文字列に変換できるかを確認
+  TEST(ColorSensorControllerTest, ConvertColorToStringcheck)
+  {
+    // 明度が低い
+    ColorSensorController::HSV lowValue = { 0, 100, 9 };
+    EXPECT_EQ(ColorSensorController::COLOR::BLACK,
+              ColorSensorController::convertHsvToColor(lowValue));
+
+    // 明度が高い
+    ColorSensorController::HSV highValue = { 0, 100, 251 };
+    EXPECT_EQ(ColorSensorController::COLOR::WHITE,
+              ColorSensorController::convertHsvToColor(highValue));
+
+    // 彩度が低く,明度も低い
+    ColorSensorController::HSV lowSaturationLowValue = { 0, 46, 94 };
+    EXPECT_EQ(ColorSensorController::COLOR::BLACK,
+              ColorSensorController::convertHsvToColor(lowSaturationLowValue));
+
+    // 彩度が低く,明度は高い
+    ColorSensorController::HSV lowSaturationHighValue = { 0, 46, 95 };
+    EXPECT_EQ(ColorSensorController::COLOR::WHITE,
+              ColorSensorController::convertHsvToColor(lowSaturationHighValue));
+
+    // 赤の場合
+    ColorSensorController::HSV redValue = { 24, 100, 120 };
+    EXPECT_EQ(ColorSensorController::COLOR::RED,
+              ColorSensorController::convertHsvToColor(redValue));
+
+    // 黄の場合
+    ColorSensorController::HSV yellowValue = { 49, 100, 120 };
+    EXPECT_EQ(ColorSensorController::COLOR::YELLOW,
+              ColorSensorController::convertHsvToColor(yellowValue));
+
+    // 緑の場合
+    ColorSensorController::HSV greenValue = { 169, 100, 120 };
+    EXPECT_EQ(ColorSensorController::COLOR::GREEN,
+              ColorSensorController::convertHsvToColor(greenValue));
+
+    // 青の場合
+    ColorSensorController::HSV blueValue = { 299, 100, 120 };
+    EXPECT_EQ(ColorSensorController::COLOR::BLUE,
+              ColorSensorController::convertHsvToColor(blueValue));
+
+    // 最後の条件分岐
+    ColorSensorController::HSV defaultRedValue = { 300, 100, 120 };
+    EXPECT_EQ(ColorSensorController::COLOR::RED,
+              ColorSensorController::convertHsvToColor(defaultRedValue));
+  }
 
   // 反射光強度を取得できるかのテスト
   TEST(ColorSensorControllerTest, GetReflectance)

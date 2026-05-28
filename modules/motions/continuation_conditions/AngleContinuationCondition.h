@@ -18,7 +18,6 @@ class AngleContinuationCondition : public BaseContinuationCondition {
    * @param _targrtAngle 目標角度(°)
    * @param _tolerance 許容誤差(デフォルトは2.0°)
    * */
-
   AngleContinuationCondition(Robot& robot, double _targetAngle, double _tolerance = 2.0);
 
   /**

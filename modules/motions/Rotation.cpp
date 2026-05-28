@@ -30,12 +30,12 @@ void Rotation::executeStep()
 
   double turn = anglePid.calculatePid(error);  // 旋回量を計算
   // PID制御で回頭方向を決定し、基本出力値を加減算して左右モータの出力を算出する
-  double reqiredRightPower = basePower + turn;
-  double reqiredLeftPower = basePower - turn;
+  double requiredRightPower = basePower + turn;
+  double requiredLeftPower = basePower - turn;
 
   // モータにPower値をセット
   robot.getWheelMotorControllerInstance().setRightPower(requiredRightPower);
-  robot.getWheelMotorControllerInstance().setLeftPower(requiredLefttPower);
+  robot.getWheelMotorControllerInstance().setLeftPower(requiredLeftPower);
 }
 
 void Rotation::finish()

@@ -47,10 +47,6 @@ class Rotation : public BaseMotion {
  private:
   Pid anglePid;      // 回頭制御用PIDコントローラ
   double basePower;  // 回頭動作の基本出力値（正の値で指定、回頭方向はPID制御で決定）
-
-  double requiredRightPower;  // 現在の右モータ出力
-
-  double requiredLefttPower;  // 現在の左モータ出力
 };
 
 #endif

@@ -45,6 +45,7 @@ set(RUNNING_INCLUDE_DIRS
   ${RUNNING_MODULE_DIR}/motions
   ${RUNNING_MODULE_DIR}/motions/continuation_conditions
   ${PROJECT_SOURCE_DIR}/common
+  ${PROJECT_SOURCE_DIR}/common/customs
   ${RUNNING_TEST_DIR}
   ${RUNNING_TEST_DIR}/dummy
   ${RUNNING_TEST_DIR}/datafiles/logfiles
@@ -91,6 +92,7 @@ if(ENABLE_CAMERA_TESTS)
     ${CAMERA_MODULE_DIR}/utils
     ${CAMERA_MODULE_DIR}/image_processors
     ${PROJECT_SOURCE_DIR}/common
+    ${PROJECT_SOURCE_DIR}/common/customs
     ${RUNNING_MODULE_DIR}/API
     ${RUNNING_TEST_DIR}/dummy
   )

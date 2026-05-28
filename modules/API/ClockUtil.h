@@ -5,12 +5,7 @@
  */
 #ifndef CLOCK_UTIL_H
 #define CLOCK_UTIL_H
-
-#ifdef USE_RASPIKE_ART
 #include "Clock.h"
-#else
-#include "customs/Clock.h"
-#endif
 
 class ClockUtil {
  public:

@@ -33,7 +33,7 @@ class Straight : public BaseMotion {
   /**
    * デストラクタ
    */
-  ~Straight() override;
+  ~Straight();
 
  protected:
   /**

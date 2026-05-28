@@ -93,7 +93,6 @@ if(ENABLE_CAMERA_TESTS)
     ${PROJECT_SOURCE_DIR}/common
     ${RUNNING_MODULE_DIR}/API
     ${RUNNING_TEST_DIR}/dummy
-    
   )
 
   # ソースファイルの登録 (適宜登録)

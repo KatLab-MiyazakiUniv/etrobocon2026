@@ -25,7 +25,7 @@ class DistanceCondition : public BaseContinuationCondition {
   /**
    * デストラクタ
    */
-  ~DistanceCondition() override;
+  ~DistanceCondition();
 
   /**
    * @brief 開始時の累計走行距離を取得して initDistance に保存する

@@ -95,12 +95,16 @@ namespace spikeapi {
      */
     float getHeading()
     {
-      azimuth += 1;  // 方位角を1度ずつ増加させる
+      float prevAzimuth = azimuth;  // 更新前を保持
 
-      // 角度が360度を超えた場合、0〜360度の範囲に正規化する
-      if(azimuth >= 360.0f) azimuth = fmodf(azimuth, 360.0f);
+      azimuth += 1.0f;  // 方位角を1度ずつ増加させる
 
-      return azimuth;
+      // // 角度が360度を超えた場合、0〜360度の範囲に正規化する
+      if(azimuth >= 360.0f) {
+        azimuth = fmodf(azimuth, 360.0f);
+      }
+
+      return azimuth;  //
     }
 
     /**

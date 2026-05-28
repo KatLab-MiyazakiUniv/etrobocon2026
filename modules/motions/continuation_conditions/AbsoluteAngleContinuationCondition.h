@@ -11,7 +11,6 @@
 /**
  * @class AbsoluteAngleContinuationCondition
  * @brief 絶対角度に到達したかを判定する継続条件クラス
- *
  * 指定された絶対角度と現在角度を比較し、
  * 許容誤差内に入った場合に条件成立と判定する。
  */

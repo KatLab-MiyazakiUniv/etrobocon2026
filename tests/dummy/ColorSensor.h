@@ -72,55 +72,16 @@ namespace spikeapi {
      */
     int32_t getAmbient() const { return sAmbient; }
 
-    /**
-     * @brief カラーセンサのライトを設定する
-     * @param bv1 輝度1
-     * @param bv2 輝度2
-     * @param bv3 輝度3
-     * @return -
-     */
-    void setLight(int32_t bv1, int32_t bv2, int32_t bv3) const
-    {
-      // ダミーなので何もしない
-    }
-
-    /**
-     * @brief カラーセンサのライトを点灯する
-     * @param -
-     * @return -
-     */
-    void lightOn() const
-    {
-      // ダミーなので何もしない
-    }
-
-    /**
-     * @brief カラーセンサのライトを消灯する
-     * @param -
-     * @return -
-     */
-    void lightOff() const
-    {
-      // ダミーなので何もしない
-    }
-
-    /**
-     * @brief インスタンス生成が正常にできたかどうかを確認するための共通メソッド
-     */
-    bool hasError() { return sHasError; }
-
-    // テスト用メンバ（値を外部から操作可能にする）
-    static RGB sRGB;
-    static HSV sHSV;
-    static int32_t sReflection;
-    static int32_t sAmbient;
-    static bool sHasError;  // hasError()の戻り値を制御するため
+    // 静的メンバ（値を外部から操作可能にする）
+    inline static RGB sRGB = { 0, 0, 0 };
+    inline static HSV sHSV = { 0, 0, 0 };
+    inline static int32_t sReflection = 0;
+    inline static int32_t sAmbient = 0;
 
     static void setRGB(RGB rgb) { sRGB = rgb; }
     static void setHSV(HSV hsv) { sHSV = hsv; }
     static void setReflection(int32_t reflection) { sReflection = reflection; }
     static void setAmbient(int32_t ambient) { sAmbient = ambient; }
-    // static void setHasError(bool hasError) { sHasError = hasError; }
 
    private:
     EPort mPort;

@@ -9,7 +9,7 @@
 
 #include "ColorSensor.h"
 #include <cstdint>
-#include <iostream>
+#include <string_view>
 
 class ColorSensorController {
  public:
@@ -102,23 +102,23 @@ class ColorSensorController {
    */
   const char* getColor(HSV& hsv);
 
-  /**
-   * @brief ライトを点灯する (標準の白)
-   */
-  void lightOn();
+  // /**
+  //  * @brief ライトを点灯する (標準の白)
+  //  */
+  // void lightOn();
 
-  /**
-   * @brief ライトを消灯する(動作しない)
-   */
-  void lightOff();
+  // /**
+  //  * @brief ライトを消灯する(動作しない)
+  //  */
+  // void lightOff();
 
-  /**
-   * @brief ライトの輝度を個別に設定する
-   * @param left 左側 (0-255)
-   * @param center 中央 (0-255)
-   * @param right 右側 (0-255)
-   */
-  void setLightBrightness(int left, int center, int right);
+  // /**
+  //  * @brief ライトの輝度を個別に設定する
+  //  * @param left 左側 (0-255)
+  //  * @param center 中央 (0-255)
+  //  * @param right 右側 (0-255)
+  //  */
+  // void setLightBrightness(int left, int center, int right);
 
  private:
   static constexpr int SATURATION_BORDER = 47;    // 無彩色かどうかの彩度の境界

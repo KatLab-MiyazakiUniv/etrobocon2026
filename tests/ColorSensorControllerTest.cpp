@@ -8,15 +8,6 @@
 #include "ColorSensorController.h"
 #include "ColorSensor.h"  // For dummy spikeapi::ColorSensor
 
-namespace spikeapi {
-
-  // 静的メンバの定義
-  ColorSensor::RGB ColorSensor::sRGB = { 0, 0, 0 };
-  ColorSensor::HSV ColorSensor::sHSV = { 0, 0, 0 };
-  int32_t ColorSensor::sReflection = 0;
-  int32_t ColorSensor::sAmbient = 0;
-}  // namespace spikeapi
-
 namespace etrobocon2026_test {
 
   // 文字列を渡した時に列挙型COLORに変換出来るかを確認
@@ -190,17 +181,6 @@ namespace etrobocon2026_test {
     spikeapi::ColorSensor::setHSV(dummyHsv);
     const char* resultColor = colorController.getColor(hsv);
     EXPECT_STREQ("BLACK", resultColor);
-  }
-
-  // ライトを点灯/消灯するテスト
-  TEST(ColorSensorControllerTest, LightControl)
-  {
-    ColorSensorController colorController;
-    // コンパイルが通ることを確認するのみ。
-    colorController.lightOn();
-    colorController.lightOff();
-    colorController.setLightBrightness(10, 20, 30);
-    SUCCEED();
   }
 
 }  // namespace etrobocon2026_test

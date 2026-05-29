@@ -40,7 +40,6 @@ namespace spikeapi {
     /**
      * @brief カラーセンサのRGB値を取得する
      * @param rgb 値を設定するRGB構造体
-     * @return -
      */
     void getRGB(RGB& rgb) const { rgb = sRGB; }
 
@@ -48,7 +47,6 @@ namespace spikeapi {
      * @brief カラーセンサで色を測定する
      * @param hsv 値を設定するHSV構造体
      * @param surface trueならば表面の色から、falseならば他の光源の色を検出する
-     * @return -
      */
     void getColor(HSV& hsv, bool surface = true) const { hsv = sHSV; }
 
@@ -56,7 +54,6 @@ namespace spikeapi {
      * @brief カラーセンサで色を測定する（近似なし）
      * @param hsv 値を設定するHSV構造体
      * @param surface trueならば表面の色から、falseならば他の光源の色を検出する
-     * @return -
      */
     void getHSV(HSV& hsv, bool surface = true) const { hsv = sHSV; }
 

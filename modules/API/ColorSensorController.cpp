@@ -92,18 +92,3 @@ const char* ColorSensorController::getColor(HSV& hsv)
 {
   return ColorSensorController::convertColorToString(ColorSensorController::convertHsvToColor(hsv));
 }
-
-// void ColorSensorController::lightOn()
-// {
-//   colorSensor.lightOn();
-// }
-
-// void ColorSensorController::lightOff()
-// {
-//   colorSensor.lightOff();
-// }
-
-// void ColorSensorController::setLightBrightness(int left, int center, int right)
-// {
-//   colorSensor.setLight(left, center, right);
-// }

@@ -14,7 +14,7 @@
 class ColorSensorController {
  public:
   /**
-   *  @brief 色を表す列挙型
+   * @brief 色を表す列挙型
    */
   enum class COLOR : int {
     NONE = 0,
@@ -101,24 +101,6 @@ class ColorSensorController {
    * @return 文字列で表現された色
    */
   const char* getColor(HSV& hsv);
-
-  // /**
-  //  * @brief ライトを点灯する (標準の白)
-  //  */
-  // void lightOn();
-
-  // /**
-  //  * @brief ライトを消灯する(動作しない)
-  //  */
-  // void lightOff();
-
-  // /**
-  //  * @brief ライトの輝度を個別に設定する
-  //  * @param left 左側 (0-255)
-  //  * @param center 中央 (0-255)
-  //  * @param right 右側 (0-255)
-  //  */
-  // void setLightBrightness(int left, int center, int right);
 
  private:
   static constexpr int SATURATION_BORDER = 47;    // 無彩色かどうかの彩度の境界

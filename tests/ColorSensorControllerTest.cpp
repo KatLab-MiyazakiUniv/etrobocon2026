@@ -11,7 +11,7 @@
 namespace etrobocon2026_test {
 
   // 文字列を渡した時に列挙型COLORに変換出来るかを確認
-  TEST(ColorSensorControllerTest, ConvertStringToColor)
+  TEST(ColorSensorControllerTest, ConvertStringToColorCheck)
   {
     ColorSensorController::COLOR expectedColor = ColorSensorController::COLOR::BLACK;
     EXPECT_EQ(expectedColor, ColorSensorController::convertStringToColor("BLACK"));

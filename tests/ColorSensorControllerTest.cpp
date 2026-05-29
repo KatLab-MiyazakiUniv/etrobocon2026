@@ -11,7 +11,7 @@
 namespace etrobocon2026_test {
 
   // 文字列を渡した時に列挙型COLORに変換出来るかを確認
-  TEST(ColorSensorControllerTest, ConvertStringToColorCheck)
+  TEST(ColorSensorControllerTest, ConvertStringToColor)
   {
     ColorSensorController::COLOR expectedColor = ColorSensorController::COLOR::BLACK;
     EXPECT_EQ(expectedColor, ColorSensorController::convertStringToColor("BLACK"));
@@ -47,7 +47,7 @@ namespace etrobocon2026_test {
   }
 
   // ColorSensorControllerのCOLORのメンバ変数を文字列に変換できるかを確認
-  TEST(ColorSensorControllerTest, ConvertColorToStringcheck)
+  TEST(ColorSensorControllerTest, ConvertColorToString)
   {
     // 明度が低い
     ColorSensorController::HSV lowValue = { 0, 100, 9 };

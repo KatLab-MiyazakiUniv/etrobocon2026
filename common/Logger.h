@@ -17,7 +17,11 @@
 
 // デフォルトのログファイルパスとファイル名
 #define DEFAULT_LOG_FILE_PATH "etrobocon2026/datafiles/logfiles/"
+#ifdef USE_RASPIKE_ART
 #define DEFAULT_LOG_FILE_NAME "logfile.txt"
+#else
+#define DEFAULT_LOG_FILE_NAME "cameralogfile.txt"
+#endif
 
 class Logger {
  public:

@@ -10,13 +10,10 @@
 #include "WheelMotorController.h"
 #include "ArmMotorController.h"
 #include "IMUController.h"
-<<<<<<< HEAD
 #include "ColorSensorController.h"
-    =======
 #include "Course.h"
-    >>>>>>> origin/main
 
-    class Robot {
+class Robot {
  public:
   /**
    * コンストラクタ

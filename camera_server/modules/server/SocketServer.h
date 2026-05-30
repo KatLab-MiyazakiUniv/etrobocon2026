@@ -7,9 +7,10 @@
 #ifndef SOCKET_SERVER_H
 #define SOCKET_SERVER_H
 
-#include <vector>
-
 #include "INetworkSystem.h"
+
+#include "Logger.h"
+#include <string>
 
 class SocketServer {
  public:

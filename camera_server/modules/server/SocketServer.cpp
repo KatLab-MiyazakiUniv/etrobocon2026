@@ -5,8 +5,8 @@
  */
 
 #include "SocketServer.h"
-#include "Logger.h"  // 👈 追加
-#include <string>    // 👈 追加 (std::to_string用)
+#include "Logger.h"
+#include <string>
 
 #define PORT 27015
 #define DEFAULT_BUFLEN 512

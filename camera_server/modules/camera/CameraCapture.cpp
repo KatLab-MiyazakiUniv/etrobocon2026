@@ -75,12 +75,12 @@ bool CameraCapture::openCamera()
   }
 
   // 解像度設定
-  if(!cap.set(cv::CAP_PROP_FRAME_WIDTH, MAX_WIDTH)) {
+  if(!cap.set(cv::CAP_PROP_FRAME_WIDTH, CAM_MAX_WIDTH)) {
     cerr << "幅設定に失敗しました。" << endl;
     return false;
   }
 
-  if(!cap.set(cv::CAP_PROP_FRAME_HEIGHT, MAX_HEIGHT)) {
+  if(!cap.set(cv::CAP_PROP_FRAME_HEIGHT, CAM_MAX_HEIGHT)) {
     cerr << "高さ設定に失敗しました。" << endl;
     return false;
   }

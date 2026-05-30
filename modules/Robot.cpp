@@ -30,3 +30,12 @@ ColorSensorController& Robot::getColorSensorControllerInstance()
 {
   return colorSensorController;
 }
+Course& Robot::getCourse()
+{
+  return course;
+}
+
+void Robot::setCourse(Course course)
+{
+  this->course = course;
+}

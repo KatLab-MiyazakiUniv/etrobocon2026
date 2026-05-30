@@ -7,8 +7,8 @@
 
 RelativeRotation::RelativeRotation(
     Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-    const Pid::PidGain& _anglePidGain, double _relativeAngle, double _basePower)
-  : Rotation(_robot, std::move(_continuationCondition), _anglePidGain, _basePower),
+    const Pid::PidGain& _anglePidGain, double _relativeAngle)
+  : Rotation(_robot, std::move(_continuationCondition), _anglePidGain),
     relativeTargetAngle(_relativeAngle)
 {
 }

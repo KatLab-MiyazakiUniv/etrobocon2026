@@ -17,14 +17,12 @@ class RelativeRotation : public Rotation {
    * @param _continuationCondition 動作の継続条件（終了判定）
    * @param _anglePidGain 角度制御用のPIDゲイン
    * @param _relativeTargetAngle 回頭したい相対角度(°)
-   * @param _basePower 回頭動作の基本出力値
    * @details
    * ロボット、継続条件、PIDゲイン、および相対角度を受け取り、
    * 相対回転動作の初期設定を行う
    */
   RelativeRotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                   const Pid::PidGain& _anglePidGain, double _relativeTargetAngle,
-                   double _basePower);
+                   const Pid::PidGain& _anglePidGain, double _relativeTargetAngle);
 
  protected:
   /**

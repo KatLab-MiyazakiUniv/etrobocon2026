@@ -7,11 +7,10 @@
 #include "Rotation.h"
 
 Rotation::Rotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                   const Pid::PidGain& _anglePidGain, double _basePower)
+                   const Pid::PidGain& _anglePidGain)
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetAngle(0.0),
-    anglePid(_anglePidGain.kp, _anglePidGain.ki, _anglePidGain.kd, 0.0),
-    basePower(_basePower)
+    anglePid(_anglePidGain.kp, _anglePidGain.ki, _anglePidGain.kd, 0.0)
 {
 }
 
@@ -29,8 +28,8 @@ void Rotation::executeStep()
   double error = AngleNormalizer::NormalizeAngle(targetAngle - currentAngle);
   double turn = anglePid.calculatePid(error);  // 旋回量を計算
   // PID制御で回頭方向を決定し、基本出力値を加減算して左右モータの出力を算出する
-  double requiredRightPower = basePower + turn;
-  double requiredLeftPower = -(basePower + turn);
+  double requiredRightPower = turn;
+  double requiredLeftPower = -(turn);
 
   // モータにPower値をセット
   robot.getWheelMotorControllerInstance().setRightPower(requiredRightPower);

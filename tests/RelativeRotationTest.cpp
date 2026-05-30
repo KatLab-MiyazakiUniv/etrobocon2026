@@ -28,7 +28,7 @@ namespace etrobocon2026_test {
     // 回頭動作を実行
     RelativeRotation relativeRotation(
         robot, std::make_unique<RelativeAngleContinuationCondition>(robot, relativeAngle), anglePid,
-        relativeAngle, 0.0);
+        relativeAngle);
     relativeRotation.run();
 
     // 回頭後の角度を計算
@@ -50,7 +50,7 @@ namespace etrobocon2026_test {
     // 回頭動作を実行
     RelativeRotation relativeRotation(
         robot, std::make_unique<RelativeAngleContinuationCondition>(robot, relativeAngle), anglePid,
-        relativeAngle, 0.0);
+        relativeAngle);
     relativeRotation.run();
 
     // 回頭後の右タイヤのpower値を取得
@@ -68,7 +68,7 @@ namespace etrobocon2026_test {
     // 回頭動作を実行
     RelativeRotation relativeRotation(
         robot, std::make_unique<RelativeAngleContinuationCondition>(robot, relativeAngle), anglePid,
-        relativeAngle, 0.0);
+        relativeAngle);
     relativeRotation.run();
 
     // 回頭後の左タイヤのpower値を取得

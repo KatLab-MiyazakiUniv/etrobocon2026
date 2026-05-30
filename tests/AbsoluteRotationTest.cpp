@@ -26,7 +26,7 @@ namespace etrobocon2026_test {
     // 回転動作を実行
     AbsoluteRotation AbsoluteRotation(
         robot, std::make_unique<AbsoluteAngleContinuationCondition>(robot, AbsoluteAngle), anglePid,
-        AbsoluteAngle, 0.0);
+        AbsoluteAngle);
     AbsoluteRotation.run();
 
     // 回転後の角度を計算
@@ -48,7 +48,7 @@ namespace etrobocon2026_test {
     // 回転動作を実行
     AbsoluteRotation AbsoluteRotation(
         robot, std::make_unique<AbsoluteAngleContinuationCondition>(robot, AbsoluteAngle), anglePid,
-        AbsoluteAngle, 0.0);
+        AbsoluteAngle);
     AbsoluteRotation.run();
 
     // 回転後の右タイヤのpower値を取得
@@ -66,7 +66,7 @@ namespace etrobocon2026_test {
     // 回転動作を実行
     AbsoluteRotation AbsoluteRotation(
         robot, std::make_unique<AbsoluteAngleContinuationCondition>(robot, AbsoluteAngle), anglePid,
-        AbsoluteAngle, 0.0);
+        AbsoluteAngle);
     AbsoluteRotation.run();
 
     // 回転後の左タイヤのpower値を取得

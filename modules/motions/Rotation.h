@@ -17,10 +17,9 @@ class Rotation : public BaseMotion {
    * @param _robot                 ロボットクラスのインスタンス
    * @param _continuationCondition 動作継続条件を判定するクラスのインスタンス
    * @param _anglePidGain          回頭制御用PIDゲイン
-   * @param _basePower             回頭動作の基本出力値（正の値で指定、回頭方向はPID制御で決定）
    */
   Rotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-           const Pid::PidGain& _anglePidGain, double _basePower);
+           const Pid::PidGain& _anglePidGain);
 
  protected:
   /**
@@ -45,8 +44,7 @@ class Rotation : public BaseMotion {
   double getCurrentAngle();
 
  private:
-  Pid anglePid;      // 回頭制御用PIDコントローラ
-  double basePower;  // 回頭動作の基本出力値（正の値で指定、回頭方向はPID制御で決定）
+  Pid anglePid;  // 回頭制御用PIDコントローラ
 };
 
 #endif

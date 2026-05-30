@@ -9,6 +9,8 @@
 
 #include <vector>
 
+#include "INetworkSystem.h"
+
 class SocketServer {
  public:
   /**
@@ -16,7 +18,7 @@ class SocketServer {
    * @details
    * ソケットサーバーの初期状態を設定する
    */
-  SocketServer();
+  explicit SocketServer(INnetworkSystem* networkSystem);
 
   /**
    * @brief サーバーを初期化する
@@ -36,8 +38,9 @@ class SocketServer {
   void shutdown();
 
  private:
-  int listenSocket;
-  bool isRunning;
+  INetworkSystem* netSys;  // 注入される具象クラスのポインタ
+  int listenSocket;        // Severのファイルディスクリプタ
+  bool isRunning;          // Serverが稼働中ならtrue
 
   /**
    * @brief クライアントとの接続を処理する

@@ -1,149 +1,156 @@
 /**
- * @file   SocketClient.cpp
- * @brief  カメラサーバーと通信するクラス
- * @author okuyama0528 sadomiya-sousi
+ * @file    SocketClient.cpp
+ * @brief   カメラサーバーと通信するクラス
+ * @author  sadomiya-sousi, okuyama0528
  */
 
 #include "SocketClient.h"
-#include <iostream>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <string.h>
 
-/**
- * コンストラクタ
- * @brief ソケット番号と接続状態を初期化
- */
-SocketClient::SocketClient() : sock(-1), isConnected(false) {}
+SocketClient::SocketClient(INetworkSystem* networkSystem)
+  : netSys(networkSystem), sock(-1), isConnected(false)
+{
+  std::string msg = "SocketClient: コンストラクタが呼び出されました (netSys: "
+                    + std::to_string(reinterpret_cast<uintptr_t>(networkSystem)) + ")";
+  Logger::info(msg.c_str());
+}
 
-/**
- * デストラクタ
- * @brief 接続中の場合はサーバーへ切断処理を行う
- */
 SocketClient::~SocketClient()
 {
+  std::string msg = "SocketClient: デストラクタが呼び出されました (isConnected: "
+                    + std::string(isConnected ? "true" : "false") + ")";
+  Logger::info(msg.c_str());
   if(isConnected) {
+    Logger::info("SocketClient: まだ接続中のため、自動切断処理へ移行します");
     disconnectFromServer();
   }
 }
 
-/**
- * サーバーへ接続する
- * @param server_ip 接続先カメラサーバーのIPアドレス
- * @return 成功:true / 失敗:false
- */
 bool SocketClient::connectToServer(const char* server_ip)
 {
-  // すでに接続済みの場合は再接続しない
+  std::string startMsg = "connectToServer: 開始 (引数 server_ip: \""
+                         + std::string(server_ip ? server_ip : "NULL") + "\")";
+  Logger::info(startMsg.c_str());
+
   if(isConnected) {
-    std::cout << "Already connected." << std::endl;
+    Logger::info("Already connected.");
+    Logger::info("connectToServer: すでに接続済みのため、何もせず終了します (return true)");
     return true;
   }
 
-  // TCPソケットを作成
-  sock = socket(AF_INET, SOCK_STREAM, 0);
+  Logger::info("connectToServer: socket(AF_INET, SOCK_STREAM, 0) を呼び出します...");
+  sock = netSys->socket(AF_INET, SOCK_STREAM, 0);
+
+  std::string sockMsg = "connectToServer: socket 作成結果 (sock = " + std::to_string(sock) + ")";
+  Logger::info(sockMsg.c_str());
+
   if(sock < 0) {
-    perror("Client: socket creation failed");
+    Logger::error("Client: socket creation failed");
+    Logger::info("connectToServer: ソケット作成に失敗しました (return false)");
     return false;
   }
 
-  // サーバーアドレス構造体の設定
   struct sockaddr_in serv_addr;
   memset(&serv_addr, 0, sizeof(serv_addr));
   serv_addr.sin_family = AF_INET;
   serv_addr.sin_port = htons(PORT);
 
-  // IPアドレスをバイナリ形式へ変換
+  std::string portMsg
+      = "connectToServer: アドレス構造体を初期化しました (PORT: " + std::to_string(PORT) + ")";
+  Logger::info(portMsg.c_str());
+
+  Logger::info("connectToServer: inet_pton を呼び出します...");
   if(inet_pton(AF_INET, server_ip, &serv_addr.sin_addr) <= 0) {
-    perror("Client: Invalid address/ Address not supported");
-    close(sock);
+    Logger::error("Client: Invalid address/ Address not supported");
+
+    std::string errIpMsg = "connectToServer: IPアドレスの変換に失敗したため、ソケット "
+                           + std::to_string(sock) + " を閉じます";
+    Logger::info(errIpMsg.c_str());
+
+    netSys->close(sock);
     sock = -1;
+    Logger::info("connectToServer: 終了 (return false)");
     return false;
   }
 
-  // サーバーへ接続要求を送る
-  if(connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
-    perror("Client: Connection Failed");
-    close(sock);
+  Logger::info("connectToServer: connect を呼び出してサーバーに接続を試みます...");
+  if(netSys->connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
+    Logger::error("Client: Connection Failed");
+
+    std::string errConnMsg
+        = "connectToServer: 接続に失敗したため、ソケット " + std::to_string(sock) + " を閉じます";
+    Logger::info(errConnMsg.c_str());
+
+    netSys->close(sock);
     sock = -1;
+    Logger::info("connectToServer: 終了 (return false)");
     return false;
   }
 
-  std::cout << "Successfully connected to camera server." << std::endl;
+  Logger::info("Successfully connected to camera server.");
+  Logger::info("connectToServer: 接続成功。ステータスを接続中に更新します");
   isConnected = true;
+  Logger::info("connectToServer: 終了 (return true)");
   return true;
 }
 
-/**
- * サーバーへ切断コマンドを送信し、接続を終了する
- */
 void SocketClient::disconnectFromServer()
 {
-  if(isConnected) {
-    // 切断コマンドを送信
-    CameraServer::Command cmd = CameraServer::Command::DISCONNECT;
-    send(sock, reinterpret_cast<const char*>(&cmd), sizeof(cmd), 0);
+  std::string startMsg = "disconnectFromServer: 開始 (現在の状態 - isConnected: "
+                         + std::string(isConnected ? "true" : "false")
+                         + ", sock: " + std::to_string(sock) + ")";
+  Logger::info(startMsg.c_str());
 
-    // ソケットをクローズして接続解除
-    close(sock);
+  if(isConnected) {
+    CameraServer::Command cmd = CameraServer::Command::DISCONNECT;
+
+    std::string cmdMsg = "disconnectFromServer: DISCONNECT コマンドを送信します (サイズ: "
+                         + std::to_string(sizeof(cmd)) + " bytes)...";
+    Logger::info(cmdMsg.c_str());
+
+    netSys->send(sock, reinterpret_cast<const char*>(&cmd), sizeof(cmd), 0);
+
+    std::string closeMsg
+        = "disconnectFromServer: ソケット " + std::to_string(sock) + " をクローズします...";
+    Logger::info(closeMsg.c_str());
+
+    netSys->close(sock);
     sock = -1;
     isConnected = false;
-    std::cout << "Disconnected from camera server." << std::endl;
+    Logger::info("Disconnected from camera server.");
+    Logger::info("disconnectFromServer: クリーンアップ完了");
+  } else {
+    Logger::info("disconnectFromServer: 未接続状態のため、切断処理をスキップします");
   }
+  Logger::info("disconnectFromServer: 終了");
 }
 
-/**
- * サーバーをシャットダウンさせるコマンドを送信する
- */
 void SocketClient::shutdownServer()
 {
-  if(isConnected) {
-    // シャットダウンコマンドを送信
-    CameraServer::Command cmd = CameraServer::Command::SHUTDOWN;
-    send(sock, reinterpret_cast<const char*>(&cmd), sizeof(cmd), 0);
+  std::string startMsg = "shutdownServer: 開始 (現在の状態 - isConnected: "
+                         + std::string(isConnected ? "true" : "false")
+                         + ", sock: " + std::to_string(sock) + ")";
+  Logger::info(startMsg.c_str());
 
-    // 接続を終了
-    close(sock);
+  if(isConnected) {
+    CameraServer::Command cmd = CameraServer::Command::SHUTDOWN;
+
+    std::string cmdMsg = "shutdownServer: SHUTDOWN コマンドを送信します (サイズ: "
+                         + std::to_string(sizeof(cmd)) + " bytes)...";
+    Logger::info(cmdMsg.c_str());
+
+    netSys->send(sock, reinterpret_cast<const char*>(&cmd), sizeof(cmd), 0);
+
+    std::string closeMsg
+        = "shutdownServer: ソケット " + std::to_string(sock) + " をクローズします...";
+    Logger::info(closeMsg.c_str());
+
+    netSys->close(sock);
     sock = -1;
     isConnected = false;
-    std::cout << "Shutdown camera server." << std::endl;
+    Logger::info("Shutdown camera server.");
+    Logger::info("shutdownServer: クリーンアップ完了");
+  } else {
+    Logger::info("shutdownServer: 未接続状態のため、シャットダウンコマンドの送信をスキップします");
   }
-}
-
-/**
- * 汎用リクエスト送受信処理
- * @tparam Req 送信するリクエストデータ型
- * @tparam Res 受信するレスポンスデータ型
- * @param request サーバーへ送るデータ
- * @param response サーバーから受け取るデータ
- * @return 成功:true / 失敗:false
- * @brief requestを送信 → responseを受信するRPC風通信処理
- */
-template <typename Req, typename Res>
-bool SocketClient::executeAction(const Req& request, Res& response)
-{
-  // 未接続なら通信不可
-  if(!isConnected) {
-    std::cerr << "Not connected to server." << std::endl;
-    return false;
-  }
-
-  // リクエストを送信する
-  if(send(sock, reinterpret_cast<const char*>(&request), sizeof(request), 0) < 0) {
-    perror("Client: send failed");
-    return false;
-  }
-
-  // 結果を受信する
-  ssize_t bytesRead = recv(sock, reinterpret_cast<char*>(&response), sizeof(response), 0);
-  if(bytesRead < 0) {
-    perror("Client: recv failed");
-    return false;
-  } else if(bytesRead != sizeof(response)) {
-    std::cerr << "Client: received incomplete response." << std::endl;
-    return false;
-  }
-
-  return true;
+  Logger::info("shutdownServer: 終了");
 }

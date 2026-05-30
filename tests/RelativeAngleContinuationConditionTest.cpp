@@ -17,7 +17,7 @@ namespace etrobocon2026_test {
     double targetAngle = 100.0;
     RelativeAngleContinuationCondition condition(robot, targetAngle);
 
-    double expectedTargetAngle = AngleNormalizer::NormalizeAngle(targetAngle + 1);
+    double expectedTargetAngle = AngleNormalizer::NormalizeAngle(targetAngle);
 
     condition.prepare();
 

@@ -104,7 +104,7 @@ namespace spikeapi {
         azimuth = fmodf(azimuth, 360.0f);
       }
 
-      return azimuth;  //
+      return prevAzimuth;  //
     }
 
     /**

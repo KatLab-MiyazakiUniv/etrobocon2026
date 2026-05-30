@@ -1,8 +1,8 @@
-[745 ms][INFO] info
-[746 ms][WARNING] warning
-[747 ms][ERROR] error
-[748 ms][DEBUG] debug
-[749 ms][INFO] formatted info
-[750 ms][WARNING] formatted warning
-[751 ms][ERROR] formatted error
-[752 ms][DEBUG] formatted debug
+[775 ms][INFO] info
+[776 ms][WARNING] warning
+[777 ms][ERROR] error
+[778 ms][DEBUG] debug
+[779 ms][INFO] formatted info
+[780 ms][WARNING] formatted warning
+[781 ms][ERROR] formatted error
+[782 ms][DEBUG] formatted debug

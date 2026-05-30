@@ -1,2 +1,2 @@
-[755 ms][INFO] virtual void etrobocon2026_test::LoggerTest_MacrosWriteExpectedLogs_Test::TestBody() created
-[756 ms][INFO] virtual void etrobocon2026_test::LoggerTest_MacrosWriteExpectedLogs_Test::TestBody() destroyed
+[784 ms][INFO] virtual void etrobocon2026_test::LoggerTest_MacrosWriteExpectedLogs_Test::TestBody() created
+[785 ms][INFO] virtual void etrobocon2026_test::LoggerTest_MacrosWriteExpectedLogs_Test::TestBody() destroyed

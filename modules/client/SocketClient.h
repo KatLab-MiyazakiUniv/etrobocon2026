@@ -1,13 +1,21 @@
 /**
  * @file   SocketClient.h
  * @brief  カメラサーバーと通信するクラス
- * @author okuyama0528 sadomiya-sousi
+ * @author okuyama0528, sadomiya-sousi
  */
 
 #ifndef SOCKET_CLIENT_H
 #define SOCKET_CLIENT_H
 
+#include "INetworkSystem.h"
 #include "SocketProtocol.h"
+#include "Logger.h"
+#include <iostream>
+// #include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <string.h>
+
 #define PORT 27015             // サーバーのポート番号
 #define SERVER_IP "127.0.0.1"  // サーバーのIPアドレス
 
@@ -15,13 +23,11 @@ class SocketClient {
  public:
   /**
    * @brief コンストラクタ
-   *
    */
-  SocketClient();
+  explicit SocketClient(INetworkSystem* networkSystem);
 
   /**
    * @brief デストラクタ
-   *
    */
   virtual ~SocketClient();
 
@@ -33,19 +39,18 @@ class SocketClient {
    */
   virtual bool connectToServer(const char* server_ip = SERVER_IP);
 
-/**
+  /**
    * @brief サーバーから切断する
-   *
    */
   virtual void disconnectFromServer();
 
   /**
    * @brief サーバーをシャットダウンする
-   *
    */
   virtual void shutdownServer();
 
  protected:
+  INetworkSystem* netSys;
   int sock;          // ソケットファイルディスクリプタ
   bool isConnected;  // サーバーへの接続状態
 

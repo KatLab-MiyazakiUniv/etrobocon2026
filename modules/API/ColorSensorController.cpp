@@ -62,12 +62,12 @@ ColorSensorController::COLOR ColorSensorController::convertHsvToColor(HSV& hsv)
 
 int ColorSensorController::getReflectance()
 {
-  return (colorSensor.getReflection());
+  return colorSensor.getReflection();
 }
 
 int ColorSensorController::getAmbient()
 {
-  return (colorSensor.getAmbient());
+  return colorSensor.getAmbient();
 }
 
 void ColorSensorController::getRawRGB(RGB& rgb)

@@ -27,7 +27,7 @@ void Rotation::executeStep()
   // 目標角度との差を計算し、-180～180度に正規化
   double error = AngleNormalizer::NormalizeAngle(targetAngle - currentAngle);
   double turn = anglePid.calculatePid(error);  // 旋回量を計算
-  // PID制御で回頭方向を決定し、基本出力値を加減算して左右モータの出力を算出する
+  // PID制御で回頭方向を決定し、左右モータの出力を算出する
   double requiredRightPower = turn;
   double requiredLeftPower = -(turn);
 

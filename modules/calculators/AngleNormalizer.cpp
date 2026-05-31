@@ -5,7 +5,7 @@
 
 #include "AngleNormalizer.h"
 
-double AngleNormalizer::NormalizeAngle(double angle)
+double AngleNormalizer::normalizeAngle(double angle)
 {
   // 角度の誤差を-180度から180度の範囲に正規化
   while(angle > 180.0) {

@@ -14,6 +14,7 @@
 #include <thread>
 #include <chrono>
 #include "SystemInfo.h"
+#include "Logger.h"
 
 class CameraCapture {
  public:

@@ -1,7 +1,8 @@
 #include <iostream>
+#include "Logger.h"
 
 int main()
 {
-  std::cout << "Hello KATLABBBBBB" << std::endl;
+  Logger::info("Hello KATLABBBBBB");
   return 0;
 }

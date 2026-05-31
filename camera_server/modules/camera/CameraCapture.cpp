@@ -13,6 +13,7 @@ CameraCapture::CameraCapture()
   : cap(),       // カメラデバイス（未接続で初期化）
     cameraID(0)  // カメラIDを0で初期化
 {
+  LOG_CREATE("CameraCapture");
 }
 
 CameraCapture::~CameraCapture()
@@ -20,6 +21,7 @@ CameraCapture::~CameraCapture()
   if(cap.isOpened()) {
     cap.release();
   }
+  LOG_DESTROY("CameraCapture");
 }
 
 int CameraCapture::findAvailableCameraID(int maxTested)
@@ -29,12 +31,12 @@ int CameraCapture::findAvailableCameraID(int maxTested)
     if(cap.isOpened()) {
       cap.release();
       // 利用可能なIDを返す
-      cerr << "カメラID:" << i << " が見つかりました" << endl;
+      Logger::printfLog(Logger::INFO, "カメラID: %d が見つかりました", i);
       return i;
     }
   }
   // どのIDも利用できなかった場合は-1を返す
-  cerr << "使用できるカメラIDが見つかりません" << endl;
+  Logger::error("使用できるカメラIDが見つかりません");
   return -1;
 }
 
@@ -46,7 +48,7 @@ int CameraCapture::getCameraID()
 bool CameraCapture::setCameraID(int id)
 {
   if(id < 0) {
-    cerr << "無効なカメラIDです" << endl;
+    Logger::error("無効なカメラIDです");
     return false;
   }
   cameraID = id;
@@ -58,30 +60,30 @@ bool CameraCapture::openCamera()
   // V4L2を指定してカメラを開く
   cap.open(cameraID, cv::CAP_V4L2);
   if(!cap.isOpened()) {
-    cerr << "カメラを開くことができませんでした。" << endl;
+    Logger::error("カメラを開くことができませんでした。");
     return false;
   }
 
   // MJPEG形式に設定
   if(!cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'))) {
-    cerr << "MJPEG形式の設定に失敗しました。" << endl;
+    Logger::error("MJPEG形式の設定に失敗しました。");
     return false;
   }
 
   // FPSを30に設定
   if(!cap.set(cv::CAP_PROP_FPS, 30)) {
-    cerr << "FPS設定に失敗しました。" << endl;
+    Logger::error("FPS設定に失敗しました。");
     return false;
   }
 
   // 解像度設定
   if(!cap.set(cv::CAP_PROP_FRAME_WIDTH, CAM_MAX_WIDTH)) {
-    cerr << "幅設定に失敗しました。" << endl;
+    Logger::error("幅設定に失敗しました。");
     return false;
   }
 
   if(!cap.set(cv::CAP_PROP_FRAME_HEIGHT, CAM_MAX_HEIGHT)) {
-    cerr << "高さ設定に失敗しました。" << endl;
+    Logger::error("高さ設定に失敗しました。");
     return false;
   }
 
@@ -89,7 +91,7 @@ bool CameraCapture::openCamera()
   double width = cap.get(cv::CAP_PROP_FRAME_WIDTH);
   double height = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
   double fps = cap.get(cv::CAP_PROP_FPS);
-  cerr << "設定後の解像度: " << width << "x" << height << ", FPS: " << fps << endl;
+  Logger::printfLog(Logger::INFO, "設定後の解像度: %fx%f, FPS: %f", width, height, fps);
 
   return true;
 }
@@ -103,7 +105,7 @@ void CameraCapture::setCapProps(double width, double height)
 bool CameraCapture::getFrame(cv::Mat& outFrame)
 {
   if(!cap.isOpened()) {
-    cerr << "カメラを開いていません" << endl;
+    Logger::error("カメラを開いていません");
     return false;
   }
 
@@ -114,18 +116,18 @@ bool CameraCapture::getFrame(cv::Mat& outFrame)
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
   }
-  cerr << "フレームの取得に失敗しました。" << endl;
+  Logger::error("フレームの取得に失敗しました。");
   return false;
 }
 
 bool CameraCapture::getFrames(vector<cv::Mat>& frames, int numFrames, int millisecondInterval)
 {
   if(numFrames <= 0) {
-    cerr << "フレーム数が無効です: " << numFrames << endl;
+    Logger::printfLog(Logger::ERROR, "フレーム数が無効です: %d", numFrames);
     return false;
   }
   if(millisecondInterval <= 0) {
-    cerr << "インターバルが無効です: " << millisecondInterval << "ms" << endl;
+    Logger::printfLog(Logger::ERROR, "インターバルが無効です: %d ms", millisecondInterval);
     return false;
   }
 
@@ -133,7 +135,7 @@ bool CameraCapture::getFrames(vector<cv::Mat>& frames, int numFrames, int millis
   bool allSuccess = true;
   for(int i = 0; i < numFrames; ++i) {
     if(!getFrame(frames[i])) {
-      cerr << "フレーム " << i << " の取得に失敗しました。" << endl;
+      Logger::printfLog(Logger::ERROR, "フレーム %d の取得に失敗しました。", i);
       allSuccess = false;
     }
     if(i < numFrames - 1) {

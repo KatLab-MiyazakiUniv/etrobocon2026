@@ -6,6 +6,7 @@
 
 #ifndef PID_H
 #define PID_H
+#include "Logger.h"
 
 class Pid {
  public:

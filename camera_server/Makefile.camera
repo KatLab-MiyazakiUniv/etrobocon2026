@@ -13,6 +13,7 @@ TARGET := camera_app
 # コンパイラとリンカのフラグ
 CXXFLAGS := -std=c++17 -Wall -Wextra -O2 -pthread
 
+
 # OpenCVのフラグを取得
 OPENCV_CFLAGS := $(shell pkg-config --cflags opencv4)
 OPENCV_LIBS := $(shell pkg-config --libs opencv4)
@@ -22,12 +23,18 @@ CXXFLAGS += $(OPENCV_CFLAGS)
 LIBS := $(OPENCV_LIBS)
 
 # インクルードパス
-INCLUDES := $(shell find $(INCLUDEDIR) -type d -printf '-I%p '-I../common)
+INCLUDES := $(shell find $(INCLUDEDIR) -type d -printf '-I%p ') \
+            -I../common \
+			-I../common/customs \
+			-I../modules/API \
+
 
 # --- ビルドルール ---
 
 # すべての .cpp ファイルを探す
 SOURCES := main.cpp $(shell find $(SRCDIR) -name '*.cpp')
+SOURCES += ../common/Logger.cpp
+SOURCES += ../modules/API/ClockUtil.cpp
 OBJS := $(addprefix $(OBJDIR)/,$(SOURCES:.cpp=.o))
 
 # デフォルトターゲット

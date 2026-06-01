@@ -1,18 +1,16 @@
 /**
  * @file SocketServer.h
- * @brief 接続を待ち、クライアントからのリクエストを処理するクラス
+ * @brief ソケット通信のServerクラス
  * @author okuyama0528, sadomiya-sousi
  */
 
 #ifndef SOCKET_SERVER_H
 #define SOCKET_SERVER_H
 
+#include <string>
 #include "SocketProtocol.h"
 #include "INetworkSystem.h"
-
-// 撮影システム側でbuildに通せない..のでコメントアウト
-// #include "Logger.h"
-#include <string>
+#include "Logger.h"
 
 class SocketServer {
  public:

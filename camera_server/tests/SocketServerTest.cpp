@@ -6,11 +6,9 @@
 
 #include <iostream>
 #include <unistd.h>
-
 #include "SocketServer.h"
 #include "MockNetworkSystem.h"
 #include <gtest/gtest.h>
-#include <iostream>
 
 TEST(SocketServerTest, InitSuccessTest)
 {

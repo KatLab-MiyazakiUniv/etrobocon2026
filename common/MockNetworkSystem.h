@@ -1,12 +1,12 @@
 /**
  * @file   MockNetworkSystem.h
- * @brief  ネットワーク関数のモックを注入するためのクラス
+ * @brief  ネットワーク関数のモックを注入するクラス
  * @author sadomiya-sousi
  */
 #pragma once
-#include "INetworkSystem.h"
 #include <cstring>
 #include <vector>
+#include "INetworkSystem.h"
 
 class MockNetworkSystem : public INetworkSystem {
  public:

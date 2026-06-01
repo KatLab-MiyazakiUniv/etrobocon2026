@@ -14,8 +14,8 @@ namespace CameraServer {
    * @brief サーバー側で実行可能なコマンド
    */
   enum class Command : uint8_t {
-    DISCONNECT = 254,  // クライアントからの切断要求
-    SHUTDOWN = 255     // サーバーシャットダウン
+    DISCONNECT = 254,  // サーバから切断
+    SHUTDOWN = 255     // サーバーをシャットダウン
   };
 }  // namespace CameraServer
 

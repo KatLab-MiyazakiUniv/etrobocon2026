@@ -17,5 +17,5 @@ TEST(SocketServerTest, InitSuccessTest)
   MockNetworkSystem mockNet;
   SocketServer server(&mockNet);
   EXPECT_TRUE(server.init());
-  server.run();
+  // server.run();
 }

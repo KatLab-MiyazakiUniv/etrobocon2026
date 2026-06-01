@@ -93,6 +93,8 @@ if(ENABLE_CAMERA_TESTS)
     ${CAMERA_MODULE_DIR}/server
     ${CAMERA_MODULE_DIR}/image_processors
     ${PROJECT_SOURCE_DIR}/common
+    ${PROJECT_SOURCE_DIR}/common/customs/
+    ${PROJECT_SOURCE_DIR}/modules/API
   )
 
   # ソースファイルの登録 (適宜登録)

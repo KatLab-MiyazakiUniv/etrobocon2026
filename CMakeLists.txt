@@ -46,6 +46,7 @@ set(RUNNING_INCLUDE_DIRS
   ${RUNNING_MODULE_DIR}/motions
   ${RUNNING_MODULE_DIR}/motions/continuation_conditions
   ${PROJECT_SOURCE_DIR}/common
+  ${PROJECT_SOURCE_DIR}/common/customs
   ${RUNNING_TEST_DIR}
   ${RUNNING_TEST_DIR}/dummy
   ${RUNNING_TEST_DIR}/datafiles/logfiles
@@ -93,8 +94,11 @@ if(ENABLE_CAMERA_TESTS)
     ${CAMERA_MODULE_DIR}/server
     ${CAMERA_MODULE_DIR}/image_processors
     ${PROJECT_SOURCE_DIR}/common
-    ${PROJECT_SOURCE_DIR}/common/customs/
-    ${PROJECT_SOURCE_DIR}/modules/API
+    # ${PROJECT_SOURCE_DIR}/modules/API
+    ${PROJECT_SOURCE_DIR}/common/customs
+    ${RUNNING_MODULE_DIR}/API
+    ${RUNNING_TEST_DIR}/dummy
+
   )
 
   # ソースファイルの登録 (適宜登録)
@@ -103,6 +107,8 @@ if(ENABLE_CAMERA_TESTS)
     "${CAMERA_MODULE_DIR}/utils/*.cpp"
     "${CAMERA_MODULE_DIR}/server/*.cpp"
     "${CAMERA_MODULE_DIR}/image_processors/*.cpp"
+    "${PROJECT_SOURCE_DIR}/common/*.cpp"
+    "${RUNNING_MODULE_DIR}/API/*.cpp"
   )
 
   # ライブラリターゲットを作成

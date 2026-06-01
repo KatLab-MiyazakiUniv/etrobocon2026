@@ -9,6 +9,12 @@
 DistanceCondition::DistanceCondition(Robot& _robot, double _targetDistance)
   : BaseContinuationCondition(_robot), targetDistance(_targetDistance), initDistance(0.0)
 {
+  LOG_CREATE("DistanceCondition");
+}
+
+DistanceCondition::~DistanceCondition()
+{
+  LOG_DESTROY("DistanceCondition");
 }
 
 void DistanceCondition::prepare()

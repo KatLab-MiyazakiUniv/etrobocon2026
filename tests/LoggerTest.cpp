@@ -129,8 +129,8 @@ namespace etrobocon2026_test {
     Logger::setFileName(fileName, logPath);
 
     // マクロを呼び出す
-    LOG_CREATE();
-    LOG_DESTROY();
+    LOG_CREATE("Test");
+    LOG_DESTROY("Test");
 
     Logger::outputToFile();
     const std::string contents = ReadFileContents(logPath + fileName);

@@ -4,10 +4,10 @@
  * @author sadomiya-sousi
  */
 
-#include "SocketServer.h"
 #include <string>
 #include <iostream>
 #include <cstring>
+#include "SocketServer.h"
 
 #define PORT 27015
 #define DEFAULT_BUFLEN 512
@@ -58,8 +58,6 @@ bool SocketServer::init()
     }
     return false;
   }
-  // serverが起動して始めてisRunningをtrueにする
-  isRunning = true;
 
   std::cout << "[INFO] Socket server initialized and listening on port " << PORT << std::endl;
   return true;
@@ -97,6 +95,7 @@ void SocketServer::handle_connection(int clientSocket)
 {
   char recvbuf[DEFAULT_BUFLEN];
   ssize_t iResult;
+  isRunning = true;
 
   // クライアントからのデータ受信ループ
   do {

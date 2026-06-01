@@ -1,6 +1,6 @@
 /**
  * @file   RealNetworkSystem.h
- * @brief  ネットワーク関数の実際の関数を注入するためのクラス
+ * @brief  実際のネットワーク関数を注入するクラス
  * @author sadomiya-sousi
  */
 
@@ -13,7 +13,7 @@ namespace etrobocon2026 {
    public:
     int socket(int domain, int type, int protocol) override
     {
-      return ::socket(domain, type, protocol);  //  :: でグローバルの本物を呼ぶ
+      return ::socket(domain, type, protocol);  //  :: でグローバル空間の関数を指定
     }
     int close(int fd) override { return ::close(fd); }
     int connect(int sockfd, const struct sockaddr* addr, socklen_t addrlen) override

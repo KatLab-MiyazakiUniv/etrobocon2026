@@ -1,6 +1,6 @@
 /**
  * @file   INetworkSystem.h
- * @brief  ネットワーク関数に対して依存性の注入を行うため基底クラス
+ * @brief  ネットワーク関数に対して依存性の注入を受ける基底クラス
  * @author sadomiya-sousi
  */
 
@@ -9,14 +9,10 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 
-// namespace etrobocon2026 {
-
 class INetworkSystem {
- public:
  public:
   // 依存性の注入後にメモリリークを防ぐためにデストラクタを記述
   virtual ~INetworkSystem() = default;
-
   virtual int socket(int domain, int type, int protocol) = 0;
   virtual int close(int fd) = 0;
   virtual int connect(int sockfd, const struct sockaddr* addr, socklen_t addrlen) = 0;
@@ -28,5 +24,3 @@ class INetworkSystem {
   virtual int accept(int sockfd, struct sockaddr* addr, socklen_t* addrlen) = 0;
   virtual ssize_t recv(int sockfd, void* buf, size_t len, int flags) = 0;
 };
-
-// }  // namespace etrobocon2026

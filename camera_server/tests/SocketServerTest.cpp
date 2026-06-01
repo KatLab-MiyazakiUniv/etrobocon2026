@@ -7,7 +7,6 @@
 #include <iostream>
 #include <unistd.h>
 
-#include "EtRobocon2026.h"
 #include "SocketServer.h"
 #include "MockNetworkSystem.h"
 #include <gtest/gtest.h>
@@ -18,4 +17,5 @@ TEST(SocketServerTest, InitSuccessTest)
   MockNetworkSystem mockNet;
   SocketServer server(&mockNet);
   EXPECT_TRUE(server.init());
+  server.run();
 }

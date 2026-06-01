@@ -5,8 +5,9 @@
  */
 
 #include "SocketServer.h"
-#include "Logger.h"
 #include <string>
+#include <iostream>
+#include <cstring>
 
 #define PORT 27015
 #define DEFAULT_BUFLEN 512
@@ -20,14 +21,17 @@ bool SocketServer::init()
 {
   listenSocket = netSys->socket(AF_INET, SOCK_STREAM, 0);
   if(listenSocket < 0) {
-    Logger::error("socket failed");
+    std::cerr << "[ERROR] socket failed" << std::endl;
     return false;
   }
 
   int opt = 1;
   if(netSys->setsockopt(listenSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
-    Logger::error("setsockopt failed");
-    netSys->close(listenSocket);
+    std::cerr << "[ERROR] setsockopt failed" << std::endl;
+    // close()が成功したか
+    if(netSys->close(listenSocket) < 0) {
+      std::cerr << "[ERROR] close failed" << std::endl;
+    }
     return false;
   }
 
@@ -38,37 +42,44 @@ bool SocketServer::init()
   serv_addr.sin_port = htons(PORT);               // ポート設定
 
   if(netSys->bind(listenSocket, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
-    Logger::error("bind failed");
-    netSys->close(listenSocket);
+    std::cerr << "[ERROR] bind failed" << std::endl;
+    // close()が成功するか
+    if(netSys->close(listenSocket) < 0) {
+      std::cerr << "[ERROR] close failed" << std::endl;
+    }
     return false;
   }
 
   if(netSys->listen(listenSocket, 3) < 0) {
-    Logger::error("listen failed");
-    netSys->close(listenSocket);
+    std::cerr << "[ERROR] listen failed" << std::endl;
+    // close()が成功するか
+    if(netSys->close(listenSocket) < 0) {
+      std::cerr << "[ERROR] close failed" << std::endl;
+    }
     return false;
   }
+  // serverが起動して始めてisRunningをtrueにする
+  isRunning = true;
 
-  Logger::info("Socket server initialized and listening on port " + std::to_string(PORT));
+  std::cout << "[INFO] Socket server initialized and listening on port " << PORT << std::endl;
   return true;
 }
 
 void SocketServer::run()
 {
-  isRunning = true;
   while(isRunning) {
     int clientSocket = netSys->accept(listenSocket, (struct sockaddr*)NULL, NULL);
     if(clientSocket < 0) {
       if(!isRunning) break;
-      Logger::error("accept failed");
+      std::cerr << "[ERROR] accept failed" << std::endl;
       continue;
     }
-    Logger::info("Client connected.");
+    std::cout << "[INFO] Client connected." << std::endl;
 
     handle_connection(clientSocket);
 
     netSys->close(clientSocket);
-    Logger::info("Client disconnected.");
+    std::cout << "[INFO] Client disconnected." << std::endl;
   }
 }
 
@@ -79,7 +90,7 @@ void SocketServer::shutdown()
     netSys->close(listenSocket);
     listenSocket = -1;
   }
-  Logger::info("Socket server shutting down.");
+  std::cout << "[INFO] Socket server shutting down." << std::endl;
 }
 
 void SocketServer::handle_connection(int clientSocket)
@@ -98,30 +109,32 @@ void SocketServer::handle_connection(int clientSocket)
 
         switch(cmd) {
           case CameraServer::Command::SHUTDOWN:
-            Logger::info("Received SHUTDOWN command.");
+            std::cout << "[INFO] Received SHUTDOWN command." << std::endl;
 
             // サーバー全体停止
             shutdown();
             break;
 
           case CameraServer::Command::DISCONNECT:
-            Logger::info("Received DISCONNECT command.");
+            std::cout << "[INFO] Received DISCONNECT command." << std::endl;
             // クライアントからの切断要求なのでreturn
             return;
 
           default:
-            Logger::info("Received command (ignored).");
+            std::cout << "[INFO] Received command (ignored)." << std::endl;
             break;
         }
       } else {
-        Logger::error("Received unexpected data size: " + std::to_string(iResult));
+        std::cerr << "[ERROR] Received unexpected data size: " << iResult << std::endl;
       }
     } else if(iResult == 0) {
       // クライアントが正常に接続終了
-      Logger::info("Connection closing...");
+      std::cout << "[INFO] Connection closing..." << std::endl;
     } else {
       // recvエラー
-      if(isRunning) Logger::error("recv failed");
+      if(isRunning) {
+        std::cerr << "[ERROR] recv failed" << std::endl;
+      }
     }
   } while(iResult > 0);
 }

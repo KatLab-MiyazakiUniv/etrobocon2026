@@ -7,9 +7,11 @@
 #ifndef SOCKET_SERVER_H
 #define SOCKET_SERVER_H
 
+#include "SocketProtocol.h"
 #include "INetworkSystem.h"
 
-#include "Logger.h"
+// 撮影システム側でbuildに通せない..のでコメントアウト
+// #include "Logger.h"
 #include <string>
 
 class SocketServer {
@@ -19,7 +21,7 @@ class SocketServer {
    * @details
    * ソケットサーバーの初期状態を設定する
    */
-  explicit SocketServer(INnetworkSystem* networkSystem);
+  explicit SocketServer(INetworkSystem* networkSystem);
 
   /**
    * @brief サーバーを初期化する

@@ -26,7 +26,7 @@ class MockNetworkSystem : public INetworkSystem {
   int close(int fd) override { return 0; }
   /**
    * @brief connect()のモック
-   * @param sockfd 閉じる対象のファイルディスクリプタ
+   * @param sockfd 通信を閉じるファイルディスクリプタ
    * @param addr インターネットドメインソケットアドレス
    * @param addrlen 構造体のバイト長
    * @return 0:成功, 1:失敗

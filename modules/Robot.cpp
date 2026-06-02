@@ -7,7 +7,11 @@
 #include "Robot.h"
 
 Robot::Robot()
-  : wheelMotorController(), armMotorController(), imuController(), colorSensorController()
+  : wheelMotorController(),
+    armMotorController(),
+    imuController(),
+    colorSensorController(),
+    socketClient()
 {
 }
 
@@ -33,6 +37,11 @@ ColorSensorController& Robot::getColorSensorControllerInstance()
 Course& Robot::getCourse()
 {
   return course;
+}
+
+SocketClient& Robot::getSocketClientInstance()
+{
+  return socketClient;
 }
 
 void Robot::setCourse(Course course)

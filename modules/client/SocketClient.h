@@ -1,30 +1,28 @@
 /**
  * @file   SocketClient.h
  * @brief  カメラサーバーと通信するクラス
- * @author okuyama0528, sadomiya-sousi
+ * @author sadomiya-sousi, okuyama0528
  */
 
 #ifndef SOCKET_CLIENT_H
 #define SOCKET_CLIENT_H
 
-#include "INetworkSystem.h"
+#include "RealNetworkSystem.h"
+#include "MockNetworkSystem.h"
 #include "SocketProtocol.h"
 #include "Logger.h"
 #include <iostream>
-// #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <string.h>
-
-#define PORT 27015             // サーバーのポート番号
-#define SERVER_IP "127.0.0.1"  // サーバーのIPアドレス
 
 class SocketClient {
  public:
   /**
    * @brief コンストラクタ
    */
-  explicit SocketClient(INetworkSystem* networkSystem);
+  explicit SocketClient(INetworkSystem* networkSystem = &real, int port = 27015,
+                        const char* server_ip = "127.0.0.1");
 
   /**
    * @brief デストラクタ
@@ -37,7 +35,7 @@ class SocketClient {
    * @return true 接続に成功した場合
    * @return false 接続に失敗した場合
    */
-  virtual bool connectToServer(const char* server_ip = SERVER_IP);
+  virtual bool connectToServer();
 
   /**
    * @brief サーバーから切断する
@@ -51,8 +49,10 @@ class SocketClient {
 
  protected:
   INetworkSystem* netSys;
-  int sock;          // ソケットファイルディスクリプタ
-  bool isConnected;  // サーバーへの接続状態
+  int sock;              // ソケットファイルディスクリプタ
+  bool isConnected;      // サーバーへの接続状態
+  int port;              // サーバーのポート番号
+  std::string serverIp;  // サーバーのIPアドレス
 
  private:
   /**

@@ -12,12 +12,14 @@
 #include "IMUController.h"
 #include "ColorSensorController.h"
 #include "Course.h"
+#include "SocketClient.h"
 
 class Robot {
  public:
   /**
    * コンストラクタ
    * @brief 外部リソースのインスタンスを初期化する
+   * @
    */
   Robot();
 
@@ -49,11 +51,18 @@ class Robot {
    * @param course コース
    */
   void setCourse(Course course);
+
   /**
    * @brief ColorSensorControllerのインスタンスの参照を返す
    * @return メンバ変数 colorSensorController(ColorSensorController のインスタンス) の参照
    */
   ColorSensorController& getColorSensorControllerInstance();
+
+  /**
+   * @brief SocketClientのDIされたインスタンスの参照を返す
+   * @return メンバ変数 socketClient(デフォルト引数でDIしたSocketClientのインスタンス) の参照
+   */
+  SocketClient& getSocketClientInstance();
 
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
@@ -61,6 +70,7 @@ class Robot {
   IMUController imuController;                  // IMUController インスタンス
   Course course;                                // コース(Left or Right)
   ColorSensorController colorSensorController;  // ColorSensorController インスタンス
+  SocketClient socketClient;                    // SocketClient DIインスタンス
 };
 
 #endif

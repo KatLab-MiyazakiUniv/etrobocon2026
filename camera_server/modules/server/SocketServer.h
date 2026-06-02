@@ -9,8 +9,11 @@
 
 #include <string>
 #include "SocketProtocol.h"
-#include "INetworkSystem.h"
+#include "RealNetworkSystem.h"
+#include "MockNetworkSystem.h"
 #include "Logger.h"
+#include <iostream>
+#include <cstring>
 
 class SocketServer {
  public:
@@ -19,7 +22,7 @@ class SocketServer {
    * @details
    * ソケットサーバーの初期状態を設定する
    */
-  explicit SocketServer(INetworkSystem* networkSystem);
+  explicit SocketServer(INetworkSystem* networkSystem = &real, int port = 27015);
 
   /**
    * @brief サーバーを初期化する
@@ -38,16 +41,18 @@ class SocketServer {
    */
   void shutdown();
 
- private:
+ public:
   INetworkSystem* netSys;  // 注入される具象クラスのポインタ
   int listenSocket;        // Severのファイルディスクリプタ
   bool isRunning;          // Serverが稼働中ならtrue
+  int port;                // サーバのポート番号
+  static constexpr int DEFAULT_BUFLEN = 512;
 
   /**
    * @brief クライアントとの接続を処理する
    * @param clientSocket クライアントソケット
    */
-  void handle_connection(int clientSocket);
+  void handleConnection(int clientSocket);
 };
 
 #endif  // SOCKET_SERVER_H

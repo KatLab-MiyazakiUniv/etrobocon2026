@@ -6,151 +6,108 @@
 
 #include "SocketClient.h"
 
-SocketClient::SocketClient(INetworkSystem* networkSystem)
-  : netSys(networkSystem), sock(-1), isConnected(false)
+SocketClient::SocketClient(INetworkSystem* networkSystem, int port, const char* server_ip)
+  : netSys(networkSystem), sock(-1), isConnected(false), port(port), serverIp(server_ip)
 {
-  std::string msg = "SocketClient: コンストラクタが呼び出されました (netSys: "
-                    + std::to_string(reinterpret_cast<uintptr_t>(networkSystem)) + ")";
-  Logger::info(msg.c_str());
+  LOG_CREATE("SocketClient");
+  Logger::printfLog(Logger::INFO, "(netSys: %p, port: %d, server_ip: %s)", networkSystem, port,
+                    server_ip);
 }
 
 SocketClient::~SocketClient()
 {
-  std::string msg = "SocketClient: デストラクタが呼び出されました (isConnected: "
-                    + std::string(isConnected ? "true" : "false") + ")";
-  Logger::info(msg.c_str());
+  LOG_DESTROY("SocketClient");
   if(isConnected) {
-    Logger::info("SocketClient: まだ接続中のため、自動切断処理へ移行します");
+    Logger::info("SocketClient:サーバーから切断");
     disconnectFromServer();
   }
 }
 
-bool SocketClient::connectToServer(const char* server_ip)
+bool SocketClient::connectToServer()
 {
-  std::string startMsg = "connectToServer: 開始 (引数 server_ip: \""
-                         + std::string(server_ip ? server_ip : "NULL") + "\")";
-  Logger::info(startMsg.c_str());
+  Logger::printfLog(Logger::INFO, "connectToServer: 開始 (IP: %s, Port: %d)", serverIp, port);
 
   if(isConnected) {
-    Logger::info("Already connected.");
-    Logger::info("connectToServer: すでに接続済みのため、何もせず終了します (return true)");
+    Logger::info("接続済み");
     return true;
   }
 
-  Logger::info("connectToServer: socket(AF_INET, SOCK_STREAM, 0) を呼び出します...");
+  Logger::info("connectToServer: socket()実行前");
   sock = netSys->socket(AF_INET, SOCK_STREAM, 0);
 
-  std::string sockMsg = "connectToServer: socket 作成結果 (sock = " + std::to_string(sock) + ")";
-  Logger::info(sockMsg.c_str());
-
+  Logger::printfLog(Logger::INFO, "connectToServer: socket()の実行後 %d", sock);
   if(sock < 0) {
-    Logger::error("Client: socket creation failed");
-    Logger::info("connectToServer: ソケット作成に失敗しました (return false)");
+    Logger::info("connectToServer: socket()失敗");
     return false;
   }
 
+  Logger::info("connectToServer: アドレス構造体初期化前");
   struct sockaddr_in serv_addr;
   memset(&serv_addr, 0, sizeof(serv_addr));
   serv_addr.sin_family = AF_INET;
-  serv_addr.sin_port = htons(PORT);
+  serv_addr.sin_port = htons(this->port);
+  Logger::printfLog(Logger::INFO, "connectToServer: アドレス構造体初期化後 (PORT: %d)", this->port);
 
-  std::string portMsg
-      = "connectToServer: アドレス構造体を初期化しました (PORT: " + std::to_string(PORT) + ")";
-  Logger::info(portMsg.c_str());
-
-  Logger::info("connectToServer: inet_pton を呼び出します...");
-  if(inet_pton(AF_INET, server_ip, &serv_addr.sin_addr) <= 0) {
-    Logger::error("Client: Invalid address/ Address not supported");
-
-    std::string errIpMsg = "connectToServer: IPアドレスの変換に失敗したため、ソケット "
-                           + std::to_string(sock) + " を閉じます";
-    Logger::info(errIpMsg.c_str());
-
+  Logger::info("connectToServer: inet_pton()実行前");
+  if(inet_pton(AF_INET, serverIp.c_str(), &serv_addr.sin_addr) <= 0) {
+    Logger::printfLog(Logger::INFO, "connectToServer: inet_pton()失敗:ソケット %d ", sock);
     netSys->close(sock);
     sock = -1;
-    Logger::info("connectToServer: 終了 (return false)");
+    Logger::info("connectToServer: 失敗.処理終了");
     return false;
   }
 
-  Logger::info("connectToServer: connect を呼び出してサーバーに接続を試みます...");
+  Logger::info("connectToServer: connect()実行前");
   if(netSys->connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
-    Logger::error("Client: Connection Failed");
-
-    std::string errConnMsg
-        = "connectToServer: 接続に失敗したため、ソケット " + std::to_string(sock) + " を閉じます";
-    Logger::info(errConnMsg.c_str());
-
+    Logger::printfLog(Logger::ERROR, "connectToServer: connect():ソケット %d を閉じます", sock);
     netSys->close(sock);
     sock = -1;
-    Logger::info("connectToServer: 終了 (return false)");
+    Logger::error("connectToServer:connect()失敗");
     return false;
   }
 
-  Logger::info("Successfully connected to camera server.");
-  Logger::info("connectToServer: 接続成功。ステータスを接続中に更新します");
+  Logger::info("connectToServer: 接続成功");
   isConnected = true;
-  Logger::info("connectToServer: 終了 (return true)");
   return true;
 }
 
 void SocketClient::disconnectFromServer()
 {
-  std::string startMsg = "disconnectFromServer: 開始 (現在の状態 - isConnected: "
-                         + std::string(isConnected ? "true" : "false")
-                         + ", sock: " + std::to_string(sock) + ")";
-  Logger::info(startMsg.c_str());
-
+  Logger::printfLog(Logger::INFO, "disconnectFromServer:開始");
   if(isConnected) {
     CameraServer::Command cmd = CameraServer::Command::DISCONNECT;
 
-    std::string cmdMsg = "disconnectFromServer: DISCONNECT コマンドを送信します (サイズ: "
-                         + std::to_string(sizeof(cmd)) + " bytes)...";
-    Logger::info(cmdMsg.c_str());
-
+    Logger::printfLog(Logger::INFO, "disconnectFromServer: DISCONNECT コマンドを送信 ");
     netSys->send(sock, reinterpret_cast<const char*>(&cmd), sizeof(cmd), 0);
 
-    std::string closeMsg
-        = "disconnectFromServer: ソケット " + std::to_string(sock) + " をクローズします...";
-    Logger::info(closeMsg.c_str());
-
+    Logger::printfLog(Logger::INFO, "disconnectFromServer: ソケット %d をクローズします...", sock);
     netSys->close(sock);
     sock = -1;
     isConnected = false;
     Logger::info("Disconnected from camera server.");
-    Logger::info("disconnectFromServer: クリーンアップ完了");
   } else {
-    Logger::info("disconnectFromServer: 未接続状態のため、切断処理をスキップします");
+    Logger::info("disconnectFromServer: 未接続状態のためスキップ");
   }
   Logger::info("disconnectFromServer: 終了");
 }
 
 void SocketClient::shutdownServer()
 {
-  std::string startMsg = "shutdownServer: 開始 (現在の状態 - isConnected: "
-                         + std::string(isConnected ? "true" : "false")
-                         + ", sock: " + std::to_string(sock) + ")";
-  Logger::info(startMsg.c_str());
-
+  Logger::printfLog(Logger::INFO, "shutdownServer: 開始 :isConnected: %s, sock: %d)",
+                    isConnected ? "true" : "false", sock);
   if(isConnected) {
     CameraServer::Command cmd = CameraServer::Command::SHUTDOWN;
 
-    std::string cmdMsg = "shutdownServer: SHUTDOWN コマンドを送信します (サイズ: "
-                         + std::to_string(sizeof(cmd)) + " bytes)...";
-    Logger::info(cmdMsg.c_str());
-
+    Logger::printfLog(Logger::INFO, "shutdownServer: SHUTDOWN コマンドを送信前");
     netSys->send(sock, reinterpret_cast<const char*>(&cmd), sizeof(cmd), 0);
 
-    std::string closeMsg
-        = "shutdownServer: ソケット " + std::to_string(sock) + " をクローズします...";
-    Logger::info(closeMsg.c_str());
-
+    Logger::printfLog(Logger::INFO, "shutdownServer: close()前 ソケット :%d ", sock);
     netSys->close(sock);
     sock = -1;
     isConnected = false;
     Logger::info("Shutdown camera server.");
-    Logger::info("shutdownServer: クリーンアップ完了");
   } else {
-    Logger::info("shutdownServer: 未接続状態のため、シャットダウンコマンドの送信をスキップします");
+    Logger::info("shutdownServer: 未接続状態のためスキップ");
   }
   Logger::info("shutdownServer: 終了");
 }

@@ -53,7 +53,6 @@ bool SocketServer::init()
 
   Logger::info("init: listen()実行前");
   if(netSys->listen(listenSocket, 3) < 0) {
-    // std::cerr << "[ERROR] listen failed" << std::endl;
     Logger::error("init: listen()失敗");
     // close()が成功するか
     if(netSys->close(listenSocket) < 0) {

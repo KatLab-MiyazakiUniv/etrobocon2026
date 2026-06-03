@@ -51,7 +51,10 @@ bool SocketClient::connectToServer()
   Logger::info("connectToServer: inet_pton()実行前");
   if(inet_pton(AF_INET, serverIp.c_str(), &serv_addr.sin_addr) <= 0) {
     Logger::printfLog(Logger::INFO, "connectToServer: inet_pton()失敗:ソケット %d ", sock);
-    netSys->close(sock);
+    // netSys->close(sock);
+    if(netSys->close(sock) < 0) {
+      Logger::error("init: close()失敗");
+    }
     sock = -1;
     Logger::info("connectToServer: 失敗.処理終了");
     return false;
@@ -60,7 +63,11 @@ bool SocketClient::connectToServer()
   Logger::info("connectToServer: connect()実行前");
   if(netSys->connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
     Logger::printfLog(Logger::ERROR, "connectToServer: connect():ソケット %d を閉じます", sock);
-    netSys->close(sock);
+    // netSys->close(sock);
+    if(netSys->close(sock) < 0) {
+      Logger::error("init: close()失敗");
+    }
+
     sock = -1;
     Logger::error("connectToServer:connect()失敗");
     return false;
@@ -81,7 +88,10 @@ void SocketClient::disconnectFromServer()
     netSys->send(sock, reinterpret_cast<const char*>(&cmd), sizeof(cmd), 0);
 
     Logger::printfLog(Logger::INFO, "disconnectFromServer: ソケット %d をクローズします...", sock);
-    netSys->close(sock);
+    // netSys->close(sock);
+    if(netSys->close(sock) < 0) {
+      Logger::error("init: close()失敗");
+    }
     sock = -1;
     isConnected = false;
     Logger::info("Disconnected from camera server.");
@@ -103,7 +113,11 @@ void SocketClient::shutdownServer()
     netSys->send(sock, reinterpret_cast<const char*>(&cmd), sizeof(cmd), 0);
 
     Logger::printfLog(Logger::INFO, "shutdownServer: close()前 ソケット :%d ", sock);
-    netSys->close(sock);
+    // netSys->close(sock);
+    if(netSys->close(sock) < 0) {
+      Logger::error("init: close()失敗");
+    }
+
     sock = -1;
     isConnected = false;
     Logger::info("Shutdown camera server.");

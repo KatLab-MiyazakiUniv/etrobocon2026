@@ -10,6 +10,7 @@
 #include <opencv2/opencv.hpp>
 #include <filesystem>
 #include <string>
+#include "Logger.h"
 
 class FrameSave {
  public:

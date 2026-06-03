@@ -11,6 +11,7 @@
 #include "SystemInfo.h"
 #include <vector>
 #include <opencv2/opencv.hpp>
+#include "Logger.h"
 
 // HSVの範囲を保持する構造体
 struct HSVRange {
@@ -26,6 +27,10 @@ class ColorRegionDetector : public BoundingBoxDetector {
    * @param roi 注目領域
    */
   ColorRegionDetector(const std::vector<HSVRange>& hsvRanges, const cv::Rect& roi);
+  /**
+   * @brief デストラクタ
+   */
+  ~ColorRegionDetector();
   // フレームから色を検出する
   /**
    * @brief フレームから色領域を検出

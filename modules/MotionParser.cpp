@@ -28,7 +28,8 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
   // ファイルを開き、開けなければ空のリストを返す
   ifstream file(commandFilePath);
   if(!file) {
-    cout << "コマンドファイルを開けませんでした: " << commandFilePath << endl;
+    Logger::printfLog(Logger::ERROR, "コマンドファイルを開けませんでした: %s",
+                      commandFilePath.c_str());
     return motionList;
   }
 

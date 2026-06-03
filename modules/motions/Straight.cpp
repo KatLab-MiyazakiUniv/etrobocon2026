@@ -16,6 +16,12 @@ Straight::Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _co
     shouldUseIMU(_shouldUseIMU),
     targetAngle(0.0)
 {
+  LOG_CREATE("Straight");
+}
+
+Straight::~Straight()
+{
+  LOG_DESTROY("Straight");
 }
 
 bool Straight::canStart()

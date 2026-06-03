@@ -8,6 +8,7 @@
 #define ETROBOCON2026_H
 
 #include <iostream>
+#include "Logger.h"
 
 class EtRobocon2026 {
  public:

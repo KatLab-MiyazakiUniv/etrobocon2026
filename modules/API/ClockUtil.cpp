@@ -34,9 +34,22 @@ void ClockUtil::wait(int milliSec)
   getClockInstance().wait(milliSec * 1000);
 }
 
+#ifdef USE_RASPIKE_ART
+
 spikeapi::Clock& ClockUtil::getClockInstance()
 {
   // 初回のみインスタンスを生成
   static spikeapi::Clock clock;
   return clock;
 }
+
+#else
+
+custom::Clock& ClockUtil::getClockInstance()
+{
+  // 初回のみインスタンスを生成
+  static custom::Clock clock;
+  return clock;
+}
+
+#endif

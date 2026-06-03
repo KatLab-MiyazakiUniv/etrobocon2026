@@ -13,7 +13,7 @@ class AngleNormalizer {
    * @param angle 正規化する角度(°)
    * @return 正規化された角度(°)
    */
-  static double NormalizeAngle(double angle);
+  static double normalizeAngle(double angle);
 
  private:
   AngleNormalizer();

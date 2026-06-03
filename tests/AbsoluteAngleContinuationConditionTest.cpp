@@ -1,0 +1,59 @@
+/**
+ * @file AbsoluteAngleContinuationConditionTest.cpp
+ * @brief AbsoluteAngleContinuationConditionクラスをテストする
+ * @author okuyama0528 yutaro-1214
+ */
+
+#include <gtest/gtest.h>
+#include "AbsoluteAngleContinuationCondition.h"
+
+namespace etrobocon2026_test {
+  // prepare()実行後に、targetAngleが正しくセット出来ているか確認
+  TEST(AbsoluteAngleContinuationConditionTest, AfterPrepare)
+  {
+    Robot robot;
+
+    double targetAngle = 100.0;
+    AbsoluteAngleContinuationCondition condition(robot, targetAngle);
+
+    double expectedTargetAngle = targetAngle;
+
+    condition.prepare();
+
+    EXPECT_EQ(expectedTargetAngle, condition.getTargetAngle());
+  }
+
+  // 目標角度に到達していない場合は継続判定になることを確認
+  TEST(AbsoluteAngleContinuationConditionConditionTest, NotReachTargetAngle)
+  {
+    Robot robot;
+
+    AbsoluteAngleContinuationCondition condition(robot, 100.0);
+
+    condition.prepare();
+
+    EXPECT_TRUE(condition.shouldContinue());
+  }
+
+  // 角度が目標角度に到達した場合は停止判定になることを確認
+  TEST(AbsoluteAngleContinuationConditionConditionTest, AfterTargetAngle)
+  {
+    Robot robot;
+
+    int i = 0;
+    double targetAngle = 20;
+
+    AbsoluteAngleContinuationCondition condition(robot, targetAngle);
+
+    condition.prepare();
+
+    // 目標角度に到達するまで回頭
+    while(condition.shouldContinue()) {
+      i++;
+    }
+
+    // 目標角度付近まで回っていることを確認
+    EXPECT_NEAR(targetAngle, robot.getIMUControllerInstance().getAzimuth(), 2);
+  }
+
+}  // namespace etrobocon2026_test

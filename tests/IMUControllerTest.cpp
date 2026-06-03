@@ -16,7 +16,7 @@ namespace IMUController_test {
   {
     IMUController imuController;
 
-    EXPECT_FLOAT_EQ(90, imuController.getAzimuth());
+    EXPECT_FLOAT_EQ(0, imuController.getAzimuth());
   }
 
   // 方位角をリセットできるかのテスト

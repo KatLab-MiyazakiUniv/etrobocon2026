@@ -22,7 +22,7 @@ class SocketServer {
    * @details
    * ソケットサーバーの初期状態を設定する
    */
-  explicit SocketServer(INetworkSystem* networkSystem = &real, int port = 27015);
+  explicit SocketServer(INetworkSystem* networkSystem = &CameraServer::real, int port = 27015);
 
   /**
    * @brief サーバーを初期化する

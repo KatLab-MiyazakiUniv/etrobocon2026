@@ -21,7 +21,7 @@ class SocketClient {
   /**
    * @brief コンストラクタ
    */
-  explicit SocketClient(INetworkSystem* networkSystem = &real, int port = 27015,
+  explicit SocketClient(INetworkSystem* networkSystem = &CameraServer::real, int port = 27015,
                         const char* server_ip = "127.0.0.1");
 
   /**

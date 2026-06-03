@@ -92,7 +92,10 @@ void SocketServer::run()
     }
     Logger::info("run: Client connected.");
     handleConnection(clientSocket);
-    netSys->close(clientSocket);
+    // netSys->close(clientSocket);
+    if(netSys->close(clientSocket) < 0) {
+      Logger::error("init: close()失敗");
+    }
     Logger::info("run: Client disconnected.");
   }
 }

@@ -18,5 +18,5 @@ void RelativeRotation::prepare()
   double initialAngle = getCurrentAngle();  // 現在の走行体角度を取得する
 
   // 現在角度にrelativeAngleを加算し、-180～180度に正規化して目標角度を算出する
-  targetAngle = AngleNormalizer::NormalizeAngle(initialAngle + relativeTargetAngle);
+  targetAngle = AngleNormalizer::normalizeAngle(initialAngle + relativeTargetAngle);
 }

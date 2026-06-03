@@ -18,7 +18,7 @@ bool AngleContinuationCondition::shouldContinue()
       = robot.getIMUControllerInstance().getAzimuth();  // IMUから現在の角度（方位角）を取得
 
   // 目標角度との差を計算し、-180〜180の範囲に正規化
-  double error = AngleNormalizer::NormalizeAngle(targetAngle - currentAngle);
+  double error = AngleNormalizer::normalizeAngle(targetAngle - currentAngle);
 
   return std::fabs(error) > tolerance;
 }

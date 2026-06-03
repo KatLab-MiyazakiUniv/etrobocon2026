@@ -93,7 +93,8 @@ void SocketClient::disconnectFromServer()
 
 void SocketClient::shutdownServer()
 {
-  Logger::printfLog(Logger::INFO, "shutdownServer: 開始 :isConnected: %s, sock: %d)",
+  Logger::printfLog(Logger::INFO, "shutdownServer: 開始");
+  Logger::printfLog(Logger::INFO, "shutdown:isConnected: %s, sock: %d)",
                     isConnected ? "true" : "false", sock);
   if(isConnected) {
     CameraServer::Command cmd = CameraServer::Command::SHUTDOWN;

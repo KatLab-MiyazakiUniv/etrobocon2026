@@ -114,6 +114,7 @@ void SocketServer::shutdown()
 
 void SocketServer::handleConnection(int clientSocket)
 {
+  Logger::info("handleConnection: 開始");
   char recvbuf[SocketServer::DEFAULT_BUFLEN];
   ssize_t iResult;
 
@@ -136,16 +137,22 @@ void SocketServer::handleConnection(int clientSocket)
             // クライアントからの切断要求なので return
             return;
           default:
-            Logger::info("handleConnection: Received command (ignored).");
+            Logger::info("handleConnection: Received unexpected command.");
             break;
         }
-      } else {
+      }
+
+      else {
         Logger::printfLog(Logger::ERROR, "handleConnection: Received unexpected data size: %zd",
                           (ssize_t)iResult);
       }
-    } else if(iResult == 0) {
+    }
+
+    else if(iResult == 0) {
       Logger::info("handleConnection: Connection closing...");
-    } else {
+    }
+
+    else {
       if(isRunning) {
         Logger::error("handleConnection: recv failed");
       }

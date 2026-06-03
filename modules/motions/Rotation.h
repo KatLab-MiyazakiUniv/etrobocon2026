@@ -22,10 +22,7 @@ class Rotation : public BaseMotion {
            const Pid::PidGain& _anglePidGain);
 
  protected:
-  /**
-   * @brief 回頭制御で使用する目標角度(°)
-   */
-  double targetAngle;
+  double targetAngle;  // 回頭制御で使用する目標角度(°)
 
   /**
    * @brief 回頭動作を1ステップ実行する

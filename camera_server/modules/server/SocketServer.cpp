@@ -12,6 +12,11 @@ SocketServer::SocketServer(INetworkSystem* networkSystem, int port)
   LOG_CREATE("SocketServer");
 }
 
+/**
+ * サーバー初期化処理
+ * @brief ソケット生成・bind・listenまでを行う
+ * @return 成功:true / 失敗:false
+ */
 bool SocketServer::init()
 {
   Logger::info("init: 開始");
@@ -67,6 +72,10 @@ bool SocketServer::init()
   return true;
 }
 
+/**
+ * サーバー本体のループ処理
+ * @brief クライアント接続を受け付け、1接続ごとに処理する
+ */
 void SocketServer::run()
 {
   Logger::info("run: 開始");
@@ -88,6 +97,10 @@ void SocketServer::run()
   }
 }
 
+/**
+ * サーバー停止処理
+ * @brief listenソケットを閉じてrunループを終了させる
+ */
 void SocketServer::shutdown()
 {
   Logger::info("shutdown: 開始");
@@ -99,7 +112,15 @@ void SocketServer::shutdown()
   Logger::info("shutdown: Socket server shutting down.");
 }
 
+<<<<<<< Updated upstream
 void SocketServer::handleConnection(int clientSocket)
+=======
+/**
+ * クライアントとの通信処理
+ * @brief 受信データを解析し、コマンドに応じて処理を行う
+ */
+void SocketServer::handle_connection(int clientSocket)
+>>>>>>> Stashed changes
 {
   char recvbuf[SocketServer::DEFAULT_BUFLEN];
   ssize_t iResult;

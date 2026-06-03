@@ -112,15 +112,7 @@ void SocketServer::shutdown()
   Logger::info("shutdown: Socket server shutting down.");
 }
 
-<<<<<<< Updated upstream
 void SocketServer::handleConnection(int clientSocket)
-=======
-/**
- * クライアントとの通信処理
- * @brief 受信データを解析し、コマンドに応じて処理を行う
- */
-void SocketServer::handle_connection(int clientSocket)
->>>>>>> Stashed changes
 {
   char recvbuf[SocketServer::DEFAULT_BUFLEN];
   ssize_t iResult;
@@ -129,8 +121,7 @@ void SocketServer::handle_connection(int clientSocket)
   do {
     iResult = netSys->recv(clientSocket, recvbuf, SocketServer::DEFAULT_BUFLEN, 0);
     if(iResult > 0) {
-      // 受信データが最低限コマンドサイズの4バイトあるか確認
-      if(static_cast<size_t>(iResult) >= sizeof(CameraServer::Command)) {
+      if(static_cast<size_t>(iResult) == CameraServer::COMMAND_SIZE) {
         // 先頭をコマンドとして解釈
         // ポインタ変数に変換した後にポインタ変数をデリファレンスすることで実際の値を参照
         CameraServer::Command cmd = *reinterpret_cast<CameraServer::Command*>(recvbuf);

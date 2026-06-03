@@ -20,5 +20,4 @@ void EtRobocon2026::start()
   //   std::cerr << "サーバーが見つかりません。サーバーが起動しているか確認してください。"
   //             << std::endl;
   // }
->>>>>>> Stashed changes
 }

@@ -19,6 +19,8 @@ namespace CameraServer {
     DISCONNECT = 254,  // サーバから切断
     SHUTDOWN = 255     // サーバーをシャットダウン
   };
+  constexpr size_t COMMAND_SIZE = sizeof(Command);
+
 }  // namespace CameraServer
 
 // 注入するインスタンスの実体は1つ

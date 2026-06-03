@@ -24,6 +24,7 @@ class MockNetworkSystem : public INetworkSystem {
    * @return 0:成功
    */
   int close(int fd) override { return 0; }
+
   /**
    * @brief connect()のモック
    * @param sockfd 通信を閉じるファイルディスクリプタ
@@ -54,6 +55,7 @@ class MockNetworkSystem : public INetworkSystem {
    * @param optlen optvalで渡した値のバイト長
    * @return 0:成功
    */
+
   int setsockopt(int sockfd, int level, int optname, const void* optval, socklen_t optlen) override
   {
     return 0;
@@ -64,6 +66,7 @@ class MockNetworkSystem : public INetworkSystem {
    * @param addrlen インターネットドメインソケットアドレスのバイト長
    * @return 0:成功
    */
+
   int bind(int sockfd, const struct sockaddr* addr, socklen_t addrlen) override { return 0; }
 
   /**
@@ -71,6 +74,7 @@ class MockNetworkSystem : public INetworkSystem {
    * @param backlog 接続待ち状態として保持できるキューの数
    * @param 0:成功
    */
+
   int listen(int sockfd, int backlog) override { return 0; }
 
   /**
@@ -79,6 +83,7 @@ class MockNetworkSystem : public INetworkSystem {
    * @param addrlen インターネットドメインソケットアドレスのバイト長
    * @retrun 888:偽の通信用のファイルディスクリプタ
    */
+
   int accept(int sockfd, struct sockaddr* addr, socklen_t* addrlen) override { return 888; }
 
   /**
@@ -88,6 +93,7 @@ class MockNetworkSystem : public INetworkSystem {
    * @param len バッファのバイト長
    * @param flgas 受信オプションのフラグ
    */
+
   ssize_t recv(int sockfd, void* buf, size_t len, int flags) override
   {
     if(dummyResponseData.empty()) return 0;  // データがなければ0を返す

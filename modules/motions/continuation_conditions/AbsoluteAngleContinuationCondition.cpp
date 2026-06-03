@@ -10,6 +10,12 @@ AbsoluteAngleContinuationCondition::AbsoluteAngleContinuationCondition(Robot& ro
                                                                        double _tolerance)
   : AngleContinuationCondition(robot, _tolerance), targetAbsAngle(_targetAbsAngle)
 {
+  LOG_CREATE("AbsoluteAngleContinuationCondition");
+}
+
+AbsoluteAngleContinuationCondition::~AbsoluteAngleContinuationCondition()
+{
+  LOG_DESTROY("AbsoluteAngleContinuationCondition");
 }
 
 void AbsoluteAngleContinuationCondition::prepare()

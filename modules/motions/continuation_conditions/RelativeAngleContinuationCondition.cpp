@@ -10,6 +10,12 @@ RelativeAngleContinuationCondition::RelativeAngleContinuationCondition(Robot& ro
                                                                        double _tolerance)
   : AngleContinuationCondition(robot, _tolerance), relativeAngle(_relativeAngle)
 {
+  LOG_CREATE("RelativeAngleContinuationCondition");
+}
+
+RelativeAngleContinuationCondition::~RelativeAngleContinuationCondition()
+{
+  LOG_DESTROY("RelativeAngleContinuationCondition");
 }
 
 void RelativeAngleContinuationCondition::prepare()

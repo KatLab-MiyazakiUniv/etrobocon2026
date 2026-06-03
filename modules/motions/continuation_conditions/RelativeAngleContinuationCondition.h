@@ -7,6 +7,7 @@
 #define RELATIVE_ANGLE_CONTINUATION_CONDITION_H
 
 #include "AngleContinuationCondition.h"
+#include "Logger.h"
 
 class RelativeAngleContinuationCondition : public AngleContinuationCondition {
  public:
@@ -17,6 +18,12 @@ class RelativeAngleContinuationCondition : public AngleContinuationCondition {
    * @param _tolerance 許容誤差(°)
    */
   RelativeAngleContinuationCondition(Robot& robot, double _relativeAngle, double _tolerance = 2.0);
+
+  /**
+   * デストラクタ
+   */
+  ~RelativeAngleContinuationCondition();
+
   /**
    * @brief 判定開始前の準備処理
    * @details

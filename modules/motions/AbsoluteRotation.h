@@ -7,6 +7,7 @@
 #define ABSOLUTE_ROTATION_H
 
 #include "Rotation.h"
+#include "Logger.h"
 
 class AbsoluteRotation : public Rotation {
  public:
@@ -19,6 +20,11 @@ class AbsoluteRotation : public Rotation {
    */
   AbsoluteRotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                    const Pid::PidGain& _anglePidGain, double _targetAbsAngle);
+
+  /**
+   * デストラクタ
+   */
+  ~AbsoluteRotation();
 
  protected:
   // 回頭動作の準備処理を行う

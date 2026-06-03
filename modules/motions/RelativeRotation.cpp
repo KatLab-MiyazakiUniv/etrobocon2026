@@ -11,6 +11,12 @@ RelativeRotation::RelativeRotation(
   : Rotation(_robot, std::move(_continuationCondition), _anglePidGain),
     relativeTargetAngle(_relativeAngle)
 {
+  LOG_CREATE("RelativeRotation");
+}
+
+RelativeRotation::~RelativeRotation()
+{
+  LOG_DESTROY("RelativeRotation");
 }
 
 void RelativeRotation::prepare()

@@ -8,6 +8,7 @@
 
 #include "Rotation.h"
 #include "AngleNormalizer.h"
+#include "Logger.h"
 
 class RelativeRotation : public Rotation {
  public:
@@ -23,6 +24,11 @@ class RelativeRotation : public Rotation {
    */
   RelativeRotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                    const Pid::PidGain& _anglePidGain, double _relativeTargetAngle);
+
+  /**
+   * デストラクタ
+   */
+  ~RelativeRotation();
 
  protected:
   /**

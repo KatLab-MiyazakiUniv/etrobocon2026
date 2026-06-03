@@ -11,6 +11,12 @@ AbsoluteRotation::AbsoluteRotation(
   : Rotation(_robot, std::move(_continuationCondition), _anglePidGain),
     targetAbsAngle(_targetAbsAngle)
 {
+  LOG_CREATE("AbsoluteRotation");
+}
+
+AbsoluteRotation::~AbsoluteRotation()
+{
+  LOG_DESTROY("AbsoluteRotation");
 }
 
 void AbsoluteRotation::prepare()

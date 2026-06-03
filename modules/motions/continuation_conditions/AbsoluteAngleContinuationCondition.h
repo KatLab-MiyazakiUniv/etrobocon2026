@@ -7,6 +7,7 @@
 #define ABSOLUTE_ANGLE_CONTINUATION_CONDITION_H
 
 #include "AngleContinuationCondition.h"
+#include "Logger.h"
 
 /**
  * @class AbsoluteAngleContinuationCondition
@@ -23,6 +24,11 @@ class AbsoluteAngleContinuationCondition : public AngleContinuationCondition {
    * @param _tolerance      角度判定の許容誤差(°)
    */
   AbsoluteAngleContinuationCondition(Robot& robot, double _targetAbsAngle, double _tolerance = 2.0);
+
+  /**
+   * デストラクタ
+   */
+  ~AbsoluteAngleContinuationCondition();
 
   /**
    * @brief 指定された絶対角度を目標角度としてセットする

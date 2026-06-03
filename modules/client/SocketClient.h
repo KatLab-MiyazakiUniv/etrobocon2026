@@ -37,7 +37,7 @@ class SocketClient {
    */
   virtual bool connectToServer();
 
-  /**
+/**
    * @brief サーバーから切断する
    */
   virtual void disconnectFromServer();

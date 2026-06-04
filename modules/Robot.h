@@ -12,6 +12,7 @@
 #include "IMUController.h"
 #include "ColorSensorController.h"
 #include "Course.h"
+#include "UltraSonicController.h"
 
 class Robot {
  public:
@@ -38,6 +39,7 @@ class Robot {
    * @return メンバ変数 imuController(IMUController のインスタンス) の参照
    */
   IMUController& getIMUControllerInstance();
+
   /*
    * @brief コースの参照を返す
    * @return メンバ変数 course(Course のインスタンス) の参照
@@ -49,11 +51,18 @@ class Robot {
    * @param course コース
    */
   void setCourse(Course course);
+
   /**
    * @brief ColorSensorControllerのインスタンスの参照を返す
    * @return メンバ変数 colorSensorController(ColorSensorController のインスタンス) の参照
    */
   ColorSensorController& getColorSensorControllerInstance();
+
+  /**
+   * @brief UltraSonicControllerのインスタンスの参照を返す
+   * @return メンバ変数 ultraSonicController(UltraSonicController のインスタンス)の参照
+   */
+  UltraSonicController& getUltraSonicControllerInstance();
 
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
@@ -61,6 +70,7 @@ class Robot {
   IMUController imuController;                  // IMUController インスタンス
   Course course;                                // コース(Left or Right)
   ColorSensorController colorSensorController;  // ColorSensorController インスタンス
+  UltraSonicController ultraSonicController;    // UltraSonicController インスタンス
 };
 
 #endif

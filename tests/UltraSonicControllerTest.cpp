@@ -19,4 +19,4 @@ namespace UltraSonicController_test {
     EXPECT_EQ(10, distance);
   }
 
-}  // namespace etrobocon2026_test
+}  // namespace UltraSonicController_test

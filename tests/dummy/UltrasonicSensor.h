@@ -27,12 +27,6 @@ namespace spikeapi {
      */
     int32_t getDistance() const { return DISTANCE; }
 
-    /**
-     * @brief 超音波信号を検出する
-     * @return true 超音波を検出した, false 超音波を検出しなかった
-     */
-    bool isPresence() const { return false; }
-
    private:
     static constexpr int32_t DISTANCE = 10;  // テスト用固定値 (cm)
   };

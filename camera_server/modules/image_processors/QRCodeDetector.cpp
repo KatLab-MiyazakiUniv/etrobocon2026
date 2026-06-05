@@ -6,12 +6,17 @@
 
 #include "QRCodeDetector.h"
 
-// 全てのパラメータを個別に指定する
+/**
+ * @brief コンストラクタ
+ */
 QRCodeDetector::QRCodeDetector()
 {
   LOG_CREATE("QRCodeDetector");
 }
 
+/**
+ * @brief デストラクタ
+ */
 QRCodeDetector::~QRCodeDetector()
 {
   LOG_DESTROY("QRCodeDetector");

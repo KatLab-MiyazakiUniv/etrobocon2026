@@ -39,3 +39,8 @@ void Robot::setCourse(Course course)
 {
   this->course = course;
 }
+
+UltraSonicController& Robot::getUltraSonicControllerInstance()
+{
+  return ultraSonicController;
+}

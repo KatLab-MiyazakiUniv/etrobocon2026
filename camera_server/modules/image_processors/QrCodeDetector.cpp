@@ -25,8 +25,8 @@ QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
     return result;
   }
 
-  std::vector<std::string> gatePositions;  // ゲート位置情報を格納するベクター
-  std::vector<cv::Point> cornerPoints;     // コードの各頂点の座標を格納するベクター
+  std::vector<std::string> gatePositions;
+  std::vector<cv::Point> cornerPoints;
 
   bool detected = detector.detectAndDecodeMulti(frame, gatePositions, cornerPoints);
 

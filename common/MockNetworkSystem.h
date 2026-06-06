@@ -19,8 +19,8 @@ class MockNetworkSystem : public INetworkSystem {
   bool forceConnectError = false;                    // connect() を失敗させるフラグ
   bool receiveCommand = false;                       // recv() で1回だけ受信させるフラグ
   void* recvBuff = nullptr;                          // recv()で受け取るデータを格納
-  int sizeOfReturnLen = CameraServer::COMMAND_SIZE;  // デフォルトでは1を返
-  uint8_t lastSentCommand = 0;
+  int sizeOfReturnLen = CameraServer::COMMAND_SIZE;  // デフォルトでは1を返す
+  uint8_t lastSentCommand = 0;                       // 送信したコマンドを保存する
   /**
    * @brief socket()のモック
    * @return ファイルディスクリプタとして999を返す

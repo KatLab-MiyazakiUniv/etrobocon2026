@@ -33,10 +33,10 @@ bool CompoundContinuationCondition::shouldContinue()
 {
   if(logicalOperator == LogicalOperator::AND) {
     return firstContinuationCondition->shouldContinue()
-           && secondContinuationCondition->shouldContinue();
+           || secondContinuationCondition->shouldContinue();
   } else if(logicalOperator == LogicalOperator::OR) {
     return firstContinuationCondition->shouldContinue()
-           || secondContinuationCondition->shouldContinue();
+           && secondContinuationCondition->shouldContinue();
   }
   return false;
 }

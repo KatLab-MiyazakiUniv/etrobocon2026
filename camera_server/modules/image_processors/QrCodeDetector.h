@@ -7,6 +7,8 @@
 #ifndef QR_CODE_DETECTOR_H
 #define QR_CODE_DETECTOR_H
 
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc.hpp>
 #include <opencv2/objdetect.hpp>
 #include "CodeDetector.h"
 #include "QrCodeDetectionResult.h"
@@ -16,8 +18,9 @@ class QrCodeDetector : public CodeDetector<QrCodeDetectionResult> {
  public:
   /**
    * @brief コンストラクタ
+   * @param _isCurved 曲面対応の検出を使用するかどうか
    */
-  QrCodeDetector();
+  explicit QrCodeDetector(bool _isCurved = false);
 
   /**
    * @brief デストラクタ
@@ -25,13 +28,14 @@ class QrCodeDetector : public CodeDetector<QrCodeDetectionResult> {
   ~QrCodeDetector();
 
   /**
-   * @brief フレーム内のすべての2次元コードを検出する
+   * @brief フレーム内の2次元コードを検出する
    * @param frame 処理対象のフレーム
    * @return 検出結果（QrCodeDetectionResult型）
    */
   QrCodeDetectionResult detect(const cv::Mat& frame) override;
 
  private:
+  bool isCurved;                // 曲面対応の検出を使用するかどうか
   cv::QRCodeDetector detector;  // 2次元コード検出クラスのインスタンス
 };
 

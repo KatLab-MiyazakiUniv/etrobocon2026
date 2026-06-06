@@ -6,8 +6,10 @@
 
 #include "QrCodeDetector.h"
 
-QrCodeDetector::QrCodeDetector()
+QrCodeDetector::QrCodeDetector(bool _isCurved) : isCurved(_isCurved)
 {
+  detector.setEpsX(0.2); 
+  detector.setEpsY(0.2);
   LOG_CREATE("QrCodeDetector");
 }
 
@@ -25,28 +27,23 @@ QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
     return result;
   }
 
-  std::vector<std::string> gatePositions;
-  std::vector<cv::Point> cornerPoints;
+  std::vector<cv::Point2f> cornerPoints;
+  std::string gatePos;
 
-  bool detected = detector.detectAndDecodeMulti(frame, gatePositions, cornerPoints);
-
-  if(!detected) return result;
-
-  for(size_t i = 0; i < gatePositions.size(); ++i) {
-    if(cornerPoints.size() < (i + 1) * 4) {
-      Logger::printfLog(Logger::WARNING,
-                        "QrCodeDetector: コード[%zu]の頂点座標が取得できませんでした。", i);
-      continue;
-    }
-    QrCodeData data;
-    data.gatePosition = gatePositions[i];
-    data.corners = { cornerPoints[i * 4 + 0], cornerPoints[i * 4 + 1], cornerPoints[i * 4 + 2],
-                     cornerPoints[i * 4 + 3] };
-    result.qrCodes.push_back(data);
+  if(isCurved) {
+    gatePos = detector.detectAndDecodeCurved(frame, cornerPoints);
+  } else {
+    gatePos = detector.detectAndDecode(frame, cornerPoints);
   }
 
-  result.count = static_cast<int>(result.qrCodes.size());
-  result.wasDetected = !result.qrCodes.empty();
+  if(!gatePos.empty() && cornerPoints.size() >= 4) {
+    result.wasDetected = true;
+    result.gatePosition = gatePos;
+    for(int i = 0; i < 4; ++i) {
+      result.corners[i]
+          = cv::Point(static_cast<int>(cornerPoints[i].x), static_cast<int>(cornerPoints[i].y));
+    }
+  }
 
   return result;
 }

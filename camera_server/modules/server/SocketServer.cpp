@@ -20,23 +20,19 @@ SocketServer::~SocketServer()
 
 bool SocketServer::init()
 {
-  Logger::info("init: 開始");
+  Logger::debug("init: 開始");
   listenSocket = netSys.socket(AF_INET, SOCK_STREAM, 0);
   if(listenSocket < 0) {
-    Logger::error("init: socket()失敗");
+    Logger::debug("init: socket()失敗");
     return false;
   }
 
   int opt = 1;
 
-  Logger::info("init: setsockopt()実行前");
+  Logger::debug("init: setsockopt()実行前");
   if(netSys.setsockopt(listenSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
     Logger::error("init: setsockopt()失敗");
-
-    // close()が成功するか
-    if(netSys.close(listenSocket) < 0) {
-      Logger::error("init: close()失敗");
-    }
+    netSys.close(listenSocket);
     return false;
   }
 
@@ -46,24 +42,18 @@ bool SocketServer::init()
   serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);  // 全インターフェースで待受
   serv_addr.sin_port = htons(this->port);         // ポート設定
 
-  Logger::info("init: bind()実行前");
+  Logger::debug("init: bind()実行前");
   if(netSys.bind(listenSocket, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
-    Logger::error("init: bind()失敗");
-
-    // close()が成功するか
-    if(netSys.close(listenSocket) < 0) {
-      Logger::error("init: close()失敗");
-    }
+    Logger::debug("init: bind()失敗");
+    netSys.close(listenSocket) < 0;
     return false;
   }
 
-  Logger::info("init: listen()実行前");
+  Logger::debug("init: listen()実行前");
   if(netSys.listen(listenSocket, 3) < 0) {
-    Logger::error("init: listen()失敗");
-    // close()が成功するか
-    if(netSys.close(listenSocket) < 0) {
-      Logger::error("init: close()失敗");
-    }
+    Logger::debug("init: listen()失敗");
+    netSys.close(listenSocket);
+    Logger::error("init: close()失敗");
     return false;
   }
 
@@ -91,12 +81,10 @@ void SocketServer::run()
       Logger::debug("run: サーバー継続");
       continue;
     }
-    Logger::info("run: Client connected.");
+    Logger::debug("run: Client connected.");
     handleConnection(clientSocket);
-    if(netSys.close(clientSocket) < 0) {
-      Logger::error("init: close()失敗");
-    }
-    Logger::info("run: Client disconnected.");
+    netSys.close(clientSocket);
+    Logger::debug("run: Client disconnected.");
   }
 }
 
@@ -106,42 +94,38 @@ void SocketServer::run()
  */
 void SocketServer::shutdown()
 {
-  Logger::info("shutdown: 開始");
+  Logger::debug("shutdown: 開始");
   isRunning = false;
   if(listenSocket != -1) {
     netSys.close(listenSocket);
     listenSocket = -1;
   }
-  Logger::info("shutdown: Socket server shutting down.");
+  Logger::debug("shutdown: Socket server shutting down.");
 }
 
 void SocketServer::handleConnection(int clientSocket)
 {
-  Logger::info("handleConnection: 開始");
+  Logger::debug("handleConnection: 開始");
   char recvbuf[SocketServer::DEFAULT_BUFLEN];
   ssize_t iResult;
 
   // クライアントからのデータ受信ループ
   do {
-    // iResult = netSys->recv(clientSocket, recvbuf, SocketServer::DEFAULT_BUFLEN, 0);
     iResult = netSys.recv(clientSocket, recvbuf, SocketServer::DEFAULT_BUFLEN, 0);
     if(iResult > 0) {
       if(static_cast<size_t>(iResult) == CameraServer::COMMAND_SIZE) {
-        // 先頭をコマンドとして解釈
-        // ポインタ変数に変換した後にポインタ変数をデリファレンスすることで実際の値を参照
         CameraServer::Command cmd = *reinterpret_cast<CameraServer::Command*>(recvbuf);
-
         switch(cmd) {
           case CameraServer::Command::SHUTDOWN:
-            Logger::info("handleConnection: Received SHUTDOWN command.");
+            Logger::debug("handleConnection: Received SHUTDOWN command.");
             shutdown();
             return;
           case CameraServer::Command::DISCONNECT:
-            Logger::info("handleConnection: Received DISCONNECT command.");
+            Logger::debug("handleConnection: Received DISCONNECT command.");
             // クライアントからの切断要求なので return
             return;
           default:
-            Logger::info("handleConnection: Received unexpected command.");
+            Logger::debug("handleConnection: Received unexpected command.");
             break;
         }
       }
@@ -153,12 +137,12 @@ void SocketServer::handleConnection(int clientSocket)
     }
 
     else if(iResult == 0) {
-      Logger::info("handleConnection: Connection closing...");
+      Logger::debug("handleConnection: Connection closing...");
     }
 
     else {
       if(isRunning) {
-        Logger::error("handleConnection: recv failed");
+        Logger::debug("handleConnection: recv failed");
       }
     }
   } while(iResult > 0);

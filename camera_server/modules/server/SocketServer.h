@@ -11,7 +11,6 @@
 #include "SocketProtocol.h"
 #include "RealNetworkSystem.h"
 #include "Logger.h"
-#include <iostream>
 #include <cstring>
 
 class SocketServer {
@@ -19,7 +18,7 @@ class SocketServer {
   /**
    * @brief SocketServerのコンストラクタ
    * @param _netSys 注入する具象クラス
-   * @param _port デフォルトはローカルアドレス
+   * @param _port デフォルトは27015
    */
   explicit SocketServer(INetworkSystem& _netSys = CameraServer::real,
                         int _port = CameraServer::DEFAULT_PORT);
@@ -37,7 +36,7 @@ class SocketServer {
   bool init();
 
   /**
-   * @brief サーバーを実行し、クライアントからの接続を待機する
+   * @brief サーバーを実行し接続用受け入れ状態にし,接続を待機
    */
   void run();
 
@@ -47,11 +46,11 @@ class SocketServer {
   void shutdown();
 
  public:
-  INetworkSystem& netSys;  // 注入される具象クラスのポインタ
-  int listenSocket;        // Severのファイルディスクリプタ
-  bool isRunning;          // Serverが稼働中ならtrue
-  int port;                // サーバのポート番号
-  static constexpr int DEFAULT_BUFLEN = 512;
+  INetworkSystem& netSys;                     // 注入される具象クラスのポインタ
+  int listenSocket;                           // Severのファイルディスクリプタ
+  bool isRunning;                             // Serverが稼働中ならtrue
+  int port;                                   // サーバのポート番号
+  static constexpr int DEFAULT_BUFLEN = 512;  // デフォルトのバッファサイズ
 
   /**
    * @brief クライアントとの接続を処理する

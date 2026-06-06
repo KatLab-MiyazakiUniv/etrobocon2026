@@ -5,8 +5,6 @@
  */
 
 #include <gtest/gtest.h>
-#include <iostream>
-#include <unistd.h>
 #include "SocketServer.h"
 #include "MockNetworkSystem.h"
 
@@ -59,7 +57,6 @@ TEST(SocketServerTest, ShutdownChangesStateCorrectly)
 {
   MockNetworkSystem mockNet;
   SocketServer server(mockNet);
-
   server.isRunning = true;
   server.listenSocket = 100;
   server.shutdown();
@@ -71,7 +68,7 @@ TEST(SocketServerTest, ShutdownChangesStateCorrectly)
 TEST(SocketServerTest, InitFailsOnSocketError)
 {
   MockNetworkSystem mockNet;
-  mockNet.forceSocketError = true;  // 正しいフラグ名に修正
+  mockNet.forceSocketError = true;
   SocketServer server(mockNet);
   EXPECT_FALSE(server.init());
 }

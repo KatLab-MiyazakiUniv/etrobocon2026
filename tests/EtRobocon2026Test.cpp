@@ -20,6 +20,6 @@ namespace etrobocon2026_test {
     // キャプチャした出力を取得
     std::string output = testing::internal::GetCapturedStdout();
 
-    EXPECT_NE(std::string::npos, output.find("Hello KATLAB\n"));
+    EXPECT_NE(std::string::npos, output.find("[INFO] Hello KATLAB\n"));
   }
 }  // namespace etrobocon2026_test

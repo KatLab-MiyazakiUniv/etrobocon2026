@@ -1,10 +1,11 @@
 /**
  * @file   RealNetworkSystem.h
- * @brief  実際のネットワーク関数の実装クラス
+ * @brief  本物のネットワークライブラリのラッパークラス
  * @author sadomiya-sousi
  */
 
-#pragma once
+#ifndef REAL_NETWORK_SYSTEM
+#define REAL_NETWORK_SYSTEM
 #include "INetworkSystem.h"
 
 class RealNetworkSystem : public INetworkSystem {
@@ -16,17 +17,14 @@ class RealNetworkSystem : public INetworkSystem {
    * @param protocol
    * @return ファイルディスクリプタ, -1:失敗
    */
-  int socket(int domain, int type, int protocol) override
-  {
-    return ::socket(domain, type, protocol);
-  }
+  int socket(int domain, int type, int protocol) override;
 
   /**
    * @brief close()のラッパー
    * @param fd クローズするファイルディスクリプタ
    * @return 0:成功, -1:失敗
    */
-  int close(int fd) override { return ::close(fd); }
+  int close(int fd) override;
 
   /**
    * @brief connect()のラッパー
@@ -35,10 +33,7 @@ class RealNetworkSystem : public INetworkSystem {
    * @param addrlen アドレス構造体のサイズ
    * @return 0:成功, -1:失敗
    */
-  int connect(int sockfd, const struct sockaddr* addr, socklen_t addrlen) override
-  {
-    return ::connect(sockfd, addr, addrlen);
-  }
+  int connect(int sockfd, const struct sockaddr* addr, socklen_t addrlen) override;
 
   /**
    * @brief send()のラッパー
@@ -48,10 +43,7 @@ class RealNetworkSystem : public INetworkSystem {
    * @param flags 送信オプションのフラグ
    * @return 送信したバイト数, -1:失敗
    */
-  ssize_t send(int sockfd, const void* buf, size_t len, int flags) override
-  {
-    return ::send(sockfd, buf, len, flags);
-  }
+  ssize_t send(int sockfd, const void* buf, size_t len, int flags) override;
 
   /**
    * @brief setsockopt()のラッパー
@@ -62,10 +54,7 @@ class RealNetworkSystem : public INetworkSystem {
    * @param optlen 設定値のバイト長
    * @return 0:成功, -1:失敗
    */
-  int setsockopt(int sockfd, int level, int optname, const void* optval, socklen_t optlen) override
-  {
-    return ::setsockopt(sockfd, level, optname, optval, optlen);
-  }
+  int setsockopt(int sockfd, int level, int optname, const void* optval, socklen_t optlen) override;
 
   /**
    * @brief bind()のラッパー
@@ -74,10 +63,7 @@ class RealNetworkSystem : public INetworkSystem {
    * @param addrlen アドレス構造体のサイズ
    * @return 0:成功, -1:失敗
    */
-  int bind(int sockfd, const struct sockaddr* addr, socklen_t addrlen) override
-  {
-    return ::bind(sockfd, addr, addrlen);
-  }
+  int bind(int sockfd, const struct sockaddr* addr, socklen_t addrlen) override;
 
   /**
    * @brief listen()のラッパー
@@ -85,7 +71,7 @@ class RealNetworkSystem : public INetworkSystem {
    * @param backlog 接続待ちキューの最大長
    * @return 0:成功, -1:失敗
    */
-  int listen(int sockfd, int backlog) override { return ::listen(sockfd, backlog); }
+  int listen(int sockfd, int backlog) override;
 
   /**
    * @brief accept()のラッパー
@@ -94,10 +80,7 @@ class RealNetworkSystem : public INetworkSystem {
    * @param addrlen アドレス構造体のサイズへのポインタ
    * @return 新しい接続用のファイルディスクリプタ, -1:失敗
    */
-  int accept(int sockfd, struct sockaddr* addr, socklen_t* addrlen) override
-  {
-    return ::accept(sockfd, addr, addrlen);
-  }
+  int accept(int sockfd, struct sockaddr* addr, socklen_t* addrlen) override;
 
   /**
    * @brief recv()のラッパー
@@ -107,8 +90,7 @@ class RealNetworkSystem : public INetworkSystem {
    * @param flags 受信オプションのフラグ
    * @return 受信したバイト数, 0:接続終了, -1:失敗
    */
-  ssize_t recv(int sockfd, void* buf, size_t len, int flags) override
-  {
-    return ::recv(sockfd, buf, len, flags);
-  }
+  ssize_t recv(int sockfd, void* buf, size_t len, int flags) override;
 };
+
+#endif

@@ -1,10 +1,11 @@
 /**
  * @file   INetworkSystem.h
- * @brief  ネットワーク関数に対して依存性の注入を受ける基底クラス
+ * @brief  ネットワーク関数をラップするための基底クラス
  * @author sadomiya-sousi
  */
 
-#pragma once
+#ifndef I_NET_WORK_SYSTEM_H
+#define I_NET_WORK_SYSTEM_H
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
@@ -97,3 +98,5 @@ class INetworkSystem {
    */
   virtual ssize_t recv(int sockfd, void* buf, size_t len, int flags) = 0;
 };
+
+#endif

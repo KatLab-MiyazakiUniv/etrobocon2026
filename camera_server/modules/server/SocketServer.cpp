@@ -63,10 +63,6 @@ bool SocketServer::init()
   return true;
 }
 
-/**
- * サーバー本体のループ処理
- * @brief クライアント接続を受け付け、1接続ごとに処理する
- */
 void SocketServer::run()
 {
   Logger::info("run: 開始");
@@ -88,10 +84,6 @@ void SocketServer::run()
   }
 }
 
-/**
- * サーバー停止処理
- * @brief listenソケットを閉じてrunループを終了させる
- */
 void SocketServer::shutdown()
 {
   Logger::debug("shutdown: 開始");

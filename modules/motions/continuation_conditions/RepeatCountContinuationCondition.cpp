@@ -21,7 +21,7 @@ RepeatCountContinuationCondition::~RepeatCountContinuationCondition()
 bool RepeatCountContinuationCondition::shouldContinue()
 {
   // 繰り返し回数が目標繰り返し回数に到達
-  if(currentRepeats == targetRepeats) return false;
+  if(currentRepeats >= targetRepeats) return false;
 
   currentRepeats++;
 

@@ -11,7 +11,7 @@ Robot::Robot()
     armMotorController(),
     imuController(),
     colorSensorController(),
-    socketClient()
+    cameraSocketClient()
 {
 }
 
@@ -41,7 +41,7 @@ Course& Robot::getCourse()
 
 SocketClient& Robot::getSocketClientInstance()
 {
-  return socketClient;
+  return cameraSocketClient;
 }
 
 void Robot::setCourse(Course course)

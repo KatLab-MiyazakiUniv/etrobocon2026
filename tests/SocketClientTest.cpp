@@ -66,7 +66,6 @@ TEST(SocketClientTest, DisconnectSendsCommand)
 {
   MockNetworkSystem mockNet;
   SocketClient client(mockNet);
-
   client.connectToServer();
   client.disconnectFromServer();
   uint8_t expectedCmd = static_cast<uint8_t>(CameraServer::Command::DISCONNECT);
@@ -93,6 +92,7 @@ TEST(SocketClientTest, ShutdownSendsCommand)
   EXPECT_EQ(mockNet.lastSentCommand, expectedCmd);
 }
 
+// 接続後にdisconnect()すると、DISCONNECTマンドが送信されることを確認
 TEST(SocketClientTest, DisconnectCommand)
 {
   MockNetworkSystem mockNet;

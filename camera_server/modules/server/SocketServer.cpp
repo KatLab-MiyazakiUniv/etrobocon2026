@@ -39,8 +39,8 @@ bool SocketServer::init()
   struct sockaddr_in serv_addr;
   memset(&serv_addr, 0, sizeof(serv_addr));
   serv_addr.sin_family = AF_INET;
-  serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);  // 全インターフェースで待受
-  serv_addr.sin_port = htons(this->port);         // ポート設定
+  serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+  serv_addr.sin_port = htons(this->port);
 
   Logger::debug("init: bind()実行前");
   if(netSys.bind(listenSocket, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
@@ -58,7 +58,6 @@ bool SocketServer::init()
   }
 
   Logger::info("init: 起動成功");
-  // 稼働フラグを true に
   isRunning = true;
   return true;
 }
@@ -114,7 +113,7 @@ void SocketServer::handleConnection(int clientSocket)
             return;
           case CameraServer::Command::DISCONNECT:
             Logger::debug("handleConnection: Received DISCONNECT command.");
-            // クライアントからの切断要求なので return
+            // クライアントからの切断要求なのでreturn
             return;
           default:
             Logger::debug("handleConnection: Received unexpected command.");

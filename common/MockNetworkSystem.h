@@ -73,7 +73,7 @@ class MockNetworkSystem : public INetworkSystem {
    * @param sockfd 接続を確立するキューのファイルディスクリプタ
    * @param addr ポート番号等の入ったインターネットドメインソケットアドレス
    * @param addrlen インターネットドメインソケットアドレスのバイト長
-   * @retrun 888:偽の通信用のファイルディスクリプタ
+   * @return 888:偽の通信用のファイルディスクリプタ
    */
   int accept(int sockfd, struct sockaddr* addr, socklen_t* addrlen) override
   {
@@ -96,7 +96,7 @@ class MockNetworkSystem : public INetworkSystem {
   /**
    * @brief recv()のモック
    * @param sockfdデータを受け渡すファイルディスクリプタ。
-   * サーバ側ならaccept()で発行したファイルディスクリプタでクライアント側ならsocket()で生成したファイルディスクリプタ
+   * サーバー側ならaccept()で発行したファイルディスクリプタでクライアント側ならsocket()で生成したファイルディスクリプタ
    * @param buf 受け取るバッファのポインタ
    * @param len バッファのバイト長
    * @param flgas 受信オプションのフラグ

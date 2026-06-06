@@ -17,9 +17,7 @@
 class Robot {
  public:
   /**
-   * コンストラクタ
    * @brief 外部リソースのインスタンスを初期化する
-   * @
    */
   Robot();
 
@@ -40,7 +38,7 @@ class Robot {
    * @return メンバ変数 imuController(IMUController のインスタンス) の参照
    */
   IMUController& getIMUControllerInstance();
-  /*
+  /**
    * @brief コースの参照を返す
    * @return メンバ変数 course(Course のインスタンス) の参照
    */
@@ -59,7 +57,7 @@ class Robot {
   ColorSensorController& getColorSensorControllerInstance();
 
   /**
-   * @brief SocketClientのDIされたインスタンスの参照を返す
+   * @brief カメラサーバー用のSocketClientのインスタンスの参照を返す
    * @return メンバ変数 socketClient(デフォルト引数でDIしたSocketClientのインスタンス) の参照
    */
   SocketClient& getSocketClientInstance();
@@ -70,7 +68,7 @@ class Robot {
   IMUController imuController;                  // IMUController インスタンス
   Course course;                                // コース(Left or Right)
   ColorSensorController colorSensorController;  // ColorSensorController インスタンス
-  SocketClient socketClient;                    // SocketClient DIインスタンス
+  SocketClient cameraSocketClient;              // カメラサーバー用のSocketClientインスタンス
 };
 
 #endif

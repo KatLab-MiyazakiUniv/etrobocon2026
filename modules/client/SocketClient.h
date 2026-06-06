@@ -10,15 +10,16 @@
 #include "RealNetworkSystem.h"
 #include "SocketProtocol.h"
 #include "Logger.h"
-#include <iostream>
 #include <arpa/inet.h>
-#include <unistd.h>
 #include <string.h>
 
 class SocketClient {
  public:
   /**
    * @brief コンストラクタ
+   * @param _netSys 注入する具象クラス
+   * @param _port デフォルトは27015
+   * @param _serverIp デフォルトはローカルアドレス
    */
   explicit SocketClient(INetworkSystem& _netSys = CameraServer::real,
                         int _port = CameraServer::DEFAULT_PORT,

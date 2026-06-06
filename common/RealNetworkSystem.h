@@ -1,6 +1,6 @@
 /**
  * @file   RealNetworkSystem.h
- * @brief  実際のネットワーク関数を注入するクラス
+ * @brief  実際のネットワーク関数の実装クラス
  * @author sadomiya-sousi
  */
 

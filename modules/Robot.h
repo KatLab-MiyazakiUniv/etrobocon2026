@@ -70,5 +70,4 @@ class Robot {
   SocketClient cameraSocketClient;              // カメラサーバー用のSocketClientインスタンス
   ColorSensorController colorSensorController;  // ColorSensorController インスタンス
 };
-
 #endif

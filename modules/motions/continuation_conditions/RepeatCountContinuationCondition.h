@@ -27,11 +27,6 @@ class RepeatCountContinuationCondition : public BaseContinuationCondition {
   ~RepeatCountContinuationCondition();
 
   /**
-   * @brief 開始時の累計繰り返し回数を取得して initRepeats に保存する
-   */
-  void prepare() override;
-
-  /**
    * @brief 開始時からの繰り返し回数が目標繰り返し回数に達した場合、動作を継続しないと判定する
    * @return true/動作を継続する、false/動作を継続しない
    */

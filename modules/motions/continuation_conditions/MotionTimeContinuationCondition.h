@@ -21,7 +21,7 @@ class MotionTimeContinuationCondition : public BaseContinuationCondition {
    * @param _targetTime 目標時間(ms)
    * @param _initTime 開始時の時間(ms)
    */
-  MotionTimeContinuationCondition(Robot& _robot, double _targetTime);
+  MotionTimeContinuationCondition(Robot& _robot, int _targetTime);
 
   /**
    * デストラクタ
@@ -40,8 +40,8 @@ class MotionTimeContinuationCondition : public BaseContinuationCondition {
   bool shouldContinue() override;
 
  private:
-  double targetTime;  // 目標時間(ms)
-  double initTime;    // 開始時の時間(ms)
+  int targetTime;  // 目標時間(ms)
+  int initTime;    // 開始時の時間(ms)
 };
 
 #endif

@@ -18,8 +18,6 @@ RepeatCountContinuationCondition::~RepeatCountContinuationCondition()
   LOG_DESTROY("RepeatCountContinuationCondition");
 }
 
-void RepeatCountContinuationCondition::prepare() {}
-
 bool RepeatCountContinuationCondition::shouldContinue()
 {
   currentRepeats++;

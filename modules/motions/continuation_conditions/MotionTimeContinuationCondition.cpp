@@ -6,7 +6,7 @@
 
 #include "MotionTimeContinuationCondition.h"
 
-MotionTimeContinuationCondition::MotionTimeContinuationCondition(Robot& _robot, double _targetTime)
+MotionTimeContinuationCondition::MotionTimeContinuationCondition(Robot& _robot, int _targetTime)
   : BaseContinuationCondition(_robot), targetTime(_targetTime), initTime(0.0)
 {
   LOG_CREATE("MotionTimeContinuationCondition");

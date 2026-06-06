@@ -1,5 +1,5 @@
 # Debian/arm64向け カメラサーバー用Makefile
-	
+
 # コンパイラ
 CXX := g++
 
@@ -34,6 +34,7 @@ INCLUDES := $(shell find $(INCLUDEDIR) -type d -printf '-I%p ') \
 # すべての .cpp ファイルを探す
 SOURCES := main.cpp $(shell find $(SRCDIR) -name '*.cpp')
 SOURCES += ../common/Logger.cpp
+SOURCES += ../common/RealNetworkSystem.cpp
 SOURCES += ../modules/API/ClockUtil.cpp
 OBJS := $(addprefix $(OBJDIR)/,$(SOURCES:.cpp=.o))
 

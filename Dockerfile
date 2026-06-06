@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
   cmake \
   clang-format \
   libopencv-dev \
+  libzxing-dev \
   nlohmann-json3-dev \
   && gem install shell \
   && apt-get clean && rm -rf /var/lib/apt/lists/*

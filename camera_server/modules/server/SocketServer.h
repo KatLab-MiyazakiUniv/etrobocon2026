@@ -26,7 +26,7 @@ class SocketServer {
 
   /**
    * @brief SocketServerのデストラクタ
-   *
+   */
   ~SocketServer();
 
   /**

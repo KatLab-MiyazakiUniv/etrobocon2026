@@ -4,8 +4,8 @@
  * @author sadomiya-sousi
  */
 
-#ifndef REAL_NETWORK_SYSTEM
-#define REAL_NETWORK_SYSTEM
+#ifndef REAL_NETWORK_SYSTEM_H
+#define REAL_NETWORK_SYSTEM_H
 #include "INetworkSystem.h"
 
 class RealNetworkSystem : public INetworkSystem {

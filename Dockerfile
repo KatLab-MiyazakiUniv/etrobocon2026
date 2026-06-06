@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
   clang-format \
   libopencv-dev \
   libzxing-dev \
+  libssl-dev \
   nlohmann-json3-dev \
   && gem install shell \
   && apt-get clean && rm -rf /var/lib/apt/lists/*

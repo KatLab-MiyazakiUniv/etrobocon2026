@@ -22,9 +22,13 @@ OPENCV_LIBS := $(shell pkg-config --libs opencv4)
 ZXING_CFLAGS := $(shell pkg-config --cflags zxing)
 ZXING_LIBS := $(shell pkg-config --libs zxing)
 
+# OpenSSLのフラグを取得
+OPENSSL_CFLAGS := $(shell pkg-config --cflags openssl)
+OPENSSL_LIBS := $(shell pkg-config --libs openssl)
+
 # フラグを追加
-CXXFLAGS += $(OPENCV_CFLAGS) $(ZXING_CFLAGS)
-LIBS := $(OPENCV_LIBS) $(ZXING_LIBS)
+CXXFLAGS += $(OPENCV_CFLAGS) $(ZXING_CFLAGS) $(OPENSSL_CFLAGS)
+LIBS := $(OPENCV_LIBS) $(ZXING_LIBS) $(OPENSSL_LIBS)
 
 # インクルードパス
 INCLUDES := $(shell find $(INCLUDEDIR) -type d -printf '-I%p ') \

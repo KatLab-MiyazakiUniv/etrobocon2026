@@ -1,6 +1,6 @@
 /**
  * @file   MockNetworkSystem.h
- * @brief  実際のネットワーク関数の実装クラス
+ * @brief  ネットワークライブラリのモッククラス
  * @author sadomiya-sousi
  */
 

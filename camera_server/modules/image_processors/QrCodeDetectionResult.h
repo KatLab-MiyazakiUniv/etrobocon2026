@@ -12,9 +12,9 @@
 #include <opencv2/core.hpp>
 
 struct QrCodeDetectionResult {
-  bool wasDetected = false;               // 検出したかどうか
-  std::string gatePosition;               // ゲート位置情報を表す文字列
-  std::array<cv::Point, 4> corners = {};  // 検出したQRコードの各頂点の座標
+  bool wasDetected = false;                 // 検出したかどうか
+  std::string content;                      // QRコードから取得した文字列
+  std::array<cv::Point2f, 4> corners = {};  // QRコードの各頂点の座標
 };
 
 #endif  // QR_CODE_DETECTION_RESULT_H

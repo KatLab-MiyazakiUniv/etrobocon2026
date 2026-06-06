@@ -36,8 +36,9 @@ class QrCodeDetector : public CodeDetector<QrCodeDetectionResult> {
   QrCodeDetectionResult detect(const cv::Mat& frame) override;
 
  private:
-  cv::QRCodeDetector detector;   // OpenCVのQRコード検出器
-  ZXing::ReaderOptions options;  // ZXingのデコードオプション
+  static constexpr float quietZoneRatio = 0.2f;  // 透視変換後のクワイエットゾーン比率
+  cv::QRCodeDetector detector;                   // OpenCVのQRコード検出器
+  ZXing::ReaderOptions options;                  // ZXingのデコードオプション
 
   /**
    * @brief 検出したQRコードの各頂点の座標から透視変換でQRコード領域を正面化する

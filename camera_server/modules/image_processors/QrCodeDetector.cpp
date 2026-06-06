@@ -26,8 +26,8 @@ cv::Mat QrCodeDetector::rectify(const cv::Mat& frame, const std::vector<cv::Poin
   float h = std::max(cv::norm(corners[3] - corners[0]), cv::norm(corners[2] - corners[1]));
   float s = std::max(w, h);
 
-  // クワイエットゾーン（余白）を20%分追加する
-  float p = s / 5.f;
+  // クワイエットゾーン（余白）を追加する
+  float p = s * quietZoneRatio;
   int totalSize = static_cast<int>(s + 2.f * p);
 
   // 余白分だけ内側にQRコード領域を配置
@@ -63,9 +63,9 @@ QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
 
   if(qrCode.isValid()) {
     result.wasDetected = true;
-    result.gatePosition = qrCode.text();
+    result.content = qrCode.text();
     for(int i = 0; i < 4; ++i) {
-      result.corners[i] = cv::Point(static_cast<int>(corners[i].x), static_cast<int>(corners[i].y));
+      result.corners[i] = corners[i];
     }
   }
 

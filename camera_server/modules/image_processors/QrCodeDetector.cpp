@@ -1,21 +1,41 @@
 /**
  * @file   QrCodeDetector.cpp
- * @brief  2次元コード検出処理クラス
+ * @brief  QRコード検出処理クラス
  * @author HaruArima08
  */
 
 #include "QrCodeDetector.h"
 
-QrCodeDetector::QrCodeDetector(bool _isCurved) : isCurved(_isCurved)
+QrCodeDetector::QrCodeDetector()
 {
-  detector.setEpsX(0.2); 
+  detector.setEpsX(0.2);
   detector.setEpsY(0.2);
+  options.setFormats(ZXing::BarcodeFormat::QRCode);
   LOG_CREATE("QrCodeDetector");
 }
 
 QrCodeDetector::~QrCodeDetector()
 {
   LOG_DESTROY("QrCodeDetector");
+}
+
+cv::Mat QrCodeDetector::rectify(const cv::Mat& frame, const std::vector<cv::Point2f>& corners) const
+{
+  // 対辺の長さの最大値を正方形の一辺とする
+  float w = std::max(cv::norm(corners[1] - corners[0]), cv::norm(corners[2] - corners[3]));
+  float h = std::max(cv::norm(corners[3] - corners[0]), cv::norm(corners[2] - corners[1]));
+  float s = std::max(w, h);
+
+  // クワイエットゾーン（余白）を20%分追加する
+  float p = s / 5.f;
+  int totalSize = static_cast<int>(s + 2.f * p);
+
+  // 余白分だけ内側にQRコード領域を配置
+  std::vector<cv::Point2f> dst = { { p, p }, { p + s, p }, { p + s, p + s }, { p, p + s } };
+  cv::Mat M = cv::getPerspectiveTransform(corners, dst);
+  cv::Mat rectified;
+  cv::warpPerspective(frame, rectified, M, cv::Size(totalSize, totalSize));
+  return rectified;
 }
 
 QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
@@ -27,21 +47,25 @@ QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
     return result;
   }
 
-  std::vector<cv::Point2f> cornerPoints;
-  std::string gatePos;
-
-  if(isCurved) {
-    gatePos = detector.detectAndDecodeCurved(frame, cornerPoints);
-  } else {
-    gatePos = detector.detectAndDecode(frame, cornerPoints);
+  // QRコードの各頂点の位置を検出
+  std::vector<cv::Point2f> corners;
+  if(!detector.detect(frame, corners) || corners.size() < 4) {
+    return result;
   }
 
-  if(!gatePos.empty() && cornerPoints.size() >= 4) {
+  // 透視変換で正面化
+  cv::Mat rectified = rectify(frame, corners);
+
+  // 正面化したフレームをデコード
+  ZXing::ImageView iv(rectified.data, rectified.cols, rectified.rows, ZXing::ImageFormat::BGR,
+                      static_cast<int>(rectified.step));
+  auto qrCode = ZXing::ReadBarcode(iv, options);
+
+  if(qrCode.isValid()) {
     result.wasDetected = true;
-    result.gatePosition = gatePos;
+    result.gatePosition = qrCode.text();
     for(int i = 0; i < 4; ++i) {
-      result.corners[i]
-          = cv::Point(static_cast<int>(cornerPoints[i].x), static_cast<int>(cornerPoints[i].y));
+      result.corners[i] = cv::Point(static_cast<int>(corners[i].x), static_cast<int>(corners[i].y));
     }
   }
 

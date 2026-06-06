@@ -13,6 +13,13 @@ class INetworkSystem {
  public:
   // 依存性の注入後にメモリリークを防ぐためにデストラクタを記述
   virtual ~INetworkSystem() = default;
+
+  /**
+   * @brief socket()のラッパー
+   * @param domain 通信ドメイン
+   * @param type ソケットタイプ
+   * @param protocol
+   */
   virtual int socket(int domain, int type, int protocol) = 0;
   virtual int close(int fd) = 0;
   virtual int connect(int sockfd, const struct sockaddr* addr, socklen_t addrlen) = 0;

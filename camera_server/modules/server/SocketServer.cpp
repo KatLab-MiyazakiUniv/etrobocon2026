@@ -6,21 +6,22 @@
 
 #include "SocketServer.h"
 
-SocketServer::SocketServer(INetworkSystem* networkSystem, int port)
-  : netSys(networkSystem), listenSocket(-1), isRunning(false), port(port)
+SocketServer::SocketServer(INetworkSystem& _netSys, int _port)
+  : netSys(_netSys), listenSocket(-1), isRunning(false), port(_port)
 {
   LOG_CREATE("SocketServer");
 }
 
-/**
- * サーバー初期化処理
- * @brief ソケット生成・bind・listenまでを行う
- * @return 成功:true / 失敗:false
- */
+SocketServer::~SocketServer()
+{
+  LOG_DESTROY("SocketClient");
+  shutdown();
+}
+
 bool SocketServer::init()
 {
   Logger::info("init: 開始");
-  listenSocket = netSys->socket(AF_INET, SOCK_STREAM, 0);
+  listenSocket = netSys.socket(AF_INET, SOCK_STREAM, 0);
   if(listenSocket < 0) {
     Logger::error("init: socket()失敗");
     return false;
@@ -29,11 +30,11 @@ bool SocketServer::init()
   int opt = 1;
 
   Logger::info("init: setsockopt()実行前");
-  if(netSys->setsockopt(listenSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
+  if(netSys.setsockopt(listenSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
     Logger::error("init: setsockopt()失敗");
 
     // close()が成功するか
-    if(netSys->close(listenSocket) < 0) {
+    if(netSys.close(listenSocket) < 0) {
       Logger::error("init: close()失敗");
     }
     return false;
@@ -46,21 +47,21 @@ bool SocketServer::init()
   serv_addr.sin_port = htons(this->port);         // ポート設定
 
   Logger::info("init: bind()実行前");
-  if(netSys->bind(listenSocket, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
+  if(netSys.bind(listenSocket, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
     Logger::error("init: bind()失敗");
 
     // close()が成功するか
-    if(netSys->close(listenSocket) < 0) {
+    if(netSys.close(listenSocket) < 0) {
       Logger::error("init: close()失敗");
     }
     return false;
   }
 
   Logger::info("init: listen()実行前");
-  if(netSys->listen(listenSocket, 3) < 0) {
+  if(netSys.listen(listenSocket, 3) < 0) {
     Logger::error("init: listen()失敗");
     // close()が成功するか
-    if(netSys->close(listenSocket) < 0) {
+    if(netSys.close(listenSocket) < 0) {
       Logger::error("init: close()失敗");
     }
     return false;
@@ -80,7 +81,7 @@ void SocketServer::run()
 {
   Logger::info("run: 開始");
   while(isRunning) {
-    int clientSocket = netSys->accept(listenSocket, (struct sockaddr*)NULL, NULL);
+    int clientSocket = netSys.accept(listenSocket, (struct sockaddr*)NULL, NULL);
     if(clientSocket < 0) {
       Logger::debug("run: accept()失敗");
       if(!isRunning) {
@@ -92,8 +93,7 @@ void SocketServer::run()
     }
     Logger::info("run: Client connected.");
     handleConnection(clientSocket);
-    // netSys->close(clientSocket);
-    if(netSys->close(clientSocket) < 0) {
+    if(netSys.close(clientSocket) < 0) {
       Logger::error("init: close()失敗");
     }
     Logger::info("run: Client disconnected.");
@@ -109,7 +109,7 @@ void SocketServer::shutdown()
   Logger::info("shutdown: 開始");
   isRunning = false;
   if(listenSocket != -1) {
-    netSys->close(listenSocket);
+    netSys.close(listenSocket);
     listenSocket = -1;
   }
   Logger::info("shutdown: Socket server shutting down.");
@@ -123,7 +123,8 @@ void SocketServer::handleConnection(int clientSocket)
 
   // クライアントからのデータ受信ループ
   do {
-    iResult = netSys->recv(clientSocket, recvbuf, SocketServer::DEFAULT_BUFLEN, 0);
+    // iResult = netSys->recv(clientSocket, recvbuf, SocketServer::DEFAULT_BUFLEN, 0);
+    iResult = netSys.recv(clientSocket, recvbuf, SocketServer::DEFAULT_BUFLEN, 0);
     if(iResult > 0) {
       if(static_cast<size_t>(iResult) == CameraServer::COMMAND_SIZE) {
         // 先頭をコマンドとして解釈

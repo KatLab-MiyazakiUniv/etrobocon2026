@@ -9,9 +9,10 @@
 
 #include <cstdint>
 #include "RealNetworkSystem.h"
-#include "MockNetworkSystem.h"
 
 namespace CameraServer {
+
+  static constexpr int DEFAULT_PORT = 27015;
   /**
    * @brief サーバー側で実行可能なコマンド
    */
@@ -20,9 +21,7 @@ namespace CameraServer {
     SHUTDOWN = 255     // サーバーをシャットダウン
   };
   constexpr size_t COMMAND_SIZE = sizeof(Command);
-  // 注入するインスタンスの実体は1つ
-  inline RealNetworkSystem real;
-
+  inline RealNetworkSystem real;  // 注入するインスタンスの実体は1つ
 }  // namespace CameraServer
 
 #endif  // SOCKET_PROTOCOL_H

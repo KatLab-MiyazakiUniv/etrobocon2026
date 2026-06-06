@@ -125,6 +125,7 @@ if(ENABLE_CAMERA_TESTS)
     PRIVATE
       camera_server_impl
       gtest_main
+      # gmock        #2026/06/05googleMockを利用するために追加
       ${OpenCV_LIBS}
   )
 

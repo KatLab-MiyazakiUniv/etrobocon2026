@@ -6,19 +6,19 @@
 
 #include "SocketClient.h"
 
-SocketClient::SocketClient(INetworkSystem* networkSystem, int port, const char* server_ip)
-  : netSys(networkSystem), sock(-1), isConnected(false), port(port), serverIp(server_ip)
+SocketClient::SocketClient(INetworkSystem& _netSys, int _port, const char* _serverIp)
+  : netSys(_netSys), sock(-1), isConnected(false), port(_port), serverIp(_serverIp)
 {
   LOG_CREATE("SocketClient");
-  Logger::printfLog(Logger::INFO, "(netSys: %p, port: %d, server_ip: %s)", networkSystem, port,
-                    server_ip);
+  // 初期化リストで,代入してるのに抽象クラスの出力と判定されerrorに..
+  //  Logger::printfLog(Logger::INFO, "(netSys: %p, port: %d, server_ip: %s)", netSys, port,
+  //  server_ip);
 }
 
 SocketClient::~SocketClient()
 {
   LOG_DESTROY("SocketClient");
   if(isConnected) {
-    Logger::info("SocketClient:サーバーから切断");
     disconnectFromServer();
   }
 }
@@ -33,7 +33,8 @@ bool SocketClient::connectToServer()
   }
 
   Logger::info("connectToServer: socket()実行前");
-  sock = netSys->socket(AF_INET, SOCK_STREAM, 0);
+  // sock = netSys->socket(AF_INET, SOCK_STREAM, 0);
+  sock = netSys.socket(AF_INET, SOCK_STREAM, 0);
 
   Logger::printfLog(Logger::INFO, "connectToServer: socket()の実行後 %d", sock);
   if(sock < 0) {
@@ -46,25 +47,27 @@ bool SocketClient::connectToServer()
   memset(&serv_addr, 0, sizeof(serv_addr));
   serv_addr.sin_family = AF_INET;
   serv_addr.sin_port = htons(this->port);
-  Logger::printfLog(Logger::INFO, "connectToServer: アドレス構造体初期化後 (PORT: %d)", this->port);
-
   Logger::info("connectToServer: inet_pton()実行前");
   if(inet_pton(AF_INET, serverIp.c_str(), &serv_addr.sin_addr) <= 0) {
     Logger::printfLog(Logger::INFO, "connectToServer: inet_pton()失敗:ソケット %d ", sock);
-    // netSys->close(sock);
-    if(netSys->close(sock) < 0) {
+    // close()が成功するか
+    // if(netSys->close(sock) < 0) {
+    if(netSys.close(sock) < 0) {
       Logger::error("init: close()失敗");
     }
     sock = -1;
     Logger::info("connectToServer: 失敗.処理終了");
     return false;
   }
+  Logger::printfLog(Logger::INFO, "connectToServer: アドレス構造体初期化後 (PORT: %d)", this->port);
 
   Logger::info("connectToServer: connect()実行前");
-  if(netSys->connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
+  // if(netSys->connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
+  if(netSys.connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
     Logger::printfLog(Logger::ERROR, "connectToServer: connect():ソケット %d を閉じます", sock);
-    // netSys->close(sock);
-    if(netSys->close(sock) < 0) {
+    // close()が成功するか
+    // if(netSys->close(sock) < 0) {
+    if(netSys.close(sock) < 0) {
       Logger::error("init: close()失敗");
     }
 
@@ -85,11 +88,13 @@ void SocketClient::disconnectFromServer()
     CameraServer::Command cmd = CameraServer::Command::DISCONNECT;
 
     Logger::printfLog(Logger::INFO, "disconnectFromServer: DISCONNECT コマンドを送信 ");
-    netSys->send(sock, reinterpret_cast<const char*>(&cmd), sizeof(cmd), 0);
+    // netSys->send(sock, reinterpret_cast<const char*>(&cmd), sizeof(cmd), 0);
+    netSys.send(sock, reinterpret_cast<const char*>(&cmd), sizeof(cmd), 0);
 
     Logger::printfLog(Logger::INFO, "disconnectFromServer: ソケット %d をクローズします...", sock);
-    // netSys->close(sock);
-    if(netSys->close(sock) < 0) {
+    // close()が成功するか
+    // if(netSys->close(sock) < 0) {
+    if(netSys.close(sock) < 0) {
       Logger::error("init: close()失敗");
     }
     sock = -1;
@@ -110,11 +115,13 @@ void SocketClient::shutdownServer()
     CameraServer::Command cmd = CameraServer::Command::SHUTDOWN;
 
     Logger::printfLog(Logger::INFO, "shutdownServer: SHUTDOWN コマンドを送信前");
-    netSys->send(sock, reinterpret_cast<const char*>(&cmd), sizeof(cmd), 0);
+    // netSys->send(sock, reinterpret_cast<const char*>(&cmd), sizeof(cmd), 0);
+    netSys.send(sock, reinterpret_cast<const char*>(&cmd), sizeof(cmd), 0);
 
     Logger::printfLog(Logger::INFO, "shutdownServer: close()前 ソケット :%d ", sock);
-    // netSys->close(sock);
-    if(netSys->close(sock) < 0) {
+    // close()が成功するか
+    // if(netSys->close(sock) < 0) {
+    if(netSys.close(sock) < 0) {
       Logger::error("init: close()失敗");
     }
 

@@ -10,7 +10,6 @@
 #include <string>
 #include "SocketProtocol.h"
 #include "RealNetworkSystem.h"
-#include "MockNetworkSystem.h"
 #include "Logger.h"
 #include <iostream>
 #include <cstring>
@@ -19,10 +18,16 @@ class SocketServer {
  public:
   /**
    * @brief SocketServerのコンストラクタ
-   * @details
-   * ソケットサーバーの初期状態を設定する
+   * @param _netSys 注入する具象クラス
+   * @param _port デフォルトはローカルアドレス
    */
-  explicit SocketServer(INetworkSystem* networkSystem = &CameraServer::real, int port = 27015);
+  explicit SocketServer(INetworkSystem& _netSys = CameraServer::real,
+                        int _port = CameraServer::DEFAULT_PORT);
+
+  /**
+   * @brief SocketServerのデストラクタ
+   *
+  ~SocketServer();
 
   /**
    * @brief サーバーを初期化する
@@ -42,7 +47,7 @@ class SocketServer {
   void shutdown();
 
  public:
-  INetworkSystem* netSys;  // 注入される具象クラスのポインタ
+  INetworkSystem& netSys;  // 注入される具象クラスのポインタ
   int listenSocket;        // Severのファイルディスクリプタ
   bool isRunning;          // Serverが稼働中ならtrue
   int port;                // サーバのポート番号
@@ -54,5 +59,4 @@ class SocketServer {
    */
   void handleConnection(int clientSocket);
 };
-
 #endif  // SOCKET_SERVER_H

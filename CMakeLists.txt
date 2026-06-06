@@ -85,6 +85,8 @@ option(ENABLE_CAMERA_TESTS "Build camera tests" ON)
 
 if(ENABLE_CAMERA_TESTS)
   find_package(OpenCV REQUIRED)
+  find_package(PkgConfig REQUIRED)
+  pkg_check_modules(ZXING REQUIRED zxing)
 
   # 必要なインクルードディレクトリの設定 (適宜登録)
   set(CAMERA_INCLUDE_DIRS
@@ -108,8 +110,8 @@ if(ENABLE_CAMERA_TESTS)
 
   # ライブラリターゲットを作成
   add_library(camera_server_impl STATIC ${CAMERA_SOURCES})
-  target_include_directories(camera_server_impl PUBLIC ${CAMERA_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
-  target_link_libraries(camera_server_impl ${OpenCV_LIBS})
+  target_include_directories(camera_server_impl PUBLIC ${CAMERA_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} ${ZXING_INCLUDE_DIRS})
+  target_link_libraries(camera_server_impl ${OpenCV_LIBS} ${ZXING_LIBRARIES})
 
   # camera_server/tests ディレクトリ内の *Test.cpp をすべてテストソースとして登録
   file(GLOB CAMERA_TEST_SOURCES

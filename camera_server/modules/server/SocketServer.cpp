@@ -45,7 +45,7 @@ bool SocketServer::init()
   Logger::debug("init: bind()実行前");
   if(netSys.bind(listenSocket, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
     Logger::debug("init: bind()失敗");
-    netSys.close(listenSocket) < 0;
+    netSys.close(listenSocket);
     return false;
   }
 

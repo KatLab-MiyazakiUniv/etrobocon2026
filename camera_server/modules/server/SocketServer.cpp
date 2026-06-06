@@ -62,7 +62,7 @@ void SocketServer::run()
   while(isRunning) {
     int clientSocket = netSys.accept(listenSocket, (struct sockaddr*)NULL, NULL);
     if(clientSocket < 0) {
-      Logger::debug("run: accept()失敗");
+      Logger::error("run: accept()失敗");
       if(!isRunning) {
         break;
       }
@@ -80,7 +80,7 @@ void SocketServer::shutdown()
     netSys.close(listenSocket);
     listenSocket = -1;
   }
-  Logger::debug("shutdown:Socket server Shutdown");
+  Logger::info("shutdown:Socket server Shutdown");
 }
 
 void SocketServer::handleConnection(int clientSocket)

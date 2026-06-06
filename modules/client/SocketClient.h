@@ -28,24 +28,24 @@ class SocketClient {
   /**
    * @brief デストラクタ
    */
-  virtual ~SocketClient();
+  ~SocketClient();
 
   /**
    * @brief サーバーに接続する
    * @return true 接続に成功した場合
    * @return false 接続に失敗した場合
    */
-  virtual bool connectToServer();
+  bool connectToServer();
 
   /**
    * @brief サーバーから切断する
    */
-  virtual void disconnectFromServer();
+  void disconnectFromServer();
 
   /**
    * @brief サーバーをシャットダウンする
    */
-  virtual void shutdownServer();
+  void shutdownServer();
 
  protected:
   INetworkSystem& netSys;

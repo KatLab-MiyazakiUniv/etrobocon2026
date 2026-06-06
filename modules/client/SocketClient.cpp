@@ -10,9 +10,6 @@ SocketClient::SocketClient(INetworkSystem& _netSys, int _port, const char* _serv
   : netSys(_netSys), sock(-1), isConnected(false), port(_port), serverIp(_serverIp)
 {
   LOG_CREATE("SocketClient");
-  // 初期化リストで,代入してるのに抽象クラスの出力と判定されerrorに..
-  // Logger::printfLog(Logger::INFO, "(netSys: %p, port: %d, serverIp: %s)", netSys, port,
-  // serverIp);
 }
 
 SocketClient::~SocketClient()

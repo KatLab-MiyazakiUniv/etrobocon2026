@@ -63,11 +63,11 @@ class Robot {
   SocketClient& getSocketClientInstance();
 
  private:
-  WheelMotorController wheelMotorController;  // WheelMotorController インスタンス
-  ArmMotorController armMotorController;      // ArmMotorController インスタンス
-  IMUController imuController;                // IMUController インスタンス
-  Course course;                              // コース(Left or Right)
-  SocketClient cameraSocketClient;
+  WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
+  ArmMotorController armMotorController;        // ArmMotorController インスタンス
+  IMUController imuController;                  // IMUController インスタンス
+  Course course;                                // コース(Left or Right)
+  SocketClient cameraSocketClient;              // cameraSocketClient インスタンス
   ColorSensorController colorSensorController;  // ColorSensorController インスタンス
 };
 #endif

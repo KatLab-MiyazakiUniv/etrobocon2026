@@ -10,6 +10,7 @@ SocketServer::SocketServer(INetworkSystem& _netSys, int _port)
   : netSys(_netSys), listenSocket(-1), isRunning(false), port(_port)
 {
   LOG_CREATE("SocketServer");
+  Logger::printfLog(Logger::INFO, "ポート番号は%d", _port);
 }
 
 SocketServer::~SocketServer()
@@ -20,16 +21,14 @@ SocketServer::~SocketServer()
 
 bool SocketServer::init()
 {
-  Logger::debug("init: 開始");
   listenSocket = netSys.socket(AF_INET, SOCK_STREAM, 0);
   if(listenSocket < 0) {
-    Logger::debug("init: socket()失敗");
+    Logger::error("init: socket()失敗");
     return false;
   }
 
   int opt = 1;
 
-  Logger::debug("init: setsockopt()実行前");
   if(netSys.setsockopt(listenSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
     Logger::error("init: setsockopt()失敗");
     netSys.close(listenSocket);
@@ -42,18 +41,14 @@ bool SocketServer::init()
   serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
   serv_addr.sin_port = htons(this->port);
 
-  Logger::debug("init: bind()実行前");
   if(netSys.bind(listenSocket, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
-    Logger::debug("init: bind()失敗");
     netSys.close(listenSocket);
     return false;
   }
 
-  Logger::debug("init: listen()実行前");
   if(netSys.listen(listenSocket, 3) < 0) {
-    Logger::debug("init: listen()失敗");
+    Logger::error("init: listen()失敗");
     netSys.close(listenSocket);
-    Logger::error("init: close()失敗");
     return false;
   }
 
@@ -64,39 +59,32 @@ bool SocketServer::init()
 
 void SocketServer::run()
 {
-  Logger::info("run: 開始");
   while(isRunning) {
     int clientSocket = netSys.accept(listenSocket, (struct sockaddr*)NULL, NULL);
     if(clientSocket < 0) {
       Logger::debug("run: accept()失敗");
       if(!isRunning) {
-        Logger::debug("run: サーバー停止");
         break;
       }
-      Logger::debug("run: サーバー継続");
       continue;
     }
-    Logger::debug("run: Client connected.");
     handleConnection(clientSocket);
     netSys.close(clientSocket);
-    Logger::debug("run: Client disconnected.");
   }
 }
 
 void SocketServer::shutdown()
 {
-  Logger::debug("shutdown: 開始");
   isRunning = false;
   if(listenSocket != -1) {
     netSys.close(listenSocket);
     listenSocket = -1;
   }
-  Logger::debug("shutdown: Socket server shutting down.");
+  Logger::debug("shutdown:Socket server Shutdown");
 }
 
 void SocketServer::handleConnection(int clientSocket)
 {
-  Logger::debug("handleConnection: 開始");
   char recvbuf[SocketServer::DEFAULT_BUFLEN];
   ssize_t iResult;
 
@@ -108,32 +96,22 @@ void SocketServer::handleConnection(int clientSocket)
         CameraServer::Command cmd = *reinterpret_cast<CameraServer::Command*>(recvbuf);
         switch(cmd) {
           case CameraServer::Command::SHUTDOWN:
-            Logger::debug("handleConnection: Received SHUTDOWN command.");
             shutdown();
             return;
           case CameraServer::Command::DISCONNECT:
-            Logger::debug("handleConnection: Received DISCONNECT command.");
             // クライアントからの切断要求なのでreturn
             return;
           default:
-            Logger::debug("handleConnection: Received unexpected command.");
             break;
         }
-      }
-
-      else {
+      } else {
         Logger::printfLog(Logger::ERROR, "handleConnection: Received unexpected data size: %zd",
                           (ssize_t)iResult);
       }
-    }
-
-    else if(iResult == 0) {
-      Logger::debug("handleConnection: Connection closing...");
-    }
-
-    else {
+    } else if(iResult == 0) {
+    } else {
       if(isRunning) {
-        Logger::debug("handleConnection: recv failed");
+        Logger::error("handleConnection: recv failed");
       }
     }
   } while(iResult > 0);

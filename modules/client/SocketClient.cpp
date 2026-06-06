@@ -78,7 +78,6 @@ void SocketClient::disconnectFromServer()
     CameraServer::Command cmd = CameraServer::Command::DISCONNECT;
 
     Logger::printfLog(Logger::DEBUG, "disconnectFromServer: DISCONNECT コマンドを送信 ");
-    // netSys->send(sock, reinterpret_cast<const char*>(&cmd), sizeof(cmd), 0);
     netSys.send(sock, reinterpret_cast<const char*>(&cmd), sizeof(cmd), 0);
 
     Logger::printfLog(Logger::DEBUG, "disconnectFromServer: ソケット %d をクローズします...", sock);

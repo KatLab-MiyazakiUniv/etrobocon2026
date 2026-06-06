@@ -1,6 +1,6 @@
 /**
  * @file   SocketClient.h
- * @brief  カメラサーバーと通信するクラス
+ * @brief  サーバーと通信するクラス
  * @author sadomiya-sousi, okuyama0528
  */
 

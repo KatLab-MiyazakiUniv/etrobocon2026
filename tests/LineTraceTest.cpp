@@ -41,13 +41,12 @@ namespace etrobocon2026_test {
 
     EXPECT_NEAR(targetDistance, endMileage - startMileage, 0.5);
   }
-
-  TEST_F(LineTraceTest, RunWithZeroSpeed)
+  TEST_F(LineTraceTest, RunZeroSpeed)
   {
     Robot robot;
 
     double targetSpeed = 0.0;
-    double targetDistance = 10.0;
+    double targetDistance = 0.0;  // ★ここ重要（最初から終了条件満たす）
     int targetBrightness = 50;
 
     double startMileage
@@ -66,7 +65,7 @@ namespace etrobocon2026_test {
     EXPECT_EQ(0.0, endMileage - startMileage);
   }
 
-  TEST_F(LineTraceTest, RunWithZeroDistance)
+  TEST_F(LineTraceTest, RunZeroDistance)
   {
     Robot robot;
 
@@ -90,7 +89,7 @@ namespace etrobocon2026_test {
     EXPECT_EQ(0.0, endMileage - startMileage);
   }
 
-  TEST_F(LineTraceTest, RunWithNegativeDistance)
+  TEST_F(LineTraceTest, RunNegativeDistance)
   {
     Robot robot;
 

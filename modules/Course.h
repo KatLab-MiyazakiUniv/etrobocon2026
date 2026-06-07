@@ -8,9 +8,9 @@
 #define COURSE_H
 
 // エリア名を持つ列挙型変数（LineTrace = 0, Area2 = 1）
-enum Area { LineTrace, Area2 };
+enum class Area { LineTrace, Area2 };
 
 // コース名を持つ列挙型変数（Left = 0, Right = 1）
-enum Course { Left, Right };
+enum class Course { Left, Right };
 
 #endif

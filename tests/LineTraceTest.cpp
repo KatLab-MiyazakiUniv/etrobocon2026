@@ -13,6 +13,8 @@ namespace etrobocon2026_test {
 
   class LineTraceTest : public ::testing::Test {
    protected:
+    Pid::PidGain rightPid = { 0.00535, 0.00115, 0.000 };
+    Pid::PidGain leftPid = { 0.00578, 0.0008535, 0.000 };
     Pid::PidGain tracePid = { 0.0055, 0.0009, 0.0 };
   };
 
@@ -29,7 +31,7 @@ namespace etrobocon2026_test {
                                     robot.getWheelMotorControllerInstance().getLeftCount());
 
     LineTrace lineTrace(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                        targetSpeed, targetBrightness, tracePid);
+                        targetSpeed, targetBrightness, rightPid, leftPid, tracePid);
 
     lineTrace.run();
 
@@ -53,7 +55,7 @@ namespace etrobocon2026_test {
                                     robot.getWheelMotorControllerInstance().getLeftCount());
 
     LineTrace lineTrace(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                        targetSpeed, targetBrightness, tracePid);
+                        targetSpeed, targetBrightness, rightPid, leftPid, tracePid);
 
     lineTrace.run();
 
@@ -77,7 +79,7 @@ namespace etrobocon2026_test {
                                     robot.getWheelMotorControllerInstance().getLeftCount());
 
     LineTrace lineTrace(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                        targetSpeed, targetBrightness, tracePid);
+                        targetSpeed, targetBrightness, rightPid, leftPid, tracePid);
 
     lineTrace.run();
 
@@ -101,7 +103,7 @@ namespace etrobocon2026_test {
                                     robot.getWheelMotorControllerInstance().getLeftCount());
 
     LineTrace lineTrace(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                        targetSpeed, targetBrightness, tracePid);
+                        targetSpeed, targetBrightness, rightPid, leftPid, tracePid);
 
     lineTrace.run();
 

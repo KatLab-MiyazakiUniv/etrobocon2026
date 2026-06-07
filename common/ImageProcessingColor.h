@@ -7,7 +7,7 @@
 #ifndef IMAGE_PROCESSING_COLOR_H
 #define IMAGE_PROCESSING_COLOR_H
 
-#include <opencv2/core/types.hpp>
+#include <opencv2/opencv.hpp>
 
 class ImageProcessingColor {
  public:

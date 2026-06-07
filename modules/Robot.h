@@ -68,7 +68,7 @@ class Robot {
   ArmMotorController armMotorController;        // ArmMotorController インスタンス
   IMUController imuController;                  // IMUController インスタンス
   Course course;                                // コース(Left or Right)
-  SocketClient cameraSocketClient;              // カメラサーバー用のSocketClient インスタンス
+  SocketClient cameraSocketClient;              // カメラサーバー用 SocketClient インスタンス
   ColorSensorController colorSensorController;  // ColorSensorController インスタンス
 };
 #endif

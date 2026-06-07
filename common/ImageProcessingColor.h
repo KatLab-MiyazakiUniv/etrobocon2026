@@ -7,8 +7,11 @@
 #ifndef IMAGE_PROCESSING_COLOR_H
 #define IMAGE_PROCESSING_COLOR_H
 
-#include <opencv2/opencv.hpp>
+#include "SocketProtocol.h"
 
+/**
+ * @brief 画像処理で使用する色定義とHSV変換処理を提供するクラス
+ */
 class ImageProcessingColor {
  public:
   /**
@@ -23,19 +26,11 @@ class ImageProcessingColor {
   };
 
   /**
-   * @brief HSV範囲を表す構造体
-   */
-  struct HSVRange {
-    cv::Scalar lower;  // HSV下限値
-    cv::Scalar upper;  // HSV上限値
-  };
-
-  /**
    * @brief 色に対応するHSV範囲を取得する
    * @param color 画像処理用の色
    * @return HSV範囲
    */
-  static const HSVRange& getHSVRangeFromColor(Color color);
+  static const CameraServer::HSVRangeData& getHSVRangeFromColor(Color color);
 
  private:
   /**
@@ -43,30 +38,11 @@ class ImageProcessingColor {
    */
   ImageProcessingColor();
 
-  /**
-   * @brief 赤色のHSV範囲
-   */
-  static const HSVRange RED_HSV;
-
-  /**
-   * @brief 青色のHSV範囲
-   */
-  static const HSVRange BLUE_HSV;
-
-  /**
-   * @brief 緑色のHSV範囲
-   */
-  static const HSVRange GREEN_HSV;
-
-  /**
-   * @brief 黄色のHSV範囲
-   */
-  static const HSVRange YELLOW_HSV;
-
-  /**
-   * @brief 黒色のHSV範囲
-   */
-  static const HSVRange BLACK_HSV;
+  static const CameraServer::HSVRangeData RED_HSV;     // 赤色のHSV範囲
+  static const CameraServer::HSVRangeData BLUE_HSV;    // 青色のHSV範囲
+  static const CameraServer::HSVRangeData GREEN_HSV;   // 緑色のHSV範囲
+  static const CameraServer::HSVRangeData YELLOW_HSV;  // 黄色のHSV範囲
+  static const CameraServer::HSVRangeData BLACK_HSV;   // 黒色のHSV範囲
 };
 
 #endif  // IMAGE_PROCESSING_COLOR_H

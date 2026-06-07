@@ -56,4 +56,18 @@ namespace etrobocon2026_test {
     EXPECT_FALSE(condition.shouldContinue());
   }
 
+  /**
+   * 目標回数が負の場合は即停止判定になることを確認
+   */
+  TEST(RepeatCountContinuationConditionTest, NegativeTargetCount)
+  {
+    Robot robot;
+
+    RepeatCountContinuationCondition condition(robot, -1);
+
+    condition.prepare();
+
+    EXPECT_FALSE(condition.shouldContinue());
+  }
+
 }  // namespace etrobocon2026_test

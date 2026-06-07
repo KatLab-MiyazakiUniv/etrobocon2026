@@ -146,4 +146,105 @@ namespace etrobocon2026_test {
     EXPECT_EQ(result.bottomRight.x, blueRect.x + blueRect.width);
     EXPECT_EQ(result.bottomRight.y, blueRect.y + blueRect.height);
   }
+
+  // 最大色インデックス取得ありのdetectで、検出できない場合 largestColorIndex == -1 になるかのテスト
+  TEST_F(ColorRegionDetectorTest, DetectWithLargestColorIndexNotDetected)
+  {
+    ColorRegionDetector detector(blackRanges, defaultROI);
+
+    cv::Mat frame(defaultRes, CV_8UC3, cv::Scalar(255, 255, 255));
+
+    BoundingBoxDetectionResult result;
+    int32_t largestColorIndex = 999;
+
+    detector.detect(frame, result, largestColorIndex);
+
+    EXPECT_FALSE(result.wasDetected);
+    EXPECT_EQ(largestColorIndex, -1);
+  }
+
+  // 最大色インデックス取得ありのdetectで、1色だけ指定した場合 largestColorIndex == 0
+  // になるかのテスト
+  TEST_F(ColorRegionDetectorTest, DetectWithLargestColorIndexSingleColor)
+  {
+    ColorRegionDetector detector(blackRanges, defaultROI);
+
+    cv::Rect blackRect(200, 300, 100, 80);
+    cv::Mat frame = makeFrameWithBlackRect(defaultRes, blackRect);
+
+    BoundingBoxDetectionResult result;
+    int32_t largestColorIndex = -1;
+
+    detector.detect(frame, result, largestColorIndex);
+
+    ASSERT_TRUE(result.wasDetected);
+    EXPECT_EQ(largestColorIndex, 0);
+  }
+
+  // 最大色インデックス取得ありのdetectで、複数色のうち面積が最大の色インデックスが返るかのテスト
+  TEST_F(ColorRegionDetectorTest, DetectWithLargestColorIndexMultipleColors)
+  {
+    // hsvRanges[0] = 黒色, hsvRanges[1] = 青色
+    std::vector<HSVRange> ranges = blackRanges;
+    ranges.push_back({ cv::Scalar(110, 200, 200), cv::Scalar(130, 255, 255) });
+
+    ColorRegionDetector detector(ranges, defaultROI);
+
+    cv::Mat frame(defaultRes, CV_8UC3, cv::Scalar(255, 255, 255));
+
+    // 黒色より青色の方が大きくなるように配置
+    cv::Rect blackRect(100, 280, 80, 80);  // 6400px
+    cv::Rect blueRect(180, 280, 160, 80);  // 12800px
+
+    cv::rectangle(frame, blackRect, cv::Scalar(0, 0, 0), cv::FILLED);
+    cv::rectangle(frame, blueRect, cv::Scalar(255, 0, 0), cv::FILLED);
+
+    BoundingBoxDetectionResult result;
+    int32_t largestColorIndex = -1;
+
+    detector.detect(frame, result, largestColorIndex);
+
+    ASSERT_TRUE(result.wasDetected);
+    EXPECT_EQ(largestColorIndex, 1);
+
+    // バウンディングボックス自体は複数色を統合した領域になっていることも確認
+    EXPECT_EQ(result.topLeft.x, blackRect.x);
+    EXPECT_EQ(result.topLeft.y, blackRect.y);
+    EXPECT_EQ(result.bottomRight.x, blueRect.x + blueRect.width);
+    EXPECT_EQ(result.bottomRight.y, blueRect.y + blueRect.height);
+  }
+
+  // 最大色インデックス取得ありのdetectで、黒色の方が大きい場合 largestColorIndex == 0
+  // になるかのテスト
+  TEST_F(ColorRegionDetectorTest, DetectWithLargestColorIndexBlackIsLargest)
+  {
+    // hsvRanges[0] = 黒色, hsvRanges[1] = 青色
+    std::vector<HSVRange> ranges = blackRanges;
+    ranges.push_back({ cv::Scalar(110, 200, 200), cv::Scalar(130, 255, 255) });
+
+    ColorRegionDetector detector(ranges, defaultROI);
+
+    cv::Mat frame(defaultRes, CV_8UC3, cv::Scalar(255, 255, 255));
+
+    // 青色より黒色の方が大きくなるように配置
+    cv::Rect blackRect(100, 280, 160, 80);  // 12800px
+    cv::Rect blueRect(260, 280, 80, 80);    // 6400px
+
+    cv::rectangle(frame, blackRect, cv::Scalar(0, 0, 0), cv::FILLED);
+    cv::rectangle(frame, blueRect, cv::Scalar(255, 0, 0), cv::FILLED);
+
+    BoundingBoxDetectionResult result;
+    int32_t largestColorIndex = -1;
+
+    detector.detect(frame, result, largestColorIndex);
+
+    ASSERT_TRUE(result.wasDetected);
+    EXPECT_EQ(largestColorIndex, 0);
+
+    // バウンディングボックス自体は複数色を統合した領域になっていることも確認
+    EXPECT_EQ(result.topLeft.x, blackRect.x);
+    EXPECT_EQ(result.topLeft.y, blackRect.y);
+    EXPECT_EQ(result.bottomRight.x, blueRect.x + blueRect.width);
+    EXPECT_EQ(result.bottomRight.y, blueRect.y + blueRect.height);
+  }
 }  // namespace etrobocon2026_test

@@ -1,5 +1,5 @@
 /**
- * @file   DistanceCondition.cpp
+ * @file   DistanceCondition.h
  * @brief  目標距離を基準に動作を継続すべきかを判定するクラス
  * @author migaku2645
  */

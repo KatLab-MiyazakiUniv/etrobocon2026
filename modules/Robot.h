@@ -60,7 +60,7 @@ class Robot {
    * @brief カメラサーバー用のSocketClientのインスタンスの参照を返す
    * @return メンバ変数 socketClient(デフォルト引数でDIしたSocketClientのインスタンス) の参照
    */
-  SocketClient& getSocketClientInstance();
+  SocketClient& getCameraSocketClientInstance();
 
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス

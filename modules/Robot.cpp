@@ -39,7 +39,7 @@ Course& Robot::getCourse()
   return course;
 }
 
-SocketClient& Robot::getSocketClientInstance()
+SocketClient& Robot::getCameraSocketClientInstance()
 {
   return cameraSocketClient;
 }

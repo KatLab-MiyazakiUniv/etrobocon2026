@@ -99,7 +99,7 @@ class MockNetworkSystem : public INetworkSystem {
    * サーバー側ならaccept()で発行したファイルディスクリプタでクライアント側ならsocket()で生成したファイルディスクリプタ
    * @param buf 受け取るバッファのポインタ
    * @param len バッファのバイト長
-   * @param flgas 受信オプションのフラグ
+   * @param flags 受信オプションのフラグ
    * @return 成功:sizeOfReturnLenは操作可能な文字数, 失敗:-1
    */
   ssize_t recv(int sockfd, void* buf, size_t len, int flags) override

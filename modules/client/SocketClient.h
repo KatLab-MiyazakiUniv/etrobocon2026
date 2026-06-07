@@ -21,7 +21,7 @@ class SocketClient {
    * @param _port デフォルトは27015
    * @param _serverIp デフォルトはローカルアドレス
    */
-  explicit SocketClient(INetworkSystem& _netSys = CameraServer::real,
+  explicit SocketClient(INetworkSystem& _netSys,
                         int _port = CameraServer::DEFAULT_PORT,
                         const char* _serverIp = "127.0.0.1");
 

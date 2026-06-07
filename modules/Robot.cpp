@@ -6,12 +6,12 @@
 
 #include "Robot.h"
 
-Robot::Robot()
+Robot::Robot(SocketClient& _cameraSocketClient)
   : wheelMotorController(),
     armMotorController(),
     imuController(),
     colorSensorController(),
-    cameraSocketClient()
+    cameraSocketClient(_cameraSocketClient)
 {
 }
 

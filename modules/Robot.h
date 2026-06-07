@@ -19,7 +19,7 @@ class Robot {
   /**
    * @brief 外部リソースのインスタンスを初期化する
    */
-  Robot();
+  Robot(SocketClient& _cameraSocketClient);
 
   /**
    * @brief WheelMotorControllerのインスタンスの参照を返す
@@ -68,7 +68,7 @@ class Robot {
   ArmMotorController armMotorController;        // ArmMotorController インスタンス
   IMUController imuController;                  // IMUController インスタンス
   Course course;                                // コース(Left or Right)
-  SocketClient cameraSocketClient;              // カメラサーバー用 SocketClient インスタンス
   ColorSensorController colorSensorController;  // ColorSensorController インスタンス
+  SocketClient& cameraSocketClient;             // カメラサーバー用の SocketClient インスタンス
 };
 #endif

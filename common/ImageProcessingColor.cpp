@@ -6,22 +6,22 @@
 
 #include "ImageProcessingColor.h"
 
-const ImageProcessingColor::HSVRange ImageProcessingColor::RED_HSV
-    = { cv::Scalar(0, 100, 100), cv::Scalar(10, 255, 255) };
+const CameraServer::HSVRangeData ImageProcessingColor::RED_HSV
+    = { { 0.0, 100.0, 100.0, 0.0 }, { 10.0, 255.0, 255.0, 0.0 } };
 
-const ImageProcessingColor::HSVRange ImageProcessingColor::BLUE_HSV
-    = { cv::Scalar(100, 100, 100), cv::Scalar(130, 255, 255) };
+const CameraServer::HSVRangeData ImageProcessingColor::BLUE_HSV
+    = { { 100.0, 100.0, 100.0, 0.0 }, { 130.0, 255.0, 255.0, 0.0 } };
 
-const ImageProcessingColor::HSVRange ImageProcessingColor::GREEN_HSV
-    = { cv::Scalar(40, 100, 100), cv::Scalar(80, 255, 255) };
+const CameraServer::HSVRangeData ImageProcessingColor::GREEN_HSV
+    = { { 40.0, 100.0, 100.0, 0.0 }, { 80.0, 255.0, 255.0, 0.0 } };
 
-const ImageProcessingColor::HSVRange ImageProcessingColor::YELLOW_HSV
-    = { cv::Scalar(20, 100, 100), cv::Scalar(35, 255, 255) };
+const CameraServer::HSVRangeData ImageProcessingColor::YELLOW_HSV
+    = { { 20.0, 100.0, 100.0, 0.0 }, { 35.0, 255.0, 255.0, 0.0 } };
 
-const ImageProcessingColor::HSVRange ImageProcessingColor::BLACK_HSV
-    = { cv::Scalar(0, 0, 0), cv::Scalar(180, 255, 50) };
+const CameraServer::HSVRangeData ImageProcessingColor::BLACK_HSV
+    = { { 0.0, 0.0, 0.0, 0.0 }, { 180.0, 255.0, 50.0, 0.0 } };
 
-const ImageProcessingColor::HSVRange& ImageProcessingColor::getHSVRangeFromColor(Color color)
+const CameraServer::HSVRangeData& ImageProcessingColor::getHSVRangeFromColor(Color color)
 {
   switch(color) {
     case RED:

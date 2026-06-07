@@ -12,7 +12,8 @@
 
 namespace CameraServer {
 
-  static constexpr int DEFAULT_PORT = 27015;
+  static constexpr int DEFAULT_PORT = 27015;  // カメラサーバーのデフォルトのポート番号
+
   /**
    * @brief サーバー側で実行可能なコマンド
    */
@@ -20,8 +21,8 @@ namespace CameraServer {
     DISCONNECT = 254,  // サーバーから切断
     SHUTDOWN = 255     // サーバーをシャットダウン
   };
-  constexpr size_t COMMAND_SIZE = sizeof(Command);
-  inline RealNetworkSystem real;  // 注入するインスタンスの実体は1つ
+
+  constexpr size_t COMMAND_SIZE = sizeof(Command);  // コマンド型のバイトサイズ
 }  // namespace CameraServer
 
 #endif  // SOCKET_PROTOCOL_H

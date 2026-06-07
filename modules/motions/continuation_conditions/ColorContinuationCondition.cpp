@@ -25,6 +25,9 @@ void ColorContinuationCondition::prepare()
 
 bool ColorContinuationCondition::shouldContinue()
 {
+  if(targetColor == ColorSensorController::COLOR::NONE) {
+    return false;
+  }
   // HSV値を取得
   ColorSensorController::HSV hsv;
   robot.getColorSensorControllerInstance().getRawHSV(hsv, true);

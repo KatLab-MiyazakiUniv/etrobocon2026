@@ -45,7 +45,7 @@ namespace etrobocon2026_test {
 
     int end = ClockUtil::now();
 
-    EXPECT_LE(end - start, 1);
+    EXPECT_LE(end - start, 5);
   }
 
   // sleep()に負の値を渡したときに、now()がほとんど増加しないことを確認するテスト

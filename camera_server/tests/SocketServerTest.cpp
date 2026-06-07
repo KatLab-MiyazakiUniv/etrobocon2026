@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 #include "SocketServer.h"
 #include "MockNetworkSystem.h"
+#include "RealNetworkSystem.h"
 
 namespace etrobocon2026_test {
   // インスタンスに指定したportを代入できているかを確認
@@ -18,14 +19,15 @@ namespace etrobocon2026_test {
     EXPECT_EQ(testPort, server.port);
   }
 
-  // CameraServer::realを参照しているかアドレスの一致で確認
+  // SocketServerが注入されたNetworkSystemを参照しているかアドレスの一致で確認
   TEST(SocketServerTest, CompareAddress)
   {
-    SocketServer server(CameraServer::real);
-    SocketServer server2(CameraServer::real);
-    EXPECT_EQ(&CameraServer::real, &server.netSys);
-    EXPECT_EQ(&server2.netSys, &server.netSys);
-    EXPECT_EQ(&CameraServer::real, &server2.netSys);
+    MockNetworkSystem mockNet;
+    SocketServer server(mockNet);
+    EXPECT_EQ(&mockNet, &server.netSys);
+    RealNetworkSystem realNet;
+    SocketServer server2(realNet);
+    EXPECT_EQ(&realNet, &server2.netSys);
   }
 
   // メンバ変数のlistenSocketの初期値が-1か

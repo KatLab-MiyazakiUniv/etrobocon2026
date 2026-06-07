@@ -20,8 +20,7 @@ class SocketServer {
    * @param _netSys 注入する具象クラス
    * @param _port デフォルトは27015
    */
-  explicit SocketServer(INetworkSystem& _netSys = CameraServer::real,
-                        int _port = CameraServer::DEFAULT_PORT);
+  explicit SocketServer(INetworkSystem& _netSys, int _port = CameraServer::DEFAULT_PORT);
 
   /**
    * @brief SocketServerのデストラクタ

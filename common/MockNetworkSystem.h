@@ -44,6 +44,7 @@ class MockNetworkSystem : public INetworkSystem {
   {
     return 0;
   }
+
   /**
    * @brief bind()のモック
    * @param sock ポート番号と紐づけるファイルディスクリプタ

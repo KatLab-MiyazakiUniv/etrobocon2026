@@ -8,7 +8,7 @@
 #define SOCKET_PROTOCOL_H
 
 #include <cstdint>
-#include <opencv2/core/types.hpp>
+#include <opencv2/opencv.hpp>
 
 namespace CameraServer {
 

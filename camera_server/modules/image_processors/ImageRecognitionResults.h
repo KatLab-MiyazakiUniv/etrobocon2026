@@ -7,7 +7,7 @@
 #ifndef IMAGE_RECOGNITION_RESULTS_H
 #define IMAGE_RECOGNITION_RESULTS_H
 
-#include <opencv2/core/types.hpp>
+#include <opencv2/opencv.hpp>
 
 struct BoundingBoxDetectionResult {
   bool wasDetected = false;  // 検出できたかどうか

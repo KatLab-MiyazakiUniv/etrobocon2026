@@ -1,7 +1,7 @@
 /**
  * @file SocketServer.h
- * @brief ソケット通信のServerクラス
- * @author okuyama0528, sadomiya-sousi
+ * @brief 接続を待ち、クライアントからのリクエストを処理するクラス
+ * @author sadomiya-sousi
  */
 
 #ifndef SOCKET_SERVER_H

@@ -58,7 +58,8 @@ class Robot {
 
   /**
    * @brief カメラサーバー用のSocketClientのインスタンスの参照を返す
-   * @return メンバ変数 socketClient(デフォルト引数でDIしたSocketClientのインスタンス) の参照
+   * @return メンバ変数
+   * socketClient(デフォルト引数でDIしたカメラサーバー用のSocketClientのインスタンス) の参照
    */
   SocketClient& getCameraSocketClientInstance();
 
@@ -67,7 +68,7 @@ class Robot {
   ArmMotorController armMotorController;        // ArmMotorController インスタンス
   IMUController imuController;                  // IMUController インスタンス
   Course course;                                // コース(Left or Right)
-  SocketClient cameraSocketClient;              // cameraSocketClient インスタンス
+  SocketClient cameraSocketClient;              // カメラサーバー用のSocketClient インスタンス
   ColorSensorController colorSensorController;  // ColorSensorController インスタンス
 };
 #endif

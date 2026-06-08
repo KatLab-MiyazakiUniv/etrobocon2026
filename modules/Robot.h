@@ -55,11 +55,20 @@ class Robot {
    */
   ColorSensorController& getColorSensorControllerInstance();
 
+  /**
+   * @brief エッジの左右判定を取得する
+   * @return true:左エッジ, false:右エッジ
+   */
+  void setEdge(Edge edge);
+
+  Edge& getEdge();
+
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
   ArmMotorController armMotorController;        // ArmMotorController インスタンス
   IMUController imuController;                  // IMUController インスタンス
   Course course;                                // コース(Left or Right)
+  Edge edge;                                    // エッジの左右判定
   ColorSensorController colorSensorController;  // ColorSensorController インスタンス
 };
 

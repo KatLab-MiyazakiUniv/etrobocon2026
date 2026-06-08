@@ -51,10 +51,10 @@ void Robot::setCourse(Course course)
 
 void Robot::setEdge(Edge edge)
 {
-  this->edge = edge;  // エッジの左右判定を設定
+  this->edge = edge;
 }
 
 Edge& Robot::getEdge()
 {
-  return edge;  // エッジの左右判定を設定
+  return edge;
 }

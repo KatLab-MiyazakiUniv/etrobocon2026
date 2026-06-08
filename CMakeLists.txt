@@ -44,6 +44,7 @@ set(RUNNING_INCLUDE_DIRS
   ${RUNNING_MODULE_DIR}/API
   ${RUNNING_MODULE_DIR}/client
   ${RUNNING_MODULE_DIR}/motions
+  ${RUNNING_MODULE_DIR}/actions #追加2026/06/08 16:55
   ${RUNNING_MODULE_DIR}/motions/continuation_conditions
   ${PROJECT_SOURCE_DIR}/common
   ${PROJECT_SOURCE_DIR}/common/customs
@@ -108,6 +109,7 @@ if(ENABLE_CAMERA_TESTS)
     "${CAMERA_MODULE_DIR}/utils/*.cpp"
     "${CAMERA_MODULE_DIR}/server/*.cpp"
     "${CAMERA_MODULE_DIR}/image_processors/*.cpp"
+    "${CAMERA_MODULE_DIR}/actions/*.cpp" #追加2026/06/08 17:55
     "${PROJECT_SOURCE_DIR}/common/*.cpp"
     "${RUNNING_MODULE_DIR}/API/*.cpp"
   )

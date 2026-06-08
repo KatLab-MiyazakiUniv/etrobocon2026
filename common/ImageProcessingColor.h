@@ -36,7 +36,7 @@ class ImageProcessingColor {
   /**
    * @brief インスタンス化禁止
    */
-  ImageProcessingColor();
+  ImageProcessingColor() = delete;
 
   static const CameraServer::HSVRangeData RED_HSV;     // 赤色のHSV範囲
   static const CameraServer::HSVRangeData BLUE_HSV;    // 青色のHSV範囲

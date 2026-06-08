@@ -14,12 +14,6 @@
 #include <opencv2/opencv.hpp>
 #include "Logger.h"
 
-// HSVの範囲を保持する構造体
-struct HSVRange {
-  cv::Scalar lower;  // HSVの下限値
-  cv::Scalar upper;  // HSVの上限値
-};
-
 class ColorRegionDetector : public BoundingBoxDetector {
  public:
   /**
@@ -27,12 +21,19 @@ class ColorRegionDetector : public BoundingBoxDetector {
    * @param hsvRanges 検出したい色のHSV範囲
    * @param roi 注目領域
    */
-  ColorRegionDetector(const std::vector<HSVRange>& hsvRanges, const cv::Rect& roi);
+  ColorRegionDetector(const std::vector<ColorRegionDetector::HSVRange>& hsvRanges,
+                      const cv::Rect& roi);
 
   /**
    * @brief デストラクタ
    */
   ~ColorRegionDetector();
+
+  // HSVの範囲を保持する構造体
+  struct HSVRange {
+    cv::Scalar lower;  // HSVの下限値
+    cv::Scalar upper;  // HSVの上限値
+  };
 
   /**
    * @brief フレームから色領域を検出

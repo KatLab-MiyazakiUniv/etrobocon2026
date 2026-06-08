@@ -21,8 +21,8 @@ class LineTrace : public BaseMotion {
    * @param _tracePidGain ライントレース用PIDゲイン
    */
   LineTrace(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-            double _targetSpeed, int _targetBrightness, const Pid::PidGain& _rightPid,
-            const Pid::PidGain& _leftPid, const Pid::PidGain& _tracePidGain);
+            double _targetSpeed, int _targetBrightness, const Pid::PidGain& _pidGain,
+            const Pid::PidGain& _rightPidGain, const Pid::PidGain& _leftPidGain);
 
  protected:
   void prepare() override;
@@ -32,9 +32,9 @@ class LineTrace : public BaseMotion {
  private:
   double targetSpeed;
   int targetBrightness;
-  Pid pid;
+  int edgeSign;  // エッジの左右判定に基づく符号（左エッジ: -1, 右エッジ: 1）
+  Pid::PidGain pidGain;
   SpeedCalculator speedCalculator;
-  int edgeSign;  // 1: 右エッジ, -1: 左エッジ
 };
 
 #endif

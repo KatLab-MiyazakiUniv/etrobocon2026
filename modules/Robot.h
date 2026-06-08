@@ -63,11 +63,24 @@ class Robot {
    */
   SocketClient& getCameraSocketClientInstance();
 
+  /**
+   * @brief エッジの左右判定を設定する
+   * @param edge エッジの左右判定
+   */
+  void setEdge(Edge edge);
+
+  /**
+   * @brief エッジの左右判定の参照を返す
+   * @return メンバ変数 edge(Edge のインスタンス) の参照
+   */
+  Edge& getEdge();
+
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
   ArmMotorController armMotorController;        // ArmMotorController インスタンス
   IMUController imuController;                  // IMUController インスタンス
   Course course;                                // コース(Left or Right)
+  Edge edge;                                    // エッジの左右判定
   ColorSensorController colorSensorController;  // ColorSensorController インスタンス
   SocketClient& cameraSocketClient;             // カメラサーバー用の SocketClient インスタンス
 };

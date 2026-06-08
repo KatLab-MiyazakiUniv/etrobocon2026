@@ -13,4 +13,7 @@ enum class Area { LineTrace, Area2 };
 // コース名を持つ列挙型変数（Left = 0, Right = 1）
 enum class Course { Left, Right };
 
+// Edegeの状態名を持つ列挙型変数（LeftEdge = 0, RightEdge = 1）
+enum class Edge { LeftEdge, RightEdge };
+
 #endif

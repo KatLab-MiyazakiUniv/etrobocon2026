@@ -13,9 +13,15 @@ LineTrace::LineTrace(Robot& _robot,
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
     targetBrightness(_targetBrightness),
-    pidGain(_pidGain),  // 誤差制御のため目標値0扱いに
+    pidGain(_pidGain),
     speedCalculator(_robot, _rightPidGain, _leftPidGain, _targetSpeed)
 {
+  LOG_CREATE("LineTrace");
+}
+
+LineTrace::~LineTrace()
+{
+  LOG_DESTROY("LineTrace");
 }
 
 void LineTrace::prepare()
@@ -27,26 +33,27 @@ void LineTrace::prepare()
 void LineTrace::executeStep()
 {
   Pid pid(pidGain.kp, pidGain.ki, pidGain.kd, targetBrightness);
-  // 直進用のベースパワーを計算
+
+  // 初期Speed値を計算
   double baseRightPower = speedCalculator.calculateRightMotorPower();
   double baseLeftPower = speedCalculator.calculateLeftMotorPower();
 
-  // 3. PID制御による旋回パワーの計算（誤差を入力）
-  // 偏差が0になれば、turningPowerは0に近づく
+  // PIDで旋回値を計算
   double turningPower
       = pid.calculatePid(robot.getColorSensorControllerInstance().getReflectance()) * edgeSign;
 
+  // モータのPower値をセット（前進の時0を下回らないように，後進の時0を上回らないようにセット）
   double rightPower = baseRightPower > 0.0 ? std::max(baseRightPower - turningPower, 0.0)
                                            : std::min(baseRightPower + turningPower, 0.0);
   double leftPower = baseLeftPower > 0.0 ? std::max(baseLeftPower + turningPower, 0.0)
                                          : std::min(baseLeftPower - turningPower, 0.0);
-  // 4. モータ出力の決定
-  // 右旋回が必要な時は右を弱め左を強める構成
+
   robot.getWheelMotorControllerInstance().setRightPower(rightPower);
   robot.getWheelMotorControllerInstance().setLeftPower(leftPower);
 }
 
 void LineTrace::finish()
 {
+  // モータを停止
   robot.getWheelMotorControllerInstance().stopBoth();
 }

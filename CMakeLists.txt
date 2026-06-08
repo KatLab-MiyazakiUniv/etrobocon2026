@@ -119,6 +119,10 @@ if(ENABLE_CAMERA_TESTS)
     "${CAMERA_TEST_DIR}/*Test.cpp"
   )
 
+  # テスト実行時に必要な画像データをビルドディレクトリへコピーするための設定
+  file(COPY ${CAMERA_TEST_DIR}/test_data
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/camera_server)
+
   # テスト実行可能ファイルの作成
   add_executable(camera_server_test ${CAMERA_TEST_SOURCES})
   target_link_libraries(camera_server_test

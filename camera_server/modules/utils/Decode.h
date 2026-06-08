@@ -45,7 +45,7 @@ class Decode {
                                                                 const unsigned char* salt);
 
   /**
-   * @brief AES-128-CBCで復号化する
+   * @brief AES-128-ECBで復号化する
    * @param cipherText 復号対象の暗号文
    * @param cipherLength 暗号文のバイト長
    * @param aesKey 復号キー

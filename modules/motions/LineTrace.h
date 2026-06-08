@@ -11,30 +11,52 @@
 #include "Pid.h"
 #include "SpeedCalculator.h"
 #include <memory>
+#include "Logger.h"
 
 class LineTrace : public BaseMotion {
  public:
   /**
-   * @brief コンストラクタ
+   * コンストラクタ
+   * @brief LineTrace を初期化する
+   * @param _robot ロボットクラスのインスタンス
+   * @param _continuationCondition 動作を継続する条件を判定するクラスのインスタンス
+   * @param _targetSpeed 目標速度(mm/秒)
+   * @param _targetBrightness 目標とする明るさの値(%)
+   * @param _pidGain ライントレース用PIDゲイン
    * @param _rightPid 右タイヤ用走行速度制御PIDゲイン
    * @param _leftPid 左タイヤ用走行速度制御PIDゲイン
-   * @param _tracePidGain ライントレース用PIDゲイン
    */
   LineTrace(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
             double _targetSpeed, int _targetBrightness, const Pid::PidGain& _pidGain,
             const Pid::PidGain& _rightPidGain, const Pid::PidGain& _leftPidGain);
 
+  /**
+   * デストラクタ
+   */
+  ~LineTrace();
+
  protected:
+  /**
+   * @brief 動作を開始する前に必要な準備を行う
+   */
   void prepare() override;
+
+  /**
+   * @brief 1周期分の動作を実行する
+   */
   void executeStep() override;
+
+  /**
+   * @brief 両タイヤモータを停止する
+   */
   void finish() override;
 
  private:
-  double targetSpeed;
-  int targetBrightness;
-  int edgeSign;  // エッジの左右判定に基づく符号（左エッジ: -1, 右エッジ: 1）
-  Pid::PidGain pidGain;
-  SpeedCalculator speedCalculator;
+  double targetSpeed;               // 目標速度(mm/秒)
+  int targetBrightness;             // 目標とする明るさの値(%)
+  int edgeSign;                     // エッジの左右判定に基づく符号（左エッジ: -1, 右エッジ: 1）
+  Pid::PidGain pidGain;             // ライントレース用PIDゲイン
+  SpeedCalculator speedCalculator;  // 目標速度に対する左右タイヤのPID制御を行うクラスのインスタンス
 };
 
 #endif

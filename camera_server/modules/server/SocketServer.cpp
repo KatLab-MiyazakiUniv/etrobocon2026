@@ -1,7 +1,7 @@
 /**
  * @file SocketServer.cpp
  * @brief 接続を待ち、クライアントからのリクエストを処理するクラス
- * @author sadomiya-sousi
+ * @author sadomiya-sousi, takuchi17
  */
 
 #include "SocketServer.h"
@@ -15,7 +15,7 @@ SocketServer::SocketServer(INetworkSystem& _netSys, int _port)
 
 SocketServer::~SocketServer()
 {
-  LOG_DESTROY("SocketClient");
+  LOG_DESTROY("SocketServer");
   shutdown();
 }
 
@@ -85,12 +85,12 @@ void SocketServer::shutdown()
 
 void SocketServer::handleConnection(int clientSocket)
 {
-  char recvbuf[SocketServer::DEFAULT_BUFLEN];
+  char recvbuf[SocketServer::getDefaultBufLen()];
   ssize_t iResult;
 
   // クライアントからのデータ受信ループ
   do {
-    iResult = netSys.recv(clientSocket, recvbuf, SocketServer::DEFAULT_BUFLEN, 0);
+    iResult = netSys.recv(clientSocket, recvbuf, SocketServer::getDefaultBufLen(), 0);
     if(iResult > 0) {
       if(static_cast<size_t>(iResult) == CameraServer::COMMAND_SIZE) {
         CameraServer::Command cmd = *reinterpret_cast<CameraServer::Command*>(recvbuf);

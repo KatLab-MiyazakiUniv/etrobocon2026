@@ -1,7 +1,7 @@
 /**
  * @file SocketServer.h
  * @brief 接続を待ち、クライアントからのリクエストを処理するクラス
- * @author sadomiya-sousi
+ * @author sadomiya-sousi, takuchi17
  */
 
 #ifndef SOCKET_SERVER_H
@@ -40,11 +40,35 @@ class SocketServer {
   void run();
 
   /**
+   * @brief サーバーのリッスンソケットを取得する
+   * @return int サーバーのリッスンソケットのファイルディスクリプタ
+   */
+  int getListenSocket() const { return listenSocket; }
+
+  /**
+   * @brief サーバーが稼働中かどうかを取得する
+   * @return int サーバーが稼働中なら1, そうでないなら0
+   */
+  int getIsRunning() const { return isRunning; }
+
+  /**
+   * @brief サーバーのポート番号を取得する
+   * @return int サーバーのポート番号
+   */
+  int getPort() const { return port; }
+
+  /**
+   * @brief デフォルトのバッファサイズを取得する
+   * @return int デフォルトのバッファサイズ
+   */
+  static int getDefaultBufLen() { return DEFAULT_BUFLEN; }
+
+  /**
    * @brief サーバーをシャットダウンする
    */
   void shutdown();
 
- public:
+ private:
   INetworkSystem& netSys;                     // 注入される具象クラスのポインタ
   int listenSocket;                           // Severのファイルディスクリプタ
   bool isRunning;                             // Serverが稼働中ならtrue

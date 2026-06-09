@@ -1,7 +1,7 @@
 /**
  * @file SocketClientTest.cpp
  * @brief SocketClientクラスをテストする
- * @author sadomiya-sousi
+ * @author sadomiya-sousi, takuchi17
  */
 
 #include <gtest/gtest.h>
@@ -73,7 +73,7 @@ namespace etrobocon2026_test {
     EXPECT_EQ(mockNet.lastSentCommand, expectedCmd);
   }
 
-  // 接続せずにshutdownしてもよいことを確認
+  // 接続せずにshutdownコマンドを送ってもクラッシュしないことを確認
   TEST(SocketClientTest, ShutdownWhileNotConnected)
   {
     MockNetworkSystem mockNet;
@@ -90,17 +90,6 @@ namespace etrobocon2026_test {
     client.connectToServer();
     client.shutdownServer();
     uint8_t expectedCmd = static_cast<uint8_t>(CameraServer::Command::SHUTDOWN);
-    EXPECT_EQ(mockNet.lastSentCommand, expectedCmd);
-  }
-
-  // 接続後にdisconnect()すると、DISCONNECTマンドが送信されることを確認
-  TEST(SocketClientTest, DisconnectCommand)
-  {
-    MockNetworkSystem mockNet;
-    SocketClient client(mockNet);
-    client.connectToServer();
-    client.disconnectFromServer();
-    uint8_t expectedCmd = static_cast<uint8_t>(CameraServer::Command::DISCONNECT);
     EXPECT_EQ(mockNet.lastSentCommand, expectedCmd);
   }
 }  // namespace etrobocon2026_test

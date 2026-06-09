@@ -1,7 +1,7 @@
 /**
  * @file   MockNetworkSystem.h
  * @brief  ネットワークライブラリのモッククラス
- * @author sadomiya-sousi
+ * @author sadomiya-sousi, takuchi17
  */
 
 #ifndef MOCK_NETWORK_SYSTEM_H
@@ -14,13 +14,15 @@
 
 class MockNetworkSystem : public INetworkSystem {
  public:
-  bool forceSocketError = false;                     // socket() を失敗させるフラグ
-  bool forceBindError = false;                       // bind() を失敗させるフラグ
-  bool forceConnectError = false;                    // connect() を失敗させるフラグ
-  bool receiveCommand = false;                       // recv() で1回だけ受信させるフラグ
-  void* recvBuff = nullptr;                          // recv()で受け取るデータを格納
+  bool forceSocketError = false;   // socket() を失敗させるフラグ
+  bool forceBindError = false;     // bind() を失敗させるフラグ
+  bool forceConnectError = false;  // connect() を失敗させるフラグ
+  bool hasRecvData = false;        // recv()で受信データを返すかどうか
+  CameraServer::Command recvData
+      = CameraServer::Command::DISCONNECT;           // recv()でbufに書き込むコマンド
   int sizeOfReturnLen = CameraServer::COMMAND_SIZE;  // デフォルトでは1を返す
   uint8_t lastSentCommand = 0;                       // 送信したコマンドを保存する
+
   /**
    * @brief socket()のモック
    * @return ファイルディスクリプタとして999を返す
@@ -70,7 +72,7 @@ class MockNetworkSystem : public INetworkSystem {
   }
 
   /**
-   * @brief return
+   * @brief accept()のモック
    * @param sockfd 接続を確立するキューのファイルディスクリプタ
    * @param addr ポート番号等の入ったインターネットドメインソケットアドレス
    * @param addrlen インターネットドメインソケットアドレスのバイト長
@@ -105,10 +107,9 @@ class MockNetworkSystem : public INetworkSystem {
    */
   ssize_t recv(int sockfd, void* buf, size_t len, int flags) override
   {
-    if(receiveCommand) {
-      void* cmd = recvBuff;
-      std::memcpy(buf, &cmd, sizeof(cmd));
-      receiveCommand = false;
+    if(hasRecvData) {
+      std::memcpy(buf, &recvData, CameraServer::COMMAND_SIZE);
+      hasRecvData = false;
       return sizeOfReturnLen;
     }
 

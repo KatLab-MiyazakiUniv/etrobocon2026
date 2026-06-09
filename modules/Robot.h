@@ -13,6 +13,7 @@
 #include "ColorSensorController.h"
 #include "Course.h"
 #include "UltraSonicController.h"
+#include "UltrasonicSensor.h"
 
 class Robot {
  public:
@@ -62,7 +63,14 @@ class Robot {
    * @brief UltraSonicControllerのインスタンスの参照を返す
    * @return メンバ変数 ultraSonicController(UltraSonicController のインスタンス)の参照
    */
-  UltraSonicController& getUltraSonicControllerInstance();
+  // UltraSonicController& getUltraSonicControllerInstance();
+
+  /**
+   * @brief UltraSonicのインスタンスの参照を返す
+   * @return メンバ変数ultraSonic(UltraSonicのインスタンス)の参照
+   */
+
+  spikeapi::UltrasonicSensor& getUltrasonicSensorInstance();
 
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
@@ -70,7 +78,8 @@ class Robot {
   IMUController imuController;                  // IMUController インスタンス
   Course course;                                // コース(Left or Right)
   ColorSensorController colorSensorController;  // ColorSensorController インスタンス
-  UltraSonicController ultraSonicController;    // UltraSonicController インスタンス
+  // UltraSonicController ultraSonicController;    // UltraSonicController インスタンス
+  spikeapi::UltrasonicSensor ultrasonicSensor;          // UltrasonicSensorインスタンス
 };
 
 #endif

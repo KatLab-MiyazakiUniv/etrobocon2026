@@ -1,5 +1,5 @@
 /**
- * @file   RepeatCountContinuationCondition.h
+ * @file   RepeatCountCondition.h
  * @brief  目標繰り返し回数を基準に動作を継続すべきかを判定するクラス
  * @author migaku2645
  */
@@ -11,20 +11,20 @@
 #include <cmath>
 #include "Logger.h"
 
-class RepeatCountContinuationCondition : public BaseContinuationCondition {
+class RepeatCountCondition : public BaseContinuationCondition {
  public:
   /**
    * コンストラクタ
-   * @brief RepeatCountContinuationCondition を初期化する
+   * @brief RepeatCountCondition を初期化する
    * @param _robot robotクラスのインスタンスの参照
    * @param _targetRepeats 目標繰り返し回数
    */
-  RepeatCountContinuationCondition(Robot& _robot, int _targetRepeats);
+  RepeatCountCondition(Robot& _robot, int _targetRepeats);
 
   /**
    * デストラクタ
    */
-  ~RepeatCountContinuationCondition();
+  ~RepeatCountCondition();
 
   /**
    * @brief 開始時からの繰り返し回数が目標繰り返し回数に達した場合、動作を継続しないと判定する

@@ -61,12 +61,12 @@ class Robot {
    * @brief 走行開始時間を返す
    * @return 走行開始時間
    */
-  int getStartTime();
+  int getRunningStartTime();
 
   /**
    * @brief 走行開始時間を設定する
    */
-  void setStartTime(int time);
+  void setRunningStartTime(int time);
 
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
@@ -74,7 +74,7 @@ class Robot {
   IMUController imuController;                  // IMUController インスタンス
   Course course;                                // コース(Left or Right)
   ColorSensorController colorSensorController;  // ColorSensorController インスタンス
-  int startTime = 0;                            // 走行開始時間
+  int runningStartTime = 0;                     // 走行開始時間
 };
 
 #endif

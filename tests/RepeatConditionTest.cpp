@@ -1,20 +1,20 @@
 /**
- * @file RepeatContinuationConditionTest.cpp
- * @brief RepeatContinuationConditionクラスをテストする
+ * @file RepeatConditionTest.cpp
+ * @brief RepeatConditionクラスをテストする
  * @author migaku2645
  */
 
 #include <gtest/gtest.h>
-#include "RepeatCountContinuationCondition.h"
+#include "RepeatCountCondition.h"
 
 namespace etrobocon2026_test {
 
   // 目標回数に到達していない場合は継続判定になることを確認
-  TEST(RepeatCountContinuationConditionTest, NotReachTargetCount)
+  TEST(RepeatCountConditionTest, NotReachTargetCount)
   {
     Robot robot;
 
-    RepeatCountContinuationCondition condition(robot, 100);
+    RepeatCountCondition condition(robot, 100);
 
     condition.prepare();
 
@@ -22,14 +22,14 @@ namespace etrobocon2026_test {
   }
 
   // 目標回数に到達した場合は停止判定になることを確認
-  TEST(RepeatCountContinuationConditionTest, AfterTargetCount)
+  TEST(RepeatCountConditionTest, AfterTargetCount)
   {
     Robot robot;
 
     int targetCount = 100;
     int actualCount = 0;
 
-    RepeatCountContinuationCondition condition(robot, targetCount);
+    RepeatCountCondition condition(robot, targetCount);
 
     condition.prepare();
 
@@ -45,11 +45,11 @@ namespace etrobocon2026_test {
   /**
    * 目標回数が0の場合は即停止判定になることを確認
    */
-  TEST(RepeatCountContinuationConditionTest, ZeroTargetCount)
+  TEST(RepeatCountConditionTest, ZeroTargetCount)
   {
     Robot robot;
 
-    RepeatCountContinuationCondition condition(robot, 0);
+    RepeatCountCondition condition(robot, 0);
 
     condition.prepare();
 
@@ -59,11 +59,11 @@ namespace etrobocon2026_test {
   /**
    * 目標回数が負の場合は即停止判定になることを確認
    */
-  TEST(RepeatCountContinuationConditionTest, NegativeTargetCount)
+  TEST(RepeatCountConditionTest, NegativeTargetCount)
   {
     Robot robot;
 
-    RepeatCountContinuationCondition condition(robot, -1);
+    RepeatCountCondition condition(robot, -1);
 
     condition.prepare();
 

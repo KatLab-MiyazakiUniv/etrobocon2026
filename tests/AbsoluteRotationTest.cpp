@@ -6,7 +6,7 @@
 
 #include <gtest/gtest.h>
 #include "AbsoluteRotation.h"
-#include "AbsoluteAngleContinuationCondition.h"
+#include "AbsoluteAngleCondition.h"
 
 namespace etrobocon2026_test {
   class AbsoluteRotationTest : public ::testing::Test {
@@ -25,7 +25,7 @@ namespace etrobocon2026_test {
 
     // 回転動作を実行
     AbsoluteRotation AbsoluteRotation(
-        robot, std::make_unique<AbsoluteAngleContinuationCondition>(robot, AbsoluteAngle), anglePid,
+        robot, std::make_unique<AbsoluteAngleCondition>(robot, AbsoluteAngle), anglePid,
         AbsoluteAngle);
     AbsoluteRotation.run();
 
@@ -47,7 +47,7 @@ namespace etrobocon2026_test {
 
     // 回転動作を実行
     AbsoluteRotation AbsoluteRotation(
-        robot, std::make_unique<AbsoluteAngleContinuationCondition>(robot, AbsoluteAngle), anglePid,
+        robot, std::make_unique<AbsoluteAngleCondition>(robot, AbsoluteAngle), anglePid,
         AbsoluteAngle);
     AbsoluteRotation.run();
 
@@ -65,7 +65,7 @@ namespace etrobocon2026_test {
 
     // 回転動作を実行
     AbsoluteRotation AbsoluteRotation(
-        robot, std::make_unique<AbsoluteAngleContinuationCondition>(robot, AbsoluteAngle), anglePid,
+        robot, std::make_unique<AbsoluteAngleCondition>(robot, AbsoluteAngle), anglePid,
         AbsoluteAngle);
     AbsoluteRotation.run();
 

@@ -1,5 +1,5 @@
 /**
- * @file   AngleContinuationCondition.h
+ * @file   AngleCondition.h
  * @brief  目標角度との誤差に基づいて動作を継続するかを判定するクラス
  * @author okuyama0528 yutaro-1214
  */
@@ -10,7 +10,7 @@
 #include "AngleNormalizer.h"
 #include <cmath>
 
-class AngleContinuationCondition : public BaseContinuationCondition {
+class AngleCondition : public BaseContinuationCondition {
  public:
   /**
    * @brief コンストラクタ
@@ -18,7 +18,7 @@ class AngleContinuationCondition : public BaseContinuationCondition {
    * @param _targrtAngle 目標角度(°)
    * @param _tolerance 許容誤差(デフォルトは2.0°)
    * */
-  AngleContinuationCondition(Robot& robot, double _targetAngle, double _tolerance = 2.0);
+  AngleCondition(Robot& robot, double _targetAngle, double _tolerance = 2.0);
 
   /**
    *@brief 目標角度との誤差が許容範囲を超えていれば継続、収まっていれば終了

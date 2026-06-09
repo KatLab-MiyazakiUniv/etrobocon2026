@@ -1,6 +1,6 @@
 /**
- * @file   MotionTimeContinuationCondition.h
- * @brief  目標時間を基準に動作を継続すべきかを判定するクラス
+ * @file   MotionTimeCondition.h
+ * @brief  １つの動作の実行時間を基準に動作を継続すべきかを判定するクラス
  * @author migaku2645
  */
 
@@ -12,21 +12,21 @@
 #include <cmath>
 #include "Logger.h"
 
-class MotionTimeContinuationCondition : public BaseContinuationCondition {
+class MotionTimeCondition : public BaseContinuationCondition {
  public:
   /**
    * コンストラクタ
-   * @brief MotionTimeContinuationCondition を初期化する
+   * @brief MotionTimeCondition を初期化する
    * @param _robot robotクラスのインスタンスの参照
    * @param _targetTime 目標時間(ms)
    * @param _initTime 開始時の時間(ms)
    */
-  MotionTimeContinuationCondition(Robot& _robot, int _targetTime);
+  MotionTimeCondition(Robot& _robot, int _targetTime);
 
   /**
    * デストラクタ
    */
-  ~MotionTimeContinuationCondition();
+  ~MotionTimeCondition();
 
   /**
    * @brief 開始時の時間を取得して initTime に保存する

@@ -1,5 +1,5 @@
 /**
- * @file   CompoundContinuationCondition.h
+ * @file   CompoundCondition.h
  * @brief  複数の継続条件を組み合わせて動作を継続すべきかを判定するクラス
  * @author migaku2645
  */
@@ -11,7 +11,7 @@
 #include "Logger.h"
 #include <memory>
 
-class CompoundContinuationCondition : public BaseContinuationCondition {
+class CompoundCondition : public BaseContinuationCondition {
  public:
   /**
    * @brief 論理演算子のenumクラス
@@ -22,20 +22,20 @@ class CompoundContinuationCondition : public BaseContinuationCondition {
 
   /**
    * コンストラクタ
-   * @brief CompoundContinuationCondition を初期化する
+   * @brief CompoundCondition を初期化する
    * @param _robot robotクラスのインスタンスの参照
    * @param _firstContinuationCondition 最初の継続条件
    * @param _secondContinuationCondition 次の継続条件
    */
-  CompoundContinuationCondition(
-      Robot& _robot, std::unique_ptr<BaseContinuationCondition> _firstContinuationCondition,
-      std::unique_ptr<BaseContinuationCondition> _secondContinuationCondition,
-      LogicalOperator _operator);
+  CompoundCondition(Robot& _robot,
+                    std::unique_ptr<BaseContinuationCondition> _firstContinuationCondition,
+                    std::unique_ptr<BaseContinuationCondition> _secondContinuationCondition,
+                    LogicalOperator _operator);
 
   /**
    * デストラクタ
    */
-  ~CompoundContinuationCondition();
+  ~CompoundCondition();
 
   /**
    * @brief 各条件判定クラスの事前準備を行う

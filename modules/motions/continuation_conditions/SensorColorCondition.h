@@ -1,31 +1,31 @@
 /**
- * @file   ColorContinuationCondition.h
+ * @file   SensorColorCondition.h
  * @brief  目標色を基準に動作を継続すべきかを判定するクラス
  * @author migaku2645
  */
 
-#ifndef COLOR_CONTINUATION_CONDITION_H
-#define COLOR_CONTINUATION_CONDITION_H
+#ifndef SENSOR_COLOR_CONTINUATION_CONDITION_H
+#define SENSOR_COLOR_CONTINUATION_CONDITION_H
 
 #include "BaseContinuationCondition.h"
 #include "ColorSensorController.h"
 #include <cmath>
 #include "Logger.h"
 
-class ColorContinuationCondition : public BaseContinuationCondition {
+class SensorColorCondition : public BaseContinuationCondition {
  public:
   /**
    * コンストラクタ
-   * @brief ColorContinuationCondition を初期化する
+   * @brief SensorColorCondition を初期化する
    * @param _robot robotクラスのインスタンスの参照
    * @param _targetColor 指定色
    */
-  ColorContinuationCondition(Robot& _robot, ColorSensorController::COLOR _targetColor);
+  SensorColorCondition(Robot& _robot, ColorSensorController::COLOR _targetColor);
 
   /**
    * デストラクタ
    */
-  ~ColorContinuationCondition();
+  ~SensorColorCondition();
 
   /**
    * @brief 指定色を検出する場合、動作を継続しないと判定する
@@ -34,9 +34,9 @@ class ColorContinuationCondition : public BaseContinuationCondition {
   bool shouldContinue() override;
 
  private:
-  int colorCount = 0;
+  int colorCount = 0;                        // 指定色を取得した回数
   ColorSensorController::COLOR targetColor;  // 指定色
-  static constexpr int JUDGE_COUNT = 2;      // 取得色の決定に必要な連続取得回数
+  static constexpr int JUDGE_COUNT = 2;      // 継続条件を修了するために必要な連続取得回数
 };
 
 #endif

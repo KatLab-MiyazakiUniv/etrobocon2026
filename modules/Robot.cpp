@@ -40,12 +40,12 @@ void Robot::setCourse(Course course)
   this->course = course;
 }
 
-int Robot::getStartTime()
+int Robot::getRunningStartTime()
 {
-  return startTime;
+  return runningStartTime;
 }
 
-void Robot::setStartTime(int time)
+void Robot::setRunningStartTime(int time)
 {
-  startTime = time;
+  runningStartTime = time;
 }

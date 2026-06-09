@@ -1,23 +1,23 @@
 /**
- * @file ColorContinuationConditionTest.cpp
- * @brief ColorContinuationConditionクラスをテストする
+ * @file SensorColorConditionTest.cpp
+ * @brief SensorColorConditionクラスをテストする
  * @author migaku2645
  */
 
 #include <gtest/gtest.h>
-#include "ColorContinuationCondition.h"
+#include "SensorColorCondition.h"
 #include "ColorSensor.h"
 #include <iostream>
 
 namespace etrobocon2026_test {
 
   // 指定色を検知していない場合は継続判定になることを確認
-  TEST(ColorContinuationConditionTest, NotReachTargetColor)
+  TEST(SensorColorConditionTest, NotReachTargetColor)
   {
     Robot robot;
     ColorSensorController::COLOR targetColor = ColorSensorController::COLOR::RED;
 
-    ColorContinuationCondition condition(robot, targetColor);
+    SensorColorCondition condition(robot, targetColor);
 
     condition.prepare();
 
@@ -26,12 +26,12 @@ namespace etrobocon2026_test {
   }
 
   // 指定色を2回連続で検知した場合は停止判定になることを確認
-  TEST(ColorContinuationConditionTest, TwoTimesTargetColor)
+  TEST(SensorColorConditionTest, TwoTimesTargetColor)
   {
     Robot robot;
     ColorSensorController::COLOR targetColor = ColorSensorController::COLOR::RED;
 
-    ColorContinuationCondition condition(robot, targetColor);
+    SensorColorCondition condition(robot, targetColor);
 
     condition.prepare();
 
@@ -47,12 +47,12 @@ namespace etrobocon2026_test {
   }
 
   // 指定色がNONEの場合は停止判定になることを確認
-  TEST(ColorContinuationConditionTest, NoneTargetColor)
+  TEST(SensorColorConditionTest, NoneTargetColor)
   {
     Robot robot;
     ColorSensorController::COLOR targetColor = ColorSensorController::COLOR::NONE;
 
-    ColorContinuationCondition condition(robot, targetColor);
+    SensorColorCondition condition(robot, targetColor);
 
     condition.prepare();
 

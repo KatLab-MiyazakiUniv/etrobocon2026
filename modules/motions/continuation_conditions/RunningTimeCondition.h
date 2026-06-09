@@ -1,5 +1,5 @@
 /**
- * @file   RunningTimeContinuationCondition.h
+ * @file   RunningTimeCondition.h
  * @brief  目標時間を基準に動作を継続すべきかを判定するクラス
  * @author migaku2645
  */
@@ -12,21 +12,21 @@
 #include <cmath>
 #include "Logger.h"
 
-class RunningTimeContinuationCondition : public BaseContinuationCondition {
+class RunningTimeCondition : public BaseContinuationCondition {
  public:
   /**
    * コンストラクタ
-   * @brief RunningTimeContinuationCondition を初期化する
+   * @brief RunningTimeCondition を初期化する
    * @param _robot robotクラスのインスタンスの参照
    * @param _targetTime 目標時間(ms)
    * @param _initTime 開始時の時間(ms)
    */
-  RunningTimeContinuationCondition(Robot& _robot, int _targetTime);
+  RunningTimeCondition(Robot& _robot, int _targetTime);
 
   /**
    * デストラクタ
    */
-  ~RunningTimeContinuationCondition();
+  ~RunningTimeCondition();
 
   /**
    * @brief 開始時からの経過時間が目標時間に達した場合、動作を継続しないと判定する

@@ -1,14 +1,13 @@
 /**
  * @file   SocketProtocol.h
  * @brief  Socket通信の共通定義ファイル
- * @author sadomiya-sousi
+ * @author sadomiya-sousi, takuchi17
  */
 
 #ifndef SOCKET_PROTOCOL_H
 #define SOCKET_PROTOCOL_H
 
 #include <cstdint>
-#include "RealNetworkSystem.h"
 
 namespace CameraServer {
 

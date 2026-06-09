@@ -1,8 +1,30 @@
 #include <iostream>
 #include "Logger.h"
+#include "SocketServer.h"
+#include "RealNetworkSystem.h"
 
 int main()
 {
   Logger::info("Hello KATLABBBBBB");
+  RealNetworkSystem real;
+
+  // カメラインスタンスの初期化の処理>未理解
+  CameraCapture camera;
+  int cameraId = camera.findAvailableCameraID();
+  if(cameraId < 0) {
+    Logger::error("No available camera found.");
+    return 1;
+  }
+  camera.setCameraID(cameraId);
+  if(!camera.openCamera()) {
+    Logger::error("Failed to open camera.");
+    return 1;
+  }
+
+  ColorRegionDetectionActionHandler colorRegionDetectionHandler(camera);
+
+  SocketServer server(colorRegionDetectionHandler, real);
+  server.init();
+  server.run();
   return 0;
 }

@@ -10,7 +10,9 @@
 #include <string>
 #include "SocketProtocol.h"
 #include "RealNetworkSystem.h"
+#include "./../actions/ColorRegionDetectionActionHandler.h"
 #include "Logger.h"
+#include "CameraCapture.h"
 #include <cstring>
 
 class SocketServer {
@@ -20,7 +22,8 @@ class SocketServer {
    * @param _netSys 注入する具象クラス
    * @param _port デフォルトは27015
    */
-  explicit SocketServer(INetworkSystem& _netSys, int _port = CameraServer::DEFAULT_PORT);
+  explicit SocketServer(ColorRegionDetectionActionHandler& _colorRegionDetectionHandler,
+                        INetworkSystem& _netSys, int _port = CameraServer::DEFAULT_PORT);
 
   /**
    * @brief SocketServerのデストラクタ
@@ -45,12 +48,13 @@ class SocketServer {
   void shutdown();
 
  public:
-  INetworkSystem& netSys;                     // 注入される具象クラスのポインタ
-  int listenSocket;                           // Severのファイルディスクリプタ
-  bool isRunning;                             // Serverが稼働中ならtrue
-  int port;                                   // サーバーのポート番号
-  static constexpr int DEFAULT_BUFLEN = 512;  // デフォルトのバッファサイズ
-
+  INetworkSystem& netSys;                                          // 注入される具象クラスのポインタ
+  int listenSocket;                                                // Severのファイルディスクリプタ
+  bool isRunning;                                                  // Serverが稼働中ならtrue
+  int port;                                                        // サーバーのポート番号
+  static constexpr int DEFAULT_BUFLEN = 512;                       // デフォルトのバッファサイズ
+  ColorRegionDetectionActionHandler& colorRegionDetectionHandler;  // 色領域検出のハンドラー
+  // ColorRegionDetectionActionHandler
   /**
    * @brief クライアントとの接続を処理する
    * @param clientSocket クライアントソケット

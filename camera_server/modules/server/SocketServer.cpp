@@ -6,8 +6,13 @@
 
 #include "SocketServer.h"
 
-SocketServer::SocketServer(INetworkSystem& _netSys, int _port)
-  : netSys(_netSys), listenSocket(-1), isRunning(false), port(_port)
+SocketServer::SocketServer(ColorRegionDetectionActionHandler& _colorRegionDetectionHandler,
+                           INetworkSystem& _netSys, int _port)
+  : netSys(_netSys),
+    listenSocket(-1),
+    isRunning(false),
+    port(_port),
+    colorRegionDetectionHandler(_colorRegionDetectionHandler)
 {
   LOG_CREATE("SocketServer");
   Logger::printfLog(Logger::INFO, "ポート番号は%d", _port);
@@ -95,6 +100,17 @@ void SocketServer::handleConnection(int clientSocket)
       if(static_cast<size_t>(iResult) == CameraServer::COMMAND_SIZE) {
         CameraServer::Command cmd = *reinterpret_cast<CameraServer::Command*>(recvbuf);
         switch(cmd) {
+          case CameraServer::Command::COLOR_REGION_DETECTION: {
+            // auto*じゃなくてもい良いんじゃないの?>後回しや
+            auto* request = reinterpret_cast<CameraServer::ColorRegionDetectorRequest*>(recvbuf);
+            Logger::info("Executing COLOR_REGION_DETECTION");
+            CameraServer::ColorRegionDetectorResponse response;
+            colorRegionDetectionHandler.execute(*request, response);
+            netSys.send(clientSocket, reinterpret_cast<const char*>(&response), sizeof(response),
+                        0);
+            break;
+          }
+
           case CameraServer::Command::SHUTDOWN:
             shutdown();
             return;

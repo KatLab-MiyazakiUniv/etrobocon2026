@@ -65,11 +65,11 @@ class Pid {
   static constexpr double defaultDelta = 0.01;  // 周期
   double prevDeviation = 0.0;                   // 前回の偏差
   double integral = 0.0;                        // 偏差の累積
-  double filteredDerivative = 0.0;      // フィルタされた微分項を保持する変数
-  double targetValue;                   // 目標値
-  double maxIntegral = 100.0;           // 累積積分値の最大値
-  double minIntegral = -100.0;          // 累積積分値の最小値
-  static constexpr double alpha = 0.8;  // ローパスフィルタの係数
+  double filteredDerivative = 0.0;              // フィルタされた微分項を保持する変数
+  double targetValue;                           // 目標値
+  double maxIntegral = 100.0;                   // 累積積分値の最大値
+  double minIntegral = -100.0;                  // 累積積分値の最小値
+  static constexpr double alpha = 0.8;          // ローパスフィルタの係数
 };
 
 #endif  // PID_H

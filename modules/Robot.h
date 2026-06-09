@@ -12,14 +12,14 @@
 #include "IMUController.h"
 #include "ColorSensorController.h"
 #include "Course.h"
+#include "SocketClient.h"
 
 class Robot {
  public:
   /**
-   * コンストラクタ
    * @brief 外部リソースのインスタンスを初期化する
    */
-  Robot();
+  Robot(SocketClient& _cameraSocketClient);
 
   /**
    * @brief WheelMotorControllerのインスタンスの参照を返す
@@ -38,7 +38,7 @@ class Robot {
    * @return メンバ変数 imuController(IMUController のインスタンス) の参照
    */
   IMUController& getIMUControllerInstance();
-  /*
+  /**
    * @brief コースの参照を返す
    * @return メンバ変数 course(Course のインスタンス) の参照
    */
@@ -49,11 +49,19 @@ class Robot {
    * @param course コース
    */
   void setCourse(Course course);
+
   /**
    * @brief ColorSensorControllerのインスタンスの参照を返す
    * @return メンバ変数 colorSensorController(ColorSensorController のインスタンス) の参照
    */
   ColorSensorController& getColorSensorControllerInstance();
+
+  /**
+   * @brief カメラサーバー用のSocketClientのインスタンスの参照を返す
+   * @return メンバ変数
+   * socketClient(デフォルト引数でDIしたカメラサーバー用のSocketClientのインスタンス) の参照
+   */
+  SocketClient& getCameraSocketClientInstance();
 
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
@@ -61,6 +69,6 @@ class Robot {
   IMUController imuController;                  // IMUController インスタンス
   Course course;                                // コース(Left or Right)
   ColorSensorController colorSensorController;  // ColorSensorController インスタンス
+  SocketClient& cameraSocketClient;             // カメラサーバー用の SocketClient インスタンス
 };
-
 #endif

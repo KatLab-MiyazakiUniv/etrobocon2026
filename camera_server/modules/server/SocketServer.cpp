@@ -97,7 +97,8 @@ void SocketServer::handleConnection(int clientSocket)
   do {
     iResult = netSys.recv(clientSocket, recvbuf, SocketServer::getDefaultBufLen(), 0);
     if(iResult > 0) {
-      if(static_cast<size_t>(iResult) == CameraServer::COMMAND_SIZE) {
+      // if(static_cast<size_t>(iResult) == CameraServer::COMMAND_SIZE) {
+      if(static_cast<size_t>(iResult) == 352) {
         CameraServer::Command cmd = *reinterpret_cast<CameraServer::Command*>(recvbuf);
         switch(cmd) {
           case CameraServer::Command::COLOR_REGION_DETECTION: {

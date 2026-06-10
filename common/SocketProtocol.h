@@ -26,13 +26,13 @@ namespace CameraServer {
   constexpr size_t COMMAND_SIZE = sizeof(Command);  // コマンド型のバイトサイズ
 
   /**
-   * @brief HSVやRGBAなどの4要素データ
+   * @brief HSVの4要素データ
    */
   struct ScalarData {
-    double v0 = 0.0;  // 1要素目
-    double v1 = 0.0;  // 2要素目
-    double v2 = 0.0;  // 3要素目
-    double v3 = 0.0;  // 4要素目
+    double v0 = 0.0;  // h
+    double v1 = 0.0;  // s
+    double v2 = 0.0;  // v
+    double v3 = 0.0;  // 透明度
   };
 
   /**
@@ -62,18 +62,15 @@ namespace CameraServer {
   };
 
   /**
-   * @brief バウンディングボックス検出結果
+   * @brief バウンディングボックスを表す座標
    */
   struct BoundingBoxDetectionResult {
     bool wasDetected = false;  // 検出できたかどうか
-
-    PointData topLeft;      // 検出領域の左上の座標
-    PointData topRight;     // 検出領域の右上の座標
-    PointData bottomLeft;   // 検出領域の左下の座標
-    PointData bottomRight;  // 検出領域の右下の座標
+    PointData topLeft;         // 左上の座標
+    PointData topRight;        // 右上の座標
+    PointData bottomLeft;      // 左下の座標
+    PointData bottomRight;     // 右下の座標
   };
-
-  // ----- 以降、色領域検出のためのプロトコル定義 -----
 
   static constexpr uint32_t MAX_HSV_RANGES = 5;  // 1リクエストで指定可能なHSV範囲の最大数
 
@@ -90,12 +87,10 @@ namespace CameraServer {
    */
   struct ColorRegionDetectorRequest {
     Command command = Command::COLOR_REGION_DETECTION;  // 色領域検出コマンド
-
     bool requireLargestColorIndex = false;   // 最も大きい色領域のインデックスを返すかどうか
     uint32_t hsvRangeCount = 0;              // hsvRangesの有効な要素数
     HSVRangeData hsvRanges[MAX_HSV_RANGES];  // HSVの範囲の配列
-
-    RectData roi;         // 検出対象の領域
+    RectData roi;                            // 検出対象の領域
   };
 
   /**

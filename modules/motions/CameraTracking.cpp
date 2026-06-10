@@ -46,11 +46,10 @@ void CameraTracking::executeStep()
   double baseRightPower = speedCalculator.calculateRightMotorPower();
   double baseLeftPower = speedCalculator.calculateLeftMotorPower();
 
-  // 色領域検出をサーバーに依頼
-  // ゲッターを呼び出すことで,
-  // robotインスタンスのメンバ変数clientを取得する>これによりクライエントはrobotの1つ
+  // 色領域検出処理の呼び出し。
   SocketClient& client = robot.getCameraSocketClientInstance();
   CameraServer::ColorRegionDetectorResponse response;
+  // run()の中でColorRegionDetectorインスタンスが繰り返し生死。インスタンスの生死のlogが重い処理
   bool success = client.executeColorRegionDetection(detectionRequest, response);
 
   // 通信失敗、または検出できなかった場合は、出力を更新せずに終了する

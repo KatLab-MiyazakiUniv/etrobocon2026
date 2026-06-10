@@ -12,7 +12,8 @@ namespace etrobocon2026_test {
   class ColorRegionDetectorTest : public ::testing::Test {
    protected:
     // 黒色を検出する設定
-    std::vector<HSVRange> blackRanges = { { cv::Scalar(0, 0, 0), cv::Scalar(180, 255, 50) } };
+    std::vector<ColorRegionDetector::HSVRange> blackRanges
+        = { { cv::Scalar(0, 0, 0), cv::Scalar(180, 255, 50) } };
     cv::Rect defaultROI = cv::Rect(50, 240, 540, 240);
     cv::Size defaultRes = cv::Size(640, 480);
 
@@ -123,7 +124,7 @@ namespace etrobocon2026_test {
   TEST_F(ColorRegionDetectorTest, MultipleColorRangesAreORed)
   {
     // 黒色と青色を検出する設定
-    std::vector<HSVRange> ranges = blackRanges;
+    std::vector<ColorRegionDetector::HSVRange> ranges = blackRanges;
     ranges.push_back({ cv::Scalar(110, 200, 200), cv::Scalar(130, 255, 255) });
 
     ColorRegionDetector detector(ranges, defaultROI);
@@ -185,7 +186,7 @@ namespace etrobocon2026_test {
   TEST_F(ColorRegionDetectorTest, DetectWithLargestColorIndexMultipleColors)
   {
     // hsvRanges[0] = 黒色, hsvRanges[1] = 青色
-    std::vector<HSVRange> ranges = blackRanges;
+    std::vector<ColorRegionDetector::HSVRange> ranges = blackRanges;
     ranges.push_back({ cv::Scalar(110, 200, 200), cv::Scalar(130, 255, 255) });
 
     ColorRegionDetector detector(ranges, defaultROI);
@@ -219,7 +220,7 @@ namespace etrobocon2026_test {
   TEST_F(ColorRegionDetectorTest, DetectWithLargestColorIndexBlackIsLargest)
   {
     // hsvRanges[0] = 黒色, hsvRanges[1] = 青色
-    std::vector<HSVRange> ranges = blackRanges;
+    std::vector<ColorRegionDetector::HSVRange> ranges = blackRanges;
     ranges.push_back({ cv::Scalar(110, 200, 200), cv::Scalar(130, 255, 255) });
 
     ColorRegionDetector detector(ranges, defaultROI);

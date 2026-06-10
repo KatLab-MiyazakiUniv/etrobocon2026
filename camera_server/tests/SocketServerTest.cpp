@@ -11,19 +11,34 @@
 
 namespace etrobocon2026_test {
   // インスタンスに指定したportを代入できているかを確認
+
+  CameraCapture camera;
+  ColorRegionDetectionActionHandler colorRegionDetectionHandler(camera);
+
   TEST(SocketServerTest, ConstructorSetsPortCorrectly)
   {
     MockNetworkSystem mockNet;
     int testPort = 12345;
-    SocketServer server(mockNet, testPort);
-    EXPECT_EQ(testPort, server.getPort());
+    SocketServer server(colorRegionDetectionHandler, mockNet, testPort);
+    EXPECT_EQ(testPort, server.port);
+  }
+
+  // SocketServerが注入されたNetworkSystemを参照しているかアドレスの一致で確認
+  TEST(SocketServerTest, CompareAddress)
+  {
+    MockNetworkSystem mockNet;
+    SocketServer server(colorRegionDetectionHandler, mockNet);
+    EXPECT_EQ(&mockNet, &server.netSys);
+    RealNetworkSystem realNet;
+    SocketServer server2(colorRegionDetectionHandler, realNet);
+    EXPECT_EQ(&realNet, &server2.netSys);
   }
 
   // メンバ変数のlistenSocketの初期値が-1か
   TEST(SocketServerTest, CheckDefaultListenSocket)
   {
     MockNetworkSystem mockNet;
-    SocketServer server(mockNet);
+    SocketServer server(colorRegionDetectionHandler, mockNet);
     int expectedDefaultListenSocket = -1;
     EXPECT_EQ(server.getListenSocket(), expectedDefaultListenSocket);
   }
@@ -32,24 +47,25 @@ namespace etrobocon2026_test {
   TEST(SocketServerTest, DefaultisRunning)
   {
     MockNetworkSystem mockNet;
-    SocketServer server(mockNet);
-    EXPECT_FALSE(server.getIsRunning());
+    SocketServer server(colorRegionDetectionHandler, mockNet);
+    EXPECT_FALSE(server.isRunning);
   }
 
   // メンバ変数のportのデフォルト引数がDEFAULT_PORTかを確認
   TEST(SocketServerTest, CheckdefaultVariable2)
   {
     MockNetworkSystem mockNet;
-    SocketServer server(mockNet);
-    EXPECT_EQ(server.getPort(), CameraServer::DEFAULT_PORT);
+    SocketServer server(colorRegionDetectionHandler, mockNet);
+    EXPECT_EQ(server.port, CameraServer::DEFAULT_PORT);
   }
 
   // shutdown()の実行後にisRunningとlistenSocketがデフォルト値に戻っているか
   TEST(SocketServerTest, ShutdownChangesStateCorrectly)
   {
     MockNetworkSystem mockNet;
-    SocketServer server(mockNet);
-    server.init();
+    SocketServer server(colorRegionDetectionHandler, mockNet);
+    server.isRunning = true;
+    server.listenSocket = 100;
     server.shutdown();
     EXPECT_FALSE(server.getIsRunning());
     EXPECT_EQ(server.getListenSocket(), -1);
@@ -60,7 +76,7 @@ namespace etrobocon2026_test {
   {
     MockNetworkSystem mockNet;
     mockNet.forceSocketError = true;
-    SocketServer server(mockNet);
+    SocketServer server(colorRegionDetectionHandler, mockNet);
     EXPECT_FALSE(server.init());
   }
 
@@ -69,7 +85,7 @@ namespace etrobocon2026_test {
   {
     MockNetworkSystem mockNet;
     mockNet.forceBindError = true;
-    SocketServer server(mockNet);
+    SocketServer server(colorRegionDetectionHandler, mockNet);
     EXPECT_FALSE(server.init());
   }
 
@@ -77,7 +93,7 @@ namespace etrobocon2026_test {
   TEST(SocketServerTest, InitSuccessTest)
   {
     MockNetworkSystem mockNet;
-    SocketServer server(mockNet);
+    SocketServer server(colorRegionDetectionHandler, mockNet);
     EXPECT_TRUE(server.init());
   }
 
@@ -85,26 +101,14 @@ namespace etrobocon2026_test {
   TEST(SocketServerTest, HandleConnectionShutdown)
   {
     MockNetworkSystem mockNet;
-    mockNet.hasRecvData = true;
-    mockNet.recvData = CameraServer::Command::SHUTDOWN;
-    SocketServer server(mockNet);
-    server.init();
-    server.run();
-    EXPECT_FALSE(server.getIsRunning());
-    EXPECT_EQ(server.getListenSocket(), -1);
+    mockNet.receiveCommand = true;
+    mockNet.recvBuff = reinterpret_cast<void*>(CameraServer::Command::SHUTDOWN);
+    SocketServer server(colorRegionDetectionHandler, mockNet);
+    server.isRunning = true;
+    server.listenSocket = 100;
+    int afterConnectListenSocket = -1;
+    int dummyClientSocket = 200;
+    server.handleConnection(dummyClientSocket);
+    EXPECT_FALSE(server.isRunning);
+    EXPECT_EQ(server.listenSocket, afterConnectListenSocket);
   }
-
-  // このテストはクライアントからDISCONNECTコマンドを受信した際に接続待ちに戻ることを確認するテストであるが、現状の実装ではrun()が無限ループに入ってしまうため、DISCONNECTコマンドを受信した際に接続待ちに戻ることを確認するテストは現状行えない。
-  // // クライアントからDISCONNECTコマンドを受信した際に接続待ちに戻ることを確認する
-  // TEST(SocketServerTest, HandleConnectionDisconnect)
-  // {
-  //   MockNetworkSystem mockNet;
-  //   mockNet.hasRecvData = true;
-  //   mockNet.recvData = CameraServer::Command::DISCONNECT;
-  //   SocketServer server(mockNet);
-  //   server.init();
-  //   server.run();
-  //   EXPECT_TRUE(server.getIsRunning());
-  //   EXPECT_EQ(server.getListenSocket(), 999);  // モックのsocket()が999を返すため
-  // }
-}  // namespace etrobocon2026_test

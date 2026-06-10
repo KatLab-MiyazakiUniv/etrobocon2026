@@ -1,0 +1,38 @@
+
+/**
+ * @file ColorRegionDetectionActionHandler.h
+ * @brief 色領域をするクラス
+ * @author sadomiya-d-sousi
+ */
+
+#ifndef COLOR_REGION_DETECTION_ACTION_HANDLER_H
+#define COLOR_REGION_DETECTION_ACTION_HANDLER_H
+
+#include "CameraCapture.h"
+#include "SocketProtocol.h"
+#include "ColorRegionDetector.h"
+
+class ColorRegionDetectionActionHandler {
+ public:
+  /**
+   * @brief コンストラクタ
+   * @param camera カメラキャプチャのインスタンス
+   */
+  ColorRegionDetectionActionHandler(CameraCapture& camera);
+
+  /**
+   * @brief ライン検出アクションを実行する
+   * @param request クライアントからのリクエスト
+   * @param response クライアントへのレスポンス
+   */
+  void execute(const CameraServer::ColorRegionDetectorRequest& request,
+               CameraServer::ColorRegionDetectorResponse& response);
+
+  // static void RectDataToCvRect(CameraServer::RectData& origin, cv::Rect& ){
+  // }
+
+ private:
+  CameraCapture& camera;
+};
+
+#endif  // TWO_COLOR_LINE_DETECTION_ACTION_HANDLER_H

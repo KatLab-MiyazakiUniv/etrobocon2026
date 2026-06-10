@@ -6,8 +6,8 @@
 
 #include "ColorRegionDetector.h"
 
-ColorRegionDetector::ColorRegionDetector(const std::vector<HSVRange>& _hsvRanges,
-                                         const cv::Rect& _roi)
+ColorRegionDetector::ColorRegionDetector(
+    const std::vector<ColorRegionDetector::HSVRange>& _hsvRanges, const cv::Rect& _roi)
   : hsvRanges(_hsvRanges), roi(_roi)
 {
   validateParameters();

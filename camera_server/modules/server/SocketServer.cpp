@@ -101,7 +101,6 @@ void SocketServer::handleConnection(int clientSocket)
         CameraServer::Command cmd = *reinterpret_cast<CameraServer::Command*>(recvbuf);
         switch(cmd) {
           case CameraServer::Command::COLOR_REGION_DETECTION: {
-            // auto*じゃなくてもい良いんじゃないの?>後回しや
             auto* request = reinterpret_cast<CameraServer::ColorRegionDetectorRequest*>(recvbuf);
             Logger::info("Executing COLOR_REGION_DETECTION");
             CameraServer::ColorRegionDetectorResponse response;

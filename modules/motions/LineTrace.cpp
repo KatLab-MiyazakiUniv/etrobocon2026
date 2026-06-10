@@ -1,20 +1,19 @@
 /**
- * @file   LineTrace.cpp
- * @brief  ライントレース動作を実行するクラス
- * @author okuyama0528
- */
+ * @file   LineTrace.cpp
+ * @brief  ライントレース動作を実行するクラス
+ * @author okuyama0528
+ */
 
 #include "LineTrace.h"
 
 LineTrace::LineTrace(Robot& _robot,
                      std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                     double _targetSpeed, int _targetBrightness, const Pid::PidGain& _pidGain,
-                     const Pid::PidGain& _rightPidGain, const Pid::PidGain& _leftPidGain)
+                     double _targetSpeed, int _targetBrightness, const Pid::PidGain& _pidGain)
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
     targetBrightness(_targetBrightness),
     pidGain(_pidGain),
-    speedCalculator(_robot, _rightPidGain, _leftPidGain, _targetSpeed)
+    speedCalculator(_robot, _targetSpeed)
 {
   LOG_CREATE("LineTrace");
 }
@@ -34,7 +33,7 @@ void LineTrace::executeStep()
 {
   Pid pid(pidGain.kp, pidGain.ki, pidGain.kd, targetBrightness);
 
-  // 初期Speed値を計算
+  // 基本Speed値を計算
   double baseRightPower = speedCalculator.calculateRightMotorPower();
   double baseLeftPower = speedCalculator.calculateLeftMotorPower();
 

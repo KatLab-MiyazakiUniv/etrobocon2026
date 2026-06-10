@@ -1,8 +1,8 @@
 /**
- * @file   LineTrace.h
- * @brief  ライントレース動作を実行するクラス
- * @author okuyama0528
- */
+ * @file   LineTrace.h
+ * @brief  ライントレース動作を実行するクラス
+ * @author okuyama0528
+ */
 
 #ifndef LINE_TRACE_H
 #define LINE_TRACE_H
@@ -23,16 +23,13 @@ class LineTrace : public BaseMotion {
    * @param _targetSpeed 目標速度(mm/秒)
    * @param _targetBrightness 目標とする明るさの値(%)
    * @param _pidGain ライントレース用PIDゲイン
-   * @param _rightPid 右タイヤ用走行速度制御PIDゲイン
-   * @param _leftPid 左タイヤ用走行速度制御PIDゲイン
    */
   LineTrace(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-            double _targetSpeed, int _targetBrightness, const Pid::PidGain& _pidGain,
-            const Pid::PidGain& _rightPidGain, const Pid::PidGain& _leftPidGain);
+            double _targetSpeed, int _targetBrightness, const Pid::PidGain& _pidGain);
 
   /**
-   * デストラクタ
-   */
+   * デストラクタ
+   */
   ~LineTrace();
 
  protected:
@@ -42,13 +39,13 @@ class LineTrace : public BaseMotion {
   void prepare() override;
 
   /**
-   * @brief 1周期分の動作を実行する
-   */
+   * @brief 1周期分の動作を実行する
+   */
   void executeStep() override;
 
   /**
-   * @brief 両タイヤモータを停止する
-   */
+   * @brief 両タイヤモータを停止する
+   */
   void finish() override;
 
  private:
@@ -56,7 +53,7 @@ class LineTrace : public BaseMotion {
   int targetBrightness;             // 目標とする明るさの値(%)
   int edgeSign;                     // エッジの左右判定に基づく符号（左エッジ: -1, 右エッジ: 1）
   Pid::PidGain pidGain;             // ライントレース用PIDゲイン
-  SpeedCalculator speedCalculator;  // 目標速度に対する左右タイヤのPID制御を行うクラスのインスタンス
+  SpeedCalculator speedCalculator;  // 目標速度に対する左右車輪のPID制御を行うクラスのインスタンス
 };
 
 #endif

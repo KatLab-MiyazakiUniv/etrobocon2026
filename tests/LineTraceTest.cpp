@@ -13,12 +13,10 @@ namespace etrobocon2026_test {
   class LineTraceTest : public ::testing::Test {
    protected:
     // テスト用のPidゲイン
-    Pid::PidGain tracePid = { 0.0055, 0.0009, 0.0 };
-    Pid::PidGain rightPid = { 0.00535, 0.00115, 0.000 };
-    Pid::PidGain leftPid = { 0.00578, 0.0008535, 0.000 };
+    Pid::PidGain tracePid = { 0.0055, 0.0009, 0.0001 };
   };
 
-  // IMU無しの場合、目標距離が正の時、run()でライントレース後、走行距離が目標距離だけ増加するかテスト（誤差あり）
+  // 目標距離が正の時、run()でライントレース後、走行距離が目標距離だけ増加するかテスト（誤差あり）
   TEST_F(LineTraceTest, Run)
   {
     Robot robot;
@@ -37,7 +35,7 @@ namespace etrobocon2026_test {
 
     // ライントレース動作を実行
     LineTrace lineTrace(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                        targetSpeed, targetBrightness, tracePid, rightPid, leftPid);
+                        targetSpeed, targetBrightness, tracePid);
     lineTrace.run();
 
     double endMileage
@@ -48,7 +46,7 @@ namespace etrobocon2026_test {
     EXPECT_NEAR(targetDistance, endMileage - startMileage, 0.5);
   }
 
-  // IMU無しの場合、目標距離が0の時、runでライントレース後、走行距離が増加しないことをテスト
+  // 目標速度が0の時、runでライントレース後、走行距離が増加しないことをテスト
   TEST_F(LineTraceTest, RunZeroSpeed)
   {
     Robot robot;
@@ -63,7 +61,7 @@ namespace etrobocon2026_test {
 
     // ライントレース動作を実行
     LineTrace lineTrace(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                        targetSpeed, targetBrightness, tracePid, rightPid, leftPid);
+                        targetSpeed, targetBrightness, tracePid);
     lineTrace.run();
 
     // ライントレース後の走行距離を計算
@@ -75,6 +73,7 @@ namespace etrobocon2026_test {
     EXPECT_EQ(0.0, endMileage - startMileage);
   }
 
+  // 目標距離が0の時、runでライントレース後、走行距離が増加しないことをテスト
   TEST_F(LineTraceTest, RunZeroDistance)
   {
     Robot robot;
@@ -89,7 +88,7 @@ namespace etrobocon2026_test {
 
     // ライントレース動作を実行
     LineTrace lineTrace(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                        targetSpeed, targetBrightness, tracePid, rightPid, leftPid);
+                        targetSpeed, targetBrightness, tracePid);
     lineTrace.run();
 
     // ライントレース後の走行距離を計算
@@ -101,6 +100,7 @@ namespace etrobocon2026_test {
     EXPECT_EQ(0.0, endMileage - startMileage);
   }
 
+  // 目標距離が負の時、runでライントレース後、走行距離が増加しないことをテスト
   TEST_F(LineTraceTest, RunNegativeDistance)
   {
     Robot robot;
@@ -115,7 +115,7 @@ namespace etrobocon2026_test {
 
     // ライントレース動作を実行
     LineTrace lineTrace(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                        targetSpeed, targetBrightness, tracePid, rightPid, leftPid);
+                        targetSpeed, targetBrightness, tracePid);
     lineTrace.run();
 
     // ライントレース後の走行距離を計算

@@ -17,7 +17,7 @@ namespace etrobocon2026_test {
     // 平文を暗号化した文
     std::string encryptedText = "U2FsdGVkX1+kU2ekK92ZjOQTL/ytu4bgR0tAJllMG6I=";
 
-    EXPECT_EQ(plainText, Decode::decrypt(key, encryotedText));
+    EXPECT_EQ(plainText, Decode::decrypt(key, encryptedText));
   }
 
   // 違う鍵では復号できないかのテスト

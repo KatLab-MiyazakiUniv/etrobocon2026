@@ -35,7 +35,7 @@ cv::Mat QrCodeDetector::rectify(const cv::Mat& frame, const std::vector<cv::Poin
                                           { quietZoneSize + qrSize, quietZoneSize },
                                           { quietZoneSize + qrSize, quietZoneSize + qrSize },
                                           { quietZoneSize, quietZoneSize + qrSize } };
-  cv::Mat pixelNum = cv::getPerspectiveTransform(corners, dst);
+  cv::Mat pixelNum = cv::getPerspectiveTransform(corners, dstCorners);
   cv::Mat rectified;
   cv::warpPerspective(frame, rectified, pixelNum, cv::Size(outputSize, outputSize));
   return rectified;

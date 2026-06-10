@@ -21,7 +21,9 @@ namespace etrobocon2026_test {
   // IMU無しの場合、目標距離が正の時、run()でライントレース後、走行距離が目標距離だけ増加するかテスト（誤差あり）
   TEST_F(LineTraceTest, Run)
   {
-    Robot robot;
+    RealNetworkSystem netSys;
+    SocketClient socketClient(netSys);
+    Robot robot(socketClient);
     double targetSpeed = 1000.0;   // 目標速度
     double targetDistance = 10.0;  // 目標距離
     int targetBrightness = 50;     // 目標とする明るさの値(%)
@@ -51,7 +53,9 @@ namespace etrobocon2026_test {
   // IMU無しの場合、目標距離が0の時、runでライントレース後、走行距離が増加しないことをテスト
   TEST_F(LineTraceTest, RunZeroSpeed)
   {
-    Robot robot;
+    RealNetworkSystem netSys;
+    SocketClient socketClient(netSys);
+    Robot robot(socketClient);
     double targetSpeed = 0.0;     // 目標速度
     double targetDistance = 0.0;  // 目標距離
     int targetBrightness = 50;    // 目標とする明るさの値(%)
@@ -77,7 +81,9 @@ namespace etrobocon2026_test {
 
   TEST_F(LineTraceTest, RunZeroDistance)
   {
-    Robot robot;
+    RealNetworkSystem netSys;
+    SocketClient socketClient(netSys);
+    Robot robot(socketClient);
     double targetSpeed = 100.0;   // 目標速度
     double targetDistance = 0.0;  // 目標距離
     int targetBrightness = 50;    // 目標とする明るさの値(%)
@@ -103,7 +109,9 @@ namespace etrobocon2026_test {
 
   TEST_F(LineTraceTest, RunNegativeDistance)
   {
-    Robot robot;
+    RealNetworkSystem netSys;
+    SocketClient socketClient(netSys);
+    Robot robot(socketClient);       // Robotクラスのインスタンスを作成
     double targetSpeed = 100.0;      // 目標速度
     double targetDistance = -100.0;  // 目標距離
     int targetBrightness = 50;       // 目標とする明るさの値(%)

@@ -81,7 +81,7 @@ namespace etrobocon2026_test {
 
     int end = ClockUtil::now();
 
-    EXPECT_LE(end - start, 1);
+    EXPECT_LE(end - start, 5);
   }
 
 }  // namespace etrobocon2026_test

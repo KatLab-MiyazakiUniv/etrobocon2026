@@ -55,6 +55,7 @@ void CameraTracking::executeStep()
 
   // 通信失敗、または検出できなかった場合は、出力を更新せずに終了する
   if(!success || !response.result.wasDetected) {
+    Logger::warning("Color region not detected");
     return;
   }
 

@@ -54,7 +54,6 @@ class SocketServer {
   int port;                                                        // サーバーのポート番号
   static constexpr int DEFAULT_BUFLEN = 512;                       // デフォルトのバッファサイズ
   ColorRegionDetectionActionHandler& colorRegionDetectionHandler;  // 色領域検出のハンドラー
-  // ColorRegionDetectionActionHandler
   /**
    * @brief クライアントとの接続を処理する
    * @param clientSocket クライアントソケット

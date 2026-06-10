@@ -1,8 +1,7 @@
-
 /**
  * @file ColorRegionDetectionActionHandler.h
  * @brief 色領域をするクラス
- * @author sadomiya-d-sousi
+ * @author sadomiya-sousi
  */
 
 #ifndef COLOR_REGION_DETECTION_ACTION_HANDLER_H
@@ -27,9 +26,6 @@ class ColorRegionDetectionActionHandler {
    */
   void execute(const CameraServer::ColorRegionDetectorRequest& request,
                CameraServer::ColorRegionDetectorResponse& response);
-
-  // static void RectDataToCvRect(CameraServer::RectData& origin, cv::Rect& ){
-  // }
 
  private:
   CameraCapture& camera;

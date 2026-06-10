@@ -1,6 +1,6 @@
 /**
  * @file   Decode.cpp
- * @brief  暗号化文字列を復号化するクラス
+ * @brief  暗号化文字列を復号するクラス
  * @author yutaro-1214 HaruArima08
  */
 
@@ -9,7 +9,10 @@
 std::string Decode::decrypt(const std::string& key, const std::string& encryptedText)
 {
   auto decoded = decodeBase64(encryptedText);
-  if(!decoded) return "";
+  if(!decoded) {
+    Logger::error("Decode: Base64でコードに失敗しました。");
+    return "";
+  }
 
   // "Salted__" ヘッダとSaltを確認（openssl enc形式）
   if(std::memcmp(decoded->data(), "Salted__", 8) != 0) {

@@ -8,9 +8,9 @@
 
 QrCodeDetector::QrCodeDetector()
 {
-  detector.setEpsX(0.2);
-  detector.setEpsY(0.2);
-  options.setFormats(ZXing::BarcodeFormat::QRCode);
+  detector.setEpsX(0.2);  // 水平方向のファインダパターン探索の許容誤差指定
+  detector.setEpsY(0.2);  // 垂直方向のファインダパターン探索の許容誤差指定
+  options.setFormats(ZXing::BarcodeFormat::QRCode);  // QRコードのみを検出
   LOG_CREATE("QrCodeDetector");
 }
 
@@ -22,19 +22,22 @@ QrCodeDetector::~QrCodeDetector()
 cv::Mat QrCodeDetector::rectify(const cv::Mat& frame, const std::vector<cv::Point2f>& corners) const
 {
   // 対辺の長さの最大値を正方形の一辺とする
-  float w = std::max(cv::norm(corners[1] - corners[0]), cv::norm(corners[2] - corners[3]));
-  float h = std::max(cv::norm(corners[3] - corners[0]), cv::norm(corners[2] - corners[1]));
-  float s = std::max(w, h);
+  float maxWidth = std::max(cv::norm(corners[1] - corners[0]), cv::norm(corners[2] - corners[3]));
+  float maxHeight = std::max(cv::norm(corners[3] - corners[0]), cv::norm(corners[2] - corners[1]));
+  float qrSize = std::max(maxWidth, maxHeight);
 
   // クワイエットゾーン（余白）を追加する
-  float p = s * quietZoneRatio;
-  int totalSize = static_cast<int>(s + 2.f * p);
+  float quietZoneSize = qrSize * quietZoneRatio;
+  int outputSize = static_cast<int>(qrSize + 2.f * quietZoneSize);
 
   // 余白分だけ内側にQRコード領域を配置
-  std::vector<cv::Point2f> dst = { { p, p }, { p + s, p }, { p + s, p + s }, { p, p + s } };
-  cv::Mat M = cv::getPerspectiveTransform(corners, dst);
+  std::vector<cv::Point2f> dstCorners = { { quietZoneSize, quietZoneSize },
+                                          { quietZoneSize + qrSize, quietZoneSize },
+                                          { quietZoneSize + qrSize, quietZoneSize + qrSize },
+                                          { quietZoneSize, quietZoneSize + qrSize } };
+  cv::Mat pixelNum = cv::getPerspectiveTransform(corners, dst);
   cv::Mat rectified;
-  cv::warpPerspective(frame, rectified, M, cv::Size(totalSize, totalSize));
+  cv::warpPerspective(frame, rectified, pixelNum, cv::Size(outputSize, outputSize));
   return rectified;
 }
 

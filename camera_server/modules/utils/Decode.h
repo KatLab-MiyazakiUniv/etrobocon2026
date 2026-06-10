@@ -1,6 +1,6 @@
 /**
  * @file   Decode.h
- * @brief  暗号化文字列を復号化するクラス
+ * @brief  暗号化文字列を復号するクラス
  * @author yutaro-1214 HaruArima08
  */
 
@@ -18,10 +18,10 @@
 class Decode {
  public:
   /**
-   * @brief 暗号化文字列を復号化する
+   * @brief 暗号化文字列を復号する
    * @param key 復号キー
    * @param encryptedText 暗号文
-   * @return 復号化した文字列（失敗時は空文字列）
+   * @return 復号した文字列（失敗時は空文字列）
    */
   static std::string decrypt(const std::string& key, const std::string& encryptedText);
 
@@ -29,7 +29,7 @@ class Decode {
   Decode();  // インスタンス化禁止
 
   /**
-   * @brief Base64エンコード文字列を復号化する
+   * @brief Base64エンコード文字列を復号する
    * @param encoded Base64エンコード暗号文
    * @return Base64デコードしたバイト列
    */
@@ -45,11 +45,11 @@ class Decode {
                                                                 const unsigned char* salt);
 
   /**
-   * @brief AES-128-ECBで復号化する
+   * @brief AES-128-ECBで復号する
    * @param cipherText 復号対象の暗号文
    * @param cipherLength 暗号文のバイト長
    * @param aesKey 復号キー
-   * @return 復号化した文字列（失敗時は空文字列）
+   * @return 復号した文字列（失敗時は空文字列）
    */
   static std::string decryptAES(const unsigned char* cipherText, int cipherLength,
                                 const unsigned char* aesKey);

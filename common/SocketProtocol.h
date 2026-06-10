@@ -96,7 +96,6 @@ namespace CameraServer {
     HSVRangeData hsvRanges[MAX_HSV_RANGES];  // HSVの範囲の配列
 
     RectData roi;         // 検出対象の領域
-    SizeData resolution;  // 解像度
   };
 
   /**

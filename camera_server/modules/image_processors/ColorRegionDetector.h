@@ -16,6 +16,12 @@
 
 class ColorRegionDetector : public BoundingBoxDetector {
  public:
+  // HSVの範囲を保持する構造体
+  struct HSVRange {
+    cv::Scalar lower;  // HSVの下限値
+    cv::Scalar upper;  // HSVの上限値
+  };
+
   /**
    * @brief コンストラクタ
    * @param hsvRanges 検出したい色のHSV範囲
@@ -28,12 +34,6 @@ class ColorRegionDetector : public BoundingBoxDetector {
    * @brief デストラクタ
    */
   ~ColorRegionDetector();
-
-  // HSVの範囲を保持する構造体
-  struct HSVRange {
-    cv::Scalar lower;  // HSVの下限値
-    cv::Scalar upper;  // HSVの上限値
-  };
 
   /**
    * @brief フレームから色領域を検出

@@ -1,13 +1,2 @@
-コマンド名,ID,引数1,引数2
-DS,ID,int
-DS,1,456
-DS,2,789
-DS,3
-DS,4
-DS,5
-DS,6
-DS,7
-DS,8
-DS,9
-DS,10,509
-DS,田中,3
+コマンド名,ID,距離,速度,R_P,R_I,R_D,L_P,L_I,L_D,A_P,A_I,A_D,IMU使用フラグ
+DS,ID,double,double,double,double,double,double,double,double,double,double,double,bool

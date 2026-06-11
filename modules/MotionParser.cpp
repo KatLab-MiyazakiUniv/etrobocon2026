@@ -50,22 +50,30 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
 
     // TODO: コマンド名をCOMMAND enumに変換して各Motionオブジェクトを生成する処理
     //       各コマンドに対応するMotionクラスが実装済みになったら順次追加していく
-    // COMMAND command = convertCommand(params[0]);
-    // switch(command) {
-    //   case COMMAND::AR: {
-    //     // AR: 角度指定回頭
-    //     // params[1]:int 角度[deg], params[2]:double 速度[mm/s], params[3]:string 方向
-    //     auto ar = new AngleRotation(robot, std::stoi(params[1]), std::stod(params[2]),
-    //                                 convertBool(params[0], params[3]));
-    //     motionList.push_back(ar);
-    //     break;
-    //   }
-    //   // ↓ 他のコマンドはここに追加していく
-    //   default: {
-    //     cout << commandFilePath << ":" << lineNum << " Command " << params[0] << " は未定義です"
-    //     << endl; break;
-    //   }
-    // }
+    COMMAND command = convertCommand(params[0]);
+    switch(command) {
+      case COMMAND::DS: {
+        std::unique_ptr<DistanceCondition> distanceCondition
+            = std::make_unique<DistanceCondition>(robot, std::stod(params[2]));
+        Pid::PidGain rightPid(std::stod(params[4]), std::stod(params[5]), std::stod(params[6]));
+        Pid::PidGain leftPid(std::stod(params[7]), std::stod(params[8]), std::stod(params[9]));
+        Pid::PidGain anglePidGain(std::stod(params[10]), std::stod(params[11]),
+                                  std::stod(params[12]));
+
+        // DS: 角度指定回頭
+        // params[1]:int 角度[deg], params[2]:double 速度[mm/s], params[3]:string 方向
+        auto ds = new Straight(robot, std::move(distanceCondition), std::stod(params[3]), rightPid,
+                               leftPid, anglePidGain, std::stoi(params[13]));
+        motionList.push_back(ds);
+        break;
+      }
+      // ↓ 他のコマンドはここに追加していく
+      default: {
+        cout << commandFilePath << ":" << lineNum << " Command " << params[0] << " は未定義です"
+             << endl;
+        break;
+      }
+    }
 
     lineNum++;  // 行番号をインクリメントする
   }
@@ -78,6 +86,7 @@ COMMAND MotionParser::convertCommand(const string& str)
   // コマンド文字列(string)と、それに対応する列挙型COMMANDのマッピングを定義
   static const unordered_map<string, COMMAND> commandMap = {
     { "EXAMPLE", COMMAND::EXAMPLE },  // 例
+    { "DS", COMMAND::DS }             // DSコマンド
   };
 
   // コマンド文字列に対応するCOMMAND値をマップから取得。なければCOMMAND::NONEを返す

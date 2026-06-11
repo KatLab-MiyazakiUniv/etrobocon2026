@@ -12,11 +12,12 @@
 #include <opencv2/objdetect.hpp>
 #include <ZXing/ReadBarcode.h>
 #include <ZXing/ReaderOptions.h>
+#include <vector>
 #include "CodeDetector.h"
 #include "QrCodeDetectionResult.h"
 #include "Logger.h"
 
-class QrCodeDetector : public CodeDetector<QrCodeDetectionResult> {
+class QrCodeDetector : public CodeDetector<std::vector<QrCodeDetectionResult>> {
  public:
   /**
    * @brief コンストラクタ
@@ -31,9 +32,9 @@ class QrCodeDetector : public CodeDetector<QrCodeDetectionResult> {
   /**
    * @brief フレーム内のQRコードを検出する
    * @param frame 処理対象のフレーム
-   * @return 検出結果（QrCodeDetectionResult型）
+   * @return 検出結果のリスト
    */
-  QrCodeDetectionResult detect(const cv::Mat& frame) override;
+  std::vector<QrCodeDetectionResult> detect(const cv::Mat& frame) override;
 
  private:
   static constexpr float quietZoneRatio = 0.2f;  // 透視変換後のクワイエットゾーン比率

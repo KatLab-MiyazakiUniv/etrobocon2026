@@ -21,7 +21,7 @@ class SpeedCalculator {
   SpeedCalculator(Robot& _robot, double _targetSpeed);
 
   /**
-   * @brief speedCalculatorのコンストラクタ
+   * @brief 左右タイヤのPIDを指定するオーバーロードコンストラクタ
    * @param _robot Robotクラスのインスタンス
    * @param _rightPid 右タイヤのPIDゲイン
    * @param _leftPid 左タイヤのPIDゲイン

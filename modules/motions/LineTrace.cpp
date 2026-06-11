@@ -8,11 +8,12 @@
 
 LineTrace::LineTrace(Robot& _robot,
                      std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                     double _targetSpeed, int _targetBrightness, const Pid::PidGain& _pidGain)
+                     double _targetSpeed, int _targetBrightness,
+                     const Pid::PidGain& _brightnessPidGain)
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
     targetBrightness(_targetBrightness),
-    pidGain(_pidGain),
+    brightnessPidGain(_brightnessPidGain),
     speedCalculator(_robot, _targetSpeed)
 {
   LOG_CREATE("LineTrace");
@@ -25,15 +26,14 @@ LineTrace::~LineTrace()
 
 void LineTrace::prepare()
 {
-  // Robotから取得したコース設定に基づきエッジを決定
   edgeSign = (robot.getEdge() == Edge::LeftEdge) ? -1 : 1;
 }
 
 void LineTrace::executeStep()
 {
-  Pid pid(pidGain.kp, pidGain.ki, pidGain.kd, targetBrightness);
+  Pid pid(brightnessPidGain.kp, brightnessPidGain.ki, brightnessPidGain.kd, targetBrightness);
 
-  // 基本Speed値を計算
+  // 目標スピードに必要なパワー値を計算
   double baseRightPower = speedCalculator.calculateRightMotorPower();
   double baseLeftPower = speedCalculator.calculateLeftMotorPower();
 
@@ -41,7 +41,7 @@ void LineTrace::executeStep()
   double turningPower
       = pid.calculatePid(robot.getColorSensorControllerInstance().getReflectance()) * edgeSign;
 
-  // モータのPower値をセット（前進の時0を下回らないように，後進の時0を上回らないようにセット）
+  // ライントレースに必要なPower値を算出（前進の時0を下回らないように，後進の時0を上回らないように計算
   double rightPower = baseRightPower > 0.0 ? std::max(baseRightPower - turningPower, 0.0)
                                            : std::min(baseRightPower + turningPower, 0.0);
   double leftPower = baseLeftPower > 0.0 ? std::max(baseLeftPower + turningPower, 0.0)
@@ -53,6 +53,5 @@ void LineTrace::executeStep()
 
 void LineTrace::finish()
 {
-  // モータを停止
   robot.getWheelMotorControllerInstance().stopBoth();
 }

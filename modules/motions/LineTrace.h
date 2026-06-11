@@ -22,10 +22,10 @@ class LineTrace : public BaseMotion {
    * @param _continuationCondition 動作を継続する条件を判定するクラスのインスタンス
    * @param _targetSpeed 目標速度(mm/秒)
    * @param _targetBrightness 目標とする明るさの値(%)
-   * @param _pidGain ライントレース用PIDゲイン
+   * @param _brightnessPidGain ライントレース用の輝度値に対するPIDゲイン
    */
   LineTrace(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-            double _targetSpeed, int _targetBrightness, const Pid::PidGain& _pidGain);
+            double _targetSpeed, int _targetBrightness, const Pid::PidGain& _brightnessPidGain);
 
   /**
    * デストラクタ
@@ -52,7 +52,7 @@ class LineTrace : public BaseMotion {
   double targetSpeed;               // 目標速度(mm/秒)
   int targetBrightness;             // 目標とする明るさの値(%)
   int edgeSign;                     // エッジの左右判定に基づく符号（左エッジ: -1, 右エッジ: 1）
-  Pid::PidGain pidGain;             // ライントレース用PIDゲイン
+  Pid::PidGain brightnessPidGain;   // ライントレース用の輝度値に対するPIDゲイン
   SpeedCalculator speedCalculator;  // 目標速度に対する左右車輪のPID制御を行うクラスのインスタンス
 };
 

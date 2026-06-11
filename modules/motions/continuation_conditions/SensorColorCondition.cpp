@@ -20,7 +20,7 @@ SensorColorCondition::~SensorColorCondition()
 bool SensorColorCondition::shouldContinue()
 {
   if(targetColor == ColorSensorController::COLOR::NONE) {
-    std::cerr << "Target color is NONE" << std::endl;
+    Logger::warning("目標色が無効です");
     return false;
   }
   // HSV値を取得

@@ -19,6 +19,11 @@ RunningTimeCondition::~RunningTimeCondition()
 
 bool RunningTimeCondition::shouldContinue()
 {
+  if(targetTime <= 0) {
+    Logger::warning("目標時間が無効です");
+    return false;
+  }
+
   // 経過時間が目標時間に到達
   if(fabs(ClockUtil::now() - robot.getRunningStartTime()) >= targetTime) return false;
 

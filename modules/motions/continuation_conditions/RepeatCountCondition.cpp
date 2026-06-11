@@ -19,6 +19,10 @@ RepeatCountCondition::~RepeatCountCondition()
 
 bool RepeatCountCondition::shouldContinue()
 {
+  if(targetRepeats <= 0) {
+    Logger::warning("目標繰り返し回数が無効です");
+    return false;
+  }
   // 繰り返し回数が目標繰り返し回数に到達
   if(currentRepeats >= targetRepeats) return false;
 

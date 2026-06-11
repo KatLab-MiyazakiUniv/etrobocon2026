@@ -6,12 +6,11 @@
 
 #include "Robot.h"
 
-Robot::Robot(SocketClient& _cameraSocketClient)
+Robot::Robot()
   : wheelMotorController(),
     armMotorController(),
     imuController(),
-    colorSensorController(),
-    cameraSocketClient(_cameraSocketClient)
+    colorSensorController()
 {
 }
 
@@ -39,10 +38,6 @@ Course& Robot::getCourse()
   return course;
 }
 
-SocketClient& Robot::getCameraSocketClientInstance()
-{
-  return cameraSocketClient;
-}
 
 void Robot::setCourse(Course course)
 {

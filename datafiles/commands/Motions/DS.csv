@@ -1,2 +1,4 @@
 コマンド名,ID,距離,速度,R_P,R_I,R_D,L_P,L_I,L_D,A_P,A_I,A_D,IMU使用フラグ
 DS,ID,double,double,double,double,double,double,double,double,double,double,double,bool
+DS,1,1000,300,0.8,0.1,0.3,0.8,0.1,0.3,0.0,0.0,0.0,0
+

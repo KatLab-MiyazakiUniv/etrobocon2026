@@ -5,6 +5,7 @@
  */
 
 #include "Straight.h"
+#include "CsvLogger.h"
 
 Straight::Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                    double _targetSpeed, const Pid::PidGain& _rightPid, const Pid::PidGain& _leftPid,
@@ -61,6 +62,13 @@ void Straight::executeStep()
   // モーターにPower値をセット
   robot.getWheelMotorControllerInstance().setRightPower(requiredRightPower + turningPower);
   robot.getWheelMotorControllerInstance().setLeftPower(requiredLeftPower - turningPower);
+
+  LogData logData;
+  logData.rightPower = robot.getWheelMotorControllerInstance().getRightPower();
+  logData.leftPower = robot.getWheelMotorControllerInstance().getLeftPower();
+  logData.rightSpeed = robot.getWheelMotorControllerInstance().getRightSpeed();
+  logData.leftSpeed = robot.getWheelMotorControllerInstance().getLeftSpeed();
+  CsvLogger::add(logData);
 }
 
 void Straight::finish()

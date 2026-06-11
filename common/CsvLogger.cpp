@@ -133,7 +133,7 @@ void CsvLogger::outputToFile()
   }
 
   // CSVファイルをバイナリモードで開く
-  std::ofstream file(outputPath, std::ios::binary | std::ios::app);
+  std::ofstream file(outputPath, std::ios::binary | std::ios::trunc);
 
   if(!file.is_open()) {
     Logger::error("CsvLogger: failed to open or create csv file");

@@ -34,6 +34,7 @@ void ColorRegionDetectionActionHandler::execute(
   }
 
   cv::Rect localRoi(request.roi.x, request.roi.y, request.roi.width, request.roi.height);
+  // ここで,ColorRegionDetectorをインスタンス化してる。execute()は繰り返し呼ばれるのでインスタンスが生死
   ColorRegionDetector detector(localHsvRanges, localRoi);
   BoundingBoxDetectionResult localResult;
 
@@ -53,11 +54,8 @@ void ColorRegionDetectionActionHandler::execute(
     response.result.bottomLeft.y = localResult.bottomLeft.y;
     response.result.bottomRight.x = localResult.bottomRight.x;
     response.result.bottomRight.y = localResult.bottomRight.y;
-
     Logger::info("Color region detected successfully");
-
   } else {
-    std::cout << "Color region not detected." << std::endl;
     Logger::error("Color region not detected");
   }
 }

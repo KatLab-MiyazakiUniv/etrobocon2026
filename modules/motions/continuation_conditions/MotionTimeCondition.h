@@ -19,7 +19,6 @@ class MotionTimeCondition : public BaseContinuationCondition {
    * @brief MotionTimeCondition を初期化する
    * @param _robot robotクラスのインスタンスの参照
    * @param _targetTime 目標時間(ms)
-   * @param _initTime 開始時の時間(ms)
    */
   MotionTimeCondition(Robot& _robot, int _targetTime);
 
@@ -29,12 +28,12 @@ class MotionTimeCondition : public BaseContinuationCondition {
   ~MotionTimeCondition();
 
   /**
-   * @brief 開始時の時間を取得して initTime に保存する
+   * @brief 動作開始時の時間を取得して initTime に保存する
    */
   void prepare() override;
 
   /**
-   * @brief 開始時からの経過時間が目標時間に達した場合、動作を継続しないと判定する
+   * @brief 動作開始時からの経過時間が目標時間に達した場合、動作を継続しないと判定する
    * @return true/動作を継続する、false/動作を継続しない
    */
   bool shouldContinue() override;

@@ -11,14 +11,12 @@ CameraTracking::CameraTracking(Robot& _robot,
                                double _targetSpeed, int _targetXCoordinate,
                                const Pid::PidGain& _pidGain, const Pid::PidGain& _rightPid,
                                const Pid::PidGain& _leftPid,
-                               const CameraServer::ColorRegionDetectorRequest& _detectionRequest,
-                               bool _isStopMotorPower)
+                               const CameraServer::ColorRegionDetectorRequest& _detectionRequest)
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
     targetXCoordinate(_targetXCoordinate),
     pidGain(_pidGain),
     detectionRequest(_detectionRequest),
-    isStopMotorPower(_isStopMotorPower),
     speedCalculator(_robot, _rightPid, _leftPid, _targetSpeed),
     cameraPid(_pidGain.kp, _pidGain.ki, _pidGain.kd, _targetXCoordinate)
 {
@@ -74,9 +72,12 @@ void CameraTracking::executeStep()
   robot.getWheelMotorControllerInstance().setLeftPower(leftPower);
 }
 
+void BaseMotion::wait()
+{
+  ClockUtil::sleep(30);  // カメラの撮影FPSに合わせて30ミリ秒待機する
+}
+
 void CameraTracking::finish()
 {
-  if(isStopMotorPower) {
-    robot.getWheelMotorControllerInstance().stopBoth();
-  }
+  robot.getWheelMotorControllerInstance().stopBoth();
 }

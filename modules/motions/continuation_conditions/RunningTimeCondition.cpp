@@ -20,7 +20,7 @@ RunningTimeCondition::~RunningTimeCondition()
 bool RunningTimeCondition::shouldContinue()
 {
   if(targetTime <= 0) {
-    Logger::warning("目標時間が無効です");
+    Logger::warning("目標時間が無効です。動作を終了します。");
     return false;
   }
 

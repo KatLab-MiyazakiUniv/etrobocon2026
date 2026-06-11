@@ -20,7 +20,7 @@ RepeatCountCondition::~RepeatCountCondition()
 bool RepeatCountCondition::shouldContinue()
 {
   if(targetRepeats <= 0) {
-    Logger::warning("目標繰り返し回数が無効です");
+    Logger::warning("目標繰り返し回数が無効です。動作を終了します。");
     return false;
   }
   // 繰り返し回数が目標繰り返し回数に到達

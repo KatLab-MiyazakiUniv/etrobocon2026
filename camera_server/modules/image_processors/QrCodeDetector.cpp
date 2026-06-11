@@ -8,8 +8,6 @@
 
 QrCodeDetector::QrCodeDetector()
 {
-  detector.setEpsX(0.2);  // 水平方向のファインダパターン探索の許容誤差指定
-  detector.setEpsY(0.2);  // 垂直方向のファインダパターン探索の許容誤差指定
   options.setFormats(ZXing::BarcodeFormat::QRCode);  // QRコードのみを検出
   LOG_CREATE("QrCodeDetector");
 }
@@ -53,8 +51,11 @@ std::vector<QrCodeDetectionResult> QrCodeDetector::detect(const cv::Mat& frame)
   // フレーム内のすべてのQRコードの頂点を検出
   std::vector<cv::Point2f> allPoints;
   if(!detector.detectMulti(frame, allPoints)) {
+    Logger::printfLog(Logger::DEBUG, "QrCodeDetector: detectMulti returned false");
     return results;
   }
+  Logger::printfLog(Logger::DEBUG, "QrCodeDetector: detectMulti found %zu points (%zu QR codes)",
+                    allPoints.size(), allPoints.size() / 4);
 
   for(size_t i = 0; i + 4 <= allPoints.size(); i += 4) {
     std::vector<cv::Point2f> corners(allPoints.begin() + i, allPoints.begin() + i + 4);

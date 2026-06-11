@@ -38,7 +38,7 @@ class QrCodeDetector : public CodeDetector<std::vector<QrCodeDetectionResult>> {
 
  private:
   static constexpr float quietZoneRatio = 0.2f;  // 透視変換後のクワイエットゾーン比率
-  cv::QRCodeDetector detector;                   // OpenCVのQRコード検出器
+  cv::QRCodeDetectorAruco detector;              // OpenCVのQRコード検出器
   ZXing::ReaderOptions options;                  // ZXingのデコードオプション
 
   /**

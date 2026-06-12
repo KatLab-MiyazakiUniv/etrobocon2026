@@ -10,6 +10,7 @@
 #include "CameraCapture.h"
 #include "SocketProtocol.h"
 #include "ColorRegionDetector.h"
+#include <memory>
 
 class ColorRegionDetectionActionHandler {
  public:
@@ -28,7 +29,10 @@ class ColorRegionDetectionActionHandler {
                CameraServer::ColorRegionDetectorResponse& response);
 
  private:
-  CameraCapture& camera;
+  CameraCapture& camera;                                   // カメラキャプチャーインスタンス
+  std::unique_ptr<ColorRegionDetector> detector;           // 使い回すインスタンスを保持
+  bool hasCachedRequest = false;                           // 1つ前のRequestを保存しているかどうか
+  CameraServer::ColorRegionDetectorRequest cachedRequest;  // 1つ前のRequestをキャッシュ
 };
 
 #endif  // TWO_COLOR_LINE_DETECTION_ACTION_HANDLER_H

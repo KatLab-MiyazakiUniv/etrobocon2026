@@ -92,7 +92,6 @@ void SocketServer::handleConnection(int clientSocket)
 {
   char recvbuf[SocketServer::getDefaultBufLen()];
   ssize_t iResult;
-
   // クライアントからのデータ受信ループ
   do {
     iResult = netSys.recv(clientSocket, recvbuf, SocketServer::getDefaultBufLen(), 0);
@@ -109,7 +108,6 @@ void SocketServer::handleConnection(int clientSocket)
                         0);
             break;
           }
-
           case CameraServer::Command::SHUTDOWN:
             shutdown();
             return;

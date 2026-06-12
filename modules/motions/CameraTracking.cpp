@@ -40,29 +40,21 @@ void CameraTracking::prepare() {}
 
 void CameraTracking::executeStep()
 {
-  // 初期Speed値を計算
   double baseRightPower = speedCalculator.calculateRightMotorPower();
   double baseLeftPower = speedCalculator.calculateLeftMotorPower();
 
-  // 色領域検出処理の呼び出し。
   SocketClient& client = robot.getCameraSocketClientInstance();
   CameraServer::ColorRegionDetectorResponse response;
-  // run()の中でColorRegionDetectorインスタンスが繰り返し生死。インスタンスの生死のlogが10ms間隔で発生し重い処理
+  // run()の中でColorRegionDetectorインスタンスが繰り返し生死していた部分
   bool success = client.executeColorRegionDetection(detectionRequest, response);
 
-  // 通信失敗、または検出できなかった場合は、出力を更新せずに終了する
   if(!success || !response.result.wasDetected) {
     Logger::warning("Color region not detected");
     return;
   }
 
-  // バウンディングボックスの中心X座標を計算
   double currentX = (response.result.topLeft.x + response.result.bottomRight.x) / 2.0;
-
-  // 旋回値の計算
   double turningPower = cameraPid.calculatePid(currentX) * -1;
-
-  // モータのPower値をセット（前進の時0を下回らないように，後進の時0を上回らないようにセット）
   double rightPower = baseRightPower > 0.0 ? std::max(baseRightPower - turningPower, 0.0)
                                            : std::min(baseRightPower + turningPower, 0.0);
   double leftPower = baseLeftPower > 0.0 ? std::max(baseLeftPower + turningPower, 0.0)

@@ -33,16 +33,13 @@ namespace etrobocon2026_test {
   // getFrameが成功し色領域が検出されるテスト,
   TEST(ColorRegionDetectionActionHandlerTest, ExecuteHandlesGetFrameSuccess)
   {
-    // ダミーの画像フレーム（白背景に黒色矩形）を作成して保存する
     cv::Mat dummyFrame(480, 640, CV_8UC3, cv::Scalar(255, 255, 255));
-    // 注目領域内に黒色矩形を描画 (x=200, y=200, w=100, h=100)
     cv::rectangle(dummyFrame, cv::Rect(200, 200, 100, 100), cv::Scalar(0, 0, 0), cv::FILLED);
 
     const char* dummyPath = "dummy_frame_success.png";
     cv::imwrite(dummyPath, dummyFrame);
 
     CameraCapture camera;
-    // カメラを開きはCamera型インスタンスのｃameraのメンバ変数のcapはopencv::videoCaputure 型の変数
     // cap.openで取得するフレームを事前に代入
     camera.cap.open(dummyPath);
     ASSERT_TRUE(camera.cap.isOpened());
@@ -96,7 +93,7 @@ namespace etrobocon2026_test {
     handler.execute(request, response);
     ASSERT_TRUE(response.result.wasDetected);
 
-    // 2回目の実行後のポインタアドレスを取得し、1回目と同じ（インスタンスが再利用された）であることを検証
+    // 2回目の実行後のポインタアドレスを取得し、1回目と同じ（インスタンスが再利用された）ことを検証
     ColorRegionDetector* secondDetectorPtr = handler.detector.get();
     EXPECT_EQ(firstDetectorPtr, secondDetectorPtr);
     std::remove(dummyPath);

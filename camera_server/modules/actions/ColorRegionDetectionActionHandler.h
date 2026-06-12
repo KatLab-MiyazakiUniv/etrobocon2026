@@ -1,6 +1,6 @@
 /**
  * @file ColorRegionDetectionActionHandler.h
- * @brief 色領域をするクラス
+ * @brief 色領域を検出するクラス
  * @author sadomiya-sousi
  */
 
@@ -35,4 +35,4 @@ class ColorRegionDetectionActionHandler {
   CameraServer::ColorRegionDetectorRequest cachedRequest;  // 1つ前のRequestをキャッシュ
 };
 
-#endif  // TWO_COLOR_LINE_DETECTION_ACTION_HANDLER_H
+#endif  // COLOR_REGION_DETECTION_ACTION_HANDLER_H

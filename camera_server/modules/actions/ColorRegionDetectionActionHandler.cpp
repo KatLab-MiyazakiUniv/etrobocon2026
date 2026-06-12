@@ -1,6 +1,6 @@
 /**
  * @file ColorRegionDetectionActionHandler.cpp
- * @brief 色領域をするクラス
+ * @brief 色領域を検出するクラス
  * @author sadomiya-sousi
  */
 
@@ -23,15 +23,14 @@ void ColorRegionDetectionActionHandler::execute(
   }
 
   // requestのメンバ変数でColorRegionDetecttorインスタンスで使用する引数を比較し,同じならインスタンス化をスキップする
-  bool changedRequest
-      = !detector || !hasCachedRequest || cachedRequest.roi.x != request.roi.x
-        || cachedRequest.roi.y != request.roi.y || cachedRequest.roi.width != request.roi.width
-        || cachedRequest.roi.height != request.roi.height
-        || cachedRequest.hsvRangeCount != request.hsvRangeCount
-        // ColorRegionDetector::HSVRangeのサイズが8バイトの倍数じゃなくて,パディングが起こる構造体なら,要変更。
-        || std::memcmp(cachedRequest.hsvRanges, request.hsvRanges,
-                       request.hsvRangeCount * sizeof(CameraServer::HSVRangeData))
-               != 0;
+  bool changedRequest = !detector || !hasCachedRequest || cachedRequest.roi.x != request.roi.x
+                        || cachedRequest.roi.y != request.roi.y
+                        || cachedRequest.roi.width != request.roi.width
+                        || cachedRequest.roi.height != request.roi.height
+                        || cachedRequest.hsvRangeCount != request.hsvRangeCount
+                        || std::memcmp(cachedRequest.hsvRanges, request.hsvRanges,
+                                       request.hsvRangeCount * sizeof(CameraServer::HSVRangeData))
+                               != 0;
 
   if(changedRequest) {
     std::vector<ColorRegionDetector::HSVRange> localHsvRanges;

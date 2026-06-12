@@ -83,3 +83,36 @@ void SocketClient::shutdownServer()
   }
   Logger::info("shutdownServer: 終了");
 }
+
+bool SocketClient::executeColorRegionDetection(
+    const CameraServer::ColorRegionDetectorRequest& request,
+    CameraServer::ColorRegionDetectorResponse& response)
+{
+  return executeAction(request, response);
+}
+
+template <typename Req, typename Res>
+bool SocketClient::executeAction(const Req& request, Res& response)
+{
+  if(!isConnected) {
+    Logger::error("Not connected to server");
+    return false;
+  }
+
+  // リクエストを送信する
+  if(netSys.send(sock, reinterpret_cast<const char*>(&request), sizeof(request), 0) < 0) {
+    Logger::error("Client: send failed");
+    return false;
+  }
+
+  // 結果を受信する
+  ssize_t bytesRead = netSys.recv(sock, reinterpret_cast<char*>(&response), sizeof(response), 0);
+  if(bytesRead < 0) {
+    Logger::error("Client: recv failed");
+    return false;
+  } else if(bytesRead != sizeof(response)) {
+    Logger::error("Client: received incomplete response");
+    return false;
+  }
+  return true;
+}

@@ -46,6 +46,28 @@ class SocketClient {
    */
   void shutdownServer();
 
+  /**
+   * @brief 線検出アクションを実行する
+   * @param request リクエスト
+   * @param response レスポンス
+   * @return true アクションの実行に成功した場合
+   * @return false アクションの実行に失敗した場合
+   */
+  virtual bool executeColorRegionDetection(const CameraServer::ColorRegionDetectorRequest& request,
+                                           CameraServer::ColorRegionDetectorResponse& response);
+
+  /**
+   * @brief サーバーにリクエストを送信し、レスポンスを受信するtemplate関数
+   * @tparam Req リクエストの型
+   * @tparam Res レスポンスの型
+   * @param request 送信するリクエスト
+   * @param response 受信するレスポンス
+   * @return true 送受信に成功した場合
+   * @return false 送受信に失敗した場合
+   */
+  template <typename Req, typename Res>
+  bool executeAction(const Req& request, Res& response);
+
  protected:
   INetworkSystem& netSys;
   int sock;              // ソケットファイルディスクリプタ

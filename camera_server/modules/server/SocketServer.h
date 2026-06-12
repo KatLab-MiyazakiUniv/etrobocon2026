@@ -10,7 +10,9 @@
 #include <string>
 #include "SocketProtocol.h"
 #include "RealNetworkSystem.h"
+#include "actions/ColorRegionDetectionActionHandler.h"
 #include "Logger.h"
+#include "CameraCapture.h"
 #include <cstring>
 
 class SocketServer {
@@ -20,7 +22,8 @@ class SocketServer {
    * @param _netSys 注入する具象クラス
    * @param _port デフォルトは27015
    */
-  explicit SocketServer(INetworkSystem& _netSys, int _port = CameraServer::DEFAULT_PORT);
+  explicit SocketServer(ColorRegionDetectionActionHandler& _colorRegionDetectionHandler,
+                        INetworkSystem& _netSys, int _port = CameraServer::DEFAULT_PORT);
 
   /**
    * @brief SocketServerのデストラクタ
@@ -47,9 +50,9 @@ class SocketServer {
 
   /**
    * @brief サーバーが稼働中かどうかを取得する
-   * @return int サーバーが稼働中なら1, そうでないなら0
+   * @return bool サーバーが稼働中ならtrue, そうでないならfalse
    */
-  int getIsRunning() const { return isRunning; }
+  bool getIsRunning() const { return isRunning; }
 
   /**
    * @brief サーバーのポート番号を取得する
@@ -64,21 +67,41 @@ class SocketServer {
   static int getDefaultBufLen() { return DEFAULT_BUFLEN; }
 
   /**
+   * @brief サーバーのリッスンソケットを設定する
+   * @param socket 設定するファイルディスクリプタ
+   */
+  void setListenSocket(int socket) { listenSocket = socket; }
+
+  /**
+   * @brief サーバーの稼働状態を設定する
+   * @param isRun 1なら稼働中, 0なら停止
+   */
+  void setIsRunning(int isRun) { isRunning = isRun; }
+
+  /**
+   * @brief サーバーのポート番号を設定する
+   * @param portNumber 設定するポート番号
+   */
+  void setPort(int portNumber) { port = portNumber; }
+
+  /**
    * @brief サーバーをシャットダウンする
    */
   void shutdown();
-
- private:
-  INetworkSystem& netSys;                     // 注入される具象クラスのポインタ
-  int listenSocket;                           // Severのファイルディスクリプタ
-  bool isRunning;                             // Serverが稼働中ならtrue
-  int port;                                   // サーバーのポート番号
-  static constexpr int DEFAULT_BUFLEN = 512;  // デフォルトのバッファサイズ
 
   /**
    * @brief クライアントとの接続を処理する
    * @param clientSocket クライアントソケット
    */
   void handleConnection(int clientSocket);
+
+  //  public:
+ private:
+  INetworkSystem& netSys;                                          // 注入される具象クラスのポインタ
+  int listenSocket;                                                // Severのファイルディスクリプタ
+  bool isRunning;                                                  // Serverが稼働中ならtrue
+  int port;                                                        // サーバーのポート番号
+  static constexpr int DEFAULT_BUFLEN = 512;                       // デフォルトのバッファサイズ
+  ColorRegionDetectionActionHandler& colorRegionDetectionHandler;  // 色領域検出のハンドラー
 };
 #endif  // SOCKET_SERVER_H

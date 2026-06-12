@@ -10,11 +10,11 @@
 #include "RealNetworkSystem.h"
 
 namespace etrobocon2026_test {
-  // インスタンスに指定したportを代入できているかを確認
 
   CameraCapture camera;
   ColorRegionDetectionActionHandler colorRegionDetectionHandler(camera);
 
+  // インスタンスに指定したportを代入できているかを確認
   TEST(SocketServerTest, ConstructorSetsPortCorrectly)
   {
     MockNetworkSystem mockNet;

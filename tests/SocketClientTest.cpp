@@ -101,24 +101,19 @@ namespace etrobocon2026_test {
     SocketClient client(mockNet);
     EXPECT_TRUE(client.connectToServer());
 
-    // リクエストの準備
     CameraServer::ColorRegionDetectorRequest request;
     request.requireLargestColorIndex = true;
     request.hsvRangeCount = 1;
 
-    // レスポンス受け取りのエミュレート設定
     mockNet.hasRecvData = true;
     mockNet.sizeOfReturnLen = sizeof(CameraServer::ColorRegionDetectorResponse);
 
     CameraServer::ColorRegionDetectorResponse actualResponse;
     EXPECT_TRUE(client.executeColorRegionDetection(request, actualResponse));
-
-    // 送信されたコマンドの検証
     uint8_t expectedCmd = static_cast<uint8_t>(CameraServer::Command::COLOR_REGION_DETECTION);
     EXPECT_EQ(mockNet.lastSentCommand, expectedCmd);
   }
 
-  // executeAction の正常系テスト
   TEST(SocketClientTest, ExecuteActionSuccess)
   {
     MockNetworkSystem mockNet;
@@ -150,10 +145,7 @@ namespace etrobocon2026_test {
     MockNetworkSystem mockNet;
     SocketClient client(mockNet);
     EXPECT_TRUE(client.connectToServer());
-
-    // 受信データがない状態(recvが-1を返す)
     mockNet.hasRecvData = false;
-
     CameraServer::ColorRegionDetectorRequest request;
     CameraServer::ColorRegionDetectorResponse response;
     EXPECT_FALSE(client.executeAction(request, response));

@@ -10,7 +10,7 @@
 using namespace std;
 
 // etrobocon2026/ の親ディレクトリからの実行を前提とした相対パス
-static const string MOTIONS_PATH    = "etrobocon2026/datafiles/commands/Motions/";
+static const string MOTIONS_PATH = "etrobocon2026/datafiles/commands/Motions/";
 static const string CONDITIONS_PATH = "etrobocon2026/datafiles/commands/Conditions/";
 
 // stringを指定した型に変換する関数(stoi,stodの代わり)
@@ -59,10 +59,10 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
       continue;
     }
 
-    string motionName    = params[0];
-    string motionId      = params[1];
+    string motionName = params[0];
+    string motionId = params[1];
     string conditionName = params[2];
-    string conditionId   = params[3];
+    string conditionId = params[3];
 
     // Motions/<motionName>.csv を開いて motionId の行を検索する
     string motionsFilePath = MOTIONS_PATH + motionName + ".csv";
@@ -90,7 +90,7 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
       }
       if(row.size() >= 2 && row[1] == motionId) {
         motionParams = move(row);
-        motionFound  = true;
+        motionFound = true;
         break;
       }
     }
@@ -120,10 +120,9 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
       lineNum++;
       continue;
     }
-    Logger::printfLog(Logger::DEBUG,
-                      "[MotionParser] Condition: %s ID=%s を Motion: %s ID=%s に注入します",
-                      conditionName.c_str(), conditionId.c_str(), motionName.c_str(),
-                      motionId.c_str());
+    Logger::printfLog(
+        Logger::DEBUG, "[MotionParser] Condition: %s ID=%s を Motion: %s ID=%s に注入します",
+        conditionName.c_str(), conditionId.c_str(), motionName.c_str(), motionId.c_str());
 
     // TODO: 各動作クラスが完成したら、以下のコメントを外してswitch-caseを実装する
     COMMAND command = convertCommand(motionName);
@@ -152,8 +151,8 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
       // }
       // ↓ 他のコマンドはここに追加していく
       default: {
-        Logger::printfLog(Logger::ERROR, "%s:%d Command %s は未定義です",
-                          commandFilePath.c_str(), lineNum, motionName.c_str());
+        Logger::printfLog(Logger::ERROR, "%s:%d Command %s は未定義です", commandFilePath.c_str(),
+                          lineNum, motionName.c_str());
         break;
       }
     }
@@ -164,8 +163,9 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
   return motionList;
 }
 
-unique_ptr<BaseContinuationCondition> MotionParser::createConditionList(
-    Robot& robot, const string& conditionName, const string& conditionId)
+unique_ptr<BaseContinuationCondition> MotionParser::createConditionList(Robot& robot,
+                                                                        const string& conditionName,
+                                                                        const string& conditionId)
 {
   string conditionsFilePath = CONDITIONS_PATH + conditionName + ".csv";
   ifstream file(conditionsFilePath);
@@ -199,16 +199,15 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionList(
           return make_unique<DistanceCondition>(robot, targetDistance);
         }
         default: {
-          Logger::printfLog(Logger::ERROR, "Condition %s は未定義です",
-                            conditionName.c_str());
+          Logger::printfLog(Logger::ERROR, "Condition %s は未定義です", conditionName.c_str());
           return nullptr;
         }
       }
     }
   }
 
-  Logger::printfLog(Logger::ERROR, "%s に ID=%s が見つかりませんでした",
-                    conditionsFilePath.c_str(), conditionId.c_str());
+  Logger::printfLog(Logger::ERROR, "%s に ID=%s が見つかりませんでした", conditionsFilePath.c_str(),
+                    conditionId.c_str());
   return nullptr;
 }
 

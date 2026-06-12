@@ -22,8 +22,8 @@
 constexpr char SEPARATOR = ',';
 
 // etrobocon2026/ ルートからの相対パス
-static const std::string AREA_PATH       = "datafiles/commands/Area/";
-static const std::string MOTIONS_PATH    = "datafiles/commands/Motions/";
+static const std::string AREA_PATH = "datafiles/commands/Area/";
+static const std::string MOTIONS_PATH = "datafiles/commands/Motions/";
 static const std::string CONDITIONS_PATH = "datafiles/commands/Conditions/";
 
 // Area enum のインデックスに対応するエリア名のテーブル
@@ -90,7 +90,7 @@ static bool validateRow(const std::vector<std::string>& typeRow,
   bool valid = true;
   char paramBuf[32];
   for(size_t i = 2; i < typeRow.size(); i++) {
-    const std::string& type  = typeRow[i];
+    const std::string& type = typeRow[i];
     const std::string& value = dataRow[i];
     snprintf(paramBuf, sizeof(paramBuf), "%zu", i - 1);
 
@@ -124,15 +124,15 @@ static bool checkRowById(const std::string& filePath, const std::string& cmdName
 {
   std::ifstream file(filePath);
   if(!file) {
-    std::cerr << "[" << label << "] " << locationInfo
-              << ": ファイルが存在しません: " << filePath << std::endl;
+    std::cerr << "[" << label << "] " << locationInfo << ": ファイルが存在しません: " << filePath
+              << std::endl;
     return false;
   }
 
   std::string h1, typeRowLine;
   if(!std::getline(file, h1) || !std::getline(file, typeRowLine)) {
-    std::cerr << "[" << label << "] " << locationInfo
-              << ": ヘッダが不足しています: " << filePath << std::endl;
+    std::cerr << "[" << label << "] " << locationInfo << ": ヘッダが不足しています: " << filePath
+              << std::endl;
     return false;
   }
 
@@ -214,10 +214,10 @@ bool checkTypeForArea(const std::string& areaFilePath, const std::string& label)
     snprintf(lineBuf, sizeof(lineBuf), "%d", lineNum);
     std::string locationInfo = std::string(lineBuf) + "行目";
 
-    std::string motionName    = params[0];
-    std::string motionId      = params[1];
+    std::string motionName = params[0];
+    std::string motionId = params[1];
     std::string conditionName = params[2];
-    std::string conditionId   = params[3];
+    std::string conditionId = params[3];
 
     if(!checkRowById(MOTIONS_PATH + motionName + ".csv", motionName, motionId, label,
                      locationInfo)) {
@@ -295,7 +295,7 @@ bool checkTypeAll(const std::string& label)
 
         char lineBuf[32];
         snprintf(lineBuf, sizeof(lineBuf), "%d", dataLineNum);
-        std::string cmdName      = dataRow.empty() ? "" : dataRow[0];
+        std::string cmdName = dataRow.empty() ? "" : dataRow[0];
         std::string locationInfo = filePath + ":" + lineBuf;
 
         if(!validateRow(typeRow, dataRow, cmdName, label, locationInfo)) {
@@ -320,8 +320,8 @@ bool checkTypeAll(const std::string& label)
 // 指定したエリアとコースに対してArea CSVの型チェックを行う。成功したらtrue、失敗したらfalseを返す。
 static bool processCourse(Area area, bool isLeftCourse)
 {
-  std::string course       = isLeftCourse ? "Left" : "Right";
-  std::string label        = AREA_NAMES[static_cast<int>(area)] + " " + course;
+  std::string course = isLeftCourse ? "Left" : "Right";
+  std::string label = AREA_NAMES[static_cast<int>(area)] + " " + course;
   std::string areaFilePath = AREA_PATH + AREA_NAMES[static_cast<int>(area)] + course + ".csv";
 
   std::cout << "[" << label << "] START CheckTypeForArea" << std::endl;
@@ -358,7 +358,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  std::string areaName  = argv[1];
+  std::string areaName = argv[1];
   std::string courseArg = argv[2];
 
   if(courseArg != "L" && courseArg != "R") {

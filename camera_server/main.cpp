@@ -5,10 +5,9 @@
 
 int main()
 {
-  Logger::info("Hello KATLABBBBBB");
+  Logger::info("Hello KATLAB");
   RealNetworkSystem real;
 
-  // カメラインスタンスの初期化の処理>未理解
   CameraCapture camera;
   int cameraId = camera.findAvailableCameraID();
   if(cameraId < 0) {
@@ -25,6 +24,5 @@ int main()
 
   SocketServer server(colorRegionDetectionHandler, real);
   server.init();
-  server.run();
   return 0;
 }

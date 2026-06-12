@@ -13,6 +13,15 @@ using namespace std;
 static const string MOTIONS_PATH = "etrobocon2026/datafiles/commands/Motions/";
 static const string CONDITIONS_PATH = "etrobocon2026/datafiles/commands/Conditions/";
 
+// 文字列の前後の空白を削除する
+static void trim(std::string& s)
+{
+  size_t start = s.find_first_not_of(" \t");
+  if(start == std::string::npos) { s.clear(); return; }
+  size_t end = s.find_last_not_of(" \t");
+  s = s.substr(start, end - start + 1);
+}
+
 // stringを指定した型に変換する関数(stoi,stodの代わり)
 template <typename T>
 T fromString(const std::string& s)
@@ -49,6 +58,7 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
     // カンマ区切りで (動作コマンド名, 動作ID, 条件コマンド名, 条件ID) を取り出す
     vector<string> params;
     for(string token; getline(ss, token, SEPARATOR);) {
+      trim(token);
       params.push_back(move(token));
     }
 
@@ -86,6 +96,7 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
       stringstream ssMotions(motionsLine);
       vector<string> row;
       for(string token; getline(ssMotions, token, SEPARATOR);) {
+        trim(token);
         row.push_back(move(token));
       }
       if(row.size() >= 2 && row[1] == motionId) {
@@ -185,6 +196,7 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionList(Robot& r
     stringstream ss(line);
     vector<string> params;
     for(string token; getline(ss, token, SEPARATOR);) {
+      trim(token);
       params.push_back(move(token));
     }
 

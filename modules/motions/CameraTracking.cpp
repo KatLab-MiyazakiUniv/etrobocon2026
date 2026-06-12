@@ -47,7 +47,7 @@ void CameraTracking::executeStep()
   // 色領域検出処理の呼び出し。
   SocketClient& client = robot.getCameraSocketClientInstance();
   CameraServer::ColorRegionDetectorResponse response;
-  // run()の中でColorRegionDetectorインスタンスが繰り返し生死。インスタンスの生死のlogが重い処理
+  // run()の中でColorRegionDetectorインスタンスが繰り返し生死。インスタンスの生死のlogが10ms間隔で発生し重い処理
   bool success = client.executeColorRegionDetection(detectionRequest, response);
 
   // 通信失敗、または検出できなかった場合は、出力を更新せずに終了する
@@ -72,7 +72,7 @@ void CameraTracking::executeStep()
   robot.getWheelMotorControllerInstance().setLeftPower(leftPower);
 }
 
-void BaseMotion::wait()
+void CameraTracking::wait()
 {
   ClockUtil::sleep(30);  // カメラの撮影FPSに合わせて30ミリ秒待機する
 }

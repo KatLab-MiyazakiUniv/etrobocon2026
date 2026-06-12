@@ -22,26 +22,42 @@ void ColorRegionDetectionActionHandler::execute(
     return;
   }
 
-  std::vector<ColorRegionDetector::HSVRange> localHsvRanges;
-  localHsvRanges.reserve(request.hsvRangeCount);
-  for(int i = 0; i < request.hsvRangeCount; i++) {
-    ColorRegionDetector::HSVRange range;
-    range.lower = cv::Scalar(request.hsvRanges[i].lower.v0, request.hsvRanges[i].lower.v1,
-                             request.hsvRanges[i].lower.v2, request.hsvRanges[i].lower.v3);
-    range.upper = cv::Scalar(request.hsvRanges[i].upper.v0, request.hsvRanges[i].upper.v1,
-                             request.hsvRanges[i].upper.v2, request.hsvRanges[i].upper.v3);
-    localHsvRanges.push_back(range);
+  // requestのメンバ変数でColorRegionDetecttorインスタンスで使用する引数を比較し,同じならインスタンス化をスキップする
+  bool changedRequest
+      = !detector || !hasCachedRequest || cachedRequest.roi.x != request.roi.x
+        || cachedRequest.roi.y != request.roi.y || cachedRequest.roi.width != request.roi.width
+        || cachedRequest.roi.height != request.roi.height
+        || cachedRequest.hsvRangeCount != request.hsvRangeCount
+        // ColorRegionDetector::HSVRangeのサイズが8バイトの倍数じゃなくて,パディングが起こる構造体なら,要変更。
+        || std::memcmp(cachedRequest.hsvRanges, request.hsvRanges,
+                       request.hsvRangeCount * sizeof(CameraServer::HSVRangeData))
+               != 0;
+
+  if(changedRequest) {
+    std::vector<ColorRegionDetector::HSVRange> localHsvRanges;
+    localHsvRanges.reserve(request.hsvRangeCount);
+    for(int i = 0; i < request.hsvRangeCount; i++) {
+      ColorRegionDetector::HSVRange range;
+      range.lower = cv::Scalar(request.hsvRanges[i].lower.v0, request.hsvRanges[i].lower.v1,
+                               request.hsvRanges[i].lower.v2, request.hsvRanges[i].lower.v3);
+      range.upper = cv::Scalar(request.hsvRanges[i].upper.v0, request.hsvRanges[i].upper.v1,
+                               request.hsvRanges[i].upper.v2, request.hsvRanges[i].upper.v3);
+      localHsvRanges.push_back(range);
+    }
+
+    cv::Rect localRoi(request.roi.x, request.roi.y, request.roi.width, request.roi.height);
+    detector = std::make_unique<ColorRegionDetector>(localHsvRanges, localRoi);
+
+    cachedRequest = request;
+    hasCachedRequest = true;
   }
 
-  cv::Rect localRoi(request.roi.x, request.roi.y, request.roi.width, request.roi.height);
-  // ここで,ColorRegionDetectorをインスタンス化してる。execute()は繰り返し呼ばれるのでインスタンスが生死
-  ColorRegionDetector detector(localHsvRanges, localRoi);
   BoundingBoxDetectionResult localResult;
 
   if(request.requireLargestColorIndex) {
-    detector.detect(frame, localResult, response.largestColorIndex);
+    detector->detect(frame, localResult, response.largestColorIndex);
   } else {
-    detector.detect(frame, localResult);
+    detector->detect(frame, localResult);
   }
 
   response.result.wasDetected = localResult.wasDetected;

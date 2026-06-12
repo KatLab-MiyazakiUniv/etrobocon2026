@@ -11,7 +11,8 @@
 
 namespace etrobocon2026_test {
 
-  // QRコードを正しく読み取れるかのテスト
+  // QRコードを含む画像を入力したときに、QRコードを検出し、
+  // 内容「25,35」を正しく取得できることを確認するテスト
   TEST(QrCodeDetectorTest, DetectQrCode)
   {
     cv::Mat frame = cv::imread("camera_server/test_data/Hint1.png");
@@ -26,7 +27,8 @@ namespace etrobocon2026_test {
     EXPECT_EQ("25,35", result.content);
   }
 
-  // 空画像を渡したときのテスト
+  // 空画像を入力したときに、QRコード未検出となり、
+  // wasDetectedがfalse、contentが空文字列になることを確認するテスト
   TEST(QrCodeDetectorTest, EmptyFrame)
   {
     QrCodeDetector detector;
@@ -39,7 +41,8 @@ namespace etrobocon2026_test {
     EXPECT_TRUE(result.content.empty());
   }
 
-  // QRコードがない画像を渡したときのテスト
+  // フレームは空でないが、QRコードを含まない画像を入力したときに、QRコード未検出となり、
+  // wasDetectedがfalse、contentが空文字列になることを確認するテスト
   TEST(QrCodeDetectorTest, NoQrCode)
   {
     QrCodeDetector detector;

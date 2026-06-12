@@ -14,7 +14,7 @@
 struct QrCodeDetectionResult {
   bool wasDetected = false;                 // 検出したかどうか
   std::string content;                      // QRコードから取得した文字列
-  std::array<cv::Point2f, 4> corners = {};  // QRコードの各頂点の座標
+  std::array<cv::Point2f, 4> corners = {};  // QRコードの各頂点の座標(左上から時計回りの順)
 };
 
 #endif  // QR_CODE_DETECTION_RESULT_H

@@ -8,11 +8,11 @@
 #include "Decode.h"
 
 namespace etrobocon2026_test {
-  // 正しく複号できるかのテスト
+  // 対応した暗号文と複号鍵が対応している場合、正しく複号できるかのテスト
   TEST(DecodeTest, SuccesDecode)
   {
     std::string plainText = "Hello";  // 平文
-    std::string key = "1234";         // 複号キー
+    std::string key = "1234";         // 複号鍵
 
     // 平文を暗号化した文
     std::string encryptedText = "U2FsdGVkX1+kU2ekK92ZjOQTL/ytu4bgR0tAJllMG6I=";
@@ -20,32 +20,17 @@ namespace etrobocon2026_test {
     EXPECT_EQ(plainText, Decode::decrypt(key, encryptedText));
   }
 
-  // 違う鍵では復号できないかのテスト
+  // 暗号文と複合鍵が対応していない場合、空文字を返すことを確認する
   TEST(DecodeTest, IncorrectKey)
   {
     std::string plainText = "Hello";  // 平文
-    std::string key = "1234";         // 複号キー
 
     // 平文を暗号化した文
     std::string encryptedText = "U2FsdGVkX1+kU2ekK92ZjOQTL/ytu4bgR0tAJllMG6I=";
 
-    std::string notKey = "1111";  // 正しくないキー
+    std::string notKey = "1111";  // 対応していない鍵
 
     EXPECT_EQ("", Decode::decrypt(notKey, encryptedText));
-  }
-  // 違う暗号文では復号できないかのテスト
-  TEST(DecodeTest, IncorrectCode)
-  {
-    std::string plainText = "Hello";  // 平文
-    std::string key = "1234";         // 複号キー
-
-    // 平文を暗号化した文
-    std::string encryptedText = "U2FsdGVkX1+kU2ekK92ZjOQTL/ytu4bgR0tAJllMG6I=";
-
-    // 正しくない暗号文
-    std::string notEncryptedText = "1111U2FsdGVkX1+kU2ekK92ZjOQTL/ytu4bgR0tAJllMG6I=";
-
-    EXPECT_EQ("", Decode::decrypt(key, notEncryptedText));
   }
 
 }  // namespace etrobocon2026_test

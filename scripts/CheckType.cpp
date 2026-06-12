@@ -1,6 +1,6 @@
 /**
- * @file   CommandMerger.cpp
- * @brief  AreaとMotionsのCSV結合と型チェックを行うスクリプト
+ * @file   CheckType.cpp
+ * @brief  Area/Motions/Conditions の CSV 型チェックを行うスクリプト
  * @author nishijima515
  */
 
@@ -9,6 +9,7 @@
 #include <climits>
 #include <cstdio>
 #include <cstdlib>
+#include <dirent.h>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -21,9 +22,9 @@
 constexpr char SEPARATOR = ',';
 
 // etrobocon2026/ ルートからの相対パス
-static const std::string AREA_PATH = "datafiles/commands/Area/";
-static const std::string MOTIONS_PATH = "datafiles/commands/Motions/";
-static const std::string RUN_PATH = "datafiles/commands/Run/";
+static const std::string AREA_PATH       = "datafiles/commands/Area/";
+static const std::string MOTIONS_PATH    = "datafiles/commands/Motions/";
+static const std::string CONDITIONS_PATH = "datafiles/commands/Conditions/";
 
 // Area enum のインデックスに対応するエリア名のテーブル
 static const std::array<std::string, 2> AREA_NAMES = { "LineTrace", "Area2" };
@@ -74,235 +75,157 @@ bool tryParse<double>(const std::string& s)
   return true;
 }
 
-// AreaのCSVファイルを読み込み、対応するMotionsのCSVファイルからコマンドを抽出し、Run用のCSVファイルを生成する
-void createRunCSV(Area area, bool isLeftCourse, const std::string& label)
+// 型定義行と実データ行を照合して型チェックする
+static bool validateRow(const std::vector<std::string>& typeRow,
+                        const std::vector<std::string>& dataRow, const std::string& cmdName,
+                        const std::string& label, const std::string& locationInfo)
 {
-  std::string areaName = AREA_NAMES[static_cast<int>(area)];
-  std::string course = isLeftCourse ? "Left" : "Right";
-
-  std::string commandAreaFilePath = AREA_PATH + areaName + course + ".csv";
-  std::string commandRunFilePath = RUN_PATH + "run_" + areaName + course + ".csv";
-
-  std::ifstream commandAreaFile(commandAreaFilePath);
-  if(!commandAreaFile) {
-    std::cerr << "[" << label << "] エリアファイルを開けませんでした: " << commandAreaFilePath
-              << std::endl;
-    return;
-  }
-
-  std::ofstream commandRunFile(commandRunFilePath, std::ios::out | std::ios::trunc);
-  if(!commandRunFile) {
-    std::cerr << "[" << label << "] 実行用ファイルを開けませんでした: " << commandRunFilePath
-              << std::endl;
-    return;
-  }
-
-  bool firstWrite = true;  // 最初の書き込みかどうか
-
-  std::string headerLine;
-  std::getline(commandAreaFile, headerLine);
-
-  std::string areaFileLine;
-  while(std::getline(commandAreaFile, areaFileLine)) {
-    size_t commentPos = areaFileLine.find('#');
-    if(commentPos != std::string::npos) {
-      areaFileLine = areaFileLine.substr(0, commentPos);
-    }
-    trim(areaFileLine);
-    if(areaFileLine.empty()) continue;
-
-    std::stringstream ssArea(areaFileLine);
-    std::vector<std::string> areaFileParams;
-    std::string token;
-    while(std::getline(ssArea, token, SEPARATOR)) {
-      trim(token);
-      areaFileParams.push_back(token);
-    }
-
-    if(areaFileParams.size() != 2) {
-      std::cerr << "[" << label << "] フォーマットが不正です: " << areaFileLine << std::endl;
-      continue;
-    }
-
-    std::string commandName = areaFileParams[0];
-    std::string commandId = areaFileParams[1];
-
-    std::string commandMotionsFilePath = MOTIONS_PATH + commandName + ".csv";
-    std::ifstream commandMotionsFile(commandMotionsFilePath);
-    if(!commandMotionsFile) {
-      std::cerr << "[" << label << "] Motionsファイルを開けませんでした: " << commandMotionsFilePath
-                << std::endl;
-      continue;
-    }
-
-    std::string motionsHeaderLine;
-    std::getline(commandMotionsFile, motionsHeaderLine);
-    std::getline(commandMotionsFile, motionsHeaderLine);
-
-    bool found = false;
-    std::string motionsFileLine;
-    while(std::getline(commandMotionsFile, motionsFileLine)) {
-      size_t motionsCommentPos = motionsFileLine.find('#');
-      if(motionsCommentPos != std::string::npos) {
-        motionsFileLine = motionsFileLine.substr(0, motionsCommentPos);
-      }
-      trim(motionsFileLine);
-      if(motionsFileLine.empty()) continue;
-
-      std::stringstream ssMotions(motionsFileLine);
-      std::vector<std::string> motionParams;
-      while(std::getline(ssMotions, token, SEPARATOR)) {
-        trim(token);
-        motionParams.push_back(token);
-      }
-
-      if(motionParams.size() >= 2 && motionParams[1] == commandId) {
-        if(!firstWrite) commandRunFile << "\n";
-        // motionsFileLine をそのまま書くと元ファイルの空白が残るため、
-        // trim済みの motionParams をカンマで再結合して書き出す
-        for(size_t j = 0; j < motionParams.size(); j++) {
-          if(j > 0) commandRunFile << SEPARATOR;
-          commandRunFile << motionParams[j];
-        }
-        firstWrite = false;
-        found = true;
-        break;
-      }
-    }
-
-    if(!found) {
-      std::cerr << "[" << label << "] " << commandName << " に ID=" << commandId
-                << " が見つかりませんでした" << std::endl;
-    }
-  }
-
-  commandRunFile.close();
-}
-
-// Run用のCSVファイルを読み込み、MotionsのCSVファイルのヘッダと照らし合わせて型チェックを行う
-bool checkType(const std::string& commandFilePath, const std::string& label)
-{
-  std::ifstream runFile(commandFilePath);
-  if(!runFile) {
-    std::cerr << "[" << label << "] 実行用ファイルを開けません: " << commandFilePath << std::endl;
+  if(dataRow.size() != typeRow.size()) {
+    std::cerr << "[" << label << "] " << locationInfo << " (" << cmdName
+              << "): 引数の数が一致しません (期待: " << typeRow.size()
+              << ", 実際: " << dataRow.size() << ")" << std::endl;
     return false;
   }
 
-  // コマンド名をキーにヘッダ行をキャッシュし、同じMotionsファイルを複数回開くのを防ぐ
-  std::unordered_map<std::string, std::vector<std::string>> headerCache;
+  bool valid = true;
+  char paramBuf[32];
+  for(size_t i = 2; i < typeRow.size(); i++) {
+    const std::string& type  = typeRow[i];
+    const std::string& value = dataRow[i];
+    snprintf(paramBuf, sizeof(paramBuf), "%zu", i - 1);
 
-  std::string line;      // ファイルの行を格納するバッファ
-  int lineNum = 1;       // 行番号
-  bool allValid = true;  // 全ての行が有効かどうかのフラグ
-
-  while(std::getline(runFile, line)) {
-    size_t commentPos = line.find('#');
-    if(commentPos != std::string::npos) {
-      line = line.substr(0, commentPos);
+    if(type == "int") {
+      if(!tryParse<int>(value)) {
+        std::cerr << "[" << label << "] " << locationInfo << " (" << cmdName << "): 第" << paramBuf
+                  << "引数はint型である必要があります (値: \"" << value << "\")" << std::endl;
+        valid = false;
+      }
+    } else if(type == "double") {
+      if(!tryParse<double>(value)) {
+        std::cerr << "[" << label << "] " << locationInfo << " (" << cmdName << "): 第" << paramBuf
+                  << "引数はdouble型である必要があります (値: \"" << value << "\")" << std::endl;
+        valid = false;
+      }
+    } else if(type == "string") {
+      // string型は任意の値を許容する
+    } else {
+      std::cerr << "[" << label << "] " << locationInfo << " (" << cmdName << "): 未対応の型 \""
+                << type << "\"" << std::endl;
+      valid = false;
     }
-    trim(line);
+  }
+  return valid;
+}
 
+// 指定したCSVファイルのIDに一致する行を探して型チェックする
+static bool checkRowById(const std::string& filePath, const std::string& cmdName,
+                         const std::string& id, const std::string& label,
+                         const std::string& locationInfo)
+{
+  std::ifstream file(filePath);
+  if(!file) {
+    std::cerr << "[" << label << "] " << locationInfo
+              << ": ファイルが存在しません: " << filePath << std::endl;
+    return false;
+  }
+
+  std::string h1, typeRowLine;
+  if(!std::getline(file, h1) || !std::getline(file, typeRowLine)) {
+    std::cerr << "[" << label << "] " << locationInfo
+              << ": ヘッダが不足しています: " << filePath << std::endl;
+    return false;
+  }
+
+  std::stringstream ssH(typeRowLine);
+  std::vector<std::string> typeRow;
+  std::string token;
+  while(std::getline(ssH, token, SEPARATOR)) {
+    trim(token);
+    typeRow.push_back(token);
+  }
+
+  std::string line;
+  while(std::getline(file, line)) {
+    size_t commentPos = line.find('#');
+    if(commentPos != std::string::npos) line = line.substr(0, commentPos);
+    trim(line);
+    if(line.empty()) continue;
+
+    std::stringstream ss(line);
+    std::vector<std::string> dataRow;
+    while(std::getline(ss, token, SEPARATOR)) {
+      trim(token);
+      dataRow.push_back(token);
+    }
+
+    if(dataRow.size() >= 2 && dataRow[1] == id) {
+      return validateRow(typeRow, dataRow, cmdName, label, locationInfo);
+    }
+  }
+
+  std::cerr << "[" << label << "] " << locationInfo << " (" << cmdName << "): ID=" << id
+            << " が見つかりませんでした" << std::endl;
+  return false;
+}
+
+// Area CSVに書かれているコマンドのみを型チェックする
+bool checkTypeForArea(const std::string& areaFilePath, const std::string& label)
+{
+  std::ifstream areaFile(areaFilePath);
+  if(!areaFile) {
+    std::cerr << "[" << label << "] エリアファイルを開けません: " << areaFilePath << std::endl;
+    return false;
+  }
+
+  bool allValid = true;
+
+  // ヘッダ行をスキップ
+  std::string headerLine;
+  std::getline(areaFile, headerLine);
+
+  int lineNum = 2;
+  std::string line;
+  while(std::getline(areaFile, line)) {
+    size_t commentPos = line.find('#');
+    if(commentPos != std::string::npos) line = line.substr(0, commentPos);
+    trim(line);
     if(line.empty()) {
       lineNum++;
       continue;
     }
 
-    std::stringstream ss(line);          // 行をカンマで分割するための文字列ストリーム
-    std::vector<std::string> runParams;  // 分割したパラメータを格納するベクター
-    std::string token;                   // 分割したトークンを一時的に格納するバッファ
+    std::stringstream ss(line);
+    std::vector<std::string> params;
+    std::string token;
     while(std::getline(ss, token, SEPARATOR)) {
       trim(token);
-      runParams.push_back(token);
+      params.push_back(token);
     }
 
-    if(runParams.empty()) {
-      lineNum++;
-      continue;
-    }
-
-    char lineBuf[32];  // 行番号を文字列に変換するバッファ
-    snprintf(lineBuf, sizeof(lineBuf), "%d", lineNum);
-
-    std::string commandName = runParams[0];
-
-    if(headerCache.find(commandName) == headerCache.end()) {
-      std::string motionFilePath = MOTIONS_PATH + commandName + ".csv";
-      std::ifstream motionFile(motionFilePath);
-
-      if(!motionFile) {
-        std::cerr << "[" << label << "] " << lineBuf
-                  << "行目: Motionsファイルが存在しません: " << motionFilePath << std::endl;
-        allValid = false;
-        lineNum++;
-        continue;
-      }
-
-      std::string motionHeaderLine;
-      if(!std::getline(motionFile, motionHeaderLine)) {
-        std::cerr << "[" << label << "] " << lineBuf
-                  << "行目: Motionsファイルが空です: " << motionFilePath << std::endl;
-        allValid = false;
-        lineNum++;
-        continue;
-      }
-      if(!std::getline(motionFile, motionHeaderLine)) {
-        std::cerr << "[" << label << "] " << lineBuf
-                  << "行目: Motionsファイルの2行目(型)が存在しません: " << motionFilePath
-                  << std::endl;
-        allValid = false;
-        lineNum++;
-        continue;
-      }
-
-      std::stringstream ssHeader(motionHeaderLine);
-      std::vector<std::string> checkParams;
-      while(std::getline(ssHeader, token, SEPARATOR)) {
-        trim(token);
-        checkParams.push_back(token);
-      }
-
-      headerCache[commandName] = checkParams;
-    }
-
-    const std::vector<std::string>& checkParams = headerCache[commandName];
-
-    if(runParams.size() != checkParams.size()) {
-      std::cerr << "[" << label << "] " << lineBuf << "行目 (" << commandName
-                << "): 引数の数が一致しません" << " (期待: " << checkParams.size()
-                << ", 実際: " << runParams.size() << ")" << std::endl;
+    if(params.size() != 4) {
+      std::cerr << "[" << label << "] " << lineNum
+                << "行目: フォーマットが不正です（4列必要）: " << line << std::endl;
       allValid = false;
       lineNum++;
       continue;
     }
 
-    // index 0: コマンド名, index 1: ID はスキップし、index 2以降のパラメータを型チェックする
-    char paramBuf[32];
-    for(size_t i = 2; i < checkParams.size(); i++) {
-      const std::string& type = checkParams[i];
-      const std::string& value = runParams[i];
-      snprintf(paramBuf, sizeof(paramBuf), "%zu", i - 1);
+    char lineBuf[32];
+    snprintf(lineBuf, sizeof(lineBuf), "%d", lineNum);
+    std::string locationInfo = std::string(lineBuf) + "行目";
 
-      if(type == "int") {
-        if(!tryParse<int>(value)) {
-          std::cerr << "[" << label << "] " << lineBuf << "行目 (" << commandName << "): 第"
-                    << paramBuf << "引数はint型である必要があります (値: \"" << value << "\")"
-                    << std::endl;
-          allValid = false;
-        }
-      } else if(type == "double") {
-        if(!tryParse<double>(value)) {
-          std::cerr << "[" << label << "] " << lineBuf << "行目 (" << commandName << "): 第"
-                    << paramBuf << "引数はdouble型である必要があります (値: \"" << value << "\")"
-                    << std::endl;
-          allValid = false;
-        }
-      } else if(type == "string") {
-        // string型は任意の値を許容する
-      } else {
-        std::cerr << "[" << label << "] " << lineBuf << "行目 (" << commandName
-                  << "): 未対応の型 \"" << type << "\"" << std::endl;
-        allValid = false;
-      }
+    std::string motionName    = params[0];
+    std::string motionId      = params[1];
+    std::string conditionName = params[2];
+    std::string conditionId   = params[3];
+
+    if(!checkRowById(MOTIONS_PATH + motionName + ".csv", motionName, motionId, label,
+                     locationInfo)) {
+      allValid = false;
+    }
+    if(!checkRowById(CONDITIONS_PATH + conditionName + ".csv", conditionName, conditionId, label,
+                     locationInfo)) {
+      allValid = false;
     }
 
     lineNum++;
@@ -311,26 +234,102 @@ bool checkType(const std::string& commandFilePath, const std::string& label)
   return allValid;
 }
 
-// 指定したエリアとコースに対して、CSVの結合と型チェックを行う。両方成功したらtrue、どちらか失敗したらfalseを返す。
+// Motions/ と Conditions/ 以下の全ファイルを型チェックする
+bool checkTypeAll(const std::string& label)
+{
+  bool allValid = true;
+
+  auto checkDirectory = [&](const std::string& dirPath) {
+    DIR* dir = opendir(dirPath.c_str());
+    if(!dir) {
+      std::cerr << "[" << label << "] ディレクトリを開けません: " << dirPath << std::endl;
+      allValid = false;
+      return;
+    }
+
+    struct dirent* entry;
+    while((entry = readdir(dir)) != nullptr) {
+      std::string name = entry->d_name;
+      if(name.size() < 4 || name.substr(name.size() - 4) != ".csv") continue;
+
+      std::string filePath = dirPath + name;
+      std::ifstream file(filePath);
+      if(!file) {
+        std::cerr << "[" << label << "] ファイルを開けません: " << filePath << std::endl;
+        allValid = false;
+        continue;
+      }
+
+      std::string h1, typeRowLine;
+      if(!std::getline(file, h1) || !std::getline(file, typeRowLine)) {
+        std::cerr << "[" << label << "] ヘッダが不足しています: " << filePath << std::endl;
+        allValid = false;
+        continue;
+      }
+
+      std::stringstream ssH(typeRowLine);
+      std::vector<std::string> typeRow;
+      std::string token;
+      while(std::getline(ssH, token, SEPARATOR)) {
+        trim(token);
+        typeRow.push_back(token);
+      }
+
+      int dataLineNum = 3;
+      std::string line;
+      while(std::getline(file, line)) {
+        size_t commentPos = line.find('#');
+        if(commentPos != std::string::npos) line = line.substr(0, commentPos);
+        trim(line);
+        if(line.empty()) {
+          dataLineNum++;
+          continue;
+        }
+
+        std::stringstream ss(line);
+        std::vector<std::string> dataRow;
+        while(std::getline(ss, token, SEPARATOR)) {
+          trim(token);
+          dataRow.push_back(token);
+        }
+
+        char lineBuf[32];
+        snprintf(lineBuf, sizeof(lineBuf), "%d", dataLineNum);
+        std::string cmdName      = dataRow.empty() ? "" : dataRow[0];
+        std::string locationInfo = filePath + ":" + lineBuf;
+
+        if(!validateRow(typeRow, dataRow, cmdName, label, locationInfo)) {
+          allValid = false;
+        }
+
+        dataLineNum++;
+      }
+    }
+    closedir(dir);
+  };
+
+  std::cout << "[" << label << "] START CheckTypeAll Motions" << std::endl;
+  checkDirectory(MOTIONS_PATH);
+  std::cout << "[" << label << "] START CheckTypeAll Conditions" << std::endl;
+  checkDirectory(CONDITIONS_PATH);
+  std::cout << "[" << label << "] END CheckTypeAll" << std::endl;
+
+  return allValid;
+}
+
+// 指定したエリアとコースに対してArea CSVの型チェックを行う。成功したらtrue、失敗したらfalseを返す。
 static bool processCourse(Area area, bool isLeftCourse)
 {
-  std::string course = isLeftCourse ? "Left" : "Right";
-  std::string label = AREA_NAMES[static_cast<int>(area)] + " " + course;
+  std::string course       = isLeftCourse ? "Left" : "Right";
+  std::string label        = AREA_NAMES[static_cast<int>(area)] + " " + course;
+  std::string areaFilePath = AREA_PATH + AREA_NAMES[static_cast<int>(area)] + course + ".csv";
 
-  std::cout << "[" << label << "] START CreateRunCSV" << std::endl;
-  createRunCSV(area, isLeftCourse, label);
-  std::cout << "[" << label << "] END CreateRunCSV" << std::endl;
-
-  std::string runFilePath
-      = RUN_PATH + "run_" + AREA_NAMES[static_cast<int>(area)] + course + ".csv";
-
-  std::cout << "[" << label << "] START CheckType" << std::endl;
-  if(!checkType(runFilePath, label)) {
-    std::cout << "[" << label << "] END CheckType: FAILED" << std::endl;
+  std::cout << "[" << label << "] START CheckTypeForArea" << std::endl;
+  if(!checkTypeForArea(areaFilePath, label)) {
+    std::cout << "[" << label << "] END CheckTypeForArea: FAILED" << std::endl;
     return false;
   }
-
-  std::cout << "[" << label << "] END CheckType: OK" << std::endl;
+  std::cout << "[" << label << "] END CheckTypeForArea: OK" << std::endl;
   return true;
 }
 
@@ -343,6 +342,7 @@ int main(int argc, char* argv[])
       allValid &= processCourse(area, true);
       allValid &= processCourse(area, false);
     }
+    allValid &= checkTypeAll("ALL");
     return allValid ? 0 : 1;
   }
 
@@ -358,7 +358,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  std::string areaName = argv[1];
+  std::string areaName  = argv[1];
   std::string courseArg = argv[2];
 
   if(courseArg != "L" && courseArg != "R") {

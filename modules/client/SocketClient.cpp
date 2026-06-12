@@ -100,13 +100,13 @@ bool SocketClient::executeAction(const Req& request, Res& response)
   }
 
   // リクエストを送信する
-  if(send(sock, reinterpret_cast<const char*>(&request), sizeof(request), 0) < 0) {
+  if(netSys.send(sock, reinterpret_cast<const char*>(&request), sizeof(request), 0) < 0) {
     Logger::error("Client: send failed");
     return false;
   }
 
   // 結果を受信する
-  ssize_t bytesRead = recv(sock, reinterpret_cast<char*>(&response), sizeof(response), 0);
+  ssize_t bytesRead = netSys.recv(sock, reinterpret_cast<char*>(&response), sizeof(response), 0);
   if(bytesRead < 0) {
     Logger::error("Client: recv failed");
     return false;

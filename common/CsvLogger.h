@@ -33,6 +33,11 @@ struct LogData {
   std::optional<int> leftPower;      // 左Power値
   std::optional<double> rightSpeed;  // 右Speed値
   std::optional<double> leftSpeed;   // 左Speed値
+  std::optional<double> currentVal;  // 現在の値
+  std::optional<double> target;      // 目標値
+  std::optional<double> kp;          // Pゲイン
+  std::optional<double> ki;          // Iゲイン
+  std::optional<double> kd;          // Dゲイン
   // 今後新しいセンサー値（例: gyro）を追加したい場合は、ここに std::optional<int> gyro;
 };
 

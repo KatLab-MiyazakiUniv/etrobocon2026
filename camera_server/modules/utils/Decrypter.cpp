@@ -1,22 +1,22 @@
 /**
- * @file   Decode.cpp
+ * @file   Decrypter.cpp
  * @brief  暗号化文字列を復号するクラス
  * @author yutaro-1214 HaruArima08
  */
 
-#include "Decode.h"
+#include "Decrypter.h"
 
-std::string Decode::decrypt(const std::string& key, const std::string& encryptedText)
+std::string Decrypter::decrypt(const std::string& key, const std::string& encryptedText)
 {
   auto decoded = decodeBase64(encryptedText);
   if(!decoded) {
-    Logger::error("Decode: Base64でコードに失敗しました。");
+    Logger::error("Decrypter: Base64でコードに失敗しました。");
     return "";
   }
 
   // "Salted__" ヘッダとSaltを確認（openssl enc形式）
   if(std::memcmp(decoded->data(), "Salted__", 8) != 0) {
-    Logger::error("Decode: Saltヘッダが見つかりません。");
+    Logger::error("Decrypter: Saltヘッダが見つかりません。");
     return "";
   }
   const unsigned char* salt = decoded->data() + 8;
@@ -27,13 +27,13 @@ std::string Decode::decrypt(const std::string& key, const std::string& encrypted
   return decryptAES(decoded->data() + 16, static_cast<int>(decoded->size()) - 16, aesKey->data());
 }
 
-std::optional<std::vector<unsigned char>> Decode::decodeBase64(const std::string& encoded)
+std::optional<std::vector<unsigned char>> Decrypter::decodeBase64(const std::string& encoded)
 {
   std::vector<unsigned char> decoded(encoded.size());
   int length = EVP_DecodeBlock(
       decoded.data(), reinterpret_cast<const unsigned char*>(encoded.c_str()), encoded.length());
   if(length < 16) {
-    Logger::error("Decode: Base64デコードに失敗しました。");
+    Logger::error("Decrypter: Base64デコードに失敗しました。");
     return std::nullopt;
   }
 
@@ -43,30 +43,30 @@ std::optional<std::vector<unsigned char>> Decode::decodeBase64(const std::string
   return decoded;
 }
 
-std::optional<std::array<unsigned char, 16>> Decode::deriveKey(const std::string& key,
-                                                               const unsigned char* salt)
+std::optional<std::array<unsigned char, 16>> Decrypter::deriveKey(const std::string& key,
+                                                                  const unsigned char* salt)
 {
   std::array<unsigned char, 16> aesKey;
   if(!PKCS5_PBKDF2_HMAC(key.c_str(), static_cast<int>(key.length()), salt, 8, 10000, EVP_sha256(),
                         static_cast<int>(aesKey.size()), aesKey.data())) {
-    Logger::error("Decode: 鍵導出に失敗しました。");
+    Logger::error("Decrypter: 鍵導出に失敗しました。");
     return std::nullopt;
   }
   return aesKey;
 }
 
-std::string Decode::decryptAES(const unsigned char* cipherText, int cipherLength,
-                               const unsigned char* aesKey)
+std::string Decrypter::decryptAES(const unsigned char* cipherText, int cipherLength,
+                                  const unsigned char* aesKey)
 {
   EVP_CIPHER_CTX* ctx = EVP_CIPHER_CTX_new();
   if(ctx == nullptr) {
-    Logger::error("Decode: 暗号コンテキストの生成に失敗しました。");
+    Logger::error("Decrypter: 暗号コンテキストの生成に失敗しました。");
     return "";
   }
 
   if(!EVP_DecryptInit_ex(ctx, EVP_aes_128_ecb(), nullptr, aesKey, nullptr)) {
     EVP_CIPHER_CTX_free(ctx);
-    Logger::error("Decode: 復号の初期化に失敗しました。");
+    Logger::error("Decrypter: 復号の初期化に失敗しました。");
     return "";
   }
 
@@ -75,13 +75,13 @@ std::string Decode::decryptAES(const unsigned char* cipherText, int cipherLength
 
   if(!EVP_DecryptUpdate(ctx, plain.data(), &outLen1, cipherText, cipherLength)) {
     EVP_CIPHER_CTX_free(ctx);
-    Logger::error("Decode: 復号処理に失敗しました。");
+    Logger::error("Decrypter: 復号処理に失敗しました。");
     return "";
   }
 
   if(!EVP_DecryptFinal_ex(ctx, plain.data() + outLen1, &outLen2)) {
     EVP_CIPHER_CTX_free(ctx);
-    Logger::error("Decode: 復号の終了処理に失敗しました。");
+    Logger::error("Decrypter: 復号の終了処理に失敗しました。");
     return "";
   }
 

@@ -1,11 +1,11 @@
 /**
- * @file   Decode.h
+ * @file   Decrypter.h
  * @brief  暗号化文字列を復号するクラス
  * @author yutaro-1214 HaruArima08
  */
 
-#ifndef DECODE_H
-#define DECODE_H
+#ifndef DECRYPTER_H
+#define DECRYPTER_H
 
 #include <openssl/evp.h>
 #include <array>
@@ -15,7 +15,7 @@
 #include <vector>
 #include "Logger.h"
 
-class Decode {
+class Decrypter {
  public:
   /**
    * @brief 暗号化文字列を復号する
@@ -26,7 +26,7 @@ class Decode {
   static std::string decrypt(const std::string& key, const std::string& encryptedText);
 
  private:
-  Decode();  // インスタンス化禁止
+  Decrypter();  // インスタンス化禁止
 
   /**
    * @brief Base64エンコード文字列を復号する
@@ -55,4 +55,4 @@ class Decode {
                                 const unsigned char* aesKey);
 };
 
-#endif  // DECODE_H
+#endif  // DECRYPTER_H

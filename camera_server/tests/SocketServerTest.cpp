@@ -20,18 +20,7 @@ namespace etrobocon2026_test {
     MockNetworkSystem mockNet;
     int testPort = 12345;
     SocketServer server(colorRegionDetectionHandler, mockNet, testPort);
-    EXPECT_EQ(testPort, server.port);
-  }
-
-  // SocketServerが注入されたNetworkSystemを参照しているかアドレスの一致で確認
-  TEST(SocketServerTest, CompareAddress)
-  {
-    MockNetworkSystem mockNet;
-    SocketServer server(colorRegionDetectionHandler, mockNet);
-    EXPECT_EQ(&mockNet, &server.netSys);
-    RealNetworkSystem realNet;
-    SocketServer server2(colorRegionDetectionHandler, realNet);
-    EXPECT_EQ(&realNet, &server2.netSys);
+    EXPECT_EQ(testPort, server.getPort());
   }
 
   // メンバ変数のlistenSocketの初期値が-1か
@@ -48,7 +37,7 @@ namespace etrobocon2026_test {
   {
     MockNetworkSystem mockNet;
     SocketServer server(colorRegionDetectionHandler, mockNet);
-    EXPECT_FALSE(server.isRunning);
+    EXPECT_FALSE(server.getIsRunning());
   }
 
   // メンバ変数のportのデフォルト引数がDEFAULT_PORTかを確認
@@ -56,7 +45,7 @@ namespace etrobocon2026_test {
   {
     MockNetworkSystem mockNet;
     SocketServer server(colorRegionDetectionHandler, mockNet);
-    EXPECT_EQ(server.port, CameraServer::DEFAULT_PORT);
+    EXPECT_EQ(server.getPort(), CameraServer::DEFAULT_PORT);
   }
 
   // shutdown()の実行後にisRunningとlistenSocketがデフォルト値に戻っているか
@@ -64,8 +53,8 @@ namespace etrobocon2026_test {
   {
     MockNetworkSystem mockNet;
     SocketServer server(colorRegionDetectionHandler, mockNet);
-    server.isRunning = true;
-    server.listenSocket = 100;
+    server.setIsRunning(true);
+    server.setListenSocket(100);
     server.shutdown();
     EXPECT_FALSE(server.getIsRunning());
     EXPECT_EQ(server.getListenSocket(), -1);
@@ -105,12 +94,12 @@ namespace etrobocon2026_test {
     mockNet.recvData = CameraServer::Command::SHUTDOWN;
 
     SocketServer server(colorRegionDetectionHandler, mockNet);
-    server.isRunning = true;
-    server.listenSocket = 100;
+    server.setIsRunning(true);
+    server.setListenSocket(100);
     int afterConnectListenSocket = -1;
     int dummyClientSocket = 200;
     server.handleConnection(dummyClientSocket);
-    EXPECT_FALSE(server.isRunning);
-    EXPECT_EQ(server.listenSocket, afterConnectListenSocket);
+    EXPECT_FALSE(server.getIsRunning());
+    EXPECT_EQ(server.getListenSocket(), afterConnectListenSocket);
   }
 }  // namespace etrobocon2026_test

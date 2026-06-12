@@ -10,7 +10,6 @@
 #include <string>
 #include "SocketProtocol.h"
 #include "RealNetworkSystem.h"
-// #include "./../actions/ColorRegionDetectionActionHandler.h"
 #include "actions/ColorRegionDetectionActionHandler.h"
 #include "Logger.h"
 #include "CameraCapture.h"

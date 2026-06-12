@@ -101,7 +101,7 @@ namespace etrobocon2026_test {
   TEST(SocketServerTest, HandleConnectionShutdown)
   {
     MockNetworkSystem mockNet;
-    mockNet.receiveCommand = true;
+    mockNet.hasRecvData = true;
     mockNet.recvData = CameraServer::Command::SHUTDOWN;
 
     SocketServer server(colorRegionDetectionHandler, mockNet);
@@ -110,8 +110,7 @@ namespace etrobocon2026_test {
     int afterConnectListenSocket = -1;
     int dummyClientSocket = 200;
     server.handleConnection(dummyClientSocket);
-    // 壊れたテスト
-    // EXPECT_FALSE(server.isRunning);
-    // EXPECT_EQ(server.listenSocket, afterConnectListenSocket);
+    EXPECT_FALSE(server.isRunning);
+    EXPECT_EQ(server.listenSocket, afterConnectListenSocket);
   }
-}
+}  // namespace etrobocon2026_test

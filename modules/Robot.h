@@ -14,6 +14,10 @@
 #include "Course.h"
 #include "SocketClient.h"
 
+// #include "Button.h"
+// #include "ForceSensor.h"
+// #include "Display.h"
+
 class Robot {
  public:
   /**
@@ -57,6 +61,22 @@ class Robot {
   ColorSensorController& getColorSensorControllerInstance();
 
   /**
+   * @brief Buttonのインスタンスの参照を返す
+   * @return メンバ変数button(Buttonのインスタンス)の参照
+   */
+  spikeapi::Button& getButtonInstance();
+  /**
+   * @brief ForceSensorのインスタンスの参照を返す
+   * @return メンバ変数forceSensor(ForceSensorのインスタンス)の参照
+   */
+  spikeapi::ForceSensor& getForceSensorInstance();
+  /**
+   * @brief Displayのインスタンスの参照を返す
+   * @return メンバ変数display(Displayのインスタンス)の参照
+   */
+  spikeapi::Display& getDisplayInstance();
+
+  /**
    * @brief カメラサーバー用のSocketClientのインスタンスの参照を返す
    * @return メンバ変数
    * socketClient(デフォルト引数でDIしたカメラサーバー用のSocketClientのインスタンス) の参照
@@ -70,5 +90,9 @@ class Robot {
   Course course;                                // コース(Left or Right)
   ColorSensorController colorSensorController;  // ColorSensorController インスタンス
   SocketClient& cameraSocketClient;             // カメラサーバー用の SocketClient インスタンス
+
+  spikeapi::Button button;            // Buttonインスタンス
+  spikeapi::ForceSensor forceSensor;  // ForceSensorインスタンス
+  spikeapi::Display display;          // Displayインスタンス
 };
 #endif

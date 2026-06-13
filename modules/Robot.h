@@ -15,6 +15,10 @@
 #include "SocketClient.h"
 #include "Course.h"
 
+// #include "Button.h"
+// #include "ForceSensor.h"
+// #include "Display.h"
+
 class Robot {
  public:
   /**
@@ -78,9 +82,34 @@ class Robot {
   Edge& getEdge();
 
   /**
+   * @brief Buttonのインスタンスの参照を返す
+   * @return メンバ変数button(Buttonのインスタンス) の参照
+   */
+  spikeapi::Button& getButtonInstance();
+
+  /**
+   * @brief ForceSensorのインスタンスの参照を返す
+   * @return メンバ変数forceSensor(ForceSensorのインスタンス)の参照
+   */
+  spikeapi::ForceSensor& getForceSensorInstance();
+  /**
+   * @brief Displayのインスタンスの参照を返す
+   * @return メンバ変数display(Displayのインスタンス)の参照
+   */
+  spikeapi::Display& getDisplayInstance();
+
+  /**
+   * @brief カメラサーバー用のSocketClientのインスタンスの参照を返す
+   * @return メンバ変数
+   * socketClient(デフォルト引数でDIしたカメラサーバー用のSocketClientのインスタンス) の参照
+  >>>>>>> 961d52f (add:updata)
+
+
+
+  /**
    * @brief エッジの左右判定を設定する
    * @param edge エッジの左右判定
-   */
+  */
   void setEdge(Edge edge);
 
   /**
@@ -104,5 +133,8 @@ class Robot {
   Course course;                                // コース(Left or Right)
   Edge edge;                                    // エッジの左右判定
   int runningStartTime = 0;                     // 走行開始時間
+  spikeapi::Button button;                      // Buttonインスタンス
+  spikeapi::ForceSensor forceSensor;            // ForceSensorインスタンス
+  spikeapi::Display display;                    // Displayインスタンス
 };
 #endif

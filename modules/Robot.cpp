@@ -11,7 +11,11 @@ Robot::Robot(SocketClient& _cameraSocketClient)
     armMotorController(),
     imuController(),
     colorSensorController(),
-    cameraSocketClient(_cameraSocketClient)
+    cameraSocketClient(_cameraSocketClient),
+     button(),
+    forceSensor(EPort::PORT_D),
+    display()
+
 {
 }
 
@@ -48,3 +52,19 @@ void Robot::setCourse(Course course)
 {
   this->course = course;
 }
+
+spikeapi::Button& Robot::getButtonInstance()
+{
+  return button;
+}
+
+spikeapi::ForceSensor& Robot::getForceSensorInstance()
+{
+  return forceSensor;
+}
+
+spikeapi::Display& Robot::getDisplayInstance()
+{
+  return display;
+}
+

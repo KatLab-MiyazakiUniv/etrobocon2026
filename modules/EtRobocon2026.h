@@ -9,6 +9,8 @@
 
 #include <iostream>
 #include "Logger.h"
+#include "Robot.h"
+#include "Calibrator.h"
 
 class EtRobocon2026 {
  public:

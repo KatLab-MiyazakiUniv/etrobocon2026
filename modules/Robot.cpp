@@ -7,7 +7,11 @@
 #include "Robot.h"
 
 Robot::Robot()
-  : wheelMotorController(), armMotorController(), imuController(), colorSensorController()/*, ultraSonicController()*/,ultrasonicSensor(EPort::PORT_F)
+  : wheelMotorController(),
+    armMotorController(),
+    imuController(),
+    colorSensorController(),
+    ultraSonicController()
 {
 }
 
@@ -40,12 +44,7 @@ void Robot::setCourse(Course course)
   this->course = course;
 }
 
-// UltraSonicController& Robot::getUltraSonicControllerInstance()
-// {
-//   return ultraSonicController;
-// }
-
-spikeapi::UltrasonicSensor& Robot::getUltrasonicSensorInstance()
+UltraSonicController& Robot::getUltraSonicControllerInstance()
 {
-  return ultrasonicSensor;
+  return ultraSonicController;
 }

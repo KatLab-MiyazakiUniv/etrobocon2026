@@ -23,8 +23,8 @@ class BatteryController {
   static uint16_t getVoltage();
 
  private:
-  static Battery& getBatteryIncetance();
-  Battery();
+  BatteryController();
+  static spikeapi::Battery& getBatteryIncetance();
 };
 
 #endif

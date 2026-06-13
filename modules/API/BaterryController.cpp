@@ -10,7 +10,7 @@ uint16_t BatteryController::getVoltage()
   return getBatteryIncetance().getVoltage();
 }
 
-Battery& BatteryController::getBatteryIncetance()
+spikeapi::Battery& BatteryController::getBatteryIncetance()
 {
   static spikeapi::Battery battery;
   return battery;

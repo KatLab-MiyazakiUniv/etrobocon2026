@@ -48,3 +48,13 @@ void Robot::setCourse(Course course)
 {
   this->course = course;
 }
+
+void Robot::setEdge(Edge edge)
+{
+  this->edge = edge;
+}
+
+Edge& Robot::getEdge()
+{
+  return edge;
+}

@@ -30,8 +30,8 @@ static const std::array<std::string, 2> AREA_NAMES = { "LineTrace", "Area2" };
 
 // 引数文字列からArea enum の変換テーブル
 static const std::unordered_map<std::string, Area> AREA_MAP = {
-  { "LineTrace", LineTrace },
-  { "Area2", Area2 },
+  { "LineTrace", Area::LineTrace },
+  { "Area2", Area::Area2 },
 };
 
 // 文字列の前後の空白を削除するユーティリティ関数
@@ -207,9 +207,9 @@ bool checkType(const std::string& commandFilePath, const std::string& label)
       continue;
     }
 
-    std::stringstream ss(line);          // 行をカンマで分割するための文字列ストリーム
+    std::stringstream ss(line);  // 行をカンマで分割するための文字列ストリーム
     std::vector<std::string> runParams;  // 分割したパラメータを格納するベクター
-    std::string token;                   // 分割したトークンを一時的に格納するバッファ
+    std::string token;  // 分割したトークンを一時的に格納するバッファ
     while(std::getline(ss, token, SEPARATOR)) {
       trim(token);
       runParams.push_back(token);

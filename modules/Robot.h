@@ -92,9 +92,8 @@ class Robot {
   Course course;                                // コース(Left or Right)
   ColorSensorController colorSensorController;  // ColorSensorController インスタンス
   SocketClient& cameraSocketClient;             // カメラサーバー用の SocketClient インスタンス
-
-  spikeapi::Button button;            // Buttonインスタンス
-  spikeapi::ForceSensor forceSensor;  // ForceSensorインスタンス
-  spikeapi::Display display;          // Displayインスタンス
+  spikeapi::Button button;                      // Buttonインスタンス
+  spikeapi::ForceSensor forceSensor;            // ForceSensorインスタンス
+  spikeapi::Display display;                    // Displayインスタンス
 };
 #endif

@@ -1,3 +1,4 @@
+
 /**
  * @file Calibrator.cpp
  * @brief キャリブレーションからスタートまでを担当するクラス
@@ -70,7 +71,7 @@ void Calibrator::measureAndSetTargetBrightness()
     }
     // ループが開始されたら連続的に輝度を取得
     if(isBrightnessMeasuring) {
-      blackBrightness = robot.getColorSensorInstance().getReflection();
+      blackBrightness = robot.getColorSensorControllerInstance().getReflectance();
       // 現在の輝度値をリアルタイムで表示
       robot.getDisplayInstance().showNumber(blackBrightness);
       // 右ボタンが押されたら確定
@@ -103,7 +104,7 @@ void Calibrator::measureAndSetTargetBrightness()
     }
     // ループが開始されたら連続的に輝度を取得
     if(isBrightnessMeasuring) {
-      whiteBrightness = robot.getColorSensorInstance().getReflection();
+      whiteBrightness = robot.getColorSensorControllerInstance().getReflectance();
       // 現在の輝度値をリアルタイムで表示
       robot.getDisplayInstance().showNumber(whiteBrightness);
       // 右ボタンが押されたら確定

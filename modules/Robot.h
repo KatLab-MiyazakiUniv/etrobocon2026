@@ -1,3 +1,4 @@
+
 /**
  * @file   Robot.h
  * @brief  走行システム全体で再利用する外部リソースを管理するクラス
@@ -14,9 +15,9 @@
 #include "Course.h"
 #include "SocketClient.h"
 
-// #include "Button.h"
-// #include "ForceSensor.h"
-// #include "Display.h"
+#include "Button.h"
+#include "ForceSensor.h"
+#include "Display.h"
 
 class Robot {
  public:
@@ -42,6 +43,13 @@ class Robot {
    * @return メンバ変数 imuController(IMUController のインスタンス) の参照
    */
   IMUController& getIMUControllerInstance();
+
+  /**
+   * @brief ColorSensorControllerのインスタンスの参照を返す
+   * @return メンバ変数 colorSensorController(ColorSensorController のインスタンス) の参照
+   */
+  ColorSensorController& getColorSensorControllerInstance();
+
   /**
    * @brief コースの参照を返す
    * @return メンバ変数 course(Course のインスタンス) の参照
@@ -53,12 +61,6 @@ class Robot {
    * @param course コース
    */
   void setCourse(Course course);
-
-  /**
-   * @brief ColorSensorControllerのインスタンスの参照を返す
-   * @return メンバ変数 colorSensorController(ColorSensorController のインスタンス) の参照
-   */
-  ColorSensorController& getColorSensorControllerInstance();
 
   /**
    * @brief Buttonのインスタンスの参照を返す

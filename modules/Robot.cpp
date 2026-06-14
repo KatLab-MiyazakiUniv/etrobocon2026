@@ -1,3 +1,4 @@
+
 /**
  * @file   Robot.cpp
  * @brief  走行システム全体で再利用する外部リソースを管理するクラス
@@ -12,7 +13,10 @@ Robot::Robot(SocketClient& _cameraSocketClient)
     imuController(),
     colorSensorController(),
     ultraSonicController(),
-    cameraSocketClient(_cameraSocketClient)
+    cameraSocketClient(_cameraSocketClient),
+    button(),
+    forceSensor(EPort::PORT_D),
+    display()
 {
 }
 
@@ -74,4 +78,19 @@ int Robot::getRunningStartTime()
 void Robot::setRunningStartTime(int time)
 {
   runningStartTime = time;
+}
+
+spikeapi::Button& Robot::getButtonInstance()
+{
+  return button;
+}
+
+spikeapi::ForceSensor& Robot::getForceSensorInstance()
+{
+  return forceSensor;
+}
+
+spikeapi::Display& Robot::getDisplayInstance()
+{
+  return display;
 }

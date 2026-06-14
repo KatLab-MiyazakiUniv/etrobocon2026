@@ -15,9 +15,9 @@
 #include "SocketClient.h"
 #include "Course.h"
 
-// #include "Button.h"
-// #include "ForceSensor.h"
-// #include "Display.h"
+#include "Button.h"
+#include "ForceSensor.h"
+#include "Display.h"
 
 class Robot {
  public:
@@ -100,9 +100,7 @@ class Robot {
 
   /**
    * @brief カメラサーバー用のSocketClientのインスタンスの参照を返す
-   * @return メンバ変数
-   * socketClient(デフォルト引数でDIしたカメラサーバー用のSocketClientのインスタンス) の参照
-  >>>>>>> 961d52f (add:updata)
+   * @return メンバ変数 socketClient(デフォルト引数でDIしたカメラサーバー用のSocketClientのインスタンス) の参照
 
 
 

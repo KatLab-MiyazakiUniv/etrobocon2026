@@ -5,7 +5,6 @@
  */
 
 #include "MotionParser.h"
-#include "DistanceCondition.h"
 
 using namespace std;
 
@@ -17,7 +16,10 @@ static const string CONDITIONS_PATH = "etrobocon2026/datafiles/commands/Conditio
 static void trim(std::string& s)
 {
   size_t start = s.find_first_not_of(" \t");
-  if(start == std::string::npos) { s.clear(); return; }
+  if(start == std::string::npos) {
+    s.clear();
+    return;
+  }
   size_t end = s.find_last_not_of(" \t");
   s = s.substr(start, end - start + 1);
 }
@@ -40,7 +42,7 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
   // Area CSVを開き、開けなければ空のリストを返す
   ifstream file(commandFilePath);
   if(!file) {
-    Logger::printfLog(Logger::ERROR, "コマンドファイルを開けませんでした: %s",
+    Logger::printfLog(Logger::ERROR, "Areaのコマンドファイルを開けませんでした: %s",
                       commandFilePath.c_str());
     return motionList;
   }
@@ -74,41 +76,11 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
     string conditionName = params[2];
     string conditionId = params[3];
 
-    // Motions/<motionName>.csv を開いて motionId の行を検索する
-    string motionsFilePath = MOTIONS_PATH + motionName + ".csv";
-    ifstream motionsFile(motionsFilePath);
-    if(!motionsFile) {
-      Logger::printfLog(Logger::ERROR, "Motionsファイルを開けませんでした: %s",
-                        motionsFilePath.c_str());
-      lineNum++;
-      continue;
-    }
-
-    // ヘッダ2行をスキップ
-    string motionsHeader;
-    getline(motionsFile, motionsHeader);
-    getline(motionsFile, motionsHeader);
-
-    vector<string> motionParams;
-    bool motionFound = false;
-    string motionsLine;
-    while(getline(motionsFile, motionsLine)) {
-      stringstream ssMotions(motionsLine);
-      vector<string> row;
-      for(string token; getline(ssMotions, token, SEPARATOR);) {
-        trim(token);
-        row.push_back(move(token));
-      }
-      if(row.size() >= 2 && row[1] == motionId) {
-        motionParams = move(row);
-        motionFound = true;
-        break;
-      }
-    }
-
-    if(!motionFound) {
-      Logger::printfLog(Logger::ERROR, "%s に ID=%s が見つかりませんでした",
-                        motionsFilePath.c_str(), motionId.c_str());
+    // 動作パラメータを取得する
+    vector<string> motionParams = extractParamsFromID(MOTIONS_PATH + motionName + ".csv", motionId);
+    if(motionParams.empty()) {
+      Logger::printfLog(Logger::ERROR, "Motions: %s ID=%s が見つかりませんでした",
+                        motionName.c_str(), motionId.c_str());
       lineNum++;
       continue;
     }
@@ -123,8 +95,18 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
       Logger::printfLog(Logger::DEBUG, "[MotionParser] Motion params: %s", paramsDebug.c_str());
     }
 
+    // 条件パラメータを取得する
+    vector<string> conditionParams
+        = extractParamsFromID(CONDITIONS_PATH + conditionName + ".csv", conditionId);
+    if(conditionParams.empty()) {
+      Logger::printfLog(Logger::ERROR, "Conditions: %s ID=%s が見つかりませんでした",
+                        conditionName.c_str(), conditionId.c_str());
+      lineNum++;
+      continue;
+    }
+
     // 条件インスタンスを生成する
-    auto condition = createConditionList(robot, conditionName, conditionId);
+    auto condition = createConditionInstance(robot, conditionParams);
     if(!condition) {
       Logger::printfLog(Logger::ERROR, "条件インスタンスの生成に失敗しました: %s %s",
                         conditionName.c_str(), conditionId.c_str());
@@ -135,37 +117,16 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
         Logger::DEBUG, "[MotionParser] Condition: %s ID=%s を Motion: %s ID=%s に注入します",
         conditionName.c_str(), conditionId.c_str(), motionName.c_str(), motionId.c_str());
 
-    // TODO: 各動作クラスが完成したら、以下のコメントを外してswitch-caseを実装する
-    COMMAND command = convertCommand(motionName);
-    switch(command) {
-      // case COMMAND::STRAIGHT: {
-      //   // Straight: motionParams[2]=speed(double)
-      //   //           motionParams[3..5]=rightPid(kp,ki,kd)
-      //   //           motionParams[6..8]=leftPid(kp,ki,kd)
-      //   //           motionParams[9..11]=anglePid(kp,ki,kd)
-      //   //           motionParams[12]=useIMU(string: "true"/"false")
-      //   auto straight = new Straight(
-      //       robot, std::move(condition),
-      //       fromString<double>(motionParams[2]),
-      //       Pid::PidGain{ fromString<double>(motionParams[3]),
-      //                     fromString<double>(motionParams[4]),
-      //                     fromString<double>(motionParams[5]) },
-      //       Pid::PidGain{ fromString<double>(motionParams[6]),
-      //                     fromString<double>(motionParams[7]),
-      //                     fromString<double>(motionParams[8]) },
-      //       Pid::PidGain{ fromString<double>(motionParams[9]),
-      //                     fromString<double>(motionParams[10]),
-      //                     fromString<double>(motionParams[11]) },
-      //       motionParams[12] == "true");
-      //   motionList.push_back(straight);
-      //   break;
-      // }
-      // ↓ 他のコマンドはここに追加していく
-      default: {
-        Logger::printfLog(Logger::ERROR, "%s:%d Command %s は未定義です", commandFilePath.c_str(),
-                          lineNum, motionName.c_str());
-        break;
-      }
+    // 動作インスタンスを生成してリストに追加する
+    BaseMotion* motion = createMotionInstance(robot, motionParams, std::move(condition));
+    if(motion) {
+      motionList.push_back(motion);
+      Logger::printfLog(Logger::DEBUG, "[MotionParser] motionList[%zu]: %s ID=%s (条件: %s ID=%s)",
+                        motionList.size() - 1, motionName.c_str(), motionId.c_str(),
+                        conditionName.c_str(), conditionId.c_str());
+    } else {
+      Logger::printfLog(Logger::ERROR, "%s:%d Command %s は未定義です", commandFilePath.c_str(),
+                        lineNum, motionName.c_str());
     }
 
     lineNum++;
@@ -174,16 +135,12 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
   return motionList;
 }
 
-unique_ptr<BaseContinuationCondition> MotionParser::createConditionList(Robot& robot,
-                                                                        const string& conditionName,
-                                                                        const string& conditionId)
+vector<string> MotionParser::extractParamsFromID(const string& filePath, const string& id)
 {
-  string conditionsFilePath = CONDITIONS_PATH + conditionName + ".csv";
-  ifstream file(conditionsFilePath);
+  ifstream file(filePath);
   if(!file) {
-    Logger::printfLog(Logger::ERROR, "Conditionsファイルを開けませんでした: %s",
-                      conditionsFilePath.c_str());
-    return nullptr;
+    Logger::printfLog(Logger::ERROR, "ファイルを開けませんでした: %s", filePath.c_str());
+    return {};
   }
 
   // ヘッダ2行をスキップ
@@ -194,33 +151,67 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionList(Robot& r
   string line;
   while(getline(file, line)) {
     stringstream ss(line);
-    vector<string> params;
+    vector<string> row;
     for(string token; getline(ss, token, SEPARATOR);) {
       trim(token);
-      params.push_back(move(token));
+      row.push_back(move(token));
     }
-
-    if(params.size() >= 2 && params[1] == conditionId) {
-      CONDITION cond = convertCondition(params[0]);
-      switch(cond) {
-        case CONDITION::DISTANCE: {
-          double targetDistance = fromString<double>(params[2]);
-          Logger::printfLog(Logger::DEBUG,
-                            "[MotionParser] DistanceCondition: targetDistance=%.1f を生成しました",
-                            targetDistance);
-          return make_unique<DistanceCondition>(robot, targetDistance);
-        }
-        default: {
-          Logger::printfLog(Logger::ERROR, "Condition %s は未定義です", conditionName.c_str());
-          return nullptr;
-        }
-      }
+    if(row.size() >= 2 && row[1] == id) {
+      return row;
     }
   }
 
-  Logger::printfLog(Logger::ERROR, "%s に ID=%s が見つかりませんでした", conditionsFilePath.c_str(),
-                    conditionId.c_str());
-  return nullptr;
+  return {};
+}
+
+unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
+    Robot& robot, const vector<string>& params)
+{
+  CONDITION cond = convertCondition(params[0]);
+  switch(cond) {
+    case CONDITION::DISTANCE: {
+      double targetDistance = fromString<double>(params[2]);
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] DistanceCondition: targetDistance=%.1f を生成しました",
+                        targetDistance);
+      return make_unique<DistanceCondition>(robot, targetDistance);
+    }
+    // ↓ 他の条件コマンドはここに追加していく
+    default:
+      return nullptr;
+  }
+}
+
+BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string>& motionParams,
+                                               unique_ptr<BaseContinuationCondition> condition)
+{
+  // TODO: 各動作クラスが完成したら、以下のコメントを外してswitch-caseを実装する
+  COMMAND command = convertCommand(motionParams[0]);
+  switch(command) {
+    // case COMMAND::STRAIGHT: {
+    //   // Straight: motionParams[2]=speed(double)
+    //   //           motionParams[3..5]=rightPid(kp,ki,kd)
+    //   //           motionParams[6..8]=leftPid(kp,ki,kd)
+    //   //           motionParams[9..11]=anglePid(kp,ki,kd)
+    //   //           motionParams[12]=useIMU(string: "true"/"false")
+    //   return new Straight(
+    //       robot, std::move(condition),
+    //       fromString<double>(motionParams[2]),
+    //       Pid::PidGain{ fromString<double>(motionParams[3]),
+    //                     fromString<double>(motionParams[4]),
+    //                     fromString<double>(motionParams[5]) },
+    //       Pid::PidGain{ fromString<double>(motionParams[6]),
+    //                     fromString<double>(motionParams[7]),
+    //                     fromString<double>(motionParams[8]) },
+    //       Pid::PidGain{ fromString<double>(motionParams[9]),
+    //                     fromString<double>(motionParams[10]),
+    //                     fromString<double>(motionParams[11]) },
+    //       motionParams[12] == "true");
+    // }
+    // ↓ 他のコマンドはここに追加していく
+    default:
+      return nullptr;
+  }
 }
 
 COMMAND MotionParser::convertCommand(const string& str)

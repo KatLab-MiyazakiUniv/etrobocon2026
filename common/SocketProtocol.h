@@ -19,6 +19,7 @@ namespace CameraServer {
    */
   enum class Command : uint8_t {
     COLOR_REGION_DETECTION = 0,  // 色領域検出
+    TAKE_SNAPSHOT = 1,           // スナップショット
     DISCONNECT = 254,            // サーバーから切断
     SHUTDOWN = 255               // サーバーをシャットダウン
   };
@@ -102,6 +103,17 @@ namespace CameraServer {
   struct ColorRegionDetectorResponse {
     BoundingBoxDetectionResult result;  // 色領域の検出結果
     int32_t largestColorIndex = -1;     // 最も面積が大きい色のインデックス
+  };
+
+  // スナップショット撮影アクションのリクエストデータ構造
+  struct SnapshotActionRequest {
+    Command command = Command::TAKE_SNAPSHOT;  // TAKE_SNAPSHOTを期待
+    char fileName[64];                         // 保存するファイル名
+  };
+
+  // スナップショット撮影アクションのレスポンスデータ構造
+  struct SnapshotActionResponse {
+    bool success;  // 撮影が成功したかどうか
   };
 
 }  // namespace CameraServer

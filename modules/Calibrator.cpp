@@ -130,7 +130,7 @@ void Calibrator::measureAndSetTargetBrightness()
   robot.getDisplayInstance().showChar(' ');                      // ディスプレイを消灯
 }
 
-/*void Calibrator::getAngleCheckFrame()
+void Calibrator::getAngleCheckFrame()
 {
   robot.getDisplayInstance().showChar('F');
   // 角度調整フレーム取得
@@ -163,7 +163,7 @@ void Calibrator::measureAndSetTargetBrightness()
   cout << "Complete Check Frame." << endl;
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));  // 1秒スリープ
 }
-*/
+
 void Calibrator::waitForStart()
 {
   Logger::info("待機中");
@@ -171,8 +171,7 @@ void Calibrator::waitForStart()
   while(!robot.getForceSensorInstance().isPressed(PRESS_POWER)) {
     std::this_thread::sleep_for(std::chrono::milliseconds(10));  // 10ミリ秒スリープ
     Logger::info("待機終了走行開始時刻のカウントを始めます");
-    ClockUtil::
-        getClockInstance();  // Clockインスタンスを生成>以降はClockUtil::のように使用出来るはず
+    ClockUtil::now;  // Clockインスタンスを生成>以降はClockUtil::のように使用出来るはず
   }
 }
 

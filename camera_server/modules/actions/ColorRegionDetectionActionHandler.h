@@ -7,6 +7,7 @@
 #ifndef COLOR_REGION_DETECTION_ACTION_HANDLER_H
 #define COLOR_REGION_DETECTION_ACTION_HANDLER_H
 
+#include "SystemInfo.h"
 #include "CameraCapture.h"
 #include "SocketProtocol.h"
 #include "ColorRegionDetector.h"
@@ -29,6 +30,7 @@ class ColorRegionDetectionActionHandler {
 
  private:
   CameraCapture& camera;
+  ColorRegionDetector detector;
 };
 
-#endif  // TWO_COLOR_LINE_DETECTION_ACTION_HANDLER_H
+#endif  // COLOR_REGION_DETECTION_ACTION_HANDLER_H

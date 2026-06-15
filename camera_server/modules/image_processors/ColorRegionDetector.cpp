@@ -19,6 +19,28 @@ ColorRegionDetector::~ColorRegionDetector()
   LOG_DESTROY("ColorRegionDetector");
 }
 
+const std::vector<ColorRegionDetector::HSVRange>& ColorRegionDetector::getHsvRanges() const
+{
+  return hsvRanges;
+}
+
+void ColorRegionDetector::setHsvRanges(const std::vector<ColorRegionDetector::HSVRange>& _hsvRanges)
+{
+  hsvRanges = _hsvRanges;
+}
+
+const cv::Rect& ColorRegionDetector::getRoi() const
+{
+  return roi;
+}
+
+void ColorRegionDetector::setRoi(const cv::Rect& _roi)
+{
+  roi = _roi;
+  validateParameters();
+}
+
+
 void ColorRegionDetector::validateParameters()
 {
   if(roi.x < 0) roi.x = 0;

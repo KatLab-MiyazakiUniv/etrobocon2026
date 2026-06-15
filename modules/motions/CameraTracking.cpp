@@ -15,7 +15,7 @@ CameraTracking::CameraTracking(Robot& _robot,
                                bool _isStopMotorPower)
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
-    targetXCoordinate(_targetXCoordinate),
+    targetXCoordinate(_targetXCoordinate + CAM_MAX_WIDTH / 2),
     pidGain(_pidGain),
     detectionRequest(_detectionRequest),
     isStopMotorPower(_isStopMotorPower),
@@ -37,8 +37,6 @@ bool CameraTracking::canStart()
   }
   return true;
 }
-
-void CameraTracking::prepare() {}
 
 void CameraTracking::executeStep()
 {
@@ -72,6 +70,11 @@ void CameraTracking::executeStep()
 
   robot.getWheelMotorControllerInstance().setRightPower(rightPower);
   robot.getWheelMotorControllerInstance().setLeftPower(leftPower);
+}
+
+void CameraTracking::wait()
+{
+  ClockUtil::sleep(30);  // カメラの撮影FPSに合わせて30ミリ秒待機する
 }
 
 void CameraTracking::finish()

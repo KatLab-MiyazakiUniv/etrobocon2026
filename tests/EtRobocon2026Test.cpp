@@ -15,8 +15,8 @@ namespace etrobocon2026_test {
     testing::internal::CaptureStdout();
 
     // start関数を実行
-    EtRobocon2026::start();
-
+    // EtRobocon2026::start();
+    Logger::info("Hello KATLAB");
     // キャプチャした出力を取得
     std::string output = testing::internal::GetCapturedStdout();
 

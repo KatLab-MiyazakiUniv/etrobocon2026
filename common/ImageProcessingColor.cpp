@@ -28,7 +28,6 @@ const CameraServer::HSVRangeData& ImageProcessingColor::getHSVRangeFromColor(Col
       return GREEN_HSV;
     case YELLOW:
       return YELLOW_HSV;
-    // カメラ走行タスクでは使わん。今後のタスクで使うかも...
     case BLACK:
       return BLACK_HSV;
     default:

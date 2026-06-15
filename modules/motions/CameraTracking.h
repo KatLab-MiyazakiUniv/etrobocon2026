@@ -55,6 +55,11 @@ class CameraTracking : public BaseMotion {
   void executeStep() override;
 
   /**
+   * @brief 1周期分の待機を行う
+   */
+  void wait();
+
+  /**
    * @brief 動作終了後の処理を行う
    */
   void finish() override;

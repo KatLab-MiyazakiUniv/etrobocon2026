@@ -7,7 +7,8 @@
 #include "ColorRegionDetectionActionHandler.h"
 
 ColorRegionDetectionActionHandler::ColorRegionDetectionActionHandler(CameraCapture& _camera)
-  : camera(_camera)
+  : camera(_camera),
+    detector({ { cv::Scalar(0, 0, 0, 0), cv::Scalar(180, 255, 30, 0) } }, cv::Rect(0, 0, 1920, 1080))
 {
 }
 
@@ -34,7 +35,9 @@ void ColorRegionDetectionActionHandler::execute(
   }
 
   cv::Rect localRoi(request.roi.x, request.roi.y, request.roi.width, request.roi.height);
-  ColorRegionDetector detector(localHsvRanges, localRoi);
+
+  detector.setHsvRanges(localHsvRanges);
+  detector.setRoi(localRoi);
   BoundingBoxDetectionResult localResult;
 
   if(request.requireLargestColorIndex) {

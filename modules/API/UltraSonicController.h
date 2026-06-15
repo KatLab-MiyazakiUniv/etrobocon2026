@@ -18,7 +18,7 @@ class UltraSonicController {
 
   /**
    * @brief 超音波センサーとの距離を取得する
-   * @return 超音波センサーとの距離（cm）
+   * @return 超音波センサーとの距離（mm）
    */
   int getDistance();
 

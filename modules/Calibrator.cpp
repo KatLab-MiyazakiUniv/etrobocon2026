@@ -166,10 +166,13 @@ void Calibrator::measureAndSetTargetBrightness()
 */
 void Calibrator::waitForStart()
 {
-  printf("On standby.\n");
+  Logger::info("待機中");
   // ForceSensorが押されるまで待機
   while(!robot.getForceSensorInstance().isPressed(PRESS_POWER)) {
     std::this_thread::sleep_for(std::chrono::milliseconds(10));  // 10ミリ秒スリープ
+    Logger::info("待機終了走行開始時刻のカウントを始めます");
+    ClockUtil::
+        getClockInstance();  // Clockインスタンスを生成>以降はClockUtil::のように使用出来るはず
   }
 }
 

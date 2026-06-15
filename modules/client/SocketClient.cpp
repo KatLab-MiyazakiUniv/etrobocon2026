@@ -91,6 +91,12 @@ bool SocketClient::executeColorRegionDetection(
   return executeAction(request, response);
 }
 
+bool SocketClient::executeSnapshotAction(const CameraServer::SnapshotActionRequest& request,
+                                         CameraServer::SnapshotActionResponse& response)
+{
+  return executeAction(request, response);
+}
+
 template <typename Req, typename Res>
 bool SocketClient::executeAction(const Req& request, Res& response)
 {

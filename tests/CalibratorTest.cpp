@@ -1,7 +1,7 @@
 /**
  * @file CalibratorTest.cpp
  * @brief Calibratorクラスのテスト
- * @author okuyama0528 sadomiya-sousi
+ * @author okuyama0528
  */
 
 #include "Calibrator.h"

@@ -26,11 +26,11 @@ void EtRobocon2026::start()
   //   return;
   // };
 
-  Calibrator calibrator(robot);
-  calibrator.selectAndSetCourse();
-  calibrator.measureAndSetTargetBrightness();
-  bool isLeftCourse = calibrator.getIsLeftCourse();
-  int targetBrightness = calibrator.getTargetBrightness();
-  // calibrator.getAngleCheckFrame();
-  calibrator.waitForStart();
+  // Calibrator calibrator(robot);
+  // calibrator.selectAndSetCourse();
+  // calibrator.measureAndSetTargetBrightness();
+  // bool isLeftCourse = calibrator.getIsLeftCourse();
+  // int targetBrightness = calibrator.getTargetBrightness();
+  // // calibrator.getAngleCheckFrame();
+  // calibrator.waitForStart();
 }

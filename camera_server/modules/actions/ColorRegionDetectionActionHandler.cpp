@@ -7,7 +7,9 @@
 #include "ColorRegionDetectionActionHandler.h"
 
 ColorRegionDetectionActionHandler::ColorRegionDetectionActionHandler(CameraCapture& _camera)
-  : camera(_camera)
+  : camera(_camera),
+    detector({ { cv::Scalar(0, 0, 0, 0), cv::Scalar(180, 255, 30, 0) } },
+             cv::Rect(0, 0, 1920, 1080))
 {
 }
 
@@ -22,41 +24,27 @@ void ColorRegionDetectionActionHandler::execute(
     return;
   }
 
-  // requestのメンバ変数でColorRegionDetecttorインスタンスで使用する引数を比較し,同じならインスタンス化をスキップする
-  bool changedRequest = !detector || !hasCachedRequest || cachedRequest.roi.x != request.roi.x
-                        || cachedRequest.roi.y != request.roi.y
-                        || cachedRequest.roi.width != request.roi.width
-                        || cachedRequest.roi.height != request.roi.height
-                        || cachedRequest.hsvRangeCount != request.hsvRangeCount
-                        || std::memcmp(cachedRequest.hsvRanges, request.hsvRanges,
-                                       request.hsvRangeCount * sizeof(CameraServer::HSVRangeData))
-                               != 0;
-
-  if(changedRequest) {
-    std::vector<ColorRegionDetector::HSVRange> localHsvRanges;
-    localHsvRanges.reserve(request.hsvRangeCount);
-    for(int i = 0; i < request.hsvRangeCount; i++) {
-      ColorRegionDetector::HSVRange range;
-      range.lower = cv::Scalar(request.hsvRanges[i].lower.v0, request.hsvRanges[i].lower.v1,
-                               request.hsvRanges[i].lower.v2, request.hsvRanges[i].lower.v3);
-      range.upper = cv::Scalar(request.hsvRanges[i].upper.v0, request.hsvRanges[i].upper.v1,
-                               request.hsvRanges[i].upper.v2, request.hsvRanges[i].upper.v3);
-      localHsvRanges.push_back(range);
-    }
-
-    cv::Rect localRoi(request.roi.x, request.roi.y, request.roi.width, request.roi.height);
-    detector = std::make_unique<ColorRegionDetector>(localHsvRanges, localRoi);
-
-    cachedRequest = request;
-    hasCachedRequest = true;
+  std::vector<ColorRegionDetector::HSVRange> localHsvRanges;
+  localHsvRanges.reserve(request.hsvRangeCount);
+  for(int i = 0; i < request.hsvRangeCount; i++) {
+    ColorRegionDetector::HSVRange range;
+    range.lower = cv::Scalar(request.hsvRanges[i].lower.v0, request.hsvRanges[i].lower.v1,
+                             request.hsvRanges[i].lower.v2, request.hsvRanges[i].lower.v3);
+    range.upper = cv::Scalar(request.hsvRanges[i].upper.v0, request.hsvRanges[i].upper.v1,
+                             request.hsvRanges[i].upper.v2, request.hsvRanges[i].upper.v3);
+    localHsvRanges.push_back(range);
   }
 
+  cv::Rect localRoi(request.roi.x, request.roi.y, request.roi.width, request.roi.height);
+
+  detector.setHsvRanges(localHsvRanges);
+  detector.setRoi(localRoi);
   BoundingBoxDetectionResult localResult;
 
   if(request.requireLargestColorIndex) {
-    detector->detect(frame, localResult, response.largestColorIndex);
+    detector.detect(frame, localResult, response.largestColorIndex);
   } else {
-    detector->detect(frame, localResult);
+    detector.detect(frame, localResult);
   }
 
   response.result.wasDetected = localResult.wasDetected;
@@ -69,8 +57,11 @@ void ColorRegionDetectionActionHandler::execute(
     response.result.bottomLeft.y = localResult.bottomLeft.y;
     response.result.bottomRight.x = localResult.bottomRight.x;
     response.result.bottomRight.y = localResult.bottomRight.y;
+
     Logger::info("Color region detected successfully");
+
   } else {
+    std::cout << "Color region not detected." << std::endl;
     Logger::error("Color region not detected");
   }
 }

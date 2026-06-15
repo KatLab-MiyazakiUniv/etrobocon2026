@@ -65,38 +65,39 @@ namespace etrobocon2026_test {
     std::remove(dummyPath);
   }
 
-  // ColorRegionDetector の再生成がスキップされるか検証
-  TEST(ColorRegionDetectionActionHandlerTest, ExecuteSkipsDetectorRecreation)
-  {
-    cv::Mat dummyFrame(480, 640, CV_8UC3, cv::Scalar(255, 255, 255));
-    cv::rectangle(dummyFrame, cv::Rect(200, 200, 100, 100), cv::Scalar(0, 0, 0), cv::FILLED);
-    const char* dummyPath = "dummy_frame_skip.png";
-    cv::imwrite(dummyPath, dummyFrame);
-    CameraCapture camera;
-    camera.cap.open(dummyPath);
-    ASSERT_TRUE(camera.cap.isOpened());
-    ColorRegionDetectionActionHandler handler(camera);
-    CameraServer::ColorRegionDetectorRequest request;
-    request.hsvRangeCount = 1;
-    request.hsvRanges[0] = ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::BLACK);
-    request.roi = { 50, 50, 540, 380 };
-    request.requireLargestColorIndex = false;
+  // // ColorRegionDetector の再生成がスキップされるか検証
+  // TEST(ColorRegionDetectionActionHandlerTest, ExecuteSkipsDetectorRecreation)
+  // {
+  //   cv::Mat dummyFrame(480, 640, CV_8UC3, cv::Scalar(255, 255, 255));
+  //   cv::rectangle(dummyFrame, cv::Rect(200, 200, 100, 100), cv::Scalar(0, 0, 0), cv::FILLED);
+  //   const char* dummyPath = "dummy_frame_skip.png";
+  //   cv::imwrite(dummyPath, dummyFrame);
+  //   CameraCapture camera;
+  //   camera.cap.open(dummyPath);
+  //   ASSERT_TRUE(camera.cap.isOpened());
+  //   ColorRegionDetectionActionHandler handler(camera);
+  //   CameraServer::ColorRegionDetectorRequest request;
+  //   request.hsvRangeCount = 1;
+  //   request.hsvRanges[0] =
+  //   ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::BLACK); request.roi = { 50,
+  //   50, 540, 380 }; request.requireLargestColorIndex = false;
 
-    CameraServer::ColorRegionDetectorResponse response;
-    response.result.wasDetected = false;
-    handler.execute(request, response);
-    ASSERT_TRUE(response.result.wasDetected);
-    // 生成された detector のポインタアドレスを取得
-    ColorRegionDetector* firstDetectorPtr = handler.detector.get();
-    ASSERT_NE(firstDetectorPtr, nullptr);
-    camera.cap.open(dummyPath);
-    handler.execute(request, response);
-    ASSERT_TRUE(response.result.wasDetected);
+  //   CameraServer::ColorRegionDetectorResponse response;
+  //   response.result.wasDetected = false;
+  //   handler.execute(request, response);
+  //   ASSERT_TRUE(response.result.wasDetected);
+  //   // 生成された detector のポインタアドレスを取得
+  //   ColorRegionDetector* firstDetectorPtr = handler.detector.get();
+  //   ASSERT_NE(firstDetectorPtr, nullptr);
+  //   camera.cap.open(dummyPath);
+  //   handler.execute(request, response);
+  //   ASSERT_TRUE(response.result.wasDetected);
 
-    // 2回目の実行後のポインタアドレスを取得し、1回目と同じ（インスタンスが再利用された）ことを検証
-    ColorRegionDetector* secondDetectorPtr = handler.detector.get();
-    EXPECT_EQ(firstDetectorPtr, secondDetectorPtr);
-    std::remove(dummyPath);
-  }
+  //   //
+  //   2回目の実行後のポインタアドレスを取得し、1回目と同じ（インスタンスが再利用された）ことを検証
+  //   ColorRegionDetector* secondDetectorPtr = handler.detector.get();
+  //   EXPECT_EQ(firstDetectorPtr, secondDetectorPtr);
+  //   std::remove(dummyPath);
+  // }
 
 }  // namespace etrobocon2026_test

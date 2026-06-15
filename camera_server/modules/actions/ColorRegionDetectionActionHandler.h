@@ -7,10 +7,10 @@
 #ifndef COLOR_REGION_DETECTION_ACTION_HANDLER_H
 #define COLOR_REGION_DETECTION_ACTION_HANDLER_H
 
+#include "SystemInfo.h"
 #include "CameraCapture.h"
 #include "SocketProtocol.h"
 #include "ColorRegionDetector.h"
-#include <memory>
 
 class ColorRegionDetectionActionHandler {
  public:
@@ -29,10 +29,8 @@ class ColorRegionDetectionActionHandler {
                CameraServer::ColorRegionDetectorResponse& response);
 
  private:
-  CameraCapture& camera;                                   // カメラキャプチャーインスタンス
-  std::unique_ptr<ColorRegionDetector> detector;           // 使い回すインスタンスを保持
-  bool hasCachedRequest = false;                           // 1つ前のRequestを保存しているかどうか
-  CameraServer::ColorRegionDetectorRequest cachedRequest;  // 1つ前のRequestをキャッシュ
+  CameraCapture& camera;
+  ColorRegionDetector detector;
 };
 
 #endif  // COLOR_REGION_DETECTION_ACTION_HANDLER_H

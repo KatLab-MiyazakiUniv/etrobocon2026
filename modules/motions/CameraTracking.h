@@ -25,11 +25,13 @@ class CameraTracking : public BaseMotion {
    * @param _rightPid 右タイヤ速度制御用PIDゲイン
    * @param _leftPid 左タイヤ速度制御用PIDゲイン
    * @param _detectionRequest 検出リクエスト
+   * @param _isStopMotorPower モーターを停止するかどうか
    */
   CameraTracking(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                  double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
                  const Pid::PidGain& _rightPid, const Pid::PidGain& _leftPid,
-                 const CameraServer::ColorRegionDetectorRequest& _detectionRequest);
+                 const CameraServer::ColorRegionDetectorRequest& _detectionRequest,
+                 bool _isStopMotorPower = true);
 
   /**
    * デストラクタ
@@ -43,19 +45,14 @@ class CameraTracking : public BaseMotion {
   bool canStart() override;
 
   /**
-   * @brief 動作を開始する前に必要な準備を行う
-   */
-  void prepare() override;
-
-  /**
    * @brief 1周期分の動作を実行する
    */
   void executeStep() override;
 
   /**
-   * @brief 1周期分の待機を行う (デフォルトは10ミリ秒待機)
+   * @brief 1周期分の待機を行う
    */
-  virtual void wait();
+  void wait();
 
   /**
    * @brief 動作終了後の処理を行う
@@ -67,6 +64,7 @@ class CameraTracking : public BaseMotion {
   int targetXCoordinate;                                      // 目標X座標
   Pid::PidGain pidGain;                                       // カメラ用のPIDゲイン構造体
   CameraServer::ColorRegionDetectorRequest detectionRequest;  // 検出リクエスト
+  bool isStopMotorPower;                                      // モーターを停止するかどうか
   SpeedCalculator speedCalculator;                            // 目標速度に対するモータパワー計算
   Pid cameraPid;                                              // カメラ画像x座標に対するPID制御
 };

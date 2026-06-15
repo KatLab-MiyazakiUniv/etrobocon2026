@@ -10,6 +10,10 @@
 #include <stdint.h>
 #include "Port.h"
 
+// ダミーのカラーID定数定義
+#define REFLECTION_BLACK 20  // ダミーの黒の反射率
+#define REFLECTION_WHITE 90  // ダミーの白の反射率
+
 namespace spikeapi {
   /**
    * SPIKE カラーセンサクラス

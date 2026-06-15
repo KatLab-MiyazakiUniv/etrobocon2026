@@ -1,3 +1,4 @@
+
 /**
  * @file   Robot.cpp
  * @brief  走行システム全体で再利用する外部リソースを管理するクラス
@@ -67,4 +68,3 @@ spikeapi::Display& Robot::getDisplayInstance()
 {
   return display;
 }
-

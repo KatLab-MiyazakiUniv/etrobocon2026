@@ -7,12 +7,14 @@
 #include "SocketServer.h"
 
 SocketServer::SocketServer(ColorRegionDetectionActionHandler& _colorRegionDetectionHandler,
-                           INetworkSystem& _netSys, int _port)
+                           SnapshotActionHandler& _snapshotHandler, INetworkSystem& _netSys,
+                           int _port)
   : netSys(_netSys),
     listenSocket(-1),
     isRunning(false),
     port(_port),
-    colorRegionDetectionHandler(_colorRegionDetectionHandler)
+    colorRegionDetectionHandler(_colorRegionDetectionHandler),
+    snapshotHandler(_snapshotHandler)
 {
   LOG_CREATE("SocketServer");
   Logger::printfLog(Logger::INFO, "ポート番号は%d", _port);
@@ -108,6 +110,21 @@ void SocketServer::handleConnection(int clientSocket)
                         0);
             break;
           }
+
+          case CameraServer::Command::TAKE_SNAPSHOT:
+            if(static_cast<size_t>(iResult) == sizeof(CameraServer::SnapshotActionRequest)) {
+              auto* request = reinterpret_cast<CameraServer::SnapshotActionRequest*>(recvbuf);
+              std::cout << "Executing TAKE_SNAPSHOT for file " << request->fileName << std::endl;
+
+              CameraServer::SnapshotActionResponse response;
+              snapshotHandler.execute(*request, response);
+
+              send(clientSocket, reinterpret_cast<const char*>(&response), sizeof(response), 0);
+            } else {
+              std::cerr << "Invalid request size for TAKE_SNAPSHOT." << std::endl;
+            }
+            break;
+
           case CameraServer::Command::SHUTDOWN:
             shutdown();
             return;

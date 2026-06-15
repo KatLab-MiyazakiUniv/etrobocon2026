@@ -9,6 +9,7 @@
 #define CALIBRATOR_H
 
 #include "Robot.h"
+#include "ClockUtil.h"
 // #include "Snapshot.h"
 
 #define PRESS_POWER 0.5f

@@ -10,7 +10,7 @@
 
 #include "Robot.h"
 #include "ClockUtil.h"
-// #include "Snapshot.h"
+#include "Snapshot.h"
 
 #define PRESS_POWER 0.5f
 
@@ -34,7 +34,7 @@ class Calibrator {
   /**
    * @brief カメラ角度調整用のフレーム取得をする
    */
-  // void getAngleCheckFrame();
+  void getAngleCheckFrame();
 
   /**
    * @brief スタート合図が出るまで待機状態にする

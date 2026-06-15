@@ -35,7 +35,7 @@ void EtRobocon2026::start()
   calibrator.measureAndSetTargetBrightness();
   bool isLeftCourse = calibrator.getIsLeftCourse();
   int targetBrightness = calibrator.getTargetBrightness();
-  // calibrator.getAngleCheckFrame();
+  calibrator.getAngleCheckFrame();
   calibrator.waitForStart();
 
 

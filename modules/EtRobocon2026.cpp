@@ -11,12 +11,9 @@ void EtRobocon2026::start()
 {
   Logger::info("Hello KATLAB");
 
-
-
-
-
   RealNetworkSystem real;
   SocketClient socketClient(real);  // SocketClientインスタンスを生成
+  socketClient.connectToServer();
   Robot robot(socketClient);  // RobotインスタンスにSocketClientを渡す
 
   std::cout << "Hello KATLAB" << std::endl;
@@ -37,15 +34,4 @@ void EtRobocon2026::start()
   int targetBrightness = calibrator.getTargetBrightness();
   calibrator.getAngleCheckFrame();
   calibrator.waitForStart();
-
-
-
-
-
-
-
-
-
-
-
 }

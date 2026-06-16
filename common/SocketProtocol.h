@@ -89,10 +89,7 @@ namespace CameraServer {
    */
   struct ColorRegionDetectorRequest {
     Command command = Command::COLOR_REGION_DETECTION;  // 色領域検出コマンド
-    bool requireLargestColorIndex = false;  // 最も大きい色領域のインデックスを返すかどうか
-    // どっちを選んでもdoubleを含む構造体のパディング(8の倍数)で344になってしまう>現状でも5バイトパディングされて344になる,,
-    // >5バイト文の無駄がある
-    //  uint32_t hsvRangeCount = 0;             // hsvRangesの有効な要素数
+    bool requireLargestColorIndex = false;   // 最も大きい色領域のインデックスを返すかどうか
     uint8_t hsvRangeCount = 0;               // hsvRangesの有効な要素数
     HSVRangeData hsvRanges[MAX_HSV_RANGES];  // HSVの範囲の配列
     RectData roi;                            // 検出対象の領域
@@ -124,7 +121,7 @@ namespace CameraServer {
 
   // 復号キー取得要求のレスポンスデータ構造
   struct DecryptionKeyResponse {
-    char key[5];  // 4文字のテキスト + NULL終端文字
+    char key[5];
   };
 
 }  // namespace CameraServer

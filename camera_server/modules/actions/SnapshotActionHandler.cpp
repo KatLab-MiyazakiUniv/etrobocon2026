@@ -1,7 +1,7 @@
 /**
  * @file SnapshotActionHandler.cpp
  * @brief スナップショット撮影をするクラス
- * @author takuchi17
+ * @author sadomiya-sousi
  */
 
 #include "SnapshotActionHandler.h"
@@ -21,10 +21,7 @@ void SnapshotActionHandler::execute(const CameraServer::SnapshotActionRequest& r
     response.success = false;
     return;
   }
-
-  // The request.fileName is a char array, so it's already a C-style string.
   FrameSave::save(frame, filePath, request.fileName);
-
   std::cout << "Snapshot saved successfully." << std::endl;
   response.success = true;
 }

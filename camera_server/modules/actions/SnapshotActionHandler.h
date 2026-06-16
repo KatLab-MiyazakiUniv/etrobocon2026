@@ -1,7 +1,7 @@
 /**
  * @file SnapshotActionHandler.h
  * @brief スナップショット撮影をするクラス
- * @author takuchi17
+ * @author sadomiya-sousi
  */
 
 #ifndef SNAPSHOT_ACTION_HANDLER_H

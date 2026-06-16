@@ -10,7 +10,7 @@
 #include <string>
 #include "SocketProtocol.h"
 #include "RealNetworkSystem.h"
-#include "actions/ColorRegionDetectionActionHandler.h"
+#include "ColorRegionDetectionActionHandler.h"
 #include "SnapshotActionHandler.h"
 #include "Logger.h"
 #include "CameraCapture.h"
@@ -98,7 +98,6 @@ class SocketServer {
    */
   void handleConnection(int clientSocket);
 
-  //  public:
  private:
   INetworkSystem& netSys;                                          // 注入される具象クラスのポインタ
   int listenSocket;                                                // Severのファイルディスクリプタ

@@ -1,4 +1,3 @@
-
 /**
  * @file   Robot.h
  * @brief  走行システム全体で再利用する外部リソースを管理するクラス
@@ -14,7 +13,6 @@
 #include "ColorSensorController.h"
 #include "Course.h"
 #include "SocketClient.h"
-
 #include "Button.h"
 #include "ForceSensor.h"
 #include "Display.h"

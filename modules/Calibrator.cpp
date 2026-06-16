@@ -13,8 +13,7 @@
 
 using namespace std;
 
-Calibrator::Calibrator(Robot& _robot)
-  : robot(_robot), isLeftCourse(true), targetBrightness(50)
+Calibrator::Calibrator(Robot& _robot) : robot(_robot), isLeftCourse(true), targetBrightness(50)
 {
   std::memset(decryptionKey, 0, sizeof(decryptionKey));
 }
@@ -172,53 +171,23 @@ void Calibrator::getAngleCheckFrame()
 void Calibrator::waitForStart()
 {
   Logger::info("待機中");
-  // ForceSensorが押されるまで待機
   while(!robot.getForceSensorInstance().isPressed(PRESS_POWER)) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));  // 10ミリ秒スリープ
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
 }
-
-// void Calibrator::inputAndSetFourDigitNumber()
-// {
-//   robot.getDisplayInstance().showChar('P');
-//   std::cout << "decryption key (0000-9999): " << endl;
-//   int inputVal;
-//   while(1) {
-//     if(std::cin >> inputVal) {
-//       if(inputVal >= 0 && inputVal <= 9999) {
-//         fourDigitNumber = inputVal;
-//         break;
-//       }
-//     } else {
-//       if(std::cin.eof()) {
-//         fourDigitNumber = 0;  // デフォルト値
-//         break;
-//       }
-//       std::cin.clear();
-//       std::cin.ignore(numeric_limits<streamsize>::max(), '\n');
-//     }
-//     cout << "Invalid input. Please enter a 4-digit number (0000-9999): " << endl;
-//   }
-//   cout << "Input 4-digit number: " << fourDigitNumber << endl;
-// }
 
 void Calibrator::inputAndSetDecryptionKey()
 {
   CameraServer::DecryptionKeyRequest request;
   CameraServer::DecryptionKeyResponse response;
-
-  Logger::info("Requesting decryption key from PC server...");
   if(robot.getCameraSocketClientInstance().executeGetDecryptionKey(request, response)) {
     std::strncpy(decryptionKey, response.key, 4);
     decryptionKey[4] = '\0';
-    Logger::printfLog(Logger::INFO, "Received Decryption Key: %s", decryptionKey);
-
-    // 取得したキーを画面にスクロール表示する
+    Logger::printfLog(Logger::INFO, "受け取った復号キー: %s", decryptionKey);
     robot.getDisplayInstance().scrollText(decryptionKey, 100);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    robot.getDisplayInstance().showChar(' ');  // ディスプレイを消灯
   } else {
-    Logger::error("Failed to receive decryption key from server. Using default 'AAAA'");
+    Logger::error("復号キーの取得に失敗");
     std::strcpy(decryptionKey, "AAAA");
   }
 }

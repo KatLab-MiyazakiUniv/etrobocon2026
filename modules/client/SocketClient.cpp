@@ -97,6 +97,12 @@ bool SocketClient::executeSnapshotAction(const CameraServer::SnapshotActionReque
   return executeAction(request, response);
 }
 
+bool SocketClient::executeGetDecryptionKey(const CameraServer::DecryptionKeyRequest& request,
+                                           CameraServer::DecryptionKeyResponse& response)
+{
+  return executeAction(request, response);
+}
+
 template <typename Req, typename Res>
 bool SocketClient::executeAction(const Req& request, Res& response)
 {

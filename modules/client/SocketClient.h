@@ -67,6 +67,16 @@ class SocketClient {
                                      CameraServer::SnapshotActionResponse& response);
 
   /**
+   * @brief 復号キーを取得するアクションを実行する
+   * @param request リクエスト
+   * @param response レスポンス
+   * @return true アクションの実行に成功した場合
+   * @return false アクションの実行に失敗した場合
+   */
+  virtual bool executeGetDecryptionKey(const CameraServer::DecryptionKeyRequest& request,
+                                       CameraServer::DecryptionKeyResponse& response);
+
+  /**
    * @brief サーバーにリクエストを送信し、レスポンスを受信するtemplate関数
    * @tparam Req リクエストの型
    * @tparam Res レスポンスの型

@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 #include "SensorColorCondition.h"
 #include "ColorSensor.h"
+#include "MockNetworkSystem.h"
 #include <iostream>
 
 namespace etrobocon2026_test {
@@ -14,7 +15,10 @@ namespace etrobocon2026_test {
   // 指定色を検知していない場合は継続判定になることを確認
   TEST(SensorColorConditionTest, NotReachTargetColor)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
+
     ColorSensorController::COLOR targetColor = ColorSensorController::COLOR::RED;
 
     SensorColorCondition condition(robot, targetColor);
@@ -28,7 +32,10 @@ namespace etrobocon2026_test {
   // 指定色を2回連続で検知した場合は停止判定になることを確認
   TEST(SensorColorConditionTest, TwoTimesTargetColor)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
+
     ColorSensorController::COLOR targetColor = ColorSensorController::COLOR::RED;
 
     SensorColorCondition condition(robot, targetColor);
@@ -49,7 +56,10 @@ namespace etrobocon2026_test {
   // 指定色がNONEの場合は停止判定になることを確認
   TEST(SensorColorConditionTest, NoneTargetColor)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
+
     ColorSensorController::COLOR targetColor = ColorSensorController::COLOR::NONE;
 
     SensorColorCondition condition(robot, targetColor);

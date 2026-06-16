@@ -6,13 +6,16 @@
 
 #include <gtest/gtest.h>
 #include "RepeatCountCondition.h"
+#include "MockNetworkSystem.h"
 
 namespace etrobocon2026_test {
 
   // 目標回数に到達していない場合は継続判定になることを確認
   TEST(RepeatCountConditionTest, NotReachTargetCount)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     RepeatCountCondition condition(robot, 100);
 
@@ -24,7 +27,9 @@ namespace etrobocon2026_test {
   // 目標回数に到達した場合は停止判定になることを確認
   TEST(RepeatCountConditionTest, AfterTargetCount)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     int targetCount = 100;
     int actualCount = 0;
@@ -47,7 +52,9 @@ namespace etrobocon2026_test {
    */
   TEST(RepeatCountConditionTest, ZeroTargetCount)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     RepeatCountCondition condition(robot, 0);
 
@@ -61,7 +68,9 @@ namespace etrobocon2026_test {
    */
   TEST(RepeatCountConditionTest, NegativeTargetCount)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     RepeatCountCondition condition(robot, -1);
 

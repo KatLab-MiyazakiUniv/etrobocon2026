@@ -6,13 +6,16 @@
 
 #include <gtest/gtest.h>
 #include "RunningTimeCondition.h"
+#include "MockNetworkSystem.h"
 
 namespace etrobocon2026_test {
 
   // 指定時間に達していない場合、shouldContinue() が true を返すかテスト
   TEST(RunningTimeConditionTest, ShouldContinueTrue)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     // 走行開始時間をセット
     robot.setRunningStartTime(ClockUtil::now());
@@ -27,7 +30,9 @@ namespace etrobocon2026_test {
   // 指定時間に達した場合、shouldContinue() が false を返すかテスト
   TEST(RunningTimeConditionTest, ShouldContinueFalse)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     // 走行開始時間をセット
     robot.setRunningStartTime(ClockUtil::now());
@@ -48,7 +53,9 @@ namespace etrobocon2026_test {
   // 指定時間が既に経過していた場合、shouldContinue() がすぐに false を返すかテスト
   TEST(RunningTimeConditionTest, AlreadyTargetTime)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     // 走行開始時間をセット
     robot.setRunningStartTime(ClockUtil::now());
@@ -65,7 +72,9 @@ namespace etrobocon2026_test {
   // 指定時間が 0 の場合、shouldContinue() がすぐに false を返すかテスト
   TEST(RunningTimeConditionTest, ZeroTargetTime)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     // 走行開始時間をセット
     robot.setRunningStartTime(ClockUtil::now());
@@ -80,7 +89,9 @@ namespace etrobocon2026_test {
   // 指定時間が負の場合、shouldContinue() がすぐに false を返すかテスト
   TEST(RunningTimeConditionTest, MinusTargetTime)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     // 走行開始時間をセット
     robot.setRunningStartTime(ClockUtil::now());

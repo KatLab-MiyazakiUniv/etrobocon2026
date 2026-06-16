@@ -9,7 +9,6 @@
 #include <thread>
 #include <chrono>
 #include <iostream>
-#include <limits>
 
 using namespace std;
 
@@ -203,57 +202,60 @@ void Calibrator::waitForStart()
 
 void Calibrator::inputAndSetFourDigitNumber()
 {
-  Logger::info("start inputAndSetFourDigitNumber");
+  int digit[4] = { 0, 0, 0, 0 };
 
-  robot.getDisplayInstance().showChar('P');
-  Logger::info("display 'P'");
+  for(int i = 0; i < 4; ++i) {
+    // ディスプレイに現在の桁のインデックス（1〜4）を表示する
+    robot.getDisplayInstance().showChar('1' + i);
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));  // 0.5秒表示
 
-  std::cout << "decryption key (0000-9999): " << endl;
-  Logger::info("prompt displayed");
+    while(1) {
+      // 現在の入力値を表示する
+      robot.getDisplayInstance().showNumber(digit[i]);
 
-  int inputVal;
-
-  while(1) {
-    Logger::info("loop begin");
-
-    if(std::cin >> inputVal) {
-      Logger::info("cin >> inputVal succeeded");
-
-      if(inputVal >= 0 && inputVal <= 9999) {
-        Logger::info("input in valid range");
-        fourDigitNumber = inputVal;
-        break;
-      } else {
-        Logger::info("input out of range");
+      // 左ボタンが押されたとき、値をデクリメントする
+      if(robot.getButtonInstance().isLeftPressed()) {
+        digit[i] = (digit[i] + 9) % 10;
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));  // チャタリング防止のスリープ
+        // ボタンが離されるまで待機
+        while(robot.getButtonInstance().isLeftPressed()) {
+          std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
       }
 
-    } else {
-      Logger::info("cin >> inputVal failed");
-
-      if(std::cin.eof()) {
-        Logger::info("EOF detected");
-        fourDigitNumber = 0;  // デフォルト値
-        break;
+      // 中央ボタンが押されたとき、値をインクリメントする
+      if(robot.getButtonInstance().isCenterPressed()) {
+        digit[i] = (digit[i] + 1) % 10;
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));  // チャタリング防止のスリープ
+        // ボタンが離されるまで待機
+        while(robot.getButtonInstance().isCenterPressed()) {
+          std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
       }
 
-      Logger::info("input error (not EOF), clearing state");
-
-      std::cin.clear();
-      Logger::info("cin.clear() called");
-
-      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-      Logger::info("cin.ignore() called (buffer flushed)");
+      // 右ボタンが押されたとき、その桁を確定して次の桁へ
+      if(robot.getButtonInstance().isRightPressed()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));  // チャタリング防止のスリープ
+        while(robot.getButtonInstance().isRightPressed()) {
+          std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+        break;
+      }
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
-
-    cout << "Invalid input. Please enter a 4-digit number (0000-9999): " << endl;
-    Logger::info("invalid message displayed");
   }
 
-  Logger::info("loop end");
+  // 4桁の数値を計算
+  fourDigitNumber = digit[0] * 1000 + digit[1] * 100 + digit[2] * 10 + digit[3];
+
+  // 確定した数値を文字列にしてスクロール表示
+  char displayStr[16];
+  sprintf(displayStr, "%04d", fourDigitNumber);
+  robot.getDisplayInstance().scrollText(displayStr, 100);
 
   cout << "Input 4-digit number: " << fourDigitNumber << endl;
-
-  Logger::info("final value set");
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  robot.getDisplayInstance().showChar(' ');  // ディスプレイを消灯
 }
 
 bool Calibrator::getIsLeftCourse()

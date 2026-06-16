@@ -7,8 +7,8 @@
 #include <gtest/gtest.h>
 #include "Rotation.h"
 #include "RelativeRotation.h"
-#include "AngleContinuationCondition.h"
-#include "RelativeAngleContinuationCondition.h"
+#include "AngleCondition.h"
+#include "RelativeAngleCondition.h"
 #include "MockNetworkSystem.h"
 
 namespace etrobocon2026_test {
@@ -30,7 +30,7 @@ namespace etrobocon2026_test {
 
     // 回頭動作を実行
     RelativeRotation relativeRotation(
-        robot, std::make_unique<RelativeAngleContinuationCondition>(robot, relativeAngle), anglePid,
+        robot, std::make_unique<RelativeAngleCondition>(robot, relativeAngle), anglePid,
         relativeAngle);
     relativeRotation.run();
 
@@ -54,7 +54,7 @@ namespace etrobocon2026_test {
 
     // 回頭動作を実行
     RelativeRotation relativeRotation(
-        robot, std::make_unique<RelativeAngleContinuationCondition>(robot, relativeAngle), anglePid,
+        robot, std::make_unique<RelativeAngleCondition>(robot, relativeAngle), anglePid,
         relativeAngle);
     relativeRotation.run();
 
@@ -74,7 +74,7 @@ namespace etrobocon2026_test {
 
     // 回頭動作を実行
     RelativeRotation relativeRotation(
-        robot, std::make_unique<RelativeAngleContinuationCondition>(robot, relativeAngle), anglePid,
+        robot, std::make_unique<RelativeAngleCondition>(robot, relativeAngle), anglePid,
         relativeAngle);
     relativeRotation.run();
 

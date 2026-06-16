@@ -34,14 +34,15 @@ ColorSensorController& Robot::getColorSensorControllerInstance()
 {
   return colorSensorController;
 }
-Course& Robot::getCourse()
-{
-  return course;
-}
 
 SocketClient& Robot::getCameraSocketClientInstance()
 {
   return cameraSocketClient;
+}
+
+Course& Robot::getCourse()
+{
+  return course;
 }
 
 void Robot::setCourse(Course course)

@@ -6,12 +6,15 @@
 
 #include <gtest/gtest.h>
 #include "AbsoluteAngleCondition.h"
+#include "MockNetworkSystem.h"
 
 namespace etrobocon2026_test {
   // prepare()実行後に、targetAngleが正しくセット出来ているか確認
   TEST(AbsoluteAngleConditionTest, AfterPrepare)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     double targetAngle = 100.0;
     AbsoluteAngleCondition condition(robot, targetAngle);
@@ -26,7 +29,9 @@ namespace etrobocon2026_test {
   // 目標角度に到達していない場合は継続判定になることを確認
   TEST(AbsoluteAngleConditionConditionTest, NotReachTargetAngle)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     AbsoluteAngleCondition condition(robot, 100.0);
 
@@ -38,7 +43,9 @@ namespace etrobocon2026_test {
   // 角度が目標角度に到達した場合は停止判定になることを確認
   TEST(AbsoluteAngleConditionConditionTest, AfterTargetAngle)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     int i = 0;
     double targetAngle = 20;

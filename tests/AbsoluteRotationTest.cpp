@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 #include "AbsoluteRotation.h"
 #include "AbsoluteAngleCondition.h"
+#include "MockNetworkSystem.h"
 
 namespace etrobocon2026_test {
   class AbsoluteRotationTest : public ::testing::Test {
@@ -18,7 +19,9 @@ namespace etrobocon2026_test {
   // run()で回転後、角度が目標角度だけ増加するかテスト（誤差あり）
   TEST_F(AbsoluteRotationTest, RunAngle)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
     double AbsoluteAngle = 60.0;  //  回頭したい相対角度
 
     double initialAngle = robot.getIMUControllerInstance().getAzimuth();  // 回頭前の角度を計算
@@ -42,7 +45,9 @@ namespace etrobocon2026_test {
   // run()で回転後、右タイヤのpowor値が0かのテスト
   TEST_F(AbsoluteRotationTest, RunRightPower)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
     double AbsoluteAngle = 45.0;  //  回頭したい相対角度
 
     // 回転動作を実行
@@ -60,7 +65,9 @@ namespace etrobocon2026_test {
   // run()で回転後、左タイヤのpowor値が0かのテスト
   TEST_F(AbsoluteRotationTest, RunLeftPower)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
     double AbsoluteAngle = 45.0;  //  回頭したい相対角度
 
     // 回転動作を実行

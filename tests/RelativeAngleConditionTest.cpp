@@ -7,12 +7,15 @@
 #include <gtest/gtest.h>
 #include "RelativeAngleCondition.h"
 #include "AngleNormalizer.h"
+#include "MockNetworkSystem.h"
 
 namespace etrobocon2026_test {
   // prepare()実行後に、targetAngleが正しくセット出来ているか確認
   TEST(RelativeAngleConditionTest, AfterPrepare)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     double targetAngle = 100.0;
     RelativeAngleCondition condition(robot, targetAngle);
@@ -27,7 +30,9 @@ namespace etrobocon2026_test {
   // 目標角度に到達していない場合は継続判定になることを確認
   TEST(RelativeAngleConditionConditionTest, NotReachTargetAngle)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     RelativeAngleCondition condition(robot, 100.0);
 
@@ -39,7 +44,9 @@ namespace etrobocon2026_test {
   // 角度が目標角度に到達した場合は停止判定になることを確認
   TEST(RelativeAngleConditionConditionTest, AfterTargetAngle)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     double targetAngle = 20;
     // initialAngleとconditionで2回getAzimuthを実行するため初期値は2
@@ -65,7 +72,9 @@ namespace etrobocon2026_test {
    */
   TEST(RelativeAngleConditionConditionTest, ZeroTargetAbgle)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     RelativeAngleCondition condition(robot, 0.0);
 

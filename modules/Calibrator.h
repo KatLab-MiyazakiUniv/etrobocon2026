@@ -42,6 +42,11 @@ class Calibrator {
   void waitForStart();
 
   /**
+   * @brief 4桁の数字入力を受け付けて，メンバ変数に保存する
+   */
+  void inputAndSetFourDigitNumber();
+
+  /**
    * @brief isLeftCourseのゲッター
    * @return true:Lコース, false:Rコース
    */
@@ -53,10 +58,17 @@ class Calibrator {
    */
   int getTargetBrightness();
 
+  /**
+   * @brief fourDigitNumberのゲッター
+   * @return 4桁の数字
+   */
+  int getFourDigitNumber();
+
  private:
   Robot& robot;          // Robotインスタンスの参照
   bool isLeftCourse;     // true:Lコース, false: Rコース
   int targetBrightness;  // 目標輝度
+  int fourDigitNumber;   // 4桁の入力数字
 };
 
 #endif

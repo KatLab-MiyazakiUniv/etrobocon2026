@@ -17,21 +17,18 @@ void EtRobocon2026::start()
   socketClient.connectToServer();
   Robot robot(socketClient);  // RobotインスタンスにSocketClientを渡す
 
-  // robot.getIMUControllerInstance().initializeOffset();
-  // robot.getIMUControllerInstance().calculateCorrectionMatrix();
+  std::cout << "Hello KATLAB" << std::endl;
 
-  // if(robot.getSocketClient().connectToServer()) {
-  //   std::cout << "Connected to server." << std::endl;
-  // } else {
-  //   std::cout << "Failed to connect to server." << std::endl;
-  //   return;
-  // };
+  Calibrator calibrator(robot);
 
-  // Calibrator calibrator(robot);
-  // calibrator.selectAndSetCourse();
-  // calibrator.measureAndSetTargetBrightness();
-  // bool isLeftCourse = calibrator.getIsLeftCourse();
-  // int targetBrightness = calibrator.getTargetBrightness();
-  // // calibrator.getAngleCheckFrame();
-  // calibrator.waitForStart();
+  // 復号キーを取得
+  calibrator.inputAndSetDecryptionKey();
+  const char* decryptionKey = calibrator.getDecryptionKey();
+  Logger::printfLog(Logger::INFO, "Retrieved Decryption Key: %s\n", decryptionKey);
+
+  // キャリブレーション等の一連の処理を実行
+  calibrator.selectAndSetCourse();
+  calibrator.measureAndSetTargetBrightness();
+  calibrator.getAngleCheckFrame();
+  calibrator.waitForStart();
 }

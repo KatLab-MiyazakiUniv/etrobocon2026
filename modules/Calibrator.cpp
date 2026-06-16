@@ -9,12 +9,14 @@
 #include <thread>
 #include <chrono>
 #include <iostream>
+#include <cstring>
 
 using namespace std;
 
 Calibrator::Calibrator(Robot& _robot)
-  : robot(_robot), isLeftCourse(true), targetBrightness(50), fourDigitNumber(0)
+  : robot(_robot), isLeftCourse(true), targetBrightness(50)
 {
+  std::memset(decryptionKey, 0, sizeof(decryptionKey));
 }
 
 void Calibrator::selectAndSetCourse()
@@ -200,62 +202,25 @@ void Calibrator::waitForStart()
 //   cout << "Input 4-digit number: " << fourDigitNumber << endl;
 // }
 
-void Calibrator::inputAndSetFourDigitNumber()
+void Calibrator::inputAndSetDecryptionKey()
 {
-  int digit[4] = { 0, 0, 0, 0 };
+  CameraServer::DecryptionKeyRequest request;
+  CameraServer::DecryptionKeyResponse response;
 
-  for(int i = 0; i < 4; ++i) {
-    // ディスプレイに現在の桁のインデックス（1〜4）を表示する
-    robot.getDisplayInstance().showChar('1' + i);
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));  // 0.5秒表示
+  Logger::info("Requesting decryption key from PC server...");
+  if(robot.getCameraSocketClientInstance().executeGetDecryptionKey(request, response)) {
+    std::strncpy(decryptionKey, response.key, 4);
+    decryptionKey[4] = '\0';
+    Logger::printfLog(Logger::INFO, "Received Decryption Key: %s", decryptionKey);
 
-    while(1) {
-      // 現在の入力値を表示する
-      robot.getDisplayInstance().showNumber(digit[i]);
-
-      // 左ボタンが押されたとき、値をデクリメントする
-      if(robot.getButtonInstance().isLeftPressed()) {
-        digit[i] = (digit[i] + 9) % 10;
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));  // チャタリング防止のスリープ
-        // ボタンが離されるまで待機
-        while(robot.getButtonInstance().isLeftPressed()) {
-          std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        }
-      }
-
-      // 中央ボタンが押されたとき、値をインクリメントする
-      if(robot.getButtonInstance().isCenterPressed()) {
-        digit[i] = (digit[i] + 1) % 10;
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));  // チャタリング防止のスリープ
-        // ボタンが離されるまで待機
-        while(robot.getButtonInstance().isCenterPressed()) {
-          std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        }
-      }
-
-      // 右ボタンが押されたとき、その桁を確定して次の桁へ
-      if(robot.getButtonInstance().isRightPressed()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));  // チャタリング防止のスリープ
-        while(robot.getButtonInstance().isRightPressed()) {
-          std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        }
-        break;
-      }
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    }
+    // 取得したキーを画面にスクロール表示する
+    robot.getDisplayInstance().scrollText(decryptionKey, 100);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    robot.getDisplayInstance().showChar(' ');  // ディスプレイを消灯
+  } else {
+    Logger::error("Failed to receive decryption key from server. Using default 'AAAA'");
+    std::strcpy(decryptionKey, "AAAA");
   }
-
-  // 4桁の数値を計算
-  fourDigitNumber = digit[0] * 1000 + digit[1] * 100 + digit[2] * 10 + digit[3];
-
-  // 確定した数値を文字列にしてスクロール表示
-  char displayStr[16];
-  sprintf(displayStr, "%04d", fourDigitNumber);
-  robot.getDisplayInstance().scrollText(displayStr, 100);
-
-  cout << "Input 4-digit number: " << fourDigitNumber << endl;
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  robot.getDisplayInstance().showChar(' ');  // ディスプレイを消灯
 }
 
 bool Calibrator::getIsLeftCourse()
@@ -268,7 +233,7 @@ int Calibrator::getTargetBrightness()
   return targetBrightness;
 }
 
-int Calibrator::getFourDigitNumber()
+const char* Calibrator::getDecryptionKey() const
 {
-  return fourDigitNumber;
+  return decryptionKey;
 }

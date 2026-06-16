@@ -1,4 +1,3 @@
-
 /**
  * @file Calibrator.cpp
  * @brief キャリブレーションからスタートまでを担当するクラス

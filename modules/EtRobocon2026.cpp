@@ -10,8 +10,25 @@
 #include "RealNetworkSystem.h"
 void EtRobocon2026::start()
 {
-  int inputVal;
-  Logger::info("標準入力ができるか検証\n");
-  std::cin >> inputVal;
-  Logger::printfLog(Logger::INFO, "cin >> inputVal succeeded:%d\n", inputVal);
+  Logger::info("Hello KATLAB");
+
+  RealNetworkSystem real;
+  SocketClient socketClient(real);  // SocketClientインスタンスを生成
+  socketClient.connectToServer();
+  Robot robot(socketClient);  // RobotインスタンスにSocketClientを渡す
+
+  std::cout << "Hello KATLAB" << std::endl;
+
+  Calibrator calibrator(robot);
+
+  // 復号キーを取得
+  calibrator.inputAndSetDecryptionKey();
+  const char* decryptionKey = calibrator.getDecryptionKey();
+  Logger::printfLog(Logger::INFO, "Retrieved Decryption Key: %s\n", decryptionKey);
+
+  // キャリブレーション等の一連の処理を実行
+  calibrator.selectAndSetCourse();
+  calibrator.measureAndSetTargetBrightness();
+  calibrator.getAngleCheckFrame();
+  calibrator.waitForStart();
 }

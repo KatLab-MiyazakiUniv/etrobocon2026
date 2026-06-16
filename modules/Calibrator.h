@@ -42,9 +42,9 @@ class Calibrator {
   void waitForStart();
 
   /**
-   * @brief 4桁の数字入力を受け付けて，メンバ変数に保存する
+   * @brief 4文字の復号キーをPCサーバーから通信で取得して，メンバ変数に保存する
    */
-  void inputAndSetFourDigitNumber();
+  void inputAndSetDecryptionKey();
 
   /**
    * @brief isLeftCourseのゲッター
@@ -59,16 +59,16 @@ class Calibrator {
   int getTargetBrightness();
 
   /**
-   * @brief fourDigitNumberのゲッター
-   * @return 4桁の数字
+   * @brief decryptionKeyのゲッター
+   * @return 4文字の復号キー
    */
-  int getFourDigitNumber();
+  const char* getDecryptionKey() const;
 
  private:
   Robot& robot;          // Robotインスタンスの参照
   bool isLeftCourse;     // true:Lコース, false: Rコース
   int targetBrightness;  // 目標輝度
-  int fourDigitNumber;   // 4桁の入力数字
+  char decryptionKey[5]; // 4文字の復号キー (+ null終端)
 };
 
 #endif

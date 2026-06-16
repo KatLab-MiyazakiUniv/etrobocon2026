@@ -76,26 +76,15 @@ namespace etrobocon2025_test {
     EXPECT_EQ(expected, actual);  // 出力とゲッタの値が等しいかテスト
   }
 
-  // 4桁の数字入力のテスト
-  TEST(CalibratorTest, getFourDigitNumber)
+  // 復号キー取得のテスト（オフライン時はデフォルト値フォールバック）
+  TEST(CalibratorTest, getDecryptionKeyFallback)
   {
     RealNetworkSystem netSys;
     SocketClient socketClient(netSys);
     Robot robot(socketClient);
     Calibrator calibrator(robot);
-    testing::internal::CaptureStdout();  // 標準出力キャプチャ開始
-    calibrator.inputAndSetFourDigitNumber();
-    string output = testing::internal::GetCapturedStdout();  // キャプチャ終了
-
-    string targetString = "Input 4-digit number: ";  // 4桁値の直前に書かれている文字列
-
-    // 出力された値を取得
-    int index = output.find(targetString) + targetString.length();
-    string expectedStr = output.substr(index);  // 値を取得（文字列）
-    int expected = stoi(expectedStr);           // 文字列を整数値に変換
-
-    int actual = calibrator.getFourDigitNumber();  // 実際の値を取得
-
-    EXPECT_EQ(expected, actual);  // 出力とゲッタの値が等しいかテスト
+    calibrator.inputAndSetDecryptionKey();
+    string actual = calibrator.getDecryptionKey();
+    EXPECT_EQ("AAAA", actual);
   }
 }  // namespace etrobocon2025_test

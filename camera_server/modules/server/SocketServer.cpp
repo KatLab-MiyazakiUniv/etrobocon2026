@@ -5,6 +5,7 @@
  */
 
 #include "SocketServer.h"
+#include <limits>
 
 SocketServer::SocketServer(ColorRegionDetectionActionHandler& _colorRegionDetectionHandler,
                            SnapshotActionHandler& _snapshotHandler, INetworkSystem& _netSys,
@@ -122,6 +123,36 @@ void SocketServer::handleConnection(int clientSocket)
             // } else {
             // std::cerr << "Invalid request size for TAKE_SNAPSHOT." << std::endl;
             // }
+            break;
+          }
+          case CameraServer::Command::GET_DECRYPTION_KEY: {
+            Logger::info("Executing GET_DECRYPTION_KEY");
+            CameraServer::DecryptionKeyResponse response;
+            std::memset(&response, 0, sizeof(response));
+
+            std::cout << "Enter a 4-character decryption key: " << std::endl;
+            std::string inputStr;
+            while(1) {
+              if(std::cin >> inputStr) {
+                if(inputStr.length() == 4) {
+                  break;
+                }
+              } else {
+                if(std::cin.eof()) {
+                  inputStr = "AAAA";  // デフォルトキー
+                  break;
+                }
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+              }
+              std::cout << "Invalid key length. Please enter exactly 4 characters: " << std::endl;
+            }
+
+            std::strncpy(response.key, inputStr.c_str(), 4);
+            response.key[4] = '\0';
+
+            netSys.send(clientSocket, reinterpret_cast<const char*>(&response), sizeof(response),
+                        0);
             break;
           }
           case CameraServer::Command::SHUTDOWN:

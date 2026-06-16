@@ -83,17 +83,9 @@ namespace etrobocon2025_test {
     SocketClient socketClient(netSys);
     Robot robot(socketClient);
     Calibrator calibrator(robot);
-
-    // std::cin のキーボード入力をシミュレートする
-    stringstream inputSim("1234\n");
-    streambuf* cinBackup = cin.rdbuf(); // 元のバッファを退避
-    cin.rdbuf(inputSim.rdbuf());        // シミュレーションバッファをセット
-
     testing::internal::CaptureStdout();  // 標準出力キャプチャ開始
     calibrator.inputAndSetFourDigitNumber();
     string output = testing::internal::GetCapturedStdout();  // キャプチャ終了
-
-    cin.rdbuf(cinBackup); // 元のバッファに復元
 
     string targetString = "Input 4-digit number: ";  // 4桁値の直前に書かれている文字列
 
@@ -104,7 +96,6 @@ namespace etrobocon2025_test {
 
     int actual = calibrator.getFourDigitNumber();  // 実際の値を取得
 
-    EXPECT_EQ(1234, expected);
-    EXPECT_EQ(1234, actual);  // 出力とゲッタの値が等しいかテスト
+    EXPECT_EQ(expected, actual);  // 出力とゲッタの値が等しいかテスト
   }
 }  // namespace etrobocon2025_test

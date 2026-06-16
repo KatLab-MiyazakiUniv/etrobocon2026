@@ -13,7 +13,8 @@ void EtRobocon2026::start()
 
   RealNetworkSystem real;
   SocketClient socketClient(real);  // SocketClientインスタンスを生成
-  Robot robot(socketClient);        // RobotインスタンスにSocketClientを渡す
+  socketClient.connectToServer();
+  Robot robot(socketClient);  // RobotインスタンスにSocketClientを渡す
 
   std::cout << "Hello KATLAB" << std::endl;
   // robot.getIMUControllerInstance().initializeOffset();

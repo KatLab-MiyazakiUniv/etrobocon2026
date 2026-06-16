@@ -22,7 +22,7 @@ namespace etrobocon2025_test {
     calibrator.waitForStart();
     string output = testing::internal::GetCapturedStdout();  // キャプチャ終了
     // find("str")はstrが見つからない場合string::nposを返す
-    bool actual = output.find("On standby.\n") != string::npos;
+    bool actual = output.find("待機中\n") != string::npos;
     EXPECT_TRUE(actual);
   }
 

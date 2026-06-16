@@ -1,4 +1,3 @@
-
 /**
  * @file Calibrator.h
  * @brief キャリブレーションからスタートまでを担当するクラス
@@ -65,10 +64,10 @@ class Calibrator {
   const char* getDecryptionKey() const;
 
  private:
-  Robot& robot;          // Robotインスタンスの参照
-  bool isLeftCourse;     // true:Lコース, false: Rコース
-  int targetBrightness;  // 目標輝度
-  char decryptionKey[5]; // 4文字の復号キー (+ null終端)
+  Robot& robot;           // Robotインスタンスの参照
+  bool isLeftCourse;      // true:Lコース, false: Rコース
+  int targetBrightness;   // 目標輝度
+  char decryptionKey[5];  // 4文字の復号キー (+ null終端)
 };
 
 #endif

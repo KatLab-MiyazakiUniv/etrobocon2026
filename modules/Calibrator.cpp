@@ -9,10 +9,14 @@
 #include <thread>
 #include <chrono>
 #include <iostream>
+#include <limits>
 
 using namespace std;
 
-Calibrator::Calibrator(Robot& _robot) : robot(_robot), isLeftCourse(true), targetBrightness(50) {}
+Calibrator::Calibrator(Robot& _robot)
+  : robot(_robot), isLeftCourse(true), targetBrightness(50), fourDigitNumber(0)
+{
+}
 
 void Calibrator::selectAndSetCourse()
 {
@@ -170,9 +174,86 @@ void Calibrator::waitForStart()
   // ForceSensorが押されるまで待機
   while(!robot.getForceSensorInstance().isPressed(PRESS_POWER)) {
     std::this_thread::sleep_for(std::chrono::milliseconds(10));  // 10ミリ秒スリープ
-    Logger::info("待機終了走行開始時刻のカウントを始めます");
-    ClockUtil::now;  // Clockインスタンスを生成>以降はClockUtil::のように使用出来るはず
   }
+}
+
+// void Calibrator::inputAndSetFourDigitNumber()
+// {
+//   robot.getDisplayInstance().showChar('P');
+//   std::cout << "decryption key (0000-9999): " << endl;
+//   int inputVal;
+//   while(1) {
+//     if(std::cin >> inputVal) {
+//       if(inputVal >= 0 && inputVal <= 9999) {
+//         fourDigitNumber = inputVal;
+//         break;
+//       }
+//     } else {
+//       if(std::cin.eof()) {
+//         fourDigitNumber = 0;  // デフォルト値
+//         break;
+//       }
+//       std::cin.clear();
+//       std::cin.ignore(numeric_limits<streamsize>::max(), '\n');
+//     }
+//     cout << "Invalid input. Please enter a 4-digit number (0000-9999): " << endl;
+//   }
+//   cout << "Input 4-digit number: " << fourDigitNumber << endl;
+// }
+
+void Calibrator::inputAndSetFourDigitNumber()
+{
+  Logger::info("start inputAndSetFourDigitNumber");
+
+  robot.getDisplayInstance().showChar('P');
+  Logger::info("display 'P'");
+
+  std::cout << "decryption key (0000-9999): " << endl;
+  Logger::info("prompt displayed");
+
+  int inputVal;
+
+  while(1) {
+    Logger::info("loop begin");
+
+    if(std::cin >> inputVal) {
+      Logger::info("cin >> inputVal succeeded");
+
+      if(inputVal >= 0 && inputVal <= 9999) {
+        Logger::info("input in valid range");
+        fourDigitNumber = inputVal;
+        break;
+      } else {
+        Logger::info("input out of range");
+      }
+
+    } else {
+      Logger::info("cin >> inputVal failed");
+
+      if(std::cin.eof()) {
+        Logger::info("EOF detected");
+        fourDigitNumber = 0;  // デフォルト値
+        break;
+      }
+
+      Logger::info("input error (not EOF), clearing state");
+
+      std::cin.clear();
+      Logger::info("cin.clear() called");
+
+      std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+      Logger::info("cin.ignore() called (buffer flushed)");
+    }
+
+    cout << "Invalid input. Please enter a 4-digit number (0000-9999): " << endl;
+    Logger::info("invalid message displayed");
+  }
+
+  Logger::info("loop end");
+
+  cout << "Input 4-digit number: " << fourDigitNumber << endl;
+
+  Logger::info("final value set");
 }
 
 bool Calibrator::getIsLeftCourse()
@@ -183,4 +264,9 @@ bool Calibrator::getIsLeftCourse()
 int Calibrator::getTargetBrightness()
 {
   return targetBrightness;
+}
+
+int Calibrator::getFourDigitNumber()
+{
+  return fourDigitNumber;
 }

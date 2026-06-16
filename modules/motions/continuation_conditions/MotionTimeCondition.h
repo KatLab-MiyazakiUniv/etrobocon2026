@@ -4,8 +4,8 @@
  * @author migaku2645
  */
 
-#ifndef MOTION_TIME_CONTINUATION_CONDITION_H
-#define MOTION_TIME_CONTINUATION_CONDITION_H
+#ifndef MOTION_TIME_CONDITION_H
+#define MOTION_TIME_CONDITION_H
 
 #include "BaseContinuationCondition.h"
 #include "ClockUtil.h"

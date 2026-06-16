@@ -4,8 +4,8 @@
  * @author migaku2645
  */
 
-#ifndef RUNNING_TIME_CONTINUATION_CONDITION_H
-#define RUNNING_TIME_CONTINUATION_CONDITION_H
+#ifndef RUNNING_TIME_CONDITION_H
+#define RUNNING_TIME_CONDITION_H
 
 #include "BaseContinuationCondition.h"
 #include "ClockUtil.h"

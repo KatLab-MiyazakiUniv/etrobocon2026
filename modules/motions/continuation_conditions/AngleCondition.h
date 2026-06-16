@@ -3,8 +3,8 @@
  * @brief  目標角度との誤差に基づいて動作を継続するかを判定するクラス
  * @author okuyama0528 yutaro-1214
  */
-#ifndef ANGLE_CONTINUATION_CONDITION_H
-#define ANGLE_CONTINUATION_CONDITION_H
+#ifndef ANGLE_CONDITION_H
+#define ANGLE_CONDITION_H
 
 #include "BaseContinuationCondition.h"
 #include "AngleNormalizer.h"

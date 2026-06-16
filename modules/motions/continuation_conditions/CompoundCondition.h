@@ -4,8 +4,8 @@
  * @author migaku2645
  */
 
-#ifndef COMPOUND_CONTINUATION_CONDITION_H
-#define COMPOUND_CONTINUATION_CONDITION_H
+#ifndef COMPOUND_CONDITION_H
+#define COMPOUND_CONDITION_H
 
 #include "BaseContinuationCondition.h"
 #include "Logger.h"

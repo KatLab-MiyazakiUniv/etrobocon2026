@@ -3,8 +3,8 @@
  * @brief  現在角度を基準に、指定した相対角度に到達したかどうかで動作を継続すべきかを判定するクラス
  * @author okuyama0528 yutaro-1214
  */
-#ifndef RELATIVE_ANGLE_CONTINUATION_CONDITION_H
-#define RELATIVE_ANGLE_CONTINUATION_CONDITION_H
+#ifndef RELATIVE_ANGLE_CONDITION_H
+#define RELATIVE_ANGLE_CONDITION_H
 
 #include "AngleCondition.h"
 #include "Logger.h"

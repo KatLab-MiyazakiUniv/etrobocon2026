@@ -3,8 +3,8 @@
  * @brief  絶対角度による継続条件クラス
  * @author okuyama0528 yutaro-1214
  */
-#ifndef ABSOLUTE_ANGLE_CONTINUATION_CONDITION_H
-#define ABSOLUTE_ANGLE_CONTINUATION_CONDITION_H
+#ifndef ABSOLUTE_ANGLE_CONDITION_H
+#define ABSOLUTE_ANGLE_CONDITION_H
 
 #include "AngleCondition.h"
 #include "Logger.h"

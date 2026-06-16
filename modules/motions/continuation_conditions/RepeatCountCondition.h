@@ -4,8 +4,8 @@
  * @author migaku2645
  */
 
-#ifndef REPEAT_COUNT_CONTINUATION_CONDITION_H
-#define REPEAT_COUNT_CONTINUATION_CONDITION_H
+#ifndef REPEAT_COUNT_CONDITION_H
+#define REPEAT_COUNT_CONDITION_H
 
 #include "BaseContinuationCondition.h"
 #include <cmath>

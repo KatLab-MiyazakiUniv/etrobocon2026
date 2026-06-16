@@ -113,24 +113,18 @@ void SocketServer::handleConnection(int clientSocket)
           }
 
           case CameraServer::Command::TAKE_SNAPSHOT: {
-            // if(static_cast<size_t>(iResult) == sizeof(CameraServer::SnapshotActionRequest)) {
             auto* request = reinterpret_cast<CameraServer::SnapshotActionRequest*>(recvbuf);
-            std::cout << "Executing TAKE_SNAPSHOT for file " << request->fileName << std::endl;
             CameraServer::SnapshotActionResponse response;
             snapshotHandler.execute(*request, response);
             netSys.send(clientSocket, reinterpret_cast<const char*>(&response), sizeof(response),
                         0);
-            // } else {
-            // std::cerr << "Invalid request size for TAKE_SNAPSHOT." << std::endl;
-            // }
             break;
           }
           case CameraServer::Command::GET_DECRYPTION_KEY: {
-            Logger::info("Executing GET_DECRYPTION_KEY");
+            Logger::info("GET_DECRYPTION_KEYを実行");
             CameraServer::DecryptionKeyResponse response;
             std::memset(&response, 0, sizeof(response));
-
-            std::cout << "Enter a 4-character decryption key: " << std::endl;
+            Logger::info("4つの文字列の復号キーを半角で入力");
             std::string inputStr;
             while(1) {
               if(std::cin >> inputStr) {
@@ -139,18 +133,17 @@ void SocketServer::handleConnection(int clientSocket)
                 }
               } else {
                 if(std::cin.eof()) {
+                  Logger::error("EOF");
                   inputStr = "AAAA";  // デフォルトキー
                   break;
                 }
                 std::cin.clear();
                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
               }
-              std::cout << "Invalid key length. Please enter exactly 4 characters: " << std::endl;
+              Logger::info("4桁に達していません。再入力を");
             }
-
             std::strncpy(response.key, inputStr.c_str(), 4);
             response.key[4] = '\0';
-
             netSys.send(clientSocket, reinterpret_cast<const char*>(&response), sizeof(response),
                         0);
             break;

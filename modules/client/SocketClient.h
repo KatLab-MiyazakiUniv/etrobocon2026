@@ -89,11 +89,11 @@ class SocketClient {
   bool executeAction(const Req& request, Res& response);
 
  protected:
-  INetworkSystem& netSys;
-  int sock;              // ソケットファイルディスクリプタ
-  bool isConnected;      // サーバーへの接続状態
-  int port;              // サーバーのポート番号
-  std::string serverIp;  // サーバーのIPアドレス
+  INetworkSystem& netSys;  // 注入される具所クラスのポインタ
+  int sock;                // ソケットファイルディスクリプタ
+  bool isConnected;        // サーバーへの接続状態
+  int port;                // サーバーのポート番号
+  std::string serverIp;    // サーバーのIPアドレス
 };
 
 #endif  // SOCKET_CLIENT_H

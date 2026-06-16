@@ -14,7 +14,6 @@
 #include "UltraSonicController.h"
 #include "SocketClient.h"
 #include "Course.h"
-
 #include "Button.h"
 #include "ForceSensor.h"
 #include "Display.h"

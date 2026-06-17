@@ -7,21 +7,22 @@
 #include "SnapshotActionHandler.h"
 #include "FrameSave.h"
 #include <iostream>
+#include "Logger.h"
 
 SnapshotActionHandler::SnapshotActionHandler(CameraCapture& _camera) : camera(_camera) {}
 
 void SnapshotActionHandler::execute(const CameraServer::SnapshotActionRequest& request,
                                     CameraServer::SnapshotActionResponse& response)
 {
-  std::cout << "Executing TAKE_SNAPSHOT command for file: " << request.fileName << std::endl;
+  Logger::printfLog(Logger::INFO, "Executing TAKE_SNAPSHOT command for file: %s", request.fileName);
 
   cv::Mat frame;
   if(!camera.getFrame(frame)) {
-    std::cerr << "Failed to capture frame for snapshot." << std::endl;
+    Logger::error("Failed to capture frame for snapshot.");
     response.success = false;
     return;
   }
   FrameSave::save(frame, filePath, request.fileName);
-  std::cout << "Snapshot saved successfully." << std::endl;
+  Logger::info("Snapshot saved successfully.");
   response.success = true;
 }

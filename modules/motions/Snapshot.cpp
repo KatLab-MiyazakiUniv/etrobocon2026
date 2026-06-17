@@ -1,13 +1,14 @@
 /**
  * @file   Snapshot.cpp
  * @brief  サーバーに写真撮影を依頼するクラス
- * @author takuchi17
+ * @author sadomiya-sousi
  */
 
 #include "Snapshot.h"
 #include "SocketClient.h"
 #include <iostream>
 #include <string.h>
+#include "Logger.h"
 
 Snapshot::Snapshot(Robot& _robot, const std::string& _fileName) : robot(_robot), fileName(_fileName)
 {
@@ -15,7 +16,7 @@ Snapshot::Snapshot(Robot& _robot, const std::string& _fileName) : robot(_robot),
 
 void Snapshot::run()
 {
-  std::cout << "Requesting snapshot: " << fileName << std::endl;
+  Logger::printfLog(Logger::INFO, "Requesting snapshot: %s", fileName.c_str());
 
   SocketClient& client = robot.getCameraSocketClientInstance();
 
@@ -29,8 +30,8 @@ void Snapshot::run()
 
   bool success = client.executeSnapshotAction(request, response);
   if(success) {
-    std::cout << "Snapshot taken successfully." << std::endl;
+    Logger::info("Snapshot taken successfully.");
   } else {
-    std::cerr << "Server failed to take snapshot." << std::endl;
+    Logger::error("Server failed to take snapshot.");
   }
 }

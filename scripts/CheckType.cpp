@@ -347,8 +347,8 @@ int main(int argc, char* argv[])
   }
 
   if(argc != 3) {
-    std::cerr << "使い方: ./scripts/merge_commands.sh [<Area名> <L|R>]" << std::endl;
-    std::cerr << "    例: ./scripts/merge_commands.sh LineTrace L" << std::endl;
+    std::cerr << "使い方: ./scripts/check_type.sh [<Area名> <L|R>]" << std::endl;
+    std::cerr << "    例: ./scripts/check_type.sh LineTrace L" << std::endl;
     std::cerr << "有効なArea名: ";
     for(size_t i = 0; i < AREA_NAMES.size(); i++) {
       std::cerr << AREA_NAMES[i];

@@ -84,16 +84,8 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
       lineNum++;
       continue;
     }
-    Logger::printfLog(Logger::DEBUG, "[MotionParser] Motion: %s ID=%s をロードしました",
+    Logger::printfLog(Logger::INFO, "[MotionParser] Motion: %s ID=%s をロードしました",
                       motionName.c_str(), motionId.c_str());
-    {
-      string paramsDebug;
-      for(size_t i = 0; i < motionParams.size(); i++) {
-        if(i > 0) paramsDebug += ", ";
-        paramsDebug += "[" + to_string(i) + "]=" + motionParams[i];
-      }
-      Logger::printfLog(Logger::DEBUG, "[MotionParser] Motion params: %s", paramsDebug.c_str());
-    }
 
     // 条件パラメータを取得する
     vector<string> conditionParams
@@ -104,7 +96,8 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
       lineNum++;
       continue;
     }
-
+    Logger::printfLog(Logger::INFO, "[MotionParser] Condition: %s ID=%s をロードしました",
+                      conditionName.c_str(), conditionId.c_str());
     // 条件インスタンスを生成する
     auto condition = createConditionInstance(robot, conditionParams);
     if(!condition) {
@@ -113,15 +106,12 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
       lineNum++;
       continue;
     }
-    Logger::printfLog(
-        Logger::DEBUG, "[MotionParser] Condition: %s ID=%s を Motion: %s ID=%s に注入します",
-        conditionName.c_str(), conditionId.c_str(), motionName.c_str(), motionId.c_str());
 
     // 動作インスタンスを生成してリストに追加する
     BaseMotion* motion = createMotionInstance(robot, motionParams, std::move(condition));
     if(motion) {
       motionList.push_back(motion);
-      Logger::printfLog(Logger::DEBUG, "[MotionParser] motionList[%zu]: %s ID=%s (条件: %s ID=%s)",
+      Logger::printfLog(Logger::INFO, "[MotionParser] motionList[%zu]: %s ID=%s (条件: %s ID=%s)",
                         motionList.size() - 1, motionName.c_str(), motionId.c_str(),
                         conditionName.c_str(), conditionId.c_str());
     } else {
@@ -167,9 +157,9 @@ vector<string> MotionParser::extractParamsFromID(const string& filePath, const s
 unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
     Robot& robot, const vector<string>& params)
 {
-  CONDITION cond = convertCondition(params[0]);
+  CONDITION_COMMAND cond = convertCondition(params[0]);
   switch(cond) {
-    case CONDITION::DISTANCE: {
+    case CONDITION_COMMAND::DISTANCE: {
       double targetDistance = fromString<double>(params[2]);
       Logger::printfLog(Logger::DEBUG,
                         "[MotionParser] DistanceCondition: targetDistance=%.1f を生成しました",
@@ -186,9 +176,9 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                                                unique_ptr<BaseContinuationCondition> condition)
 {
   // TODO: 各動作クラスが完成したら、以下のコメントを外してswitch-caseを実装する
-  COMMAND command = convertCommand(motionParams[0]);
+  MOTION_COMMAND command = convertCommand(motionParams[0]);
   switch(command) {
-    // case COMMAND::STRAIGHT: {
+    // case MOTION_COMMAND::STRAIGHT: {
     //   // Straight: motionParams[2]=speed(double)
     //   //           motionParams[3..5]=rightPid(kp,ki,kd)
     //   //           motionParams[6..8]=leftPid(kp,ki,kd)
@@ -210,40 +200,42 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
     // }
     // ↓ 他のコマンドはここに追加していく
     default:
+      Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
+                        motionParams[0].c_str());
       return nullptr;
   }
 }
 
-COMMAND MotionParser::convertCommand(const string& str)
+MOTION_COMMAND MotionParser::convertCommand(const string& str)
 {
-  // コマンド文字列(string)と、それに対応する列挙型COMMANDのマッピングを定義
-  static const unordered_map<string, COMMAND> commandMap = {
-    { "EXAMPLE", COMMAND::EXAMPLE },
-    { "Straight", COMMAND::STRAIGHT },
+  // コマンド文字列(string)と、それに対応する列挙型MOTION_COMMANDのマッピングを定義
+  static const unordered_map<string, MOTION_COMMAND> commandMap = {
+    { "EXAMPLE", MOTION_COMMAND::EXAMPLE },
+    { "Straight", MOTION_COMMAND::STRAIGHT },
   };
 
-  // コマンド文字列に対応するCOMMAND値をマップから取得。なければCOMMAND::NONEを返す
+  // コマンド文字列に対応するMOTION_COMMAND値をマップから取得。なければMOTION_COMMAND::NONEを返す
   auto it = commandMap.find(str);
   if(it != commandMap.end()) {
     return it->second;
   } else {
-    return COMMAND::NONE;
+    return MOTION_COMMAND::NONE;
   }
 }
 
-CONDITION MotionParser::convertCondition(const string& str)
+CONDITION_COMMAND MotionParser::convertCondition(const string& str)
 {
-  // 条件コマンド文字列と、それに対応する列挙型CONDITIONのマッピングを定義
-  static const unordered_map<string, CONDITION> conditionMap = {
-    { "Distance", CONDITION::DISTANCE },
+  // 条件コマンド文字列と、それに対応する列挙型CONDITION_COMMANDのマッピングを定義
+  static const unordered_map<string, CONDITION_COMMAND> conditionMap = {
+    { "Distance", CONDITION_COMMAND::DISTANCE },
   };
 
-  // 条件コマンド文字列に対応するCONDITION値をマップから取得。なければCONDITION::NONEを返す
+  // 条件コマンド文字列に対応するCONDITION_COMMAND値をマップから取得。なければCONDITION_COMMAND::NONEを返す
   auto it = conditionMap.find(str);
   if(it != conditionMap.end()) {
     return it->second;
   } else {
-    return CONDITION::NONE;
+    return CONDITION_COMMAND::NONE;
   }
 }
 

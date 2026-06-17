@@ -47,7 +47,7 @@ spikeapi::Clock& ClockUtil::getClockInstance()
 
 custom::Clock& ClockUtil::getClockInstance()
 {
-  // 初回のみインスタンスを生成(走行開始時刻)
+  // 初回のみインスタンスを生成
   static custom::Clock clock;
   return clock;
 }

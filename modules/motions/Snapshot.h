@@ -1,13 +1,11 @@
 /**
  * @file   Snapshot.h
  * @brief  サーバーに写真撮影を依頼するクラス
- * @author takuchi17
+ * @author sadomiya-sousi
  */
 
 #ifndef SNAPSHOT_H
 #define SNAPSHOT_H
-
-// #include "Motion.h"
 
 #include "Robot.h"
 #include <string>

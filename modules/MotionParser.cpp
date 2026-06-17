@@ -206,7 +206,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
   }
 }
 
-MOTION_COMMAND MotionParser::convertCommand(const string& str)
+MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
 {
   // コマンド文字列(string)と、それに対応する列挙型MOTION_COMMANDのマッピングを定義
   static const unordered_map<string, MOTION_COMMAND> commandMap = {
@@ -223,7 +223,7 @@ MOTION_COMMAND MotionParser::convertCommand(const string& str)
   }
 }
 
-CONDITION_COMMAND MotionParser::convertCondition(const string& str)
+MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str)
 {
   // 条件コマンド文字列と、それに対応する列挙型CONDITION_COMMANDのマッピングを定義
   static const unordered_map<string, CONDITION_COMMAND> conditionMap = {

@@ -84,7 +84,7 @@ namespace etrobocon2026_test {
                                 targetX, gain, gain, gain, req);
 
     EXPECT_DOUBLE_EQ(tracking.getTargetSpeed(), speed);
-    EXPECT_EQ(tracking.getTargetXCoordinate(), targetX + CAM_MAX_WIDTH / 2);
+    EXPECT_EQ(tracking.getTargetXCoordinate(), targetX);
 
     const auto& retReq = tracking.getDetectionRequest();
     EXPECT_EQ(retReq.hsvRangeCount, req.hsvRangeCount);

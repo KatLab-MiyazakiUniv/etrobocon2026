@@ -1,10 +1,18 @@
 /**
- *  @file SpeedCalculator.cpp
- *  @brief 目標速度に対応するpower値を算出するクラス
- *  @author migaku2645
- */
+ *  @file SpeedCalculator.cpp
+ *  @brief 目標速度に対応するpower値を算出するクラス
+ *  @author migaku2645
+ */
 #include "SpeedCalculator.h"
 #include "ClockUtil.h"
+
+const Pid::PidGain SpeedCalculator::DEFAULT_RIGHT_PID = { 0.005, 0.001, 0.0 };
+const Pid::PidGain SpeedCalculator::DEFAULT_LEFT_PID = { 0.005, 0.001, 0.0 };
+
+SpeedCalculator::SpeedCalculator(Robot& _robot, double _targetSpeed)
+  : SpeedCalculator(_robot, DEFAULT_RIGHT_PID, DEFAULT_LEFT_PID, _targetSpeed)
+{
+}
 
 SpeedCalculator::SpeedCalculator(Robot& _robot, const Pid::PidGain& _rightPid,
                                  const Pid::PidGain& _leftPid, double _targetSpeed)

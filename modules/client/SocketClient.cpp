@@ -38,14 +38,16 @@ bool SocketClient::connectToServer()
   serv_addr.sin_family = AF_INET;
   serv_addr.sin_port = htons(this->port);
   if(inet_pton(AF_INET, serverIp.c_str(), &serv_addr.sin_addr) <= 0) {
-    Logger::printfLog(Logger::ERROR, "SocketClient:connectToServer: inet_pton()失敗:ソケット %d", sock);
+    Logger::printfLog(Logger::ERROR, "SocketClient:connectToServer: inet_pton()失敗:ソケット %d",
+                      sock);
     netSys.close(sock);
     sock = -1;
     return false;
   }
 
   if(netSys.connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
-    Logger::printfLog(Logger::ERROR, "SocketClient:connectToServer: connect():ソケット %d を閉じます", sock);
+    Logger::printfLog(Logger::ERROR,
+                      "SocketClient:connectToServer: connect():ソケット %d を閉じます", sock);
     netSys.close(sock);
     sock = -1;
     return false;

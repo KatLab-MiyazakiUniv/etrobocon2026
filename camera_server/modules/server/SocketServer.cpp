@@ -118,8 +118,10 @@ void SocketServer::handleConnection(int clientSocket)
             break;
         }
       } else {
-        Logger::printfLog(Logger::ERROR, "SocketServer:handleConnection: 予期しないデータサイズを受信しました: %zd",
-                          (ssize_t)iResult);
+        Logger::printfLog(
+            Logger::ERROR,
+            "SocketServer:handleConnection: 予期しないデータサイズを受信しました: %zd",
+            (ssize_t)iResult);
       }
     } else if(iResult == 0) {
     } else {

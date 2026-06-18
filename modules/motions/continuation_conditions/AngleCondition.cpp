@@ -1,18 +1,17 @@
 /**
- * @file   AngleContinuationCondition.cpp
+ * @file   AngleCondition.cpp
  * @brief  目標角度との誤差に基づいて動作を継続するかを判定するクラス
  * @author okuyama0528 yutaro-1214
  */
-#include "AngleContinuationCondition.h"
+#include "AngleCondition.h"
 
-AngleContinuationCondition::AngleContinuationCondition(Robot& robot, double _targetAngle,
-                                                       double _tolerance)
+AngleCondition::AngleCondition(Robot& robot, double _targetAngle, double _tolerance)
   : BaseContinuationCondition(robot), targetAngle(_targetAngle), tolerance(_tolerance)
 {
 }
 
 // 動作を継続するかどうかを判定する関数
-bool AngleContinuationCondition::shouldContinue()
+bool AngleCondition::shouldContinue()
 {
   double currentAngle
       = robot.getIMUControllerInstance().getAzimuth();  // IMUから現在の角度（方位角）を取得
@@ -23,7 +22,7 @@ bool AngleContinuationCondition::shouldContinue()
   return std::fabs(error) > tolerance;
 }
 
-double AngleContinuationCondition::getTargetAngle() const
+double AngleCondition::getTargetAngle() const
 {
   return targetAngle;
 }

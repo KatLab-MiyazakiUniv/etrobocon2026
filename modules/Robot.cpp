@@ -11,6 +11,7 @@ Robot::Robot(SocketClient& _cameraSocketClient)
     armMotorController(),
     imuController(),
     colorSensorController(),
+    ultraSonicController(),
     cameraSocketClient(_cameraSocketClient)
 {
 }
@@ -34,9 +35,10 @@ ColorSensorController& Robot::getColorSensorControllerInstance()
 {
   return colorSensorController;
 }
-Course& Robot::getCourse()
+
+UltraSonicController& Robot::getUltraSonicControllerInstance()
 {
-  return course;
+  return ultraSonicController;
 }
 
 SocketClient& Robot::getCameraSocketClientInstance()
@@ -44,9 +46,19 @@ SocketClient& Robot::getCameraSocketClientInstance()
   return cameraSocketClient;
 }
 
+Course& Robot::getCourse()
+{
+  return course;
+}
+
 void Robot::setCourse(Course course)
 {
   this->course = course;
+}
+
+Edge& Robot::getEdge()
+{
+  return edge;
 }
 
 void Robot::setEdge(Edge edge)
@@ -54,7 +66,12 @@ void Robot::setEdge(Edge edge)
   this->edge = edge;
 }
 
-Edge& Robot::getEdge()
+int Robot::getRunningStartTime()
 {
-  return edge;
+  return runningStartTime;
+}
+
+void Robot::setRunningStartTime(int time)
+{
+  runningStartTime = time;
 }

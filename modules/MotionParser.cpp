@@ -139,6 +139,7 @@ vector<string> MotionParser::extractParamsFromID(const string& filePath, const s
   getline(file, header);
 
   string line;
+  vector<string> result;
   while(getline(file, line)) {
     stringstream ss(line);
     vector<string> row;
@@ -147,11 +148,16 @@ vector<string> MotionParser::extractParamsFromID(const string& filePath, const s
       row.push_back(move(token));
     }
     if(row.size() >= 2 && row[1] == id) {
-      return row;
+      if(!result.empty()) {
+        Logger::printfLog(Logger::ERROR, "%s に ID=%s が重複しています", filePath.c_str(),
+                          id.c_str());
+        return {};
+      }
+      result = move(row);
     }
   }
 
-  return {};
+  return result;
 }
 
 unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(

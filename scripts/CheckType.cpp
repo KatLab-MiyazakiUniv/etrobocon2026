@@ -277,6 +277,7 @@ bool checkTypeAll(const std::string& label)
 
       int dataLineNum = 3;
       std::string line;
+      std::unordered_map<std::string, int> seenIds;  // ID → 最初に出現した行番号
       while(std::getline(file, line)) {
         size_t commentPos = line.find('#');
         if(commentPos != std::string::npos) line = line.substr(0, commentPos);
@@ -297,6 +298,19 @@ bool checkTypeAll(const std::string& label)
         snprintf(lineBuf, sizeof(lineBuf), "%d", dataLineNum);
         std::string cmdName = dataRow.empty() ? "" : dataRow[0];
         std::string locationInfo = filePath + ":" + lineBuf;
+
+        // 重複IDチェック
+        if(dataRow.size() >= 2) {
+          const std::string& id = dataRow[1];
+          auto it = seenIds.find(id);
+          if(it != seenIds.end()) {
+            std::cerr << "[" << label << "] " << locationInfo << " (" << cmdName << "): ID=" << id
+                      << " が重複しています (最初の出現: " << it->second << "行目)" << std::endl;
+            allValid = false;
+          } else {
+            seenIds[id] = dataLineNum;
+          }
+        }
 
         if(!validateRow(typeRow, dataRow, cmdName, label, locationInfo)) {
           allValid = false;

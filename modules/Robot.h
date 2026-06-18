@@ -11,9 +11,9 @@
 #include "ArmMotorController.h"
 #include "IMUController.h"
 #include "ColorSensorController.h"
+#include "UltraSonicController.h"
 #include "SocketClient.h"
 #include "Course.h"
-#include "UltraSonicController.h"
 
 class Robot {
  public:
@@ -72,6 +72,18 @@ class Robot {
   void setCourse(Course course);
 
   /**
+   * @brief エッジの左右判定の参照を返す
+   * @return メンバ変数 edge(Edge のインスタンス) の参照
+   */
+  Edge& getEdge();
+
+  /**
+   * @brief エッジの左右判定を設定する
+   * @param edge エッジの左右判定
+   */
+  void setEdge(Edge edge);
+
+  /**
    * @brief 走行開始時間を返す
    * @return 走行開始時間
    */
@@ -90,6 +102,7 @@ class Robot {
   UltraSonicController ultraSonicController;    // UltraSonicController インスタンス
   SocketClient& cameraSocketClient;             // カメラサーバー用の SocketClient インスタンス
   Course course;                                // コース(Left or Right)
+  Edge edge;                                    // エッジの左右判定
   int runningStartTime = 0;                     // 走行開始時間
 };
 #endif

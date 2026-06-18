@@ -56,6 +56,16 @@ void Robot::setCourse(Course course)
   this->course = course;
 }
 
+Edge& Robot::getEdge()
+{
+  return edge;
+}
+
+void Robot::setEdge(Edge edge)
+{
+  this->edge = edge;
+}
+
 int Robot::getRunningStartTime()
 {
   return runningStartTime;

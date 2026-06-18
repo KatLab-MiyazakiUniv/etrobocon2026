@@ -24,6 +24,12 @@ help:
 	@echo " $$ make format"
 	@echo フォーマットチェックをする
 	@echo " $$ make format-check"
+	@echo Motions/Conditions以下の全コマンドCSVを型チェックする
+	@echo " $$ make check-type-commands"
+	@echo 全エリアのArea CSVを型チェックする
+	@echo " $$ make check-type-areas"
+	@echo 指定エリア・コースのArea CSVを型チェックする
+	@echo " $$ make check-type AREA=<Area名> COURSE=<L|R>"
 	@echo 全システムのテストをビルドする
 	@echo " $$ make test-build"
 	@echo 走行システムのテストをビルドする
@@ -95,6 +101,21 @@ endif
 
 format-check:
 	$(FORMAT_FILES) | xargs clang-format --dry-run --Werror -style=file
+
+# Motions/ と Conditions/ 以下の全コマンドCSVを型チェックする
+check-type-commands:
+	./scripts/check_type.sh --commands
+
+# 全エリア × Left/Right の Area CSV を型チェックする
+check-type-areas:
+	./scripts/check_type.sh LineTrace L
+	./scripts/check_type.sh LineTrace R
+	./scripts/check_type.sh Area2 L
+	./scripts/check_type.sh Area2 R
+
+# 指定エリア・コースの型チェック（例: make check-type AREA=LineTrace COURSE=L）
+check-type:
+	./scripts/check_type.sh $(AREA) $(COURSE)
 
 ## テスト関連 ##
 # 全システムのテストをビルドする

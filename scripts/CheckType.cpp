@@ -360,9 +360,15 @@ int main(int argc, char* argv[])
     return allValid ? 0 : 1;
   }
 
+  // --commands: Motions/ と Conditions/ 以下の全ファイルを型チェック
+  if(argc == 2 && std::string(argv[1]) == "--commands") {
+    return checkTypeAll("ALL") ? 0 : 1;
+  }
+
   if(argc != 3) {
     std::cerr << "使い方: ./scripts/check_type.sh [<Area名> <L|R>]" << std::endl;
     std::cerr << "    例: ./scripts/check_type.sh LineTrace L" << std::endl;
+    std::cerr << "         ./scripts/check_type.sh --commands" << std::endl;
     std::cerr << "有効なArea名: ";
     for(size_t i = 0; i < AREA_NAMES.size(); i++) {
       std::cerr << AREA_NAMES[i];

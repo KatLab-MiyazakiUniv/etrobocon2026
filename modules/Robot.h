@@ -11,8 +11,8 @@
 #include "ArmMotorController.h"
 #include "IMUController.h"
 #include "ColorSensorController.h"
-#include "Course.h"
 #include "SocketClient.h"
+#include "Course.h"
 
 class Robot {
  public:
@@ -38,17 +38,6 @@ class Robot {
    * @return メンバ変数 imuController(IMUController のインスタンス) の参照
    */
   IMUController& getIMUControllerInstance();
-  /**
-   * @brief コースの参照を返す
-   * @return メンバ変数 course(Course のインスタンス) の参照
-   */
-  Course& getCourse();
-
-  /**
-   * @brief コースを設定する
-   * @param course コース
-   */
-  void setCourse(Course course);
 
   /**
    * @brief ColorSensorControllerのインスタンスの参照を返す
@@ -63,12 +52,36 @@ class Robot {
    */
   SocketClient& getCameraSocketClientInstance();
 
+  /**
+   * @brief コースの参照を返す
+   * @return メンバ変数 course(Course のインスタンス) の参照
+   */
+  Course& getCourse();
+
+  /**
+   * @brief コースを設定する
+   * @param course コース
+   */
+  void setCourse(Course course);
+
+  /**
+   * @brief 走行開始時間を返す
+   * @return 走行開始時間
+   */
+  int getRunningStartTime();
+
+  /**
+   * @brief 走行開始時間を設定する
+   */
+  void setRunningStartTime(int time);
+
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
   ArmMotorController armMotorController;        // ArmMotorController インスタンス
   IMUController imuController;                  // IMUController インスタンス
-  Course course;                                // コース(Left or Right)
   ColorSensorController colorSensorController;  // ColorSensorController インスタンス
   SocketClient& cameraSocketClient;             // カメラサーバー用の SocketClient インスタンス
+  Course course;                                // コース(Left or Right)
+  int runningStartTime = 0;                     // 走行開始時間
 };
 #endif

@@ -28,10 +28,10 @@ void ColorRegionDetectionActionHandler::execute(
   localHsvRanges.reserve(request.hsvRangeCount);
   for(int i = 0; i < request.hsvRangeCount; i++) {
     ColorRegionDetector::HSVRange range;
-    range.lower = cv::Scalar(request.hsvRanges[i].lower.v0, request.hsvRanges[i].lower.v1,
-                             request.hsvRanges[i].lower.v2, request.hsvRanges[i].lower.v3);
-    range.upper = cv::Scalar(request.hsvRanges[i].upper.v0, request.hsvRanges[i].upper.v1,
-                             request.hsvRanges[i].upper.v2, request.hsvRanges[i].upper.v3);
+    range.lower = cv::Scalar(request.hsvRanges[i].lower.h, request.hsvRanges[i].lower.s,
+                             request.hsvRanges[i].lower.v);
+    range.upper = cv::Scalar(request.hsvRanges[i].upper.h, request.hsvRanges[i].upper.s,
+                             request.hsvRanges[i].upper.v);
     localHsvRanges.push_back(range);
   }
 
@@ -61,7 +61,6 @@ void ColorRegionDetectionActionHandler::execute(
     Logger::info("Color region detected successfully");
 
   } else {
-    std::cout << "Color region not detected." << std::endl;
     Logger::error("Color region not detected");
   }
 }

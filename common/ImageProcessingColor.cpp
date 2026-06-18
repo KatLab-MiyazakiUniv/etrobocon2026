@@ -7,15 +7,15 @@
 #include "ImageProcessingColor.h"
 
 const CameraServer::HSVRangeData ImageProcessingColor::RED_HSV
-    = { { 0.0, 100.0, 100.0, 0.0 }, { 10.0, 255.0, 255.0, 0.0 } };
+    = { { 0.0, 100.0, 100.0 }, { 10.0, 255.0, 255.0 } };
 const CameraServer::HSVRangeData ImageProcessingColor::BLUE_HSV
-    = { { 100.0, 100.0, 100.0, 0.0 }, { 130.0, 255.0, 255.0, 0.0 } };
+    = { { 100.0, 100.0, 100.0 }, { 130.0, 255.0, 255.0 } };
 const CameraServer::HSVRangeData ImageProcessingColor::GREEN_HSV
-    = { { 40.0, 100.0, 100.0, 0.0 }, { 80.0, 255.0, 255.0, 0.0 } };
+    = { { 40.0, 100.0, 100.0 }, { 80.0, 255.0, 255.0 } };
 const CameraServer::HSVRangeData ImageProcessingColor::YELLOW_HSV
-    = { { 20.0, 100.0, 100.0, 0.0 }, { 35.0, 255.0, 255.0, 0.0 } };
+    = { { 20.0, 100.0, 100.0 }, { 35.0, 255.0, 255.0 } };
 const CameraServer::HSVRangeData ImageProcessingColor::BLACK_HSV
-    = { { 0.0, 0.0, 0.0, 0.0 }, { 180.0, 255.0, 50.0, 0.0 } };
+    = { { 0.0, 0.0, 0.0 }, { 180.0, 255.0, 50.0 } };
 
 const CameraServer::HSVRangeData& ImageProcessingColor::getHSVRangeFromColor(Color color)
 {

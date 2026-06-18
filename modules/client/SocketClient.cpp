@@ -1,7 +1,7 @@
 /**
  * @file    SocketClient.cpp
  * @brief   カメラサーバーと通信するクラス
- * @author  sadomiya-sousi, okuyama0528
+ * @author  sadomiya-sousi okuyama0528
  */
 
 #include "SocketClient.h"

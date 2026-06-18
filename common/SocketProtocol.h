@@ -26,13 +26,12 @@ namespace CameraServer {
   constexpr size_t COMMAND_SIZE = sizeof(Command);  // コマンド型のバイトサイズ
 
   /**
-   * @brief HSVの4要素データ
+   * @brief HSVの3要素データ
    */
   struct ScalarData {
-    double v0 = 0.0;  // h
-    double v1 = 0.0;  // s
-    double v2 = 0.0;  // v
-    double v3 = 0.0;  // 透明度
+    double h = 0.0;  // h
+    double s = 0.0;  // s
+    double v = 0.0;  // v
   };
 
   /**

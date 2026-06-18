@@ -5,8 +5,10 @@
  */
 
 #include <gtest/gtest.h>
+#define private public
 #define protected public
 #include "CameraTracking.h"
+#undef private
 #undef protected
 #include "MockNetworkSystem.h"
 #include "BaseContinuationCondition.h"

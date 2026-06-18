@@ -51,12 +51,11 @@ void ColorRegionDetector::validateParameters()
 void ColorRegionDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& result)
 {
   cv::Mat hsvFrame;
-  cv::Rect roiRect;
   cv::Rect boundingBox;
 
   // 最大色インデックスが不要な場合は、バウンディングボックス検出のみ行う
-  if(!detectBoundingBox(frame, result, hsvFrame, roiRect, boundingBox)) {
-    Logger::error("色領域のバウンディングボックスの検出に失敗しました。");
+  if(!detectBoundingBox(frame, result, hsvFrame, boundingBox)) {
+    Logger::error("ColorRegionDetector:色領域のバウンディングボックスの検出に失敗");
     return;
   }
 }
@@ -65,24 +64,21 @@ void ColorRegionDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResul
                                  int32_t& largestColorIndex)
 {
   largestColorIndex = -1;
-
   cv::Mat hsvFrame;
-  cv::Rect roiRect;
   cv::Rect boundingBox;
 
   // 複数色を統合したマスクからバウンディングボックスを検出する
-  if(!detectBoundingBox(frame, result, hsvFrame, roiRect, boundingBox)) {
-    Logger::error("色領域のバウンディングボックスの検出に失敗しました。");
+  if(!detectBoundingBox(frame, result, hsvFrame, boundingBox)) {
+    Logger::error("ColorRegionDetector:色領域のバウンディングボックスの検出に失敗");
     return;
   }
-
   // 検出したバウンディングボックス内で最も面積が大きい色のインデックスを取得する
   largestColorIndex = findLargestColorIndex(hsvFrame, boundingBox);
 }
 
 bool ColorRegionDetector::detectBoundingBox(const cv::Mat& frame,
                                             BoundingBoxDetectionResult& result, cv::Mat& hsvFrame,
-                                            cv::Rect& roiRect, cv::Rect& boundingBox)
+                                            cv::Rect& boundingBox)
 {
   result.wasDetected = false;
 
@@ -96,8 +92,7 @@ bool ColorRegionDetector::detectBoundingBox(const cv::Mat& frame,
   frameProcessed = frame.clone();
 
   // ROI切り出し
-  roiRect = roi;
-  roiRect = roiRect & cv::Rect(0, 0, frameProcessed.cols, frameProcessed.rows);
+  cv::Rect roiRect = roi & cv::Rect(0, 0, frameProcessed.cols, frameProcessed.rows);
 
   if(roiRect.empty()) {
     Logger::error("ROIがフレーム内に収まっていません。");
@@ -164,22 +159,22 @@ int32_t ColorRegionDetector::findLargestColorIndex(const cv::Mat& hsvFrame,
   double maxArea = 0.0;
   int32_t largestColorIndex = -1;
 
-  // 検出されたバウンディングボックス領域だけを対象にする
+  // フレーム中のバウンディングボックス領域を切り取る
   cv::Mat targetHsvFrame = hsvFrame(boundingBox);
 
-  // 指定された各HSV範囲について、バウンディングボックス内の該当画素数を数える
+  // バウンディングボックス内の, 指定の各HSV範囲の該当画素数を数える
   for(size_t i = 0; i < hsvRanges.size(); ++i) {
     cv::Mat mask;
     cv::inRange(targetHsvFrame, hsvRanges[i].lower, hsvRanges[i].upper, mask);
 
     double area = static_cast<double>(cv::countNonZero(mask));
+    // int area = static_cast<int>(cv::countNonZero(mask));
 
     if(area > maxArea) {
       maxArea = area;
       largestColorIndex = static_cast<int32_t>(i);
     }
   }
-
   return largestColorIndex;
 }
 
@@ -187,13 +182,10 @@ void ColorRegionDetector::setBoundingBoxResult(const cv::Rect& boundingBox, cons
                                                BoundingBoxDetectionResult& result)
 {
   result.topLeft = cv::Point(boundingBox.x + roiRect.x, boundingBox.y + roiRect.y);
-
   result.topRight
       = cv::Point(boundingBox.x + boundingBox.width + roiRect.x, boundingBox.y + roiRect.y);
-
   result.bottomLeft
       = cv::Point(boundingBox.x + roiRect.x, boundingBox.y + boundingBox.height + roiRect.y);
-
   result.bottomRight = cv::Point(boundingBox.x + boundingBox.width + roiRect.x,
                                  boundingBox.y + boundingBox.height + roiRect.y);
 }

@@ -1,7 +1,7 @@
 /**
  * @file   SocketClient.h
  * @brief  サーバーと通信するクラス
- * @author sadomiya-sousi, okuyama0528
+ * @author sadomiya-sousi okuyama0528
  */
 
 #ifndef SOCKET_CLIENT_H
@@ -68,12 +68,12 @@ class SocketClient {
   template <typename Req, typename Res>
   bool executeAction(const Req& request, Res& response);
 
- protected:
-  INetworkSystem& netSys;
-  int sock;              // ソケットファイルディスクリプタ
-  bool isConnected;      // サーバーへの接続状態
-  int port;              // サーバーのポート番号
-  std::string serverIp;  // サーバーのIPアドレス
+ private:
+  INetworkSystem& netSys;  // 注入される具所クラスのポインタ
+  int sock;                // ソケットファイルディスクリプタ(セッター無し)
+  bool isConnected;        // サーバーへの接続状態(セッター無し)
+  int port;                // サーバーのポート番号
+  std::string serverIp;    // サーバーのIPアドレス
 };
 
 #endif  // SOCKET_CLIENT_H

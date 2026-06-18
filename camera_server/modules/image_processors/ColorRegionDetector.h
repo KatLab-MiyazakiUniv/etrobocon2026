@@ -16,10 +16,10 @@
 
 class ColorRegionDetector : public BoundingBoxDetector {
  public:
-  // HSVの範囲を保持する構造体
+  // HSVの範囲を保持
   struct HSVRange {
-    cv::Scalar lower;  // HSVの下限値
-    cv::Scalar upper;  // HSVの上限値
+    cv::Scalar lower;  // 下限値
+    cv::Scalar upper;  // 上限値
   };
 
   /**
@@ -89,13 +89,12 @@ class ColorRegionDetector : public BoundingBoxDetector {
    * @param frame 入力フレーム
    * @param result 検出結果
    * @param hsvFrame ROI内のHSV画像
-   * @param roiRect フレーム内に収めたROI
    * @param boundingBox ROI内座標系のバウンディングボックス
    * @return 検出できた場合 true、できなかった場合 false
    * @details 複数色のマスクを統合して、統合された色領域全体のバウンディングボックスを検出する
    */
   bool detectBoundingBox(const cv::Mat& frame, BoundingBoxDetectionResult& result,
-                         cv::Mat& hsvFrame, cv::Rect& roiRect, cv::Rect& boundingBox);
+                         cv::Mat& hsvFrame, cv::Rect& boundingBox);
 
   /**
    * @brief 検出されたバウンディングボックス内で最も面積が大きい色のインデックスを取得する

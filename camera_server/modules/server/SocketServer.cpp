@@ -1,7 +1,7 @@
 /**
  * @file SocketServer.cpp
  * @brief 接続を待ち、クライアントからのリクエストを処理するクラス
- * @author sadomiya-sousi, takuchi17
+ * @author sadomiya-sousi takuchi17
  */
 
 #include "SocketServer.h"

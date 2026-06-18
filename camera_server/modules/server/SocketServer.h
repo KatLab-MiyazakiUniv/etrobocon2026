@@ -1,7 +1,7 @@
 /**
  * @file SocketServer.h
  * @brief 接続を待ち、クライアントからのリクエストを処理するクラス
- * @author sadomiya-sousi, takuchi17
+ * @author sadomiya-sousi takuchi17
  */
 
 #ifndef SOCKET_SERVER_H
@@ -97,11 +97,12 @@ class SocketServer {
 
   //  public:
  private:
-  INetworkSystem& netSys;                                          // 注入される具象クラスのポインタ
-  int listenSocket;                                                // Severのファイルディスクリプタ
-  bool isRunning;                                                  // Serverが稼働中ならtrue
-  int port;                                                        // サーバーのポート番号
-  static constexpr int DEFAULT_BUFLEN = 512;                       // デフォルトのバッファサイズ
-  ColorRegionDetectionActionHandler& colorRegionDetectionHandler;  // 色領域検出のハンドラー
+  INetworkSystem& netSys;                     // 注入される具象クラスのポインタ
+  int listenSocket;                           // Severのファイルディスクリプタ(セッター不要)
+  bool isRunning;                             // Serverが稼働中ならtrue(セッター不要)
+  int port;                                   // サーバーのポート番号
+  static constexpr int DEFAULT_BUFLEN = 512;  // デフォルトのバッファサイズ
+  ColorRegionDetectionActionHandler&
+      colorRegionDetectionHandler;  // 色領域検出のハンドラー(セッター不要)
 };
 #endif  // SOCKET_SERVER_H

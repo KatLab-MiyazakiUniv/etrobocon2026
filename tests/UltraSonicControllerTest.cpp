@@ -13,10 +13,11 @@ namespace UltraSonicController_test {
   TEST(UltraSonicControllerTest, getDistance)
   {
     UltraSonicController ultraSonicController;
+    int expectedDistance = 100;  // テスト用の固定値 (mm)
 
     int distance = ultraSonicController.getDistance();
 
-    EXPECT_EQ(10, distance);
+    EXPECT_EQ(expectedDistance, distance);
   }
 
 }  // namespace UltraSonicController_test

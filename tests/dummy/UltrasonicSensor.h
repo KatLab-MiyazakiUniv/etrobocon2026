@@ -23,12 +23,12 @@ namespace spikeapi {
 
     /**
      * @brief 距離を取得する
-     * @return 距離 (cm)
+     * @return 距離 (mm)
      */
     int32_t getDistance() const { return DISTANCE; }
 
    private:
-    static constexpr int32_t DISTANCE = 10;  // テスト用固定値 (cm)
+    static constexpr int32_t DISTANCE = 100;  // テスト用固定値 (mm)
   };
 
 }  // namespace spikeapi

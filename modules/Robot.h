@@ -13,6 +13,7 @@
 #include "ColorSensorController.h"
 #include "SocketClient.h"
 #include "Course.h"
+#include "UltraSonicController.h"
 
 class Robot {
  public:
@@ -44,6 +45,12 @@ class Robot {
    * @return メンバ変数 colorSensorController(ColorSensorController のインスタンス) の参照
    */
   ColorSensorController& getColorSensorControllerInstance();
+
+  /**
+   * @brief UltraSonicControllerのインスタンスの参照を返す
+   * @return メンバ変数 ultraSonicController(UltraSonicController のインスタンス)の参照
+   */
+  UltraSonicController& getUltraSonicControllerInstance();
 
   /**
    * @brief カメラサーバー用のSocketClientのインスタンスの参照を返す
@@ -80,6 +87,7 @@ class Robot {
   ArmMotorController armMotorController;        // ArmMotorController インスタンス
   IMUController imuController;                  // IMUController インスタンス
   ColorSensorController colorSensorController;  // ColorSensorController インスタンス
+  UltraSonicController ultraSonicController;    // UltraSonicController インスタンス
   SocketClient& cameraSocketClient;             // カメラサーバー用の SocketClient インスタンス
   Course course;                                // コース(Left or Right)
   int runningStartTime = 0;                     // 走行開始時間

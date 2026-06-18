@@ -11,6 +11,7 @@ Robot::Robot(SocketClient& _cameraSocketClient)
     armMotorController(),
     imuController(),
     colorSensorController(),
+    ultraSonicController(),
     cameraSocketClient(_cameraSocketClient)
 {
 }
@@ -33,6 +34,11 @@ IMUController& Robot::getIMUControllerInstance()
 ColorSensorController& Robot::getColorSensorControllerInstance()
 {
   return colorSensorController;
+}
+
+UltraSonicController& Robot::getUltraSonicControllerInstance()
+{
+  return ultraSonicController;
 }
 
 SocketClient& Robot::getCameraSocketClientInstance()

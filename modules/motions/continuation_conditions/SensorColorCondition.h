@@ -36,7 +36,7 @@ class SensorColorCondition : public BaseContinuationCondition {
  private:
   int colorCount = 0;                        // 指定色を取得した回数
   ColorSensorController::COLOR targetColor;  // 指定色
-  static constexpr int JUDGE_COUNT = 2;      // 継続条件を修了するために必要な連続取得回数
+  static constexpr int JUDGE_COUNT = 2;  // 継続条件を修了するために必要な連続取得回数
 };
 
 #endif

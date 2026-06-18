@@ -12,12 +12,12 @@ int main()
   int cameraId = camera.findAvailableCameraID();
   if(cameraId < 0) {
     Logger::error("No available camera found.");
-    return 1;
+    return -1;
   }
   camera.setCameraID(cameraId);
   if(!camera.openCamera()) {
     Logger::error("Failed to open camera.");
-    return 1;
+    return -1;
   }
 
   ColorRegionDetectionActionHandler colorRegionDetectionHandler(camera);

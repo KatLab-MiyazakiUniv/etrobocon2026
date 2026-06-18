@@ -113,7 +113,7 @@ class CameraTracking : public BaseMotion {
   /**
    * @brief 1周期分の待機を行う
    */
-  void wait();
+  void wait() override;
 
   /**
    * @brief 動作終了後の処理を行う

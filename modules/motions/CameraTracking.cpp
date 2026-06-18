@@ -15,7 +15,7 @@ CameraTracking::CameraTracking(Robot& _robot,
                                bool _isStopMotorPower)
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
-    targetXCoordinate(_targetXCoordinate + CAM_MAX_WIDTH / 2),
+    targetXCoordinate(_targetXCoordinate),
     detectionRequest(_detectionRequest),
     isStopMotorPower(_isStopMotorPower),
     speedCalculator(_robot, _rightPid, _leftPid, _targetSpeed),
@@ -101,7 +101,7 @@ int CameraTracking::getTargetXCoordinate() const
 
 void CameraTracking::setTargetXCoordinate(int _targetXCoordinate)
 {
-  targetXCoordinate = _targetXCoordinate + CAM_MAX_WIDTH / 2;
+  targetXCoordinate = _targetXCoordinate;
 }
 
 const CameraServer::ColorRegionDetectorRequest& CameraTracking::getDetectionRequest() const

@@ -21,6 +21,11 @@ class ColorRegionDetectionActionHandler {
   ColorRegionDetectionActionHandler(CameraCapture& camera);
 
   /**
+   * @brief デストラクタ
+   */
+  ~ColorRegionDetectionActionHandler();
+
+  /**
    * @brief ライン検出アクションを実行する
    * @param request クライアントからのリクエスト
    * @param response クライアントへのレスポンス

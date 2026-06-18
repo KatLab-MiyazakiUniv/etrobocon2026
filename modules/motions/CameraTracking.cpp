@@ -33,6 +33,7 @@ bool CameraTracking::canStart()
 {
   if(targetSpeed == 0.0) {
     return false;
+    Logger::error("CameraTracking:目標スピードが0です");
   }
   return true;
 }
@@ -102,7 +103,6 @@ void CameraTracking::setTargetXCoordinate(int _targetXCoordinate)
 {
   targetXCoordinate = _targetXCoordinate + CAM_MAX_WIDTH / 2;
 }
-
 
 const CameraServer::ColorRegionDetectorRequest& CameraTracking::getDetectionRequest() const
 {

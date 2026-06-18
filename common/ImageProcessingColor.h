@@ -22,7 +22,9 @@ class ImageProcessingColor {
     BLUE,    // 青
     GREEN,   // 緑
     YELLOW,  // 黄
-    BLACK    // 黒
+    BLACK,   // 黒
+    GRAY,    // 灰(正確な値が不明なので0)
+    WHITE    // 白(正確な値が不明なので0)
   };
 
   /**
@@ -43,6 +45,8 @@ class ImageProcessingColor {
   static const CameraServer::HSVRangeData GREEN_HSV;   // 緑色のHSV範囲
   static const CameraServer::HSVRangeData YELLOW_HSV;  // 黄色のHSV範囲
   static const CameraServer::HSVRangeData BLACK_HSV;   // 黒色のHSV範囲
+  static const CameraServer::HSVRangeData GRAY_HSV;    // 灰色のHSV範囲
+  static const CameraServer::HSVRangeData WHITE_HSV;   // 白色のHSV範囲
 };
 
 #endif  // IMAGE_PROCESSING_COLOR_H

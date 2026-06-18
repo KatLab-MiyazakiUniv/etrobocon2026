@@ -47,7 +47,7 @@ class SocketClient {
   void shutdownServer();
 
   /**
-   * @brief 線検出アクションを実行する
+   * @brief 色領域検出アクションを実行する
    * @param request リクエスト
    * @param response レスポンス
    * @return true アクションの実行に成功した場合

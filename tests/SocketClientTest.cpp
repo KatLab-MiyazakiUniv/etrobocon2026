@@ -114,6 +114,7 @@ namespace etrobocon2026_test {
     EXPECT_EQ(mockNet.lastSentCommand, expectedCmd);
   }
 
+  // executeActionが成功しtrueを返すことを確認するテスト
   TEST(SocketClientTest, ExecuteActionSuccess)
   {
     MockNetworkSystem mockNet;

@@ -62,7 +62,6 @@ class CameraTracking : public BaseMotion {
    */
   void setTargetXCoordinate(int _targetXCoordinate);
 
-
   /**
    * @brief 色領域検出リクエストを取得する
    * @return const CameraServer::ColorRegionDetectorRequest& 検出リクエストへの参照
@@ -121,7 +120,7 @@ class CameraTracking : public BaseMotion {
    */
   void finish() override;
 
- protected:
+ private:
   double targetSpeed;                                         // 目標速度
   int targetXCoordinate;                                      // 目標X座標
   CameraServer::ColorRegionDetectorRequest detectionRequest;  // 検出リクエスト

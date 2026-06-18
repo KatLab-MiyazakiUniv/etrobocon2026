@@ -11,12 +11,12 @@ int main()
   CameraCapture camera;
   int cameraId = camera.findAvailableCameraID();
   if(cameraId < 0) {
-    Logger::error("No available camera found.");
+    Logger::error("利用可能なカメラを認識失敗");
     return -1;
   }
   camera.setCameraID(cameraId);
   if(!camera.openCamera()) {
-    Logger::error("Failed to open camera.");
+    Logger::error("カメラの起動に失敗");
     return -1;
   }
 

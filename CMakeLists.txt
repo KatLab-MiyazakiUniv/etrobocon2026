@@ -42,6 +42,7 @@ set(RUNNING_INCLUDE_DIRS
   ${RUNNING_MODULE_DIR}
   ${RUNNING_MODULE_DIR}/calculators
   ${RUNNING_MODULE_DIR}/API
+  ${RUNNING_MODULE_DIR}/client
   ${RUNNING_MODULE_DIR}/motions
   ${RUNNING_MODULE_DIR}/motions/continuation_conditions
   ${PROJECT_SOURCE_DIR}/common
@@ -85,11 +86,15 @@ option(ENABLE_CAMERA_TESTS "Build camera tests" ON)
 
 if(ENABLE_CAMERA_TESTS)
   find_package(OpenCV REQUIRED)
+  find_package(PkgConfig REQUIRED)
+  pkg_check_modules(ZXING REQUIRED zxing)
+  pkg_check_modules(OPENSSL REQUIRED openssl)
 
   # 必要なインクルードディレクトリの設定 (適宜登録)
   set(CAMERA_INCLUDE_DIRS
     ${CAMERA_MODULE_DIR}/camera
     ${CAMERA_MODULE_DIR}/utils
+    ${CAMERA_MODULE_DIR}/server
     ${CAMERA_MODULE_DIR}/image_processors
     ${PROJECT_SOURCE_DIR}/common
     ${PROJECT_SOURCE_DIR}/common/customs
@@ -101,6 +106,7 @@ if(ENABLE_CAMERA_TESTS)
   file(GLOB_RECURSE CAMERA_SOURCES
     "${CAMERA_MODULE_DIR}/camera/*.cpp"
     "${CAMERA_MODULE_DIR}/utils/*.cpp"
+    "${CAMERA_MODULE_DIR}/server/*.cpp"
     "${CAMERA_MODULE_DIR}/image_processors/*.cpp"
     "${PROJECT_SOURCE_DIR}/common/*.cpp"
     "${RUNNING_MODULE_DIR}/API/*.cpp"
@@ -108,13 +114,17 @@ if(ENABLE_CAMERA_TESTS)
 
   # ライブラリターゲットを作成
   add_library(camera_server_impl STATIC ${CAMERA_SOURCES})
-  target_include_directories(camera_server_impl PUBLIC ${CAMERA_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
-  target_link_libraries(camera_server_impl ${OpenCV_LIBS})
+  target_include_directories(camera_server_impl PUBLIC ${CAMERA_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} ${ZXING_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIRS})
+  target_link_libraries(camera_server_impl ${OpenCV_LIBS} ${ZXING_LIBRARIES} ${OPENSSL_LIBRARIES})
 
   # camera_server/tests ディレクトリ内の *Test.cpp をすべてテストソースとして登録
   file(GLOB CAMERA_TEST_SOURCES
     "${CAMERA_TEST_DIR}/*Test.cpp"
   )
+
+  # テスト実行時に必要な画像データをビルドディレクトリへコピーするための設定
+  file(COPY ${CAMERA_TEST_DIR}/test_data
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/camera_server)
 
   # テスト実行可能ファイルの作成
   add_executable(camera_server_test ${CAMERA_TEST_SOURCES})

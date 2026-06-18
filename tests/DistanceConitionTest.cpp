@@ -6,6 +6,7 @@
 
 #include <gtest/gtest.h>
 #include "DistanceCondition.h"
+#include "MockNetworkSystem.h"
 
 namespace etrobocon2026_test {
 
@@ -14,7 +15,9 @@ namespace etrobocon2026_test {
    */
   TEST(DistanceConditionTest, ContinueImmediatelyAfterPrepare)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     DistanceCondition condition(robot, 100.0);
 
@@ -28,7 +31,9 @@ namespace etrobocon2026_test {
    */
   TEST(DistanceConditionTest, ContinueBeforeTargetDistance)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     DistanceCondition condition(robot, 1000.0);
 
@@ -46,7 +51,9 @@ namespace etrobocon2026_test {
    */
   TEST(DistanceConditionTest, StopAtTargetDistance)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     double targetDistance = 10.0;
 
@@ -74,7 +81,9 @@ namespace etrobocon2026_test {
    */
   TEST(DistanceConditionTest, StopAtTargetDistance2)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     double targetDistance = 10.0;
 
@@ -101,7 +110,9 @@ namespace etrobocon2026_test {
    */
   TEST(DistanceConditionTest, ZeroTargetDistance)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     DistanceCondition condition(robot, 0.0);
 
@@ -115,7 +126,9 @@ namespace etrobocon2026_test {
    */
   TEST(DistanceConditionTest, NegativeTargetDistance)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     DistanceCondition condition(robot, -100.0);
 
@@ -129,7 +142,9 @@ namespace etrobocon2026_test {
    */
   TEST(DistanceConditionTest, ContinuousCallStable)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     DistanceCondition condition(robot, 100.0);
 

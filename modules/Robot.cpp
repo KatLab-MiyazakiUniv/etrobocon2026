@@ -6,12 +6,13 @@
 
 #include "Robot.h"
 
-Robot::Robot()
+Robot::Robot(SocketClient& _cameraSocketClient)
   : wheelMotorController(),
     armMotorController(),
     imuController(),
     colorSensorController(),
-    ultraSonicController()
+    ultraSonicController(),
+    cameraSocketClient(_cameraSocketClient)
 {
 }
 
@@ -34,6 +35,17 @@ ColorSensorController& Robot::getColorSensorControllerInstance()
 {
   return colorSensorController;
 }
+
+UltraSonicController& Robot::getUltraSonicControllerInstance()
+{
+  return ultraSonicController;
+}
+
+SocketClient& Robot::getCameraSocketClientInstance()
+{
+  return cameraSocketClient;
+}
+
 Course& Robot::getCourse()
 {
   return course;
@@ -44,7 +56,12 @@ void Robot::setCourse(Course course)
   this->course = course;
 }
 
-UltraSonicController& Robot::getUltraSonicControllerInstance()
+int Robot::getRunningStartTime()
 {
-  return ultraSonicController;
+  return runningStartTime;
+}
+
+void Robot::setRunningStartTime(int time)
+{
+  runningStartTime = time;
 }

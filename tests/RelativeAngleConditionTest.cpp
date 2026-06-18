@@ -1,21 +1,24 @@
 /**
- * @file RelativeAngleContinuationConditionTest.cpp
- * @brief RelativeAngleContinuationConditionクラスをテストする
+ * @file RelativeAngleConditionTest.cpp
+ * @brief RelativeAngleConditionクラスをテストする
  * @author okuyama0528 yutaro-1214
  */
 
 #include <gtest/gtest.h>
-#include "RelativeAngleContinuationCondition.h"
+#include "RelativeAngleCondition.h"
 #include "AngleNormalizer.h"
+#include "MockNetworkSystem.h"
 
 namespace etrobocon2026_test {
   // prepare()実行後に、targetAngleが正しくセット出来ているか確認
-  TEST(RelativeAngleContinuationConditionTest, AfterPrepare)
+  TEST(RelativeAngleConditionTest, AfterPrepare)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     double targetAngle = 100.0;
-    RelativeAngleContinuationCondition condition(robot, targetAngle);
+    RelativeAngleCondition condition(robot, targetAngle);
 
     double expectedTargetAngle = AngleNormalizer::normalizeAngle(targetAngle);
 
@@ -25,11 +28,13 @@ namespace etrobocon2026_test {
   }
 
   // 目標角度に到達していない場合は継続判定になることを確認
-  TEST(RelativeAngleContinuationConditionConditionTest, NotReachTargetAngle)
+  TEST(RelativeAngleConditionConditionTest, NotReachTargetAngle)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
-    RelativeAngleContinuationCondition condition(robot, 100.0);
+    RelativeAngleCondition condition(robot, 100.0);
 
     condition.prepare();
 
@@ -37,9 +42,11 @@ namespace etrobocon2026_test {
   }
 
   // 角度が目標角度に到達した場合は停止判定になることを確認
-  TEST(RelativeAngleContinuationConditionConditionTest, AfterTargetAngle)
+  TEST(RelativeAngleConditionConditionTest, AfterTargetAngle)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
     double targetAngle = 20;
     // initialAngleとconditionで2回getAzimuthを実行するため初期値は2
@@ -47,7 +54,7 @@ namespace etrobocon2026_test {
 
     double initialAngle = robot.getIMUControllerInstance().getAzimuth();
 
-    RelativeAngleContinuationCondition condition(robot, targetAngle);
+    RelativeAngleCondition condition(robot, targetAngle);
 
     condition.prepare();
 
@@ -63,11 +70,13 @@ namespace etrobocon2026_test {
   /**
    * 目標角度が0の場合は即停止判定になることを確認
    */
-  TEST(RelativeAngleContinuationConditionConditionTest, ZeroTargetAbgle)
+  TEST(RelativeAngleConditionConditionTest, ZeroTargetAbgle)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
 
-    RelativeAngleContinuationCondition condition(robot, 0.0);
+    RelativeAngleCondition condition(robot, 0.0);
 
     condition.prepare();
 

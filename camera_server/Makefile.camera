@@ -1,5 +1,5 @@
 # Debian/arm64向け カメラサーバー用Makefile
-	
+
 # コンパイラ
 CXX := g++
 
@@ -13,14 +13,21 @@ TARGET := camera_app
 # コンパイラとリンカのフラグ
 CXXFLAGS := -std=c++17 -Wall -Wextra -O2 -pthread
 
-
 # OpenCVのフラグを取得
 OPENCV_CFLAGS := $(shell pkg-config --cflags opencv4)
 OPENCV_LIBS := $(shell pkg-config --libs opencv4)
 
-# OpenCVのフラグを追加
-CXXFLAGS += $(OPENCV_CFLAGS)
-LIBS := $(OPENCV_LIBS)
+# zxing-cppのフラグを取得
+ZXING_CFLAGS := $(shell pkg-config --cflags zxing)
+ZXING_LIBS := $(shell pkg-config --libs zxing)
+
+# OpenSSLのフラグを取得
+OPENSSL_CFLAGS := $(shell pkg-config --cflags openssl)
+OPENSSL_LIBS := $(shell pkg-config --libs openssl)
+
+# フラグを追加
+CXXFLAGS += $(OPENCV_CFLAGS) $(ZXING_CFLAGS) $(OPENSSL_CFLAGS)
+LIBS := $(OPENCV_LIBS) $(ZXING_LIBS) $(OPENSSL_LIBS)
 
 # インクルードパス
 INCLUDES := $(shell find $(INCLUDEDIR) -type d -printf '-I%p ') \
@@ -34,6 +41,7 @@ INCLUDES := $(shell find $(INCLUDEDIR) -type d -printf '-I%p ') \
 # すべての .cpp ファイルを探す
 SOURCES := main.cpp $(shell find $(SRCDIR) -name '*.cpp')
 SOURCES += ../common/Logger.cpp
+SOURCES += ../common/RealNetworkSystem.cpp
 SOURCES += ../modules/API/ClockUtil.cpp
 OBJS := $(addprefix $(OBJDIR)/,$(SOURCES:.cpp=.o))
 

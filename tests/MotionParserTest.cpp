@@ -5,6 +5,7 @@
  */
 
 #include "MotionParser.h"
+#include "MockNetworkSystem.h"
 #include <gtest/gtest.h>
 #include <gtest/internal/gtest-port.h>
 
@@ -14,7 +15,9 @@ namespace etrobocon2026_test {
   // ファイルパスが存在しない場合のテスト
   TEST(MotionParserTest, NotCreateMotionList)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
     string csvPath = "../tests/test_data/NonExistent.csv";
 
     // 標準出力のキャプチャ開始
@@ -37,7 +40,9 @@ namespace etrobocon2026_test {
   // ファイルパスが存在するが、コマンドが未実装の場合のテスト
   TEST(MotionParserTest, NoErrorMessageWhenFileExistsButNoImplementation)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
     string csvPath = "../tests/test_data/Existent.csv";  // 存在するファイル
 
     // 標準出力キャプチャ開始

@@ -8,6 +8,7 @@
 #include "Straight.h"
 #include "Mileage.h"
 #include "DistanceCondition.h"
+#include "MockNetworkSystem.h"
 #include <iostream>
 
 namespace etrobocon2026_test {
@@ -22,7 +23,9 @@ namespace etrobocon2026_test {
   // IMU無しの場合、目標距離が正の時、run()で直進後、走行距離が目標距離だけ増加するかテスト（誤差あり）
   TEST_F(StraightTest, Run)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
     double targetSpeed = 1000.0;   // 目標速度
     double targetDistance = 10.0;  // 目標距離
 
@@ -51,7 +54,9 @@ namespace etrobocon2026_test {
   // IMU無しの場合、目標距離が0の時、runで直進後、走行距離が増加しないことをテスト
   TEST_F(StraightTest, RunWithZeroDistance)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
     double targetSpeed = 50.0;    // 目標速度
     double targetDistance = 0.0;  // 目標距離
 
@@ -77,7 +82,9 @@ namespace etrobocon2026_test {
   // IMU無しの場合、目標距離が負の時、runで直進後、走行距離が増加しないことをテスト
   TEST_F(StraightTest, RunWithNegativeDistance)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
     double targetSpeed = 50.0;       // 目標速度
     double targetDistance = -100.0;  // 目標距離
 
@@ -104,7 +111,9 @@ namespace etrobocon2026_test {
   // IMU無しの場合、目標距離が正、目標速度が0の場合、走行距離0でrun()が終了するか確認
   TEST_F(StraightTest, RunWithZeroSpeed)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
     double targetSpeed = 0.0;      // 目標速度
     double targetDistance = 10.0;  // 目標距離
 
@@ -131,7 +140,9 @@ namespace etrobocon2026_test {
   // IMU有りの場合、目標距離が正の時、run()で直進後、走行距離が目標距離だけ増加するかテスト（誤差あり）
   TEST_F(StraightTest, ImuRun)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
     double targetSpeed = 1000.0;   // 目標速度
     double targetDistance = 10.0;  // 目標距離
 
@@ -160,7 +171,9 @@ namespace etrobocon2026_test {
   // IMU有りの場合、目標距離が0の時、runで直進後、走行距離が増加しないことをテスト
   TEST_F(StraightTest, ImuRunZeroDistance)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
     double targetSpeed = 50.0;    // 目標速度
     double targetDistance = 0.0;  // 目標距離
 
@@ -186,7 +199,9 @@ namespace etrobocon2026_test {
   // IMU有りの場合、目標距離が負の時、runで直進後、走行距離が増加しないことをテスト
   TEST_F(StraightTest, ImuRunNegativeDistance)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
     double targetSpeed = 50.0;       // 目標速度
     double targetDistance = -100.0;  // 目標距離
 
@@ -213,7 +228,9 @@ namespace etrobocon2026_test {
   // IMU有りの場合、目標距離が正、目標速度が0の場合、走行距離0でrun()が終了するか確認
   TEST_F(StraightTest, ImuRunWithZeroSpeed)
   {
-    Robot robot;
+    MockNetworkSystem mockNetworkSystem;
+    SocketClient mockSocketClient(mockNetworkSystem);
+    Robot robot(mockSocketClient);
     double targetSpeed = 0.0;      // 目標速度
     double targetDistance = 10.0;  // 目標距離
 

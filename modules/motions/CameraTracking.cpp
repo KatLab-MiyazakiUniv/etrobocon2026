@@ -16,7 +16,6 @@ CameraTracking::CameraTracking(Robot& _robot,
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
     targetXCoordinate(_targetXCoordinate + CAM_MAX_WIDTH / 2),
-    pidGain(_pidGain),
     detectionRequest(_detectionRequest),
     isStopMotorPower(_isStopMotorPower),
     speedCalculator(_robot, _rightPid, _leftPid, _targetSpeed),
@@ -52,7 +51,7 @@ void CameraTracking::executeStep()
 
   // 通信失敗、または検出できなかった場合は、出力を更新せずに終了する
   if(!success || !response.result.wasDetected) {
-    Logger::warning("Color region not detected");
+    Logger::warning("CameraTracking:色領域が検出されませんでした");
     return;
   }
 
@@ -82,4 +81,56 @@ void CameraTracking::finish()
   if(isStopMotorPower) {
     robot.getWheelMotorControllerInstance().stopBoth();
   }
+}
+
+double CameraTracking::getTargetSpeed() const
+{
+  return targetSpeed;
+}
+
+void CameraTracking::setTargetSpeed(double _targetSpeed)
+{
+  targetSpeed = _targetSpeed;
+}
+
+int CameraTracking::getTargetXCoordinate() const
+{
+  return targetXCoordinate;
+}
+
+void CameraTracking::setTargetXCoordinate(int _targetXCoordinate)
+{
+  targetXCoordinate = _targetXCoordinate + CAM_MAX_WIDTH / 2;
+}
+
+
+const CameraServer::ColorRegionDetectorRequest& CameraTracking::getDetectionRequest() const
+{
+  return detectionRequest;
+}
+
+void CameraTracking::setDetectionRequest(
+    const CameraServer::ColorRegionDetectorRequest& _detectionRequest)
+{
+  detectionRequest = _detectionRequest;
+}
+
+bool CameraTracking::getIsStopMotorPower() const
+{
+  return isStopMotorPower;
+}
+
+void CameraTracking::setIsStopMotorPower(bool _isStopMotorPower)
+{
+  isStopMotorPower = _isStopMotorPower;
+}
+
+const SpeedCalculator& CameraTracking::getSpeedCalculator() const
+{
+  return speedCalculator;
+}
+
+const Pid& CameraTracking::getCameraPid() const
+{
+  return cameraPid;
 }

@@ -38,6 +38,68 @@ class CameraTracking : public BaseMotion {
    */
   ~CameraTracking();
 
+  /**
+   * @brief 目標速度を取得する
+   * @return double 目標速度
+   */
+  double getTargetSpeed() const;
+
+  /**
+   * @brief 目標速度を設定する
+   * @param _targetSpeed 設定する目標速度
+   */
+  void setTargetSpeed(double _targetSpeed);
+
+  /**
+   * @brief 目標X座標を取得する
+   * @return int 目標X座標
+   */
+  int getTargetXCoordinate() const;
+
+  /**
+   * @brief 目標X座標を設定する
+   * @param _targetXCoordinate 設定する目標X座標
+   */
+  void setTargetXCoordinate(int _targetXCoordinate);
+
+
+  /**
+   * @brief 色領域検出リクエストを取得する
+   * @return const CameraServer::ColorRegionDetectorRequest& 検出リクエストへの参照
+   */
+  const CameraServer::ColorRegionDetectorRequest& getDetectionRequest() const;
+
+  /**
+   * @brief 色領域検出リクエストを設定する
+   * @param _detectionRequest 設定する検出リクエスト
+   */
+  void setDetectionRequest(const CameraServer::ColorRegionDetectorRequest& _detectionRequest);
+
+  /**
+   * @brief モーターを停止するかどうかを取得する
+   * @return true 停止する場合
+   * @return false 停止しない場合
+   */
+  bool getIsStopMotorPower() const;
+
+  /**
+   * @brief モーターを停止するかどうかを設定する
+   * @param _isStopMotorPower 設定するフラグ
+   */
+  void setIsStopMotorPower(bool _isStopMotorPower);
+
+  /**
+   * @brief 目標速度に対するモータパワー計算器を取得する
+   * @return const SpeedCalculator& モータパワー計算器への参照
+   */
+  const SpeedCalculator& getSpeedCalculator() const;
+
+  /**
+   * @brief カメラ画像x座標に対するPID制御器を取得する
+   * @return const Pid& PID制御器への参照
+   */
+  const Pid& getCameraPid() const;
+
  protected:
   /**
    * @brief 動作を開始できるかどうかを判定する
@@ -62,7 +124,6 @@ class CameraTracking : public BaseMotion {
  protected:
   double targetSpeed;                                         // 目標速度
   int targetXCoordinate;                                      // 目標X座標
-  Pid::PidGain pidGain;                                       // カメラ用のPIDゲイン構造体
   CameraServer::ColorRegionDetectorRequest detectionRequest;  // 検出リクエスト
   bool isStopMotorPower;                                      // モーターを停止するかどうか
   SpeedCalculator speedCalculator;                            // 目標速度に対するモータパワー計算

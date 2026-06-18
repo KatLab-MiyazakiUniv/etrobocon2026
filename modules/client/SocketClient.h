@@ -68,6 +68,43 @@ class SocketClient {
   template <typename Req, typename Res>
   bool executeAction(const Req& request, Res& response);
 
+  /**
+   * @brief ソケットファイルディスクリプタを取得する
+   * @return int ソケットファイルディスクリプタ
+   */
+  int getSock() const;
+
+  /**
+   * @brief サーバーへの接続状態を取得する
+   * @return true 接続されている場合
+   * @return false 接続されていない場合
+   */
+  bool getIsConnected() const;
+
+  /**
+   * @brief サーバーのポート番号を取得する
+   * @return int ポート番号
+   */
+  int getPort() const;
+
+  /**
+   * @brief サーバーのポート番号を設定する
+   * @param _port 設定するポート番号
+   */
+  void setPort(int _port);
+
+  /**
+   * @brief サーバーのIPアドレスを取得する
+   * @return const std::string& サーバーのIPアドレスへの参照
+   */
+  const std::string& getServerIp() const;
+
+  /**
+   * @brief サーバーのIPアドレスを設定する
+   * @param _serverIp 設定するIPアドレス
+   */
+  void setServerIp(const std::string& _serverIp);
+
  private:
   INetworkSystem& netSys;  // 注入される具所クラスのポインタ
   int sock;                // ソケットファイルディスクリプタ(セッター無し)

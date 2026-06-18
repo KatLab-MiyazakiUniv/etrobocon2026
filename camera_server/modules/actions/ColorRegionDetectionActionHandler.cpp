@@ -19,7 +19,7 @@ void ColorRegionDetectionActionHandler::execute(
 {
   cv::Mat frame;
   if(!camera.getFrame(frame)) {
-    Logger::error("filed to get frame");
+    Logger::error("ColorRegionDetectionActionHandler:フレームの取得に失敗しました");
     response.result.wasDetected = false;
     return;
   }
@@ -58,9 +58,19 @@ void ColorRegionDetectionActionHandler::execute(
     response.result.bottomRight.x = localResult.bottomRight.x;
     response.result.bottomRight.y = localResult.bottomRight.y;
 
-    Logger::info("Color region detected successfully");
+    Logger::info("ColorRegionDetectionActionHandler:色領域の検出に成功しました");
 
   } else {
-    Logger::error("Color region not detected");
+    Logger::error("ColorRegionDetectionActionHandler:色領域が検出されませんでした");
   }
+}
+
+const CameraCapture& ColorRegionDetectionActionHandler::getCamera() const
+{
+  return camera;
+}
+
+const ColorRegionDetector& ColorRegionDetectionActionHandler::getDetector() const
+{
+  return detector;
 }

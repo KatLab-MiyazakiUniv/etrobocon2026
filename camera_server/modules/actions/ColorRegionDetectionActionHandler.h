@@ -28,6 +28,18 @@ class ColorRegionDetectionActionHandler {
   void execute(const CameraServer::ColorRegionDetectorRequest& request,
                CameraServer::ColorRegionDetectorResponse& response);
 
+  /**
+   * @brief カメラキャプチャのインスタンスを取得する
+   * @return CameraCapture& カメラキャプチャのインスタンスへの参照
+   */
+  const CameraCapture& getCamera() const;
+
+  /**
+   * @brief 色領域検出器を取得する
+   * @return const ColorRegionDetector& 色領域検出器への参照
+   */
+  const ColorRegionDetector& getDetector() const;
+
  private:
   CameraCapture& camera;
   ColorRegionDetector detector;

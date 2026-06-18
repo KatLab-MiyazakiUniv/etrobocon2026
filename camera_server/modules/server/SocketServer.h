@@ -46,43 +46,43 @@ class SocketServer {
    * @brief サーバーのリッスンソケットを取得する
    * @return int サーバーのリッスンソケットのファイルディスクリプタ
    */
-  int getListenSocket() const { return listenSocket; }
+  int getListenSocket() const;
 
   /**
    * @brief サーバーが稼働中かどうかを取得する
    * @return bool サーバーが稼働中ならtrue, そうでないならfalse
    */
-  bool getIsRunning() const { return isRunning; }
+  bool getIsRunning() const;
 
   /**
    * @brief サーバーのポート番号を取得する
    * @return int サーバーのポート番号
    */
-  int getPort() const { return port; }
+  int getPort() const;
 
   /**
    * @brief デフォルトのバッファサイズを取得する
    * @return int デフォルトのバッファサイズ
    */
-  static int getDefaultBufLen() { return DEFAULT_BUFLEN; }
-
-  /**
-   * @brief サーバーのリッスンソケットを設定する
-   * @param socket 設定するファイルディスクリプタ
-   */
-  void setListenSocket(int socket) { listenSocket = socket; }
-
-  /**
-   * @brief サーバーの稼働状態を設定する
-   * @param isRun 1なら稼働中, 0なら停止
-   */
-  void setIsRunning(int isRun) { isRunning = isRun; }
+  static int getDefaultBufLen();
 
   /**
    * @brief サーバーのポート番号を設定する
    * @param portNumber 設定するポート番号
    */
-  void setPort(int portNumber) { port = portNumber; }
+  void setPort(int portNumber);
+
+  /**
+   * @brief ネットワークシステムを取得する
+   * @return INetworkSystem& ネットワークシステムへの参照
+   */
+  INetworkSystem& getNetSys() const;
+
+  /**
+   * @brief 色領域検出のハンドラーを取得する
+   * @return ColorRegionDetectionActionHandler& 色領域検出のハンドラーへの参照
+   */
+  const ColorRegionDetectionActionHandler& getColorRegionDetectionHandler() const;
 
   /**
    * @brief サーバーをシャットダウンする

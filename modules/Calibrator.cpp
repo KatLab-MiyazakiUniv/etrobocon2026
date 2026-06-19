@@ -49,7 +49,7 @@ void Calibrator::selectAndSetCourse()
     }
   }
   const char* course = isLeftCourse ? "Left" : "Right";
-  Logger::printfLog(Logger::info, "Calibrator:走行開始 %s Course", course);
+  Logger::printfLog(Logger::INFO, "Calibrator:走行開始 %s Course", course);
   robot.getDisplayInstance().scrollText("OK", 50);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));  // 1秒スリープ
 }

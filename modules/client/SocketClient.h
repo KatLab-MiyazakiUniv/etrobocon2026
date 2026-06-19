@@ -47,7 +47,7 @@ class SocketClient {
   void shutdownServer();
 
   /**
-   * @brief 線検出アクションを実行する
+   * @brief 検出アクションを実行する
    * @param request リクエスト
    * @param response レスポンス
    * @return true アクションの実行に成功した場合
@@ -55,6 +55,26 @@ class SocketClient {
    */
   virtual bool executeColorRegionDetection(const CameraServer::ColorRegionDetectorRequest& request,
                                            CameraServer::ColorRegionDetectorResponse& response);
+
+  /**
+   * @brief スナップショットアクションを実行する
+   * @param request リクエスト
+   * @param response レスポンス
+   * @return true アクションの実行に成功した場合
+   * @return false アクションの実行に失敗した場合
+   */
+  virtual bool executeSnapshotAction(const CameraServer::SnapshotActionRequest& request,
+                                     CameraServer::SnapshotActionResponse& response);
+
+  /**
+   * @brief 復号キーを取得するアクションを実行する
+   * @param request リクエスト
+   * @param response レスポンス
+   * @return true アクションの実行に成功した場合
+   * @return false アクションの実行に失敗した場合
+   */
+  virtual bool executeGetDecryptionKey(const CameraServer::DecryptionKeyRequest& request,
+                                       CameraServer::DecryptionKeyResponse& response);
 
   /**
    * @brief サーバーにリクエストを送信し、レスポンスを受信するtemplate関数
@@ -69,11 +89,11 @@ class SocketClient {
   bool executeAction(const Req& request, Res& response);
 
  protected:
-  INetworkSystem& netSys;
-  int sock;              // ソケットファイルディスクリプタ
-  bool isConnected;      // サーバーへの接続状態
-  int port;              // サーバーのポート番号
-  std::string serverIp;  // サーバーのIPアドレス
+  INetworkSystem& netSys;  // 注入される具所クラスのポインタ
+  int sock;                // ソケットファイルディスクリプタ
+  bool isConnected;        // サーバーへの接続状態
+  int port;                // サーバーのポート番号
+  std::string serverIp;    // サーバーのIPアドレス
 };
 
 #endif  // SOCKET_CLIENT_H

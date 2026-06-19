@@ -10,7 +10,8 @@
 #include <string>
 #include "SocketProtocol.h"
 #include "RealNetworkSystem.h"
-#include "actions/ColorRegionDetectionActionHandler.h"
+#include "ColorRegionDetectionActionHandler.h"
+#include "SnapshotActionHandler.h"
 #include "Logger.h"
 #include "CameraCapture.h"
 #include <cstring>
@@ -21,9 +22,11 @@ class SocketServer {
    * @brief SocketServerのコンストラクタ
    * @param _netSys 注入する具象クラス
    * @param _port デフォルトは27015
+   * @param snapshotHandler スナップショット撮影アクションハンドラ
    */
   explicit SocketServer(ColorRegionDetectionActionHandler& _colorRegionDetectionHandler,
-                        INetworkSystem& _netSys, int _port = CameraServer::DEFAULT_PORT);
+                        SnapshotActionHandler& snapshotHandler, INetworkSystem& _netSys,
+                        int _port = CameraServer::DEFAULT_PORT);
 
   /**
    * @brief SocketServerのデストラクタ
@@ -95,7 +98,6 @@ class SocketServer {
    */
   void handleConnection(int clientSocket);
 
-  //  public:
  private:
   INetworkSystem& netSys;                                          // 注入される具象クラスのポインタ
   int listenSocket;                                                // Severのファイルディスクリプタ
@@ -103,5 +105,6 @@ class SocketServer {
   int port;                                                        // サーバーのポート番号
   static constexpr int DEFAULT_BUFLEN = 512;                       // デフォルトのバッファサイズ
   ColorRegionDetectionActionHandler& colorRegionDetectionHandler;  // 色領域検出のハンドラー
+  SnapshotActionHandler& snapshotHandler;                          // スナップショットのハンドラー
 };
 #endif  // SOCKET_SERVER_H

@@ -5,14 +5,17 @@
  */
 
 #include "SocketServer.h"
+#include <limits>
 
 SocketServer::SocketServer(ColorRegionDetectionActionHandler& _colorRegionDetectionHandler,
-                           INetworkSystem& _netSys, int _port)
+                           SnapshotActionHandler& _snapshotHandler, INetworkSystem& _netSys,
+                           int _port)
   : netSys(_netSys),
     listenSocket(-1),
     isRunning(false),
     port(_port),
-    colorRegionDetectionHandler(_colorRegionDetectionHandler)
+    colorRegionDetectionHandler(_colorRegionDetectionHandler),
+    snapshotHandler(_snapshotHandler)
 {
   LOG_CREATE("SocketServer");
   Logger::printfLog(Logger::INFO, "ポート番号は%d", _port);
@@ -104,6 +107,43 @@ void SocketServer::handleConnection(int clientSocket)
             Logger::info("Executing COLOR_REGION_DETECTION");
             CameraServer::ColorRegionDetectorResponse response;
             colorRegionDetectionHandler.execute(*request, response);
+            netSys.send(clientSocket, reinterpret_cast<const char*>(&response), sizeof(response),
+                        0);
+            break;
+          }
+
+          case CameraServer::Command::TAKE_SNAPSHOT: {
+            auto* request = reinterpret_cast<CameraServer::SnapshotActionRequest*>(recvbuf);
+            CameraServer::SnapshotActionResponse response;
+            snapshotHandler.execute(*request, response);
+            netSys.send(clientSocket, reinterpret_cast<const char*>(&response), sizeof(response),
+                        0);
+            break;
+          }
+          case CameraServer::Command::GET_DECRYPTION_KEY: {
+            Logger::info("GET_DECRYPTION_KEYを実行");
+            CameraServer::DecryptionKeyResponse response;
+            std::memset(&response, 0, sizeof(response));
+            Logger::info("4つの文字列の復号キーを半角で入力");
+            std::string inputStr;
+            while(1) {
+              if(std::cin >> inputStr) {
+                if(inputStr.length() == 4) {
+                  break;
+                }
+              } else {
+                if(std::cin.eof()) {
+                  Logger::error("EOF");
+                  inputStr = "AAAA";  // デフォルトキー
+                  break;
+                }
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+              }
+              Logger::info("4桁に達していません。再入力を");
+            }
+            std::strncpy(response.key, inputStr.c_str(), 4);
+            response.key[4] = '\0';
             netSys.send(clientSocket, reinterpret_cast<const char*>(&response), sizeof(response),
                         0);
             break;

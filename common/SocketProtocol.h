@@ -19,6 +19,8 @@ namespace CameraServer {
    */
   enum class Command : uint8_t {
     COLOR_REGION_DETECTION = 0,  // 色領域検出
+    TAKE_SNAPSHOT = 1,           // スナップショット
+    GET_DECRYPTION_KEY = 2,      // 復号キー取得
     DISCONNECT = 254,            // サーバーから切断
     SHUTDOWN = 255               // サーバーをシャットダウン
   };
@@ -87,10 +89,7 @@ namespace CameraServer {
    */
   struct ColorRegionDetectorRequest {
     Command command = Command::COLOR_REGION_DETECTION;  // 色領域検出コマンド
-    bool requireLargestColorIndex = false;  // 最も大きい色領域のインデックスを返すかどうか
-    // どっちを選んでもdoubleを含む構造体のパディング(8の倍数)で344になってしまう>現状でも5バイトパディングされて344になる,,
-    // >5バイト文の無駄がある
-    //  uint32_t hsvRangeCount = 0;             // hsvRangesの有効な要素数
+    bool requireLargestColorIndex = false;   // 最も大きい色領域のインデックスを返すかどうか
     uint8_t hsvRangeCount = 0;               // hsvRangesの有効な要素数
     HSVRangeData hsvRanges[MAX_HSV_RANGES];  // HSVの範囲の配列
     RectData roi;                            // 検出対象の領域
@@ -102,6 +101,27 @@ namespace CameraServer {
   struct ColorRegionDetectorResponse {
     BoundingBoxDetectionResult result;  // 色領域の検出結果
     int32_t largestColorIndex = -1;     // 最も面積が大きい色のインデックス
+  };
+
+  // スナップショット撮影アクションのリクエストデータ構造
+  struct SnapshotActionRequest {
+    Command command = Command::TAKE_SNAPSHOT;  // TAKE_SNAPSHOTを期待
+    char fileName[64];                         // 保存するファイル名
+  };
+
+  // スナップショット撮影アクションのレスポンスデータ構造
+  struct SnapshotActionResponse {
+    bool success;  // 撮影が成功したかどうか
+  };
+
+  // 復号キー取得要求のリクエストデータ構造
+  struct DecryptionKeyRequest {
+    Command command = Command::GET_DECRYPTION_KEY;
+  };
+
+  // 復号キー取得要求のレスポンスデータ構造
+  struct DecryptionKeyResponse {
+    char key[5];
   };
 
 }  // namespace CameraServer

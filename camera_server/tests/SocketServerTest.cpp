@@ -12,7 +12,6 @@
 namespace etrobocon2026_test {
 
   CameraCapture camera;
-  ColorRegionDetectionActionHandler colorRegionDetectionHandler(camera);
   SnapshotActionHandler snapshotActionHandler(camera);
 
   // インスタンスに指定したportを代入できているかを確認
@@ -20,7 +19,7 @@ namespace etrobocon2026_test {
   {
     MockNetworkSystem mockNet;
     int testPort = 12345;
-    SocketServer server(colorRegionDetectionHandler, snapshotActionHandler, mockNet, testPort);
+    SocketServer server(snapshotActionHandler, mockNet, testPort);
     EXPECT_EQ(testPort, server.getPort());
   }
 
@@ -28,7 +27,7 @@ namespace etrobocon2026_test {
   TEST(SocketServerTest, CheckDefaultListenSocket)
   {
     MockNetworkSystem mockNet;
-    SocketServer server(colorRegionDetectionHandler, snapshotActionHandler, mockNet);
+    SocketServer server(snapshotActionHandler, mockNet);
     int expectedDefaultListenSocket = -1;
     EXPECT_EQ(server.getListenSocket(), expectedDefaultListenSocket);
   }
@@ -37,7 +36,7 @@ namespace etrobocon2026_test {
   TEST(SocketServerTest, DefaultisRunning)
   {
     MockNetworkSystem mockNet;
-    SocketServer server(colorRegionDetectionHandler, snapshotActionHandler, mockNet);
+    SocketServer server(snapshotActionHandler, mockNet);
     EXPECT_FALSE(server.getIsRunning());
   }
 
@@ -45,7 +44,7 @@ namespace etrobocon2026_test {
   TEST(SocketServerTest, CheckdefaultVariable2)
   {
     MockNetworkSystem mockNet;
-    SocketServer server(colorRegionDetectionHandler, snapshotActionHandler, mockNet);
+    SocketServer server(snapshotActionHandler, mockNet);
     EXPECT_EQ(server.getPort(), CameraServer::DEFAULT_PORT);
   }
 
@@ -53,7 +52,7 @@ namespace etrobocon2026_test {
   TEST(SocketServerTest, ShutdownChangesStateCorrectly)
   {
     MockNetworkSystem mockNet;
-    SocketServer server(colorRegionDetectionHandler, snapshotActionHandler, mockNet);
+    SocketServer server(snapshotActionHandler, mockNet);
     server.setIsRunning(true);
     server.setListenSocket(100);
     server.shutdown();
@@ -66,7 +65,7 @@ namespace etrobocon2026_test {
   {
     MockNetworkSystem mockNet;
     mockNet.forceSocketError = true;
-    SocketServer server(colorRegionDetectionHandler, snapshotActionHandler, mockNet);
+    SocketServer server(snapshotActionHandler, mockNet);
     EXPECT_FALSE(server.init());
   }
 
@@ -75,7 +74,7 @@ namespace etrobocon2026_test {
   {
     MockNetworkSystem mockNet;
     mockNet.forceBindError = true;
-    SocketServer server(colorRegionDetectionHandler, snapshotActionHandler, mockNet);
+    SocketServer server(snapshotActionHandler, mockNet);
     EXPECT_FALSE(server.init());
   }
 
@@ -83,7 +82,7 @@ namespace etrobocon2026_test {
   TEST(SocketServerTest, InitSuccessTest)
   {
     MockNetworkSystem mockNet;
-    SocketServer server(colorRegionDetectionHandler, snapshotActionHandler, mockNet);
+    SocketServer server(snapshotActionHandler, mockNet);
     EXPECT_TRUE(server.init());
   }
 
@@ -93,14 +92,11 @@ namespace etrobocon2026_test {
     MockNetworkSystem mockNet;
     mockNet.hasRecvData = true;
     mockNet.recvData = CameraServer::Command::SHUTDOWN;
+    SocketServer server(mockNet);
+    server.init();
+    server.run();
 
-    SocketServer server(colorRegionDetectionHandler, snapshotActionHandler, mockNet);
-    server.setIsRunning(true);
-    server.setListenSocket(100);
-    int afterConnectListenSocket = -1;
-    int dummyClientSocket = 200;
-    server.handleConnection(dummyClientSocket);
     EXPECT_FALSE(server.getIsRunning());
-    EXPECT_EQ(server.getListenSocket(), afterConnectListenSocket);
+    EXPECT_EQ(server.getListenSocket(), -1);
   }
 }  // namespace etrobocon2026_test

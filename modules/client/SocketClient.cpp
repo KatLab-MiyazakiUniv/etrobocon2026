@@ -84,13 +84,6 @@ void SocketClient::shutdownServer()
   Logger::info("shutdownServer: 終了");
 }
 
-bool SocketClient::executeColorRegionDetection(
-    const CameraServer::ColorRegionDetectorRequest& request,
-    CameraServer::ColorRegionDetectorResponse& response)
-{
-  return executeAction(request, response);
-}
-
 bool SocketClient::executeSnapshotAction(const CameraServer::SnapshotActionRequest& request,
                                          CameraServer::SnapshotActionResponse& response)
 {

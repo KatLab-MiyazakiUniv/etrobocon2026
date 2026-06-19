@@ -18,7 +18,6 @@ class MockNetworkSystem : public INetworkSystem {
   bool forceBindError = false;     // bind() を失敗させるフラグ
   bool forceConnectError = false;  // connect() を失敗させるフラグ
   bool hasRecvData = false;        // recv()で受信データを返すかどうか
-  bool receiveCommand = true;
   CameraServer::Command recvData
       = CameraServer::Command::DISCONNECT;           // recv()でbufに書き込むコマンド
   int sizeOfReturnLen = CameraServer::COMMAND_SIZE;  // デフォルトでは1を返す
@@ -113,6 +112,7 @@ class MockNetworkSystem : public INetworkSystem {
       hasRecvData = false;
       return sizeOfReturnLen;
     }
+
     return -1;
   }
 

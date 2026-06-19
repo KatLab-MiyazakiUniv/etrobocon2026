@@ -10,7 +10,6 @@
 #include <string>
 #include "SocketProtocol.h"
 #include "RealNetworkSystem.h"
-#include "ColorRegionDetectionActionHandler.h"
 #include "SnapshotActionHandler.h"
 #include "Logger.h"
 #include "CameraCapture.h"
@@ -24,8 +23,7 @@ class SocketServer {
    * @param _port デフォルトは27015
    * @param snapshotHandler スナップショット撮影アクションハンドラ
    */
-  explicit SocketServer(ColorRegionDetectionActionHandler& _colorRegionDetectionHandler,
-                        SnapshotActionHandler& snapshotHandler, INetworkSystem& _netSys,
+  explicit SocketServer(SnapshotActionHandler& snapshotHandler, INetworkSystem& _netSys,
                         int _port = CameraServer::DEFAULT_PORT);
 
   /**
@@ -53,9 +51,9 @@ class SocketServer {
 
   /**
    * @brief サーバーが稼働中かどうかを取得する
-   * @return bool サーバーが稼働中ならtrue, そうでないならfalse
+   * @return int サーバーが稼働中なら1, そうでないなら0
    */
-  bool getIsRunning() const { return isRunning; }
+  int getIsRunning() const { return isRunning; }
 
   /**
    * @brief サーバーのポート番号を取得する
@@ -70,41 +68,22 @@ class SocketServer {
   static int getDefaultBufLen() { return DEFAULT_BUFLEN; }
 
   /**
-   * @brief サーバーのリッスンソケットを設定する
-   * @param socket 設定するファイルディスクリプタ
-   */
-  void setListenSocket(int socket) { listenSocket = socket; }
-
-  /**
-   * @brief サーバーの稼働状態を設定する
-   * @param isRun 1なら稼働中, 0なら停止
-   */
-  void setIsRunning(int isRun) { isRunning = isRun; }
-
-  /**
-   * @brief サーバーのポート番号を設定する
-   * @param portNumber 設定するポート番号
-   */
-  void setPort(int portNumber) { port = portNumber; }
-
-  /**
    * @brief サーバーをシャットダウンする
    */
   void shutdown();
+
+ private:
+  INetworkSystem& netSys;                     // 注入される具象クラスのポインタ
+  int listenSocket;                           // Severのファイルディスクリプタ
+  bool isRunning;                             // Serverが稼働中ならtrue
+  int port;                                   // サーバーのポート番号
+  static constexpr int DEFAULT_BUFLEN = 512;  // デフォルトのバッファサイズ
+  SnapshotActionHandler& snapshotHandler;     // スナップショットのハンドラー
 
   /**
    * @brief クライアントとの接続を処理する
    * @param clientSocket クライアントソケット
    */
   void handleConnection(int clientSocket);
-
- private:
-  INetworkSystem& netSys;                                          // 注入される具象クラスのポインタ
-  int listenSocket;                                                // Severのファイルディスクリプタ
-  bool isRunning;                                                  // Serverが稼働中ならtrue
-  int port;                                                        // サーバーのポート番号
-  static constexpr int DEFAULT_BUFLEN = 512;                       // デフォルトのバッファサイズ
-  ColorRegionDetectionActionHandler& colorRegionDetectionHandler;  // 色領域検出のハンドラー
-  SnapshotActionHandler& snapshotHandler;                          // スナップショットのハンドラー
 };
 #endif  // SOCKET_SERVER_H

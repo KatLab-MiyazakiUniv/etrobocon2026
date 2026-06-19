@@ -20,10 +20,9 @@ int main()
     return 1;
   }
 
-  ColorRegionDetectionActionHandler colorRegionDetectionHandler(camera);
   SnapshotActionHandler snapshotActionHandler(camera);
 
-  SocketServer server(colorRegionDetectionHandler, snapshotActionHandler, real);
+  SocketServer server(snapshotActionHandler, real);
   server.init();
   server.run();
   return 0;

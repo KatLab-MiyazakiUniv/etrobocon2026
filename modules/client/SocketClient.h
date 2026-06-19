@@ -47,16 +47,6 @@ class SocketClient {
   void shutdownServer();
 
   /**
-   * @brief 検出アクションを実行する
-   * @param request リクエスト
-   * @param response レスポンス
-   * @return true アクションの実行に成功した場合
-   * @return false アクションの実行に失敗した場合
-   */
-  virtual bool executeColorRegionDetection(const CameraServer::ColorRegionDetectorRequest& request,
-                                           CameraServer::ColorRegionDetectorResponse& response);
-
-  /**
    * @brief スナップショットアクションを実行する
    * @param request リクエスト
    * @param response レスポンス

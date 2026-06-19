@@ -16,9 +16,7 @@ Snapshot::Snapshot(Robot& _robot, const std::string& _fileName) : robot(_robot),
 
 void Snapshot::run()
 {
-  Logger::printfLog(Logger::INFO, "Requesting snapshot: %s", fileName.c_str());
-
-  SocketClient& client = robot.getCameraSocketClientInstance();
+  Logger::printfLog(Logger::INFO, "Requesting snapshot: %s", fileName);
 
   CameraServer::SnapshotActionRequest request;
   request.command = CameraServer::Command::TAKE_SNAPSHOT;
@@ -28,10 +26,10 @@ void Snapshot::run()
 
   CameraServer::SnapshotActionResponse response;
 
-  bool success = client.executeSnapshotAction(request, response);
+  bool success = robot.getCameraSocketClientInstance().executeSnapshotAction(request, response);
   if(success) {
-    Logger::info("Snapshot taken successfully.");
+    Logger::info("Snapshot:撮影成功");
   } else {
-    Logger::error("Server failed to take snapshot.");
+    Logger::error("Snapshot:撮影失敗");
   }
 }

@@ -26,42 +26,6 @@ namespace CameraServer {
 
   constexpr size_t COMMAND_SIZE = sizeof(Command);  // コマンド型のバイトサイズ
 
-  /**
-   * @brief HSVの4要素データ
-   */
-  struct ScalarData {
-    double v0 = 0.0;  // h
-    double v1 = 0.0;  // s
-    double v2 = 0.0;  // v
-    double v3 = 0.0;  // 透明度
-  };
-
-  /**
-   * @brief 矩形領域データ
-   */
-  struct RectData {
-    int32_t x = 0;       // 左上のx座標
-    int32_t y = 0;       // 左上のy座標
-    int32_t width = 0;   // 幅
-    int32_t height = 0;  // 高さ
-  };
-
-  /**
-   * @brief 画像サイズデータ
-   */
-  struct SizeData {
-    int32_t width = 0;   // 幅
-    int32_t height = 0;  // 高さ
-  };
-
-  /**
-   * @brief 座標データ
-   */
-  struct PointData {
-    int32_t x = 0;  // x座標
-    int32_t y = 0;  // y座標
-  };
-
   // スナップショット撮影アクションのリクエストデータ構造
   struct SnapshotActionRequest {
     Command command = Command::TAKE_SNAPSHOT;  // TAKE_SNAPSHOTを期待

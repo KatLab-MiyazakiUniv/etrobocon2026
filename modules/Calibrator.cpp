@@ -128,7 +128,7 @@ void Calibrator::measureAndSetTargetBrightness()
   targetBrightness = (whiteBrightness + blackBrightness) / 2;
   // 目標輝度をディスプレイに表示
   robot.getDisplayInstance().showNumber(targetBrightness);
-  cout << "Target Brightness Value is " << targetBrightness << endl;
+  Logger::printfLog("Calibrator:目標輝度値は %d ", targetBrightness);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));  // 1秒スリープ
   robot.getDisplayInstance().showChar(' ');                      // ディスプレイを消灯
 }
@@ -163,13 +163,13 @@ void Calibrator::getAngleCheckFrame()
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(10));  // 10ミリ秒スリープ
   }
-  cout << "Complete Check Frame." << endl;
+  Logger::info("Calibrator:アングル調節完了");
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));  // 1秒スリープ
 }
 
 void Calibrator::waitForStart()
 {
-  Logger::info("待機中");
+  Logger::info("Calibrator:待機中");
   while(!robot.getForceSensorInstance().isPressed(PRESS_POWER)) {
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
@@ -182,11 +182,11 @@ void Calibrator::inputAndSetDecryptionKey()
   if(robot.getCameraSocketClientInstance().executeGetDecryptionKey(request, response)) {
     std::strncpy(decryptionKey, response.key, 4);
     decryptionKey[4] = '\0';
-    Logger::printfLog(Logger::INFO, "受け取った復号キー: %s", decryptionKey);
+    Logger::printfLog(Logger::INFO, "Calibrator:受け取った復号キー: %s", decryptionKey);
     robot.getDisplayInstance().scrollText(decryptionKey, 100);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   } else {
-    Logger::error("復号キーの取得に失敗");
+    Logger::error("Calibrator:復号キーの取得に失敗");
     std::strcpy(decryptionKey, "AAAA");
   }
 }

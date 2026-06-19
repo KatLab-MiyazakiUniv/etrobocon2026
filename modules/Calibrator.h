@@ -9,6 +9,7 @@
 
 #include "Robot.h"
 #include "ClockUtil.h"
+#include "Logger.h"
 #include "Snapshot.h"
 
 #define PRESS_POWER 0.5f

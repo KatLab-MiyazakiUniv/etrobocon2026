@@ -14,15 +14,15 @@ SnapshotActionHandler::SnapshotActionHandler(CameraCapture& _camera) : camera(_c
 void SnapshotActionHandler::execute(const CameraServer::SnapshotActionRequest& request,
                                     CameraServer::SnapshotActionResponse& response)
 {
-  Logger::printfLog(Logger::INFO, "Executing TAKE_SNAPSHOT command for file: %s", request.fileName);
+  Logger::printfLog(Logger::INFO, "SnapshotActionHandler:実行: %s", request.fileName);
 
   cv::Mat frame;
   if(!camera.getFrame(frame)) {
-    Logger::error("Failed to capture frame for snapshot.");
+    Logger::error("SnapshotActionHandler:フレーム取得失敗");
     response.success = false;
     return;
   }
   FrameSave::save(frame, filePath, request.fileName);
-  Logger::info("Snapshot saved successfully.");
+  Logger::info("SnapshotActionHandler:保存成功");
   response.success = true;
 }

@@ -1,15 +1,15 @@
 /**
- * @file   RelativeAngleContinuationCondition.h
+ * @file   RelativeAngleCondition.h
  * @brief  現在角度を基準に、指定した相対角度に到達したかどうかで動作を継続すべきかを判定するクラス
  * @author okuyama0528 yutaro-1214
  */
-#ifndef RELATIVE_ANGLE_CONTINUATION_CONDITION_H
-#define RELATIVE_ANGLE_CONTINUATION_CONDITION_H
+#ifndef RELATIVE_ANGLE_CONDITION_H
+#define RELATIVE_ANGLE_CONDITION_H
 
-#include "AngleContinuationCondition.h"
+#include "AngleCondition.h"
 #include "Logger.h"
 
-class RelativeAngleContinuationCondition : public AngleContinuationCondition {
+class RelativeAngleCondition : public AngleCondition {
  public:
   /**
    * @brief 相対角度で回頭完了を判定するコンストラクタ
@@ -17,12 +17,12 @@ class RelativeAngleContinuationCondition : public AngleContinuationCondition {
    * @param _relativeAngle 回頭する相対角度(°)
    * @param _tolerance 許容誤差(°)
    */
-  RelativeAngleContinuationCondition(Robot& robot, double _relativeAngle, double _tolerance = 2.0);
+  RelativeAngleCondition(Robot& robot, double _relativeAngle, double _tolerance = 2.0);
 
   /**
    * デストラクタ
    */
-  ~RelativeAngleContinuationCondition();
+  ~RelativeAngleCondition();
 
   /**
    * @brief 判定開始前の準備処理

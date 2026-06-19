@@ -16,7 +16,8 @@ std::string CsvLogger::fileName
 
 // CSVヘッダーの定義
 const std::vector<std::string> CsvLogger::HEADERS
-    = { "time", "comand:id", "brightness", "rightPower", "leftPower", "rightSpeed", "leftSpeed" };
+    = { "time",      "comand:id",  "brightness", "rightPower", "leftPower", "rightSpeed",
+        "leftSpeed", "currentVal", "target",     "kp",         "ki",        "kd" };
 
 // CSVログの初期化
 void CsvLogger::init()
@@ -96,7 +97,12 @@ void CsvLogger::add(const LogData& data)
   appendField(rowStr, localData.rightPower, false);
   appendField(rowStr, localData.leftPower, false);
   appendField(rowStr, localData.rightSpeed, false);
-  appendField(rowStr, localData.leftSpeed, true);
+  appendField(rowStr, localData.leftSpeed, false);
+  appendField(rowStr, localData.currentVal, false);
+  appendField(rowStr, localData.target, false);
+  appendField(rowStr, localData.kp, false);
+  appendField(rowStr, localData.ki, false);
+  appendField(rowStr, localData.kd, true);
   rowStr += "\n";
 
   int written = snprintf(&logs[currentIndex], remainBuffer, "%s", rowStr.c_str());
@@ -133,7 +139,7 @@ void CsvLogger::outputToFile()
   }
 
   // CSVファイルをバイナリモードで開く
-  std::ofstream file(outputPath, std::ios::binary | std::ios::app);
+  std::ofstream file(outputPath, std::ios::binary | std::ios::trunc);
 
   if(!file.is_open()) {
     Logger::error("CsvLogger: failed to open or create csv file");

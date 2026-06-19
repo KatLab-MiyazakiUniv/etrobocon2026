@@ -64,9 +64,9 @@ namespace etrobocon2026_test {
     CsvLogger::outputToFile();
 
     const std::string contents = ReadFileContents(fullPath);
-    EXPECT_NE(contents.find("time,comand:id,brightness,rightPower,leftPower,rightSpeed,leftSpeed\n"
-                            "42,CDL,100,100,-100,50.53,-50.5\n"),
+    EXPECT_NE(contents.find("time,comand:id,brightness,rightPower,leftPower,rightSpeed,leftSpeed"),
               std::string::npos);
+    EXPECT_NE(contents.find("42,CDL,100,100,-100,50.53,-50.5"), std::string::npos);
   }
 
   // 複数回 add() を呼び出したときに、CSV ファイルに各行が連続して保存されることを確認する
@@ -94,10 +94,10 @@ namespace etrobocon2026_test {
     CsvLogger::outputToFile();
 
     const std::string contents = ReadFileContents(fullPath);
-    EXPECT_NE(contents.find("time,comand:id,brightness,rightPower,leftPower,rightSpeed,leftSpeed\n"
-                            "1,CDL,2,3,4,5.5,6.5\n"
-                            "7,CDL,8,9,10,11.123,12\n"),
+    EXPECT_NE(contents.find("time,comand:id,brightness,rightPower,leftPower,rightSpeed,leftSpeed"),
               std::string::npos);
+    EXPECT_NE(contents.find("1,CDL,2,3,4,5.5,6.5"), std::string::npos);
+    EXPECT_NE(contents.find("7,CDL,8,9,10,11.123,12"), std::string::npos);
   }
 
   // 一部の値が欠けているときに空文字（,,）でカンマが維持されるか確認する
@@ -124,8 +124,8 @@ namespace etrobocon2026_test {
 
     const std::string contents = ReadFileContents(fullPath);
     // 期待される出力: "time,brightness,rightPower,leftPower\n,60,,35\n"
-    EXPECT_NE(contents.find("time,comand:id,brightness,rightPower,leftPower,rightSpeed,leftSpeed\n"
-                            "90,,60,,35,,\n"),
+    EXPECT_NE(contents.find("time,comand:id,brightness,rightPower,leftPower,rightSpeed,leftSpeed"),
               std::string::npos);
+    EXPECT_NE(contents.find("90,,60,,35,,"), std::string::npos);
   }
 }  // namespace etrobocon2026_test

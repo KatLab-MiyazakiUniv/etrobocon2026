@@ -64,7 +64,7 @@ namespace etrobocon2025_test {
     calibrator.measureAndSetTargetBrightness();
     string output = testing::internal::GetCapturedStdout();  // キャプチャ終了
 
-    string targetString = "Target Brightness Value is ";  // 目標輝度値の直前に書かれている文字列
+    string targetString = "Calibrator:目標輝度値は ";  // 目標輝度値の直前に書かれている文字列
 
     // 出力された目標輝度値を取得
     int index = output.find(targetString) + targetString.length();

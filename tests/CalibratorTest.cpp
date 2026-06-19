@@ -38,11 +38,11 @@ namespace etrobocon2025_test {
     string output = testing::internal::GetCapturedStdout();  // キャプチャ終了
     bool expected;
     // Leftコースと出力されていた場合
-    if(output.find("Will Run on the Left Course") != string::npos) {
+    if(output.find("Calibrator:走行開始 Left Course") != string::npos) {
       expected = true;  // Lコース
     }
     // Rightコースと出力されていた場合
-    else if(output.find("Will Run on the Right Course") != string::npos) {
+    else if(output.find("Calibrator:走行開始 Right Course") != string::npos) {
       expected = false;  // Rコース
     }
     // 想定していない状況

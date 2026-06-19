@@ -91,7 +91,7 @@ namespace etrobocon2026_test {
     MockNetworkSystem mockNet;
     mockNet.hasRecvData = true;
     mockNet.recvData = CameraServer::Command::SHUTDOWN;
-    SocketServer server(mockNet);
+    SocketServer server(snapshotActionHandler, mockNet);
     server.init();
     server.run();
 

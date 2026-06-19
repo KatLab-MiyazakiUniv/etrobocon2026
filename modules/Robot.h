@@ -11,8 +11,9 @@
 #include "ArmMotorController.h"
 #include "IMUController.h"
 #include "ColorSensorController.h"
-#include "Course.h"
+#include "UltraSonicController.h"
 #include "SocketClient.h"
+#include "Course.h"
 
 class Robot {
  public:
@@ -38,6 +39,26 @@ class Robot {
    * @return メンバ変数 imuController(IMUController のインスタンス) の参照
    */
   IMUController& getIMUControllerInstance();
+
+  /**
+   * @brief ColorSensorControllerのインスタンスの参照を返す
+   * @return メンバ変数 colorSensorController(ColorSensorController のインスタンス) の参照
+   */
+  ColorSensorController& getColorSensorControllerInstance();
+
+  /**
+   * @brief UltraSonicControllerのインスタンスの参照を返す
+   * @return メンバ変数 ultraSonicController(UltraSonicController のインスタンス)の参照
+   */
+  UltraSonicController& getUltraSonicControllerInstance();
+
+  /**
+   * @brief カメラサーバー用のSocketClientのインスタンスの参照を返す
+   * @return メンバ変数
+   * socketClient(デフォルト引数でDIしたカメラサーバー用のSocketClientのインスタンス) の参照
+   */
+  SocketClient& getCameraSocketClientInstance();
+
   /**
    * @brief コースの参照を返す
    * @return メンバ変数 course(Course のインスタンス) の参照
@@ -51,24 +72,37 @@ class Robot {
   void setCourse(Course course);
 
   /**
-   * @brief ColorSensorControllerのインスタンスの参照を返す
-   * @return メンバ変数 colorSensorController(ColorSensorController のインスタンス) の参照
+   * @brief エッジの左右判定の参照を返す
+   * @return メンバ変数 edge(Edge のインスタンス) の参照
    */
-  ColorSensorController& getColorSensorControllerInstance();
+  Edge& getEdge();
 
   /**
-   * @brief カメラサーバー用のSocketClientのインスタンスの参照を返す
-   * @return メンバ変数
-   * socketClient(デフォルト引数でDIしたカメラサーバー用のSocketClientのインスタンス) の参照
+   * @brief エッジの左右判定を設定する
+   * @param edge エッジの左右判定
    */
-  SocketClient& getCameraSocketClientInstance();
+  void setEdge(Edge edge);
+
+  /**
+   * @brief 走行開始時間を返す
+   * @return 走行開始時間
+   */
+  int getRunningStartTime();
+
+  /**
+   * @brief 走行開始時間を設定する
+   */
+  void setRunningStartTime(int time);
 
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
   ArmMotorController armMotorController;        // ArmMotorController インスタンス
   IMUController imuController;                  // IMUController インスタンス
-  Course course;                                // コース(Left or Right)
   ColorSensorController colorSensorController;  // ColorSensorController インスタンス
+  UltraSonicController ultraSonicController;    // UltraSonicController インスタンス
   SocketClient& cameraSocketClient;             // カメラサーバー用の SocketClient インスタンス
+  Course course;                                // コース(Left or Right)
+  Edge edge;                                    // エッジの左右判定
+  int runningStartTime = 0;                     // 走行開始時間
 };
 #endif

@@ -49,7 +49,7 @@ void Calibrator::selectAndSetCourse()
     }
   }
   const char* course = isLeftCourse ? "Left" : "Right";
-  printf("\nWill Run on the %s Course\n", course);
+  Logger::printfLog(Logger::info, "Calibrator:走行開始 %s Course", course);
   robot.getDisplayInstance().scrollText("OK", 50);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));  // 1秒スリープ
 }
@@ -128,7 +128,7 @@ void Calibrator::measureAndSetTargetBrightness()
   targetBrightness = (whiteBrightness + blackBrightness) / 2;
   // 目標輝度をディスプレイに表示
   robot.getDisplayInstance().showNumber(targetBrightness);
-  Logger::printfLog("Calibrator:目標輝度値は %d ", targetBrightness);
+  Logger::printfLog(Logger::INFO, "Calibrator:目標輝度値は %d ", targetBrightness);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));  // 1秒スリープ
   robot.getDisplayInstance().showChar(' ');                      // ディスプレイを消灯
 }

@@ -53,8 +53,7 @@ namespace etrobocon2026_test {
   {
     MockNetworkSystem mockNet;
     SocketServer server(snapshotActionHandler, mockNet);
-    server.setIsRunning(true);
-    server.setListenSocket(100);
+    server.init();
     server.shutdown();
     EXPECT_FALSE(server.getIsRunning());
     EXPECT_EQ(server.getListenSocket(), -1);

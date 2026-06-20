@@ -100,9 +100,9 @@ class Robot {
   IMUController imuController;                  // IMUController インスタンス
   ColorSensorController colorSensorController;  // ColorSensorController インスタンス
   UltraSonicController ultraSonicController;    // UltraSonicController インスタンス
-  SocketClient& cameraSocketClient;             // カメラサーバー用の SocketClient インスタンス
-  Course course;                                // コース(Left or Right)
-  Edge edge;                                    // エッジの左右判定
-  int runningStartTime = 0;                     // 走行開始時間
+  SocketClient& cameraSocketClient;  // カメラサーバー用の SocketClient インスタンス
+  Course course;                     // コース(Left or Right)
+  Edge edge;                         // エッジの左右判定
+  int runningStartTime = 0;          // 走行開始時間
 };
 #endif

@@ -205,6 +205,16 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
     //       motionParams[12] == "true");
     // }
     // ↓ 他のコマンドはここに追加していく
+    case MOTION_COMMAND::LINETRACE: {
+      // LineTrace: motionParams[2]=speed(double)
+      //           motionParams[3]=brightness(int)
+      //           motionParams[4..6]=brightnessPid(kp,ki,kd)
+      return new LineTrace(robot, std::move(condition), fromString<double>(motionParams[2]),
+                           fromString<int>(motionParams[3]),
+                           Pid::PidGain{ fromString<double>(motionParams[4]),
+                                         fromString<double>(motionParams[5]),
+                                         fromString<double>(motionParams[6]) });
+    }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
                         motionParams[0].c_str());
@@ -218,6 +228,7 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
   static const unordered_map<string, MOTION_COMMAND> commandMap = {
     { "EXAMPLE", MOTION_COMMAND::EXAMPLE },
     { "Straight", MOTION_COMMAND::STRAIGHT },
+    { "LineTrace", MOTION_COMMAND::LINETRACE },
   };
 
   // コマンド文字列に対応するMOTION_COMMAND値をマップから取得。なければMOTION_COMMAND::NONEを返す

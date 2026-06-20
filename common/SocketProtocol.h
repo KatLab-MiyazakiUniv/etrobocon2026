@@ -18,10 +18,9 @@ namespace CameraServer {
    * @brief サーバー側で実行可能なコマンド
    */
   enum class Command : uint8_t {
-    TAKE_SNAPSHOT = 1,       // スナップショット
-    GET_DECRYPTION_KEY = 2,  // 復号キー取得
-    DISCONNECT = 254,        // サーバーから切断
-    SHUTDOWN = 255           // サーバーをシャットダウン
+    TAKE_SNAPSHOT = 1,  // スナップショット
+    DISCONNECT = 254,   // サーバーから切断
+    SHUTDOWN = 255      // サーバーをシャットダウン
   };
 
   constexpr size_t COMMAND_SIZE = sizeof(Command);  // コマンド型のバイトサイズ
@@ -36,17 +35,6 @@ namespace CameraServer {
   struct SnapshotActionResponse {
     bool success;  // 撮影が成功したかどうか
   };
-
-  // 復号キー取得要求のリクエストデータ構造
-  struct DecryptionKeyRequest {
-    Command command = Command::GET_DECRYPTION_KEY;
-  };
-
-  // 復号キー取得要求のレスポンスデータ構造
-  struct DecryptionKeyResponse {
-    char key[5];
-  };
-
 }  // namespace CameraServer
 
 #endif  // SOCKET_PROTOCOL_H

@@ -134,7 +134,7 @@ class Robot {
   spikeapi::Button button;                      // Buttonインスタンス
   spikeapi::ForceSensor forceSensor;            // ForceSensorインスタンス
   spikeapi::Display display;
-  char decryptionKey[5] = { 0 };
-  int targetBrightness = 50;  // Displayインスタンス
+  char decryptionKey[5] = { 0 };  // 復号キー
+  int targetBrightness = 50;      // 目標輝度
 };
 #endif

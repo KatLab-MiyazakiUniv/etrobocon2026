@@ -108,34 +108,6 @@ void SocketServer::handleConnection(int clientSocket)
                         0);
             break;
           }
-          case CameraServer::Command::GET_DECRYPTION_KEY: {
-            Logger::info("GET_DECRYPTION_KEYを実行");
-            CameraServer::DecryptionKeyResponse response;
-            std::memset(&response, 0, sizeof(response));
-            Logger::info("4つの文字列の復号キーを半角で入力");
-            std::string inputStr;
-            while(1) {
-              if(std::cin >> inputStr) {
-                if(inputStr.length() == 4) {
-                  break;
-                }
-              } else {
-                if(std::cin.eof()) {
-                  Logger::error("EOF");
-                  inputStr = "AAAA";  // デフォルトキー
-                  break;
-                }
-                std::cin.clear();
-                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-              }
-              Logger::info("4桁に達していません。再入力を");
-            }
-            std::strncpy(response.key, inputStr.c_str(), 4);
-            response.key[4] = '\0';
-            netSys.send(clientSocket, reinterpret_cast<const char*>(&response), sizeof(response),
-                        0);
-            break;
-          }
           case CameraServer::Command::SHUTDOWN:
             shutdown();
             return;

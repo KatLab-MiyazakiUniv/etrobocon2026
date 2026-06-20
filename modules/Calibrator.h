@@ -47,6 +47,12 @@ class Calibrator {
    */
   void inputAndSetDecryptionKey();
 
+  /**
+   * @brief 4文字の復号キーをメンバ変数に保存する
+   * @param key 4文字の復号キー
+   */
+  void setDecryptionKey(const std::string& key);
+
  private:
   Robot& robot;  // Robotインスタンスの参照
 };

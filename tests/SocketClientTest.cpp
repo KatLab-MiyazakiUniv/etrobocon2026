@@ -93,21 +93,4 @@ namespace etrobocon2026_test {
     uint8_t expectedCmd = static_cast<uint8_t>(CameraServer::Command::SHUTDOWN);
     EXPECT_EQ(mockNet.lastSentCommand, expectedCmd);
   }
-
-  // executeGetDecryptionKey の正常系テスト
-  TEST(SocketClientTest, ExecuteGetDecryptionKeySuccess)
-  {
-    MockNetworkSystem mockNet;
-    SocketClient client(mockNet);
-    EXPECT_TRUE(client.connectToServer());
-
-    CameraServer::DecryptionKeyRequest request;
-    mockNet.hasRecvData = true;
-    mockNet.sizeOfReturnLen = sizeof(CameraServer::DecryptionKeyResponse);
-
-    CameraServer::DecryptionKeyResponse response;
-    EXPECT_TRUE(client.executeGetDecryptionKey(request, response));
-    uint8_t expectedCmd = static_cast<uint8_t>(CameraServer::Command::GET_DECRYPTION_KEY);
-    EXPECT_EQ(mockNet.lastSentCommand, expectedCmd);
-  }
 }  // namespace etrobocon2026_test

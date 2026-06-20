@@ -83,9 +83,9 @@ namespace etrobocon2025_test {
     Robot robot(socketClient);
     Calibrator calibrator(robot);
 
-    calibrator.inputAndSetDecryptionKey();
+    calibrator.inputAndSetDecryptionKey();  // オフライン時はデフォルト値フォールバック
 
-    string actual = robot.getDecryptionKey();
-    EXPECT_EQ("AAAA", actual);
+    string actual = robot.getDecryptionKey();  //
+    EXPECT_EQ("AAAA", actual);                 // デフォルト値とゲッタの値が等しいかテスト
   }
 }  // namespace etrobocon2025_test

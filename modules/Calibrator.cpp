@@ -165,20 +165,26 @@ void Calibrator::waitForStart()
   }
 }
 
-void Calibrator::inputAndSetDecryptionKey()
+void Calibrator::setDecryptionKey(const std::string& key)
 {
-  CameraServer::DecryptionKeyRequest request;
-  CameraServer::DecryptionKeyResponse response;
-
-  if(robot.getCameraSocketClientInstance().executeGetDecryptionKey(request, response)) {
-    robot.setDecryptionKey(response.key);
-
-    Logger::printfLog(Logger::INFO, "Calibrator:受け取った復号キー: %s", response.key);
-
-    robot.getDisplayInstance().scrollText(response.key, 100);
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  if(key.length() == 4) {
+    robot.setDecryptionKey(key.c_str());
   } else {
-    Logger::error("Calibrator:復号キーの取得に失敗");
     robot.setDecryptionKey("AAAA");
   }
+}
+
+void Calibrator::inputAndSetDecryptionKey()
+{
+  std::string key;
+
+  Logger::info("4文字の復号キーを入力してください");
+
+  while(true) {
+    std::cin >> key;
+    if(key.length() == 4) break;
+    Logger::info("4文字で入力してください");
+  }
+
+  setDecryptionKey(key);
 }

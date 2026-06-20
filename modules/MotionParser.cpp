@@ -8,6 +8,22 @@
 
 using namespace std;
 
+// etrobocon2026/ の親ディレクトリからの実行を前提とした相対パス
+static const string MOTIONS_PATH = "etrobocon2026/datafiles/commands/Motions/";
+static const string CONDITIONS_PATH = "etrobocon2026/datafiles/commands/Conditions/";
+
+// 文字列の前後の空白を削除する
+static void trim(std::string& s)
+{
+  size_t start = s.find_first_not_of(" \t");
+  if(start == std::string::npos) {
+    s.clear();
+    return;
+  }
+  size_t end = s.find_last_not_of(" \t");
+  s = s.substr(start, end - start + 1);
+}
+
 // stringを指定した型に変換する関数(stoi,stodの代わり)
 template <typename T>
 T fromString(const std::string& s)
@@ -20,72 +36,212 @@ T fromString(const std::string& s)
 
 vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& commandFilePath)
 {
-  // 行番号カウンタ
   int lineNum = 1;
-  // 動作インスタンスのリスト
   vector<BaseMotion*> motionList;
 
-  // ファイルを開き、開けなければ空のリストを返す
+  // Area CSVを開き、開けなければ空のリストを返す
   ifstream file(commandFilePath);
   if(!file) {
-    Logger::printfLog(Logger::ERROR, "コマンドファイルを開けませんでした: %s",
+    Logger::printfLog(Logger::ERROR, "Areaのコマンドファイルを開けませんでした: %s",
                       commandFilePath.c_str());
     return motionList;
   }
 
-  // 各行を格納する変数を定義
   string line;
 
+  // ヘッダ行をスキップ
+  if(!getline(file, line)) return motionList;
+  lineNum++;
+
   // fileから1行ずつ文字列として line に読み込む
-  // TODO: 各動作クラスが完成したら、以下のコメントを外してswitch-caseを実装する
   while(getline(file, line)) {
-    // 文字列 line をストリームに変換
     stringstream ss(line);
 
-    // カンマ区切りでコマンド名とその引数を1つずつ取り出して params に追加
+    // カンマ区切りで (動作コマンド名, 動作ID, 条件コマンド名, 条件ID) を取り出す
     vector<string> params;
     for(string token; getline(ss, token, SEPARATOR);) {
+      trim(token);
       params.push_back(move(token));
     }
 
-    // TODO: コマンド名をCOMMAND enumに変換して各Motionオブジェクトを生成する処理
-    //       各コマンドに対応するMotionクラスが実装済みになったら順次追加していく
-    // COMMAND command = convertCommand(params[0]);
-    // switch(command) {
-    //   case COMMAND::AR: {
-    //     // AR: 角度指定回頭
-    //     // params[1]:int 角度[deg], params[2]:double 速度[mm/s], params[3]:string 方向
-    //     auto ar = new AngleRotation(robot, std::stoi(params[1]), std::stod(params[2]),
-    //                                 convertBool(params[0], params[3]));
-    //     motionList.push_back(ar);
-    //     break;
-    //   }
-    //   // ↓ 他のコマンドはここに追加していく
-    //   default: {
-    //     cout << commandFilePath << ":" << lineNum << " Command " << params[0] << " は未定義です"
-    //     << endl; break;
-    //   }
-    // }
+    if(params.size() < 4) {
+      Logger::printfLog(Logger::ERROR, "%s:%d フォーマットが不正です（4列必要）",
+                        commandFilePath.c_str(), lineNum);
+      lineNum++;
+      continue;
+    }
 
-    lineNum++;  // 行番号をインクリメントする
+    string motionName = params[0];
+    string motionId = params[1];
+    string conditionName = params[2];
+    string conditionId = params[3];
+
+    // 動作パラメータを取得する
+    vector<string> motionParams = extractParamsFromID(MOTIONS_PATH + motionName + ".csv", motionId);
+    if(motionParams.empty()) {
+      Logger::printfLog(Logger::ERROR, "Motions: %s ID=%s が見つかりませんでした",
+                        motionName.c_str(), motionId.c_str());
+      lineNum++;
+      continue;
+    }
+    Logger::printfLog(Logger::INFO, "[MotionParser] Motion: %s ID=%s をロードしました",
+                      motionName.c_str(), motionId.c_str());
+
+    // 条件パラメータを取得する
+    vector<string> conditionParams
+        = extractParamsFromID(CONDITIONS_PATH + conditionName + ".csv", conditionId);
+    if(conditionParams.empty()) {
+      Logger::printfLog(Logger::ERROR, "Conditions: %s ID=%s が見つかりませんでした",
+                        conditionName.c_str(), conditionId.c_str());
+      lineNum++;
+      continue;
+    }
+    Logger::printfLog(Logger::INFO, "[MotionParser] Condition: %s ID=%s をロードしました",
+                      conditionName.c_str(), conditionId.c_str());
+    // 条件インスタンスを生成する
+    auto condition = createConditionInstance(robot, conditionParams);
+    if(!condition) {
+      Logger::printfLog(Logger::ERROR, "条件インスタンスの生成に失敗しました: %s %s",
+                        conditionName.c_str(), conditionId.c_str());
+      lineNum++;
+      continue;
+    }
+
+    // 動作インスタンスを生成してリストに追加する
+    BaseMotion* motion = createMotionInstance(robot, motionParams, std::move(condition));
+    if(motion) {
+      motionList.push_back(motion);
+      Logger::printfLog(Logger::INFO, "[MotionParser] motionList[%zu]: %s ID=%s (条件: %s ID=%s)",
+                        motionList.size() - 1, motionName.c_str(), motionId.c_str(),
+                        conditionName.c_str(), conditionId.c_str());
+    } else {
+      Logger::printfLog(Logger::ERROR, "%s:%d Command %s は未定義です", commandFilePath.c_str(),
+                        lineNum, motionName.c_str());
+    }
+
+    lineNum++;
   }
 
   return motionList;
 }
 
-COMMAND MotionParser::convertCommand(const string& str)
+vector<string> MotionParser::extractParamsFromID(const string& filePath, const string& id)
 {
-  // コマンド文字列(string)と、それに対応する列挙型COMMANDのマッピングを定義
-  static const unordered_map<string, COMMAND> commandMap = {
-    { "EXAMPLE", COMMAND::EXAMPLE },  // 例
+  ifstream file(filePath);
+  if(!file) {
+    Logger::printfLog(Logger::ERROR, "ファイルを開けませんでした: %s", filePath.c_str());
+    return {};
+  }
+
+  // ヘッダ2行をスキップ
+  string header;
+  getline(file, header);
+  getline(file, header);
+
+  string line;
+  vector<string> result;
+  while(getline(file, line)) {
+    stringstream ss(line);
+    vector<string> row;
+    for(string token; getline(ss, token, SEPARATOR);) {
+      trim(token);
+      row.push_back(move(token));
+    }
+    if(row.size() >= 2 && row[1] == id) {
+      if(!result.empty()) {
+        Logger::printfLog(Logger::ERROR, "%s に ID=%s が重複しています", filePath.c_str(),
+                          id.c_str());
+        return {};
+      }
+      result = move(row);
+    }
+  }
+
+  return result;
+}
+
+unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
+    Robot& robot, const vector<string>& params)
+{
+  CONDITION_COMMAND cond = convertCondition(params[0]);
+  switch(cond) {
+    case CONDITION_COMMAND::DISTANCE: {
+      double targetDistance = fromString<double>(params[2]);
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] DistanceCondition: targetDistance=%.1f を生成しました",
+                        targetDistance);
+      return make_unique<DistanceCondition>(robot, targetDistance);
+    }
+    // ↓ 他の条件コマンドはここに追加していく
+    default:
+      return nullptr;
+  }
+}
+
+BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string>& motionParams,
+                                               unique_ptr<BaseContinuationCondition> condition)
+{
+  // TODO: 各動作クラスが完成したら、以下のコメントを外してswitch-caseを実装する
+  MOTION_COMMAND command = convertCommand(motionParams[0]);
+  switch(command) {
+    // case MOTION_COMMAND::STRAIGHT: {
+    //   // Straight: motionParams[2]=speed(double)
+    //   //           motionParams[3..5]=rightPid(kp,ki,kd)
+    //   //           motionParams[6..8]=leftPid(kp,ki,kd)
+    //   //           motionParams[9..11]=anglePid(kp,ki,kd)
+    //   //           motionParams[12]=useIMU(string: "true"/"false")
+    //   return new Straight(
+    //       robot, std::move(condition),
+    //       fromString<double>(motionParams[2]),
+    //       Pid::PidGain{ fromString<double>(motionParams[3]),
+    //                     fromString<double>(motionParams[4]),
+    //                     fromString<double>(motionParams[5]) },
+    //       Pid::PidGain{ fromString<double>(motionParams[6]),
+    //                     fromString<double>(motionParams[7]),
+    //                     fromString<double>(motionParams[8]) },
+    //       Pid::PidGain{ fromString<double>(motionParams[9]),
+    //                     fromString<double>(motionParams[10]),
+    //                     fromString<double>(motionParams[11]) },
+    //       motionParams[12] == "true");
+    // }
+    // ↓ 他のコマンドはここに追加していく
+    default:
+      Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
+                        motionParams[0].c_str());
+      return nullptr;
+  }
+}
+
+MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
+{
+  // コマンド文字列(string)と、それに対応する列挙型MOTION_COMMANDのマッピングを定義
+  static const unordered_map<string, MOTION_COMMAND> commandMap = {
+    { "EXAMPLE", MOTION_COMMAND::EXAMPLE },
+    { "Straight", MOTION_COMMAND::STRAIGHT },
   };
 
-  // コマンド文字列に対応するCOMMAND値をマップから取得。なければCOMMAND::NONEを返す
+  // コマンド文字列に対応するMOTION_COMMAND値をマップから取得。なければMOTION_COMMAND::NONEを返す
   auto it = commandMap.find(str);
   if(it != commandMap.end()) {
     return it->second;
   } else {
-    return COMMAND::NONE;
+    return MOTION_COMMAND::NONE;
+  }
+}
+
+MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str)
+{
+  // 条件コマンド文字列と、それに対応する列挙型CONDITION_COMMANDのマッピングを定義
+  static const unordered_map<string, CONDITION_COMMAND> conditionMap = {
+    { "Distance", CONDITION_COMMAND::DISTANCE },
+  };
+
+  // 条件コマンド文字列に対応するCONDITION_COMMAND値をマップから取得。なければCONDITION_COMMAND::NONEを返す
+  auto it = conditionMap.find(str);
+  if(it != conditionMap.end()) {
+    return it->second;
+  } else {
+    return CONDITION_COMMAND::NONE;
   }
 }
 

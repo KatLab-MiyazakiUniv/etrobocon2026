@@ -93,3 +93,24 @@ spikeapi::Display& Robot::getDisplayInstance()
 {
   return display;
 }
+
+void Robot::setDecryptionKey(const char* key)
+{
+  std::strncpy(decryptionKey, key, 4);
+  decryptionKey[4] = '\0';
+}
+
+const char* Robot::getDecryptionKey() const
+{
+  return decryptionKey;
+}
+
+void Robot::setTargetBrightness(int brightness)
+{
+  targetBrightness = brightness;
+}
+
+int Robot::getTargetBrightness() const
+{
+  return targetBrightness;
+}

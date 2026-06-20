@@ -17,6 +17,7 @@
 #include "Button.h"
 #include "ForceSensor.h"
 #include "Display.h"
+#include <cstring>
 
 class Robot {
  public:
@@ -98,15 +99,9 @@ class Robot {
   spikeapi::Display& getDisplayInstance();
 
   /**
-   * @brief カメラサーバー用のSocketClientのインスタンスの参照を返す
-   * @return メンバ変数 socketClient(デフォルト引数でDIしたカメラサーバー用のSocketClientのインスタンス) の参照
-
-
-
-  /**
    * @brief エッジの左右判定を設定する
    * @param edge エッジの左右判定
-  */
+   */
   void setEdge(Edge edge);
 
   /**
@@ -120,6 +115,12 @@ class Robot {
    */
   void setRunningStartTime(int time);
 
+  void setDecryptionKey(const char* key);
+  const char* getDecryptionKey() const;
+
+  void setTargetBrightness(int brightness);
+  int getTargetBrightness() const;
+
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
   ArmMotorController armMotorController;        // ArmMotorController インスタンス
@@ -132,6 +133,8 @@ class Robot {
   int runningStartTime = 0;                     // 走行開始時間
   spikeapi::Button button;                      // Buttonインスタンス
   spikeapi::ForceSensor forceSensor;            // ForceSensorインスタンス
-  spikeapi::Display display;                    // Displayインスタンス
+  spikeapi::Display display;
+  char decryptionKey[5] = { 0 };
+  int targetBrightness = 50;  // Displayインスタンス
 };
 #endif

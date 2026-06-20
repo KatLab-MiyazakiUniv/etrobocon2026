@@ -12,46 +12,36 @@
 
 using namespace std;
 
-Calibrator::Calibrator(Robot& _robot) : robot(_robot), isLeftCourse(true), targetBrightness(50)
-{
-  std::memset(decryptionKey, 0, sizeof(decryptionKey));
-}
+Calibrator::Calibrator(Robot& _robot) : robot(_robot) {}
 
 void Calibrator::selectAndSetCourse()
 {
   robot.getDisplayInstance().showChar('C');  // C:コース
+  Course course = Course::Left;
   while(1) {
     // 左ボタンが押されたときRコースがセットされていれば、Lコースをセットする
-    if(robot.getButtonInstance().isLeftPressed() && !isLeftCourse) {
-      isLeftCourse = true;
+    if(robot.getButtonInstance().isLeftPressed()) {
+      course = (course == Course::Left) ? Course::Right : Course::Left;
       // 画面にLコースが選択されたことを表示
-      robot.getDisplayInstance().showChar('L');
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));  // 10ミリ秒スリープ
+      robot.getDisplayInstance().showChar(course == Course::Left ? 'L' : 'R');
       // ボタンが離されるまで待機
       while(robot.getButtonInstance().isLeftPressed()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));  // 10ミリ秒スリープ
-      }
-    }
-    // 左ボタンが押されたときLコースがセットされていれば、Rコースをセットする
-    else if(robot.getButtonInstance().isLeftPressed() && isLeftCourse) {
-      isLeftCourse = false;
-      // 画面にRコースが選択されたことを表示
-      robot.getDisplayInstance().showChar('R');
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));  // 10ミリ秒スリープ
-      // ボタンが離されるまで待機
-      while(robot.getButtonInstance().isLeftPressed()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));  // 10ミリ秒スリープ
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
       }
     }
     // 右ボタンが押されたときコース選択を終了
     if(robot.getButtonInstance().isRightPressed()) {
       break;
     }
+    std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
-  const char* course = isLeftCourse ? "Left" : "Right";
-  Logger::printfLog(Logger::INFO, "Calibrator:走行開始 %s Course", course);
+  robot.setCourse(course);
+
+  Logger::printfLog(Logger::INFO, "Calibrator:走行開始 %s Course",
+                    course == Course::Left ? "Left" : "Right");
+
   robot.getDisplayInstance().scrollText("OK", 50);
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));  // 1秒スリープ
+  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 }
 
 void Calibrator::measureAndSetTargetBrightness()
@@ -91,7 +81,6 @@ void Calibrator::measureAndSetTargetBrightness()
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(10));  // 10ミリ秒スリープ
   }
-
   robot.getDisplayInstance().showChar('W');
   // 白の輝度測定
   // 左ボタンで輝度を取得し、右ボタンで白の輝度を決定する
@@ -124,11 +113,12 @@ void Calibrator::measureAndSetTargetBrightness()
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(10));  // 10ミリ秒スリープ
   }
+  int target = (whiteBrightness + blackBrightness) / 2;
+  robot.setTargetBrightness(target);
 
-  targetBrightness = (whiteBrightness + blackBrightness) / 2;
   // 目標輝度をディスプレイに表示
-  robot.getDisplayInstance().showNumber(targetBrightness);
-  Logger::printfLog(Logger::INFO, "Calibrator:目標輝度値は %d ", targetBrightness);
+  robot.getDisplayInstance().showNumber(target);
+  Logger::printfLog(Logger::INFO, "Calibrator:目標輝度値は %d ", target);
   std::this_thread::sleep_for(std::chrono::milliseconds(1000));  // 1秒スリープ
   robot.getDisplayInstance().showChar(' ');                      // ディスプレイを消灯
 }
@@ -179,29 +169,16 @@ void Calibrator::inputAndSetDecryptionKey()
 {
   CameraServer::DecryptionKeyRequest request;
   CameraServer::DecryptionKeyResponse response;
+
   if(robot.getCameraSocketClientInstance().executeGetDecryptionKey(request, response)) {
-    std::strncpy(decryptionKey, response.key, 4);
-    decryptionKey[4] = '\0';
-    Logger::printfLog(Logger::INFO, "Calibrator:受け取った復号キー: %s", decryptionKey);
-    robot.getDisplayInstance().scrollText(decryptionKey, 100);
+    robot.setDecryptionKey(response.key);
+
+    Logger::printfLog(Logger::INFO, "Calibrator:受け取った復号キー: %s", response.key);
+
+    robot.getDisplayInstance().scrollText(response.key, 100);
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
   } else {
     Logger::error("Calibrator:復号キーの取得に失敗");
-    std::strcpy(decryptionKey, "AAAA");
+    robot.setDecryptionKey("AAAA");
   }
-}
-
-bool Calibrator::getIsLeftCourse()
-{
-  return isLeftCourse;
-}
-
-int Calibrator::getTargetBrightness()
-{
-  return targetBrightness;
-}
-
-const char* Calibrator::getDecryptionKey() const
-{
-  return decryptionKey;
 }

@@ -35,9 +35,6 @@ namespace spikeapi {
      * Buttonでは複数生成が問題ないので、常にfalseを返す
      */
     bool hasError();
-
-   private:
-    bool isPressedFlag = true;  // ダミーでは常に押されているとする
   };
 }  // namespace spikeapi
 

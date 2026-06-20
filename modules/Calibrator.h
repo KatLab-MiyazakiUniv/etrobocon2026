@@ -11,6 +11,7 @@
 #include "ClockUtil.h"
 #include "Logger.h"
 #include "Snapshot.h"
+#include "Course.h"
 
 #define PRESS_POWER 0.5f
 
@@ -46,29 +47,8 @@ class Calibrator {
    */
   void inputAndSetDecryptionKey();
 
-  /**
-   * @brief isLeftCourseのゲッター
-   * @return true:Lコース, false:Rコース
-   */
-  bool getIsLeftCourse();
-
-  /**
-   * @brief targetBrightnessのゲッター
-   * @return 目標輝度
-   */
-  int getTargetBrightness();
-
-  /**
-   * @brief decryptionKeyのゲッター
-   * @return 4文字の復号キー
-   */
-  const char* getDecryptionKey() const;
-
  private:
-  Robot& robot;           // Robotインスタンスの参照
-  bool isLeftCourse;      // true:Lコース, false: Rコース
-  int targetBrightness;   // 目標輝度
-  char decryptionKey[5];  // 4文字の復号キー (+ null終端)
+  Robot& robot;  // Robotインスタンスの参照
 };
 
 #endif

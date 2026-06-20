@@ -27,39 +27,38 @@ namespace etrobocon2025_test {
   }
 
   // 左右ボタンでLRコースを選択できるかのテスト
-  TEST(CalibratorTest, GetIsLeftCourse)
+  TEST(CalibratorTest, SetCourse)
   {
     RealNetworkSystem netSys;
     SocketClient socketClient(netSys);
     Robot robot(socketClient);
     Calibrator calibrator(robot);
+
     testing::internal::CaptureStdout();  // 標準出力キャプチャ開始
     calibrator.selectAndSetCourse();
     string output = testing::internal::GetCapturedStdout();  // キャプチャ終了
-    bool expected;
+
+    Course actual = robot.getCourse();
     // Leftコースと出力されていた場合
+
     if(output.find("Calibrator:走行開始 Left Course") != string::npos) {
-      expected = true;  // Lコース
+      EXPECT_EQ(Course::Left, actual);
+      // Rightコースと出力されていた場合
+    } else if(output.find("Calibrator:走行開始 Right Course") != string::npos) {
+      EXPECT_EQ(Course::Right, actual);  // 出力とゲッタの値が等しいかテスト
+    } else {
+      FAIL();  // 想定外
     }
-    // Rightコースと出力されていた場合
-    else if(output.find("Calibrator:走行開始 Right Course") != string::npos) {
-      expected = false;  // Rコース
-    }
-    // 想定していない状況
-    else {
-      expected = NULL;
-    }
-    bool actual = calibrator.getIsLeftCourse();  // 実際のisLeftCourseを取得
-    EXPECT_EQ(expected, actual);                 // 出力とゲッタの値が等しいかテスト
   }
 
   // 目標輝度値を取得できるかのテスト
-  TEST(CalibratorTest, getTargetBrightness)
+  TEST(CalibratorTest, TargetBrightness)
   {
     RealNetworkSystem netSys;
     SocketClient socketClient(netSys);
     Robot robot(socketClient);
     Calibrator calibrator(robot);
+
     testing::internal::CaptureStdout();  // 標準出力キャプチャ開始
     calibrator.measureAndSetTargetBrightness();
     string output = testing::internal::GetCapturedStdout();  // キャプチャ終了
@@ -71,20 +70,22 @@ namespace etrobocon2025_test {
     string expectedStr = output.substr(index);  // 輝度値を取得（文字列）
     int expected = stoi(expectedStr);           // 文字列を整数値に変換
 
-    int actual = calibrator.getTargetBrightness();  // 実際の輝度値を取得
+    int actual = robot.getTargetBrightness();  // 実際の輝度値を取得
 
     EXPECT_EQ(expected, actual);  // 出力とゲッタの値が等しいかテスト
   }
 
   // 復号キー取得のテスト（オフライン時はデフォルト値フォールバック）
-  TEST(CalibratorTest, getDecryptionKeyFallback)
+  TEST(CalibratorTest, DecryptionKeyFallback)
   {
     RealNetworkSystem netSys;
     SocketClient socketClient(netSys);
     Robot robot(socketClient);
     Calibrator calibrator(robot);
+
     calibrator.inputAndSetDecryptionKey();
-    string actual = calibrator.getDecryptionKey();
+
+    string actual = robot.getDecryptionKey();
     EXPECT_EQ("AAAA", actual);
   }
 }  // namespace etrobocon2025_test

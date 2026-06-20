@@ -14,7 +14,6 @@ class BatteryController {
   /**
    * 電流取得
    * バッテリーの電流を取得する
-   * @param -
    * @return 電流[mA]
    */
   static uint16_t getCurrent();
@@ -22,14 +21,13 @@ class BatteryController {
   /**
    * 電圧取得
    * バッテリーの電圧を取得する
-   * @param -
    * @return 電圧[mV]
    */
   static uint16_t getVoltage();
 
  private:
   BatteryController();
-  static spikeapi::Battery& getBatteryIncetance();
+  static spikeapi::Battery& getBatteryInstance();
 };
 
 #endif

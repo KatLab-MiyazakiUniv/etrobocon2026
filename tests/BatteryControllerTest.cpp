@@ -6,7 +6,6 @@
 
 #include <gtest/gtest.h>
 #include "BatteryController.h"
-#include <iostream>
 
 namespace etrobocon2026 {
   // バッテリーの電圧が取得できるかテスト

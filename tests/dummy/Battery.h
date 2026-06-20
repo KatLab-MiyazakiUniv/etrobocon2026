@@ -9,7 +9,7 @@
 
 #include <cstdint>
 
-// ClockUtil.h が "spikeapi::Clock" を参照しているため、名前空間を合わせる
+// BatteryController.h が "spikeapi::Clock" を参照しているため、名前空間を合わせる
 namespace spikeapi {
   class Battery {
    public:

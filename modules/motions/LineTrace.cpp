@@ -53,6 +53,10 @@ void LineTrace::executeStep()
   LogData logData;
   logData.target = targetBrightness;
   logData.brightness = robot.getColorSensorControllerInstance().getReflectance();
+  logData.rightPower = robot.getWheelMotorControllerInstance().getRightPower();
+  logData.leftPower = robot.getWheelMotorControllerInstance().getLeftPower();
+  logData.rightSpeed = robot.getWheelMotorControllerInstance().getRightPower();
+  logData.leftSpeed = robot.getWheelMotorControllerInstance().getLeftPower();
   logData.kp = brightnessPidGain.kp;
   logData.ki = brightnessPidGain.ki;
   logData.kd = brightnessPidGain.kd;

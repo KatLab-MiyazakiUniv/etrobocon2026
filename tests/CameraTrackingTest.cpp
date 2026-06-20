@@ -40,7 +40,7 @@ namespace etrobocon2026_test {
     req.roi = { 0, 0, 640, 480 };
 
     TestCameraTracking tracking(robot, std::make_unique<SimpleContinuationCondition>(robot), 50.0,
-                                320, gain, gain, gain, req);
+                                320, gain, req);
 
     EXPECT_TRUE(tracking.canStart());
   }
@@ -59,7 +59,7 @@ namespace etrobocon2026_test {
     req.roi = { 0, 0, 640, 480 };
 
     TestCameraTracking tracking(robot, std::make_unique<SimpleContinuationCondition>(robot), 0.0,
-                                320, gain, gain, gain, req);
+                                320, gain, req);
 
     EXPECT_FALSE(tracking.canStart());
   }
@@ -81,7 +81,7 @@ namespace etrobocon2026_test {
     int targetX = 350;
 
     TestCameraTracking tracking(robot, std::make_unique<SimpleContinuationCondition>(robot), speed,
-                                targetX, gain, gain, gain, req);
+                                targetX, gain, req);
 
     EXPECT_DOUBLE_EQ(tracking.getTargetSpeed(), speed);
     EXPECT_EQ(tracking.getTargetXCoordinate(), targetX);

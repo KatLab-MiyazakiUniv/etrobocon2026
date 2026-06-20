@@ -9,8 +9,7 @@
 CameraTracking::CameraTracking(Robot& _robot,
                                std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                                double _targetSpeed, int _targetXCoordinate,
-                               const Pid::PidGain& _pidGain, const Pid::PidGain& _rightPid,
-                               const Pid::PidGain& _leftPid,
+                               const Pid::PidGain& _pidGain,
                                const CameraServer::ColorRegionDetectorRequest& _detectionRequest,
                                bool _isStopMotorPower)
   : BaseMotion(_robot, std::move(_continuationCondition)),
@@ -18,7 +17,7 @@ CameraTracking::CameraTracking(Robot& _robot,
     targetXCoordinate(_targetXCoordinate),
     detectionRequest(_detectionRequest),
     isStopMotorPower(_isStopMotorPower),
-    speedCalculator(_robot, _rightPid, _leftPid, _targetSpeed),
+    speedCalculator(_robot, _targetSpeed),
     cameraPid(_pidGain.kp, _pidGain.ki, _pidGain.kd, _targetXCoordinate)
 {
   LOG_CREATE("CameraTracking");
@@ -32,8 +31,8 @@ CameraTracking::~CameraTracking()
 bool CameraTracking::canStart()
 {
   if(targetSpeed == 0.0) {
-    return false;
     Logger::error("CameraTracking:目標スピードが0です");
+    return false;
   }
   return true;
 }
@@ -89,19 +88,9 @@ double CameraTracking::getTargetSpeed() const
   return targetSpeed;
 }
 
-void CameraTracking::setTargetSpeed(double _targetSpeed)
-{
-  targetSpeed = _targetSpeed;
-}
-
 int CameraTracking::getTargetXCoordinate() const
 {
   return targetXCoordinate;
-}
-
-void CameraTracking::setTargetXCoordinate(int _targetXCoordinate)
-{
-  targetXCoordinate = _targetXCoordinate;
 }
 
 const CameraServer::ColorRegionDetectorRequest& CameraTracking::getDetectionRequest() const
@@ -118,11 +107,6 @@ void CameraTracking::setDetectionRequest(
 bool CameraTracking::getIsStopMotorPower() const
 {
   return isStopMotorPower;
-}
-
-void CameraTracking::setIsStopMotorPower(bool _isStopMotorPower)
-{
-  isStopMotorPower = _isStopMotorPower;
 }
 
 const SpeedCalculator& CameraTracking::getSpeedCalculator() const

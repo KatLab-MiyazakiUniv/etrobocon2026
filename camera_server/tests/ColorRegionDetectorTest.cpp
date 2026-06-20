@@ -164,8 +164,8 @@ namespace etrobocon2026_test {
     EXPECT_EQ(largestColorIndex, -1);
   }
 
-  // 最大色インデックス取得のdetectで、1色だけ指定した場合 largestColorIndex ==
-  // 0になるかのテスト
+  // 最大色インデックス取得のdetectで、1色だけ指定した場合
+  // largestColorIndex == 0になるかのテスト
   TEST_F(ColorRegionDetectorTest, DetectWithLargestColorIndexSingleColor)
   {
     ColorRegionDetector detector(blackRanges, defaultROI);
@@ -215,8 +215,8 @@ namespace etrobocon2026_test {
     EXPECT_EQ(result.bottomRight.y, blueRect.y + blueRect.height);
   }
 
-  // 最大色インデックス取得ありのdetectで、黒色の方が大きい場合 largestColorIndex == 0
-  // になるかのテスト
+  // 最大色インデックス取得ありのdetectで、黒色の方が大きい場合
+  // largestColorIndex == 0 になるかのテスト
   TEST_F(ColorRegionDetectorTest, DetectWithLargestColorIndexBlackIsLargest)
   {
     // hsvRanges[0] = 黒色, hsvRanges[1] = 青色

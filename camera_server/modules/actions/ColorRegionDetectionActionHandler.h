@@ -26,7 +26,7 @@ class ColorRegionDetectionActionHandler {
   ~ColorRegionDetectionActionHandler();
 
   /**
-   * @brief ライン検出アクションを実行する
+   * @brief 色領域検出アクションを実行する
    * @param request クライアントからのリクエスト
    * @param response クライアントへのレスポンス
    */

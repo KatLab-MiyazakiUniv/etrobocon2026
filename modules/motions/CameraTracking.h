@@ -22,14 +22,11 @@ class CameraTracking : public BaseMotion {
    * @param _targetSpeed 目標速度
    * @param _targetXCoordinate 目標x座標
    * @param _pidGain カメラ制御用PIDゲイン
-   * @param _rightPid 右タイヤ速度制御用PIDゲイン
-   * @param _leftPid 左タイヤ速度制御用PIDゲイン
    * @param _detectionRequest 検出リクエスト
    * @param _isStopMotorPower モーターを停止するかどうか
    */
   CameraTracking(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                  double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
-                 const Pid::PidGain& _rightPid, const Pid::PidGain& _leftPid,
                  const CameraServer::ColorRegionDetectorRequest& _detectionRequest,
                  bool _isStopMotorPower = true);
 
@@ -45,22 +42,10 @@ class CameraTracking : public BaseMotion {
   double getTargetSpeed() const;
 
   /**
-   * @brief 目標速度を設定する
-   * @param _targetSpeed 設定する目標速度
-   */
-  void setTargetSpeed(double _targetSpeed);
-
-  /**
    * @brief 目標X座標を取得する
    * @return int 目標X座標
    */
   int getTargetXCoordinate() const;
-
-  /**
-   * @brief 目標X座標を設定する
-   * @param _targetXCoordinate 設定する目標X座標
-   */
-  void setTargetXCoordinate(int _targetXCoordinate);
 
   /**
    * @brief 色領域検出リクエストを取得する
@@ -80,12 +65,6 @@ class CameraTracking : public BaseMotion {
    * @return false 停止しない場合
    */
   bool getIsStopMotorPower() const;
-
-  /**
-   * @brief モーターを停止するかどうかを設定する
-   * @param _isStopMotorPower 設定するフラグ
-   */
-  void setIsStopMotorPower(bool _isStopMotorPower);
 
   /**
    * @brief 目標速度に対するモータパワー計算器を取得する

@@ -63,7 +63,7 @@ class ColorRegionDetector : public BoundingBoxDetector {
    * @param frame 入力フレーム
    * @param result 検出結果
    */
-  void detect(const cv::Mat& frame, BoundingBoxDetectionResult& result);
+  void detect(const cv::Mat& frame, BoundingBoxDetectionResult& result) override;
 
   /**
    * @brief フレームから色領域を検出し、最も面積が大きい色のインデックスも取得
@@ -79,6 +79,7 @@ class ColorRegionDetector : public BoundingBoxDetector {
       = 50.0;                       // これ以下の面積の輪郭はノイズとみなして除外する
   std::vector<HSVRange> hsvRanges;  // 検出したい色のHSV範囲のリスト
   cv::Rect roi;                     // フレーム全体に対するROI
+
   /**
    * @brief ROIがフレーム内に収まるように補正する
    */

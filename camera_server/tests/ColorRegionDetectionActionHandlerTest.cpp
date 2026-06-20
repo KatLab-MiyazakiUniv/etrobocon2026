@@ -13,7 +13,7 @@
 #include <fstream>
 #include <filesystem>
 #include <string>
-#include "dummy/MockCameraCapture.h"
+#include "MockCameraCapture.h"
 
 namespace etrobocon2026_test {
 

@@ -34,6 +34,10 @@ const CameraServer::HSVRangeData& ImageProcessingColor::getHSVRangeFromColor(Col
       return YELLOW_HSV;
     case BLACK:
       return BLACK_HSV;
+    case GRAY:
+      return GRAY_HSV;
+    case WHITE:
+      return WHITE_HSV;
     default:
       return RED_HSV;
   }

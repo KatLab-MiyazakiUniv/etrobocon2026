@@ -9,6 +9,7 @@
 #include <chrono>
 #include <iostream>
 #include <cstring>
+#include <fstream>
 
 using namespace std;
 
@@ -178,15 +179,14 @@ void Calibrator::inputAndSetDecryptionKey()
 {
   std::string key;
 
-  Logger::info("復号キー取得開始");
+  Logger::info("4文字の復号キーを入力してください");
 
-  std::ifstream ifs("key.txt");
-  if(ifs >> key && key.length() == 4) {
-    Logger::info("ファイルから取得");
-    setDecryptionKey(key);
-    return;
+  while(true) {
+    if(!(std::cin >> key)) {
+      // :point_down: これが超重要
+      Logger::error("入力できない環境 → AAAA使用");
+      setDecryptionKey("AAAA");
+      return;
+    }
   }
-
-  Logger::error("ファイル失敗 → AAAA");
-  setDecryptionKey("AAAA");
 }

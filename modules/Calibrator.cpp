@@ -178,13 +178,15 @@ void Calibrator::inputAndSetDecryptionKey()
 {
   std::string key;
 
-  Logger::info("4文字の復号キーを入力してください");
+  Logger::info("復号キー取得開始");
 
-  while(true) {
-    std::cin >> key;
-    if(key.length() == 4) break;
-    Logger::info("4文字で入力してください");
+  std::ifstream ifs("key.txt");
+  if(ifs >> key && key.length() == 4) {
+    Logger::info("ファイルから取得");
+    setDecryptionKey(key);
+    return;
   }
 
-  setDecryptionKey(key);
+  Logger::error("ファイル失敗 → AAAA");
+  setDecryptionKey("AAAA");
 }

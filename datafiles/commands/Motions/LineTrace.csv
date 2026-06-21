@@ -1,0 +1,4 @@
+コマンド名,ID,speed,brightness,brightness_kp,brightness_ki,brightness_kd
+LineTrace,ID,double,int,double,double,double
+LineTrace,001,400,60,0.028,0.011,0.025
+LineTrace,002,500,45,0.018,0.0,0.014

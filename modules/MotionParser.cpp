@@ -172,7 +172,71 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
                         targetDistance);
       return make_unique<DistanceCondition>(robot, targetDistance);
     }
-    // ↓ 他の条件コマンドはここに追加していく
+    case CONDITION_COMMAND::ABSOLUTE_ANGLE: {
+      double targetAngle = fromString<double>(params[2]);
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] AbsoluteAngleCondition: targetAngle=%.1f を生成しました",
+                        targetAngle);
+      return make_unique<AbsoluteAngleCondition>(robot, targetAngle);
+    }
+    case CONDITION_COMMAND::RELATIVE_ANGLE: {
+      double targetAngle = fromString<double>(params[2]);
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] RelativeAngleCondition: targetAngle=%.1f を生成しました",
+                        targetAngle);
+      return make_unique<RelativeAngleCondition>(robot, targetAngle);
+    }
+    case CONDITION_COMMAND::SENSOR_COLOR: {
+      std::string targetColorName = params[2];
+
+      auto targetColor = ColorSensorController::convertStringToColor(targetColorName);
+
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] SensorColorCondition: targetColor=%s を生成しました",
+                        targetColorName.c_str());
+
+      return std::make_unique<SensorColorCondition>(robot, targetColor);
+    }
+    case CONDITION_COMMAND::RUNNING_TIME: {
+      double targetTime = fromString<int>(params[2]);
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] RunningTimeCondition: targetTime=%.1f を生成しました",
+                        targetTime);
+      return make_unique<RunningTimeCondition>(robot, targetTime);
+    }
+    case CONDITION_COMMAND::MOTION_TIME: {
+      double targetTime = fromString<int>(params[2]);
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] MotionTimeCondition: targetTime=%.1f を生成しました",
+                        targetTime);
+      return make_unique<MotionTimeCondition>(robot, targetTime);
+    }
+    case CONDITION_COMMAND::REPEAT_COUNT: {
+      int targetCount = fromString<int>(params[2]);
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] RepeatCountCondition: targetCount=%.1f を生成しました",
+                        targetCount);
+      return make_unique<RepeatCountCondition>(robot, targetCount);
+    }
+    case CONDITION_COMMAND::DISTANCE_AND_SCOLOR: {
+      double targetDistance = fromString<double>(params[2]);
+      std::string targetColorName = params[3];
+
+      auto targetColor = ColorSensorController::convertStringToColor(targetColorName);
+
+      Logger::printfLog(
+          Logger::DEBUG,
+          "[MotionParser] DistanceAndColor: targetDistance=%.1f, targetColor=%s を生成しました",
+          targetDistance, targetColorName.c_str());
+
+      auto distanceCondition = std::make_unique<DistanceCondition>(robot, targetDistance);
+
+      auto colorCondition = std::make_unique<SensorColorCondition>(robot, targetColor);
+
+      return std::make_unique<CompoundCondition>(robot, std::move(distanceCondition),
+                                                 std::move(colorCondition),
+                                                 CompoundCondition::LogicalOperator::AND);
+    }
     default:
       return nullptr;
   }
@@ -184,27 +248,22 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
   // TODO: 各動作クラスが完成したら、以下のコメントを外してswitch-caseを実装する
   MOTION_COMMAND command = convertCommand(motionParams[0]);
   switch(command) {
-    // case MOTION_COMMAND::STRAIGHT: {
-    //   // Straight: motionParams[2]=speed(double)
-    //   //           motionParams[3..5]=rightPid(kp,ki,kd)
-    //   //           motionParams[6..8]=leftPid(kp,ki,kd)
-    //   //           motionParams[9..11]=anglePid(kp,ki,kd)
-    //   //           motionParams[12]=useIMU(string: "true"/"false")
-    //   return new Straight(
-    //       robot, std::move(condition),
-    //       fromString<double>(motionParams[2]),
-    //       Pid::PidGain{ fromString<double>(motionParams[3]),
-    //                     fromString<double>(motionParams[4]),
-    //                     fromString<double>(motionParams[5]) },
-    //       Pid::PidGain{ fromString<double>(motionParams[6]),
-    //                     fromString<double>(motionParams[7]),
-    //                     fromString<double>(motionParams[8]) },
-    //       Pid::PidGain{ fromString<double>(motionParams[9]),
-    //                     fromString<double>(motionParams[10]),
-    //                     fromString<double>(motionParams[11]) },
-    //       motionParams[12] == "true");
-    // }
-    // ↓ 他のコマンドはここに追加していく
+    case MOTION_COMMAND::STRAIGHT: {
+      // Straight: motionParams[2]=speed(double)
+      //           motionParams[3..5]=rightPid(kp,ki,kd)
+      //           motionParams[6..8]=leftPid(kp,ki,kd)
+      //           motionParams[9..11]=anglePid(kp,ki,kd)
+      //           motionParams[12]=useIMU(string: "true"/"false")
+      return new Straight(
+          robot, std::move(condition), fromString<double>(motionParams[2]),
+          Pid::PidGain{ fromString<double>(motionParams[3]), fromString<double>(motionParams[4]),
+                        fromString<double>(motionParams[5]) },
+          Pid::PidGain{ fromString<double>(motionParams[6]), fromString<double>(motionParams[7]),
+                        fromString<double>(motionParams[8]) },
+          Pid::PidGain{ fromString<double>(motionParams[9]), fromString<double>(motionParams[10]),
+                        fromString<double>(motionParams[11]) },
+          motionParams[12] == "true");
+    }
     case MOTION_COMMAND::LINETRACE: {
       // LineTrace: motionParams[2]=speed(double)
       //           motionParams[3]=brightness(int)
@@ -214,6 +273,45 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                            Pid::PidGain{ fromString<double>(motionParams[4]),
                                          fromString<double>(motionParams[5]),
                                          fromString<double>(motionParams[6]) });
+    }
+    case MOTION_COMMAND::ABSOLUTE_ROTATION: {
+      // AbsoluteRotation:
+      // motionParams[2]=anglePid.kp
+      // motionParams[3]=anglePid.ki
+      // motionParams[4]=anglePid.kd
+      // motionParams[5]=targetAbsAngle
+
+      Pid::PidGain anglePidGain{ fromString<double>(motionParams[2]),
+                                 fromString<double>(motionParams[3]),
+                                 fromString<double>(motionParams[4]) };
+
+      double targetAbsAngle = fromString<double>(motionParams[5]);
+
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] AbsoluteRotation: targetAbsAngle=%.1f を生成しました",
+                        targetAbsAngle);
+
+      return new AbsoluteRotation(robot, std::move(condition), anglePidGain, targetAbsAngle);
+    }
+
+    case MOTION_COMMAND::RELATIVE_ROTATION: {
+      // RelativeRotation:
+      // motionParams[2]=anglePid.kp
+      // motionParams[3]=anglePid.ki
+      // motionParams[4]=anglePid.kd
+      // motionParams[5]=relativeTargetAngle
+
+      Pid::PidGain anglePidGain{ fromString<double>(motionParams[2]),
+                                 fromString<double>(motionParams[3]),
+                                 fromString<double>(motionParams[4]) };
+
+      double relativeTargetAngle = fromString<double>(motionParams[5]);
+
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] RelativeRotation: relativeTargetAngle=%.1f を生成しました",
+                        relativeTargetAngle);
+
+      return new RelativeRotation(robot, std::move(condition), anglePidGain, relativeTargetAngle);
     }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
@@ -229,6 +327,8 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
     { "EXAMPLE", MOTION_COMMAND::EXAMPLE },
     { "Straight", MOTION_COMMAND::STRAIGHT },
     { "LineTrace", MOTION_COMMAND::LINETRACE },
+    { "AbsoluteRotation", MOTION_COMMAND::ABSOLUTE_ROTATION },
+    { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
   };
 
   // コマンド文字列に対応するMOTION_COMMAND値をマップから取得。なければMOTION_COMMAND::NONEを返す
@@ -245,6 +345,13 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
   // 条件コマンド文字列と、それに対応する列挙型CONDITION_COMMANDのマッピングを定義
   static const unordered_map<string, CONDITION_COMMAND> conditionMap = {
     { "Distance", CONDITION_COMMAND::DISTANCE },
+    { "AbsoluteAngle", CONDITION_COMMAND::ABSOLUTE_ANGLE },
+    { "RelativeAngle", CONDITION_COMMAND::RELATIVE_ANGLE },
+    { "SensorColor", CONDITION_COMMAND::SENSOR_COLOR },
+    { "RunningTime", CONDITION_COMMAND::RUNNING_TIME },
+    { "MotionTime", CONDITION_COMMAND::MOTION_TIME },
+    { "RepeatCount", CONDITION_COMMAND::REPEAT_COUNT },
+    { "DistanceAndColor", CONDITION_COMMAND::DISTANCE_AND_SCOLOR },
   };
 
   // 条件コマンド文字列に対応するCONDITION_COMMAND値をマップから取得。なければCONDITION_COMMAND::NONEを返す

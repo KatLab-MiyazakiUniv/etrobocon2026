@@ -167,9 +167,6 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
   switch(cond) {
     case CONDITION_COMMAND::DISTANCE: {
       double targetDistance = fromString<double>(params[2]);
-      Logger::printfLog(Logger::DEBUG,
-                        "[MotionParser] DistanceCondition: targetDistance=%.1f を生成しました",
-                        targetDistance);
       return make_unique<DistanceCondition>(robot, targetDistance);
     }
     // ↓ 他の条件コマンドはここに追加していく

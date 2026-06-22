@@ -6,6 +6,7 @@
 
 #include "EtRobocon2026.h"
 #include "AreaMaster.h"
+<<<<<<< HEAD
 #include "Calibrator.h"
 #include "RealNetworkSystem.h"
 #include "RepeatCountCondition.h"
@@ -13,6 +14,12 @@
 #include "SocketClient.h"
 #include "CsvLogger.h"
 #include "ClockUtil.h"
+=======
+#include "Robot.h"
+#include "Course.h"
+#include "CsvLogger.h"
+#include "RealNetworkSystem.h"
+>>>>>>> 5106417 (update: モーションパーサーを使うように)
 
 void EtRobocon2026::start()
 {

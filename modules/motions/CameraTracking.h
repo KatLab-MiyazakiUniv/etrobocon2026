@@ -12,6 +12,8 @@
 #include "SpeedCalculator.h"
 #include "SocketProtocol.h"
 
+
+
 class CameraTracking : public BaseMotion {
  public:
   /**

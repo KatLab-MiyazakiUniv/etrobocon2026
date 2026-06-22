@@ -30,6 +30,18 @@ void ColorRegionDetectionActionHandler::execute(
     return;
   }
 
+
+  // フレームを保存する（動画作成ツール用）
+  std::string directoryPath = "datafiles/line_trace";
+  std::string fileName = "roi_x" + std::to_string(request.roi.x) +
+                         "_y" + std::to_string(request.roi.y) +
+                         "_w" + std::to_string(request.roi.width) +
+                         "_h" + std::to_string(request.roi.height) +
+                         "_" + std::to_string(ClockUtil::now());
+  FrameSave::save(frame, directoryPath, fileName);
+
+
+
   std::vector<ColorRegionDetector::HSVRange> localHsvRanges;
   localHsvRanges.reserve(request.hsvRangeCount);
   for(int i = 0; i < request.hsvRangeCount; i++) {

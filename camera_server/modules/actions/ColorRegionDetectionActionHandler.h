@@ -11,6 +11,10 @@
 #include "CameraCapture.h"
 #include "SocketProtocol.h"
 #include "ColorRegionDetector.h"
+#include "FrameSave.h"
+#include "ClockUtil.h"
+
+
 
 class ColorRegionDetectionActionHandler {
  public:

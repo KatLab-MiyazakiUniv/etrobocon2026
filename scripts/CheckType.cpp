@@ -365,16 +365,29 @@ int main(int argc, char* argv[])
     return checkTypeAll("ALL") ? 0 : 1;
   }
 
-  if(argc != 3) {
-    std::cerr << "使い方: ./scripts/check_type.sh [<Area名> <L|R>]" << std::endl;
-    std::cerr << "    例: ./scripts/check_type.sh LineTrace L" << std::endl;
-    std::cerr << "         ./scripts/check_type.sh --commands" << std::endl;
-    std::cerr << "有効なArea名: ";
-    for(size_t i = 0; i < AREA_NAMES.size(); i++) {
-      std::cerr << AREA_NAMES[i];
-      if(i + 1 < AREA_NAMES.size()) std::cerr << ", ";
+  // <CSVファイルパス>: 指定した Area CSV ファイルを直接型チェック
+  if(argc == 2) {
+    std::string filePath = argv[1];
+    std::string label = filePath;
+    size_t slashPos = label.find_last_of("/\\");
+    if(slashPos != std::string::npos) label = label.substr(slashPos + 1);
+    size_t dotPos = label.rfind('.');
+    if(dotPos != std::string::npos) label = label.substr(0, dotPos);
+
+    std::cout << "[" << label << "] START CheckTypeForArea" << std::endl;
+    if(!checkTypeForArea(filePath, label)) {
+      std::cout << "[" << label << "] END CheckTypeForArea: FAILED" << std::endl;
+      return 1;
     }
-    std::cerr << std::endl;
+    std::cout << "[" << label << "] END CheckTypeForArea: OK" << std::endl;
+    return 0;
+  }
+
+  if(argc != 3) {
+    std::cerr << "使い方: ./scripts/check_type.sh [<CSVファイルパス>]" << std::endl;
+    std::cerr << "    例: ./scripts/check_type.sh datafiles/commands/Area/LineTraceLeft.csv"
+              << std::endl;
+    std::cerr << "         ./scripts/check_type.sh --commands" << std::endl;
     return 1;
   }
 

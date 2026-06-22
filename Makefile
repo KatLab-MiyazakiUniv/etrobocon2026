@@ -28,8 +28,8 @@ help:
 	@echo " $$ make check-type-commands"
 	@echo 全エリアのArea CSVを型チェックする
 	@echo " $$ make check-type-areas"
-	@echo 指定エリア・コースのArea CSVを型チェックする
-	@echo " $$ make check-type AREA=<Area名> COURSE=<L|R>"
+	@echo 指定ファイルのArea CSVを型チェックする
+	@echo " $$ make check-type FILE=<ファイル名.csv>"
 	@echo 全システムのテストをビルドする
 	@echo " $$ make test-build"
 	@echo 走行システムのテストをビルドする
@@ -106,16 +106,15 @@ format-check:
 check-type-commands:
 	./scripts/check_type.sh --commands
 
-# 全エリア × Left/Right の Area CSV を型チェックする
+# datafiles/commands/Area/ 以下の全 Area CSV を自動探索して型チェックする
 check-type-areas:
-	./scripts/check_type.sh LineTrace L
-	./scripts/check_type.sh LineTrace R
-	./scripts/check_type.sh Area2 L
-	./scripts/check_type.sh Area2 R
+	@set -e; for f in $$(find datafiles/commands/Area -name "*.csv" | sort); do \
+		./scripts/check_type.sh "$$f"; \
+	done
 
-# 指定エリア・コースの型チェック（例: make check-type AREA=LineTrace COURSE=L）
+# 指定ファイルの Area CSV を型チェックする（例: make check-type FILE=LineTraceLeft.csv）
 check-type:
-	./scripts/check_type.sh $(AREA) $(COURSE)
+	./scripts/check_type.sh datafiles/commands/Area/$(FILE)
 
 ## テスト関連 ##
 # 全システムのテストをビルドする

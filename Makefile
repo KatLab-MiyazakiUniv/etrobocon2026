@@ -2,6 +2,7 @@ SHELL := /bin/bash
 MAKEFILE_PATH := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 DOCKER_IMAGE   := kat_etrobo2026:arm64
+DOCKER_IMAGE_MOVIE := kat_etrobo2026_movie:latest
 DOCKER_WORKDIR := /RasPike-ART/sdk/workspace/etrobocon2026
 DOCKER_MOUNT   := -v $(MAKEFILE_PATH):$(DOCKER_WORKDIR)
 

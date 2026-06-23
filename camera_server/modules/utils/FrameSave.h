@@ -31,8 +31,7 @@ class FrameSave {
    * @param roi 検出対象の領域(ROI)
    */
   static void save(cv::Mat& frame, const std::string& filePath,
-                   const BoundingBoxDetectionResult& result,
-                   const cv::Rect& roi);
+                   const BoundingBoxDetectionResult& result, const cv::Rect& roi);
 
  private:
   FrameSave();  // インスタンス化の禁止

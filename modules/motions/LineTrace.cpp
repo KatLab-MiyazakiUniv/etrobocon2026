@@ -14,7 +14,8 @@ LineTrace::LineTrace(Robot& _robot,
     targetSpeed(_targetSpeed),
     targetBrightness(_targetBrightness),
     brightnessPidGain(_brightnessPidGain),
-    speedCalculator(_robot, _targetSpeed)
+    speedCalculator(_robot, _targetSpeed),
+    pid(brightnessPidGain.kp, brightnessPidGain.ki, brightnessPidGain.kd, targetBrightness)
 {
   LOG_CREATE("LineTrace");
 }
@@ -31,8 +32,6 @@ void LineTrace::prepare()
 
 void LineTrace::executeStep()
 {
-  Pid pid(brightnessPidGain.kp, brightnessPidGain.ki, brightnessPidGain.kd, targetBrightness);
-
   // 目標スピードに必要なパワー値を計算
   double baseRightPower = speedCalculator.calculateRightMotorPower();
   double baseLeftPower = speedCalculator.calculateLeftMotorPower();

@@ -5,11 +5,6 @@
  */
 
 #include "Calibrator.h"
-#include <thread>
-#include <chrono>
-#include <iostream>
-#include <cstring>
-#include <fstream>
 
 using namespace std;
 
@@ -183,11 +178,9 @@ void Calibrator::inputAndSetDecryptionKey()
   std::ifstream ifs;
   ifs.open("etrobocon2026/key.txt", std::ios::in | std::ios::binary);
 
-  // ① ファイル開けたかチェック
   if(!ifs.is_open()) {
     Logger::error("key.txt を開けません（存在しない or パスが違う）");
   } else {
-    // ② 読み込みチェック
     if(!(ifs >> key)) {
       Logger::error("key.txt 読み込み失敗（中身が空 or フォーマット不正）");
     } else if(key.length() != 4) {

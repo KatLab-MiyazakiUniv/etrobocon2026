@@ -12,6 +12,11 @@
 #include "Logger.h"
 #include "Snapshot.h"
 #include "Course.h"
+#include <thread>
+#include <chrono>
+#include <iostream>
+#include <cstring>
+#include <fstream>
 
 #define PRESS_POWER 0.5f
 

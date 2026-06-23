@@ -54,6 +54,7 @@ void EtRobocon2026::start()
 //   };
   // LineTraceLeft.csv と左エッジを使ってライントレース区間を走行する。
   robot.setCourse(Course::Left);
+  // robot.setEdge(Edge::LeftEdge);
   robot.setEdge(Edge::LeftEdge);
 
 

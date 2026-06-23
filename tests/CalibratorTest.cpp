@@ -7,6 +7,7 @@
 #include "Calibrator.h"
 #include <gtest/gtest.h>
 #include <iostream>
+#include <cstdio>
 
 using namespace std;
 
@@ -74,18 +75,28 @@ namespace etrobocon2025_test {
 
     EXPECT_EQ(expected, actual);  // 出力とゲッタの値が等しいかテスト
   }
-
-  // 復号キー取得のテスト（オフライン時はデフォルト値フォールバック）
-  TEST(CalibratorTest, DecryptionKeyFallback)
+  TEST(CalibratorTest, DecryptionKeyFromFile)
   {
+    // --- ディレクトリ作成 ---
+    std::filesystem::create_directory("etrobocon2026");
+
+    // --- ファイル作成 ---
+    std::ofstream ofs("etrobocon2026/key.txt");
+    ofs << "1234";
+    ofs.close();
+
     RealNetworkSystem netSys;
     SocketClient socketClient(netSys);
     Robot robot(socketClient);
     Calibrator calibrator(robot);
 
-    calibrator.inputAndSetDecryptionKey();  // オフライン時はデフォルト値フォールバック
+    calibrator.inputAndSetDecryptionKey();
 
-    string actual = robot.getDecryptionKey();  //
-    EXPECT_EQ("AAAA", actual);                 // デフォルト値とゲッタの値が等しいかテスト
+    std::string actual = robot.getDecryptionKey();
+    EXPECT_EQ("1234", actual);
+
+    // --- 後片付け ---
+    std::remove("etrobocon2026/key.txt");
+    std::filesystem::remove("etrobocon2026");
   }
 }  // namespace etrobocon2025_test

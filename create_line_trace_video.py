@@ -1,6 +1,6 @@
 """
 @file   create_line_trace_video.py
-@brief  保存された連続JPEG画像から、ROI枠・文字を描画しつつ、FFmpegを利用し高速に動画を作成する
+@brief  保存された連続JPEG画像から、BoundingBox・文字を描画しつつ、FFmpegを利用し高速に動画を作成する
 @author sadomiya-sousi
 """
 
@@ -11,6 +11,7 @@ import glob
 import argparse
 import subprocess
 import cv2
+import numpy as np
 
 
 def parse_args():
@@ -36,20 +37,19 @@ def parse_args():
 
 def collect_and_sort_images(input_dir):
   """
-  @brief ディレクトリ内の 'roi_' で始まり、拡張子がJPEG/jpg/png等のファイルを収集し、
+  @brief ディレクトリ内の 'det_' で始まり、拡張子がJPEG/jpg/png等のファイルを収集し、
          ファイル名末尾のタイムスタンプ数値順（昇順）にソートして、
-         (ファイルパス, x, y, w, h) のリストを返す。
-         ファイル名形式: roi_x{x}_y{y}_w{w}_h{h}_{timestamp}.JPEG
+         (ファイルパス, was_detected, tlx, tly, trx, try_val, blx, bly, brx, bry) のリストを返す。
+         ファイル名形式: det_d{wasDetected}_tlx{topLeft.x}_tly{topLeft.y}_trx{topRight.x}_try{topRight.y}_blx{bottomLeft.x}_bly{bottomLeft.y}_brx{bottomRight.x}_bry{bottomRight.y}_{timestamp}.JPEG
   @param input_dir 入力JPEG画像のディレクトリのパス
-  @return ソート後の (ファイルパス, x, y, w, h) のリスト
+  @return ソート後の (ファイルパス, was_detected, tlx, tly, trx, try_val, blx, bly, brx, bry) のリスト
   """
-  pattern = os.path.join(input_dir, "roi_*")
+  pattern = os.path.join(input_dir, "det_*")
   files = glob.glob(pattern)
 
   # 正規表現でファイル名から座標とタイムスタンプを抽出
-  # 例: roi_x100_y120_w200_h150_1718876400.JPEG
   regex = re.compile(
-      r'roi_x(\d+)_y(\d+)_w(\d+)_h(\d+)_(\d+)\.(?:[jJ][pP][eE]?[gG]|[pP][nN][gG])'
+      r'det_d(\d+)_tlx(\d+)_tly(\d+)_trx(\d+)_try(\d+)_blx(\d+)_bly(\d+)_brx(\d+)_bry(\d+)_(\d+)\.(?:[jJ][pP][eE]?[gG]|[pP][nN][gG])'
   )
 
   image_list = []
@@ -57,18 +57,30 @@ def collect_and_sort_images(input_dir):
     basename = os.path.basename(filepath)
     match = regex.match(basename)
     if match:
-      x = int(match.group(1))
-      y = int(match.group(2))
-      w = int(match.group(3))
-      h = int(match.group(4))
-      timestamp = int(match.group(5))
-      image_list.append((filepath, timestamp, x, y, w, h))
+      was_detected = int(match.group(1))
+      tlx = int(match.group(2))
+      tly = int(match.group(3))
+      trx = int(match.group(4))
+      try_val = int(match.group(5))
+      blx = int(match.group(6))
+      bly = int(match.group(7))
+      brx = int(match.group(8))
+      bry = int(match.group(9))
+      timestamp = int(match.group(10))
+      image_list.append((
+          filepath, timestamp, was_detected, tlx, tly, trx, try_val, blx, bly,
+          brx, bry
+      ))
 
   # タイムスタンプ順で昇順ソート
   image_list.sort(key=lambda item: item[1])
 
   # ソート後はタイムスタンプを除外したリストを返す
-  return [(item[0], item[2], item[3], item[4], item[5]) for item in image_list]
+  return [
+      (item[0], item[2], item[3], item[4], item[5], item[6], item[7], item[8],
+       item[9], item[10])
+      for item in image_list
+  ]
 
 
 def main():
@@ -94,7 +106,7 @@ def main():
   # 最初の有効な画像を読み込んでサイズを決定する
   first_img = None
   first_idx = 0
-  for idx, (path, x, y, w, h) in enumerate(images):
+  for idx, (path, *_) in enumerate(images):
     first_img = cv2.imread(path)
     if first_img is not None:
       first_idx = idx
@@ -150,7 +162,7 @@ def main():
   processed_files = []
 
   try:
-    for idx, (path, x, y, w, h) in enumerate(images):
+    for idx, (path, was_detected, tlx, tly, trx, try_val, blx, bly, brx, bry) in enumerate(images):
       # 最初の有効画像は再読込せず流用する
       if idx == first_idx and success_count == 0:
         img = first_img
@@ -164,17 +176,28 @@ def main():
       # 画像のリサイズ
       resized = cv2.resize(img, (width, height))
 
-      # リサイズ後の比率に合わせてROI座標をスケール変換
-      rx = int(x * args.scale)
-      ry = int(y * args.scale)
-      rw = int(w * args.scale)
-      rh = int(h * args.scale)
+      if was_detected == 1:
+        # BoundingBoxの4つの頂点
+        rtlx = int(tlx * args.scale)
+        rtly = int(tly * args.scale)
+        rtrx = int(trx * args.scale)
+        rtry = int(try_val * args.scale)
+        rblx = int(blx * args.scale)
+        rbly = int(bly * args.scale)
+        rbrx = int(brx * args.scale)
+        rbry = int(bry * args.scale)
 
-      # ROI赤枠の描画（太さ2, BGR赤: (0, 0, 255)）
-      cv2.rectangle(resized, (rx, ry), (rx + rw, ry + rh), (0, 0, 255), 2)
+        # 頂点を結びポリゴンを描画（太さ2, BGR赤: (0, 0, 255)）
+        pts = np.array([[rtlx, rtly], [rtrx, rtry], [rbrx, rbry], [rblx, rbly]], np.int32)
+        pts = pts.reshape((-1, 1, 2))
+        cv2.polylines(resized, [pts], isClosed=True, color=(0, 0, 255), thickness=2)
 
-      # テキスト情報の重畳 (ROIの生座標値を表示)
-      text = f"ROI: x={x}, y={y}, w={w}, h={h}"
+        # テキスト情報の重畳 (検出結果の座標を表示)
+        text = f"Detected: TL({tlx},{tly}), BR({brx},{bry})"
+      else:
+        # テキスト情報の重畳 (未検出を表示)
+        text = "Detected: False"
+
       # フォントサイズや位置を適宜調整
       font_scale = 0.5 * (width / 400.0) # 画像幅に応じた自動調整
       font_scale = max(0.4, min(font_scale, 1.0))

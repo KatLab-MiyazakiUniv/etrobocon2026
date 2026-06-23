@@ -1,0 +1,25 @@
+# 動画作成用の実行環境を提供するDockerfile
+# 走行中のプログラムとは関係がないため,arm/amdに対応
+FROM python:3.11
+
+# 必要なシステムパッケージのインストール
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# 作業ディレクトリの設定
+WORKDIR /workspace
+
+# Python依存ライブラリのインストール
+# GUI非依存の opencv-python-headless をインストールして軽量化
+RUN python -m pip install --upgrade pip \
+    && pip install --no-cache-dir \
+    numpy \
+    opencv-python-headless
+
+# スクリプトをコンテナ内にコピー
+COPY create_line_trace_video.py /workspace/
+
+# デフォルトのエントリーポイントを設定し、引数をそのまま渡せるようにする
+ENTRYPOINT ["python", "/workspace/create_line_trace_video.py"]

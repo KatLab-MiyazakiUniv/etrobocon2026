@@ -20,6 +20,7 @@ void EtRobocon2026::start()
   SocketClient client(real);
   Robot robot(client);
   robot.setCourse(Course::Left);
+  // robot.setEdge(Edge::LeftEdge);
   robot.setEdge(Edge::LeftEdge);
   Area lineTraceArea = Area::LineTrace;
   AreaMaster lineTraceAreaMaster(robot, lineTraceArea);

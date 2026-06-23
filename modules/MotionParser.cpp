@@ -313,6 +313,14 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
 
       return new RelativeRotation(robot, std::move(condition), anglePidGain, relativeTargetAngle);
     }
+    case MOTION_COMMAND::EDGECHANGE: {
+      std::string edgeString = motionParams[2];
+      if(fromString<int>(edgeString) == 1) {
+        robot.setEdge(Edge::RightEdge);
+      } else {
+        robot.setEdge(Edge::LeftEdge);
+      }
+    }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
                         motionParams[0].c_str());
@@ -329,6 +337,7 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
     { "LineTrace", MOTION_COMMAND::LINETRACE },
     { "AbsoluteRotation", MOTION_COMMAND::ABSOLUTE_ROTATION },
     { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
+    { "EdgeChange", MOTION_COMMAND::EDGECHANGE },
   };
 
   // コマンド文字列に対応するMOTION_COMMAND値をマップから取得。なければMOTION_COMMAND::NONEを返す

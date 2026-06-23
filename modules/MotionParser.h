@@ -39,6 +39,7 @@ class MotionParser {
     LINETRACE,
     RELATIVE_ROTATION,
     ABSOLUTE_ROTATION,
+    EDGECHANGE,
     NONE
   };
   // 条件コマンド名を持つ列挙型クラス

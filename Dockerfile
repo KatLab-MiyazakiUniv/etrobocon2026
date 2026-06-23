@@ -1,7 +1,7 @@
-# PC環境(Debian Trixie amd64/x86_64)を構築するためのDockerfile
-FROM --platform=linux/amd64 debian:trixie
+# 実機環境(Debian Trixie AArch64)を構築するためのDockerfile
+FROM --platform=linux/arm64 debian:trixie
 
-# 必要なパッケージをインストール (Boostライブラリを追加済み)
+# 必要なパッケージをインストール
 RUN apt-get update && apt-get install -y \
   build-essential \
   ruby \
@@ -19,12 +19,11 @@ RUN apt-get update && apt-get install -y \
 ENV LANG=C.UTF-8
 
 # RasPike-ART を clone
-# libraspike-artは，RasPike-ART内で運営がリンクで紐づけていたため，直接cloneする必要がある>ドッカー内でクローンしようとすると,タイムアウトするので、下記はドッカーの外で実行しコピーする
-# RUN git clone --depth=1 https://github.com/ETrobocon/RasPike-ART.git /RasPike-ART \
-#   && git clone --depth=1 https://github.com/ETrobocon/libraspike-art.git /RasPike-ART/libraspike-art \
-#   && cd /RasPike-ART/libraspike-art \
-#   && git submodule update --init ./external/
-COPY RasPike-ART /RasPike-ART
+# libraspike-artは，RasPike-ART内で運営がリンクで紐づけていたため，直接cloneする必要がある
+RUN git clone --depth=1 https://github.com/ETrobocon/RasPike-ART.git /RasPike-ART \
+  && git clone --depth=1 https://github.com/ETrobocon/libraspike-art.git /RasPike-ART/libraspike-art \
+  && cd /RasPike-ART/libraspike-art \
+  && git submodule update --init ./external/
 
 # 作業ディレクトリを/RasPike-ART/sdk/workspace/etrobocon2026に設定
 WORKDIR /RasPike-ART/sdk/workspace/etrobocon2026

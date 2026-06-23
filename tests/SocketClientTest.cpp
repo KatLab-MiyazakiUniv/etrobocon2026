@@ -10,6 +10,7 @@
 #include "Logger.h"
 
 namespace etrobocon2026_test {
+
   // 正常に接続できることを確認
   TEST(SocketClientTest, ConnectSuccess)
   {

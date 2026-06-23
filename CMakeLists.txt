@@ -44,6 +44,7 @@ set(RUNNING_INCLUDE_DIRS
   ${RUNNING_MODULE_DIR}/API
   ${RUNNING_MODULE_DIR}/client
   ${RUNNING_MODULE_DIR}/motions
+  ${RUNNING_MODULE_DIR}/actions
   ${RUNNING_MODULE_DIR}/motions/continuation_conditions
   ${PROJECT_SOURCE_DIR}/common
   ${PROJECT_SOURCE_DIR}/common/customs
@@ -92,10 +93,12 @@ if(ENABLE_CAMERA_TESTS)
 
   # 必要なインクルードディレクトリの設定 (適宜登録)
   set(CAMERA_INCLUDE_DIRS
+    ${CAMERA_MODULE_DIR}
     ${CAMERA_MODULE_DIR}/camera
     ${CAMERA_MODULE_DIR}/utils
     ${CAMERA_MODULE_DIR}/server
     ${CAMERA_MODULE_DIR}/image_processors
+    ${CAMERA_MODULE_DIR}/actions
     ${PROJECT_SOURCE_DIR}/common
     ${PROJECT_SOURCE_DIR}/common/customs
     ${RUNNING_MODULE_DIR}/API
@@ -108,6 +111,7 @@ if(ENABLE_CAMERA_TESTS)
     "${CAMERA_MODULE_DIR}/utils/*.cpp"
     "${CAMERA_MODULE_DIR}/server/*.cpp"
     "${CAMERA_MODULE_DIR}/image_processors/*.cpp"
+    "${CAMERA_MODULE_DIR}/actions/*.cpp"
     "${PROJECT_SOURCE_DIR}/common/*.cpp"
     "${RUNNING_MODULE_DIR}/API/*.cpp"
   )

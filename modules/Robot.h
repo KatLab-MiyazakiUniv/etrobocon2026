@@ -14,6 +14,10 @@
 #include "UltraSonicController.h"
 #include "SocketClient.h"
 #include "Course.h"
+#include "Button.h"
+#include "ForceSensor.h"
+#include "Display.h"
+#include <cstring>
 
 class Robot {
  public:
@@ -78,6 +82,23 @@ class Robot {
   Edge& getEdge();
 
   /**
+   * @brief Buttonのインスタンスの参照を返す
+   * @return メンバ変数button(Buttonのインスタンス) の参照
+   */
+  spikeapi::Button& getButtonInstance();
+
+  /**
+   * @brief ForceSensorのインスタンスの参照を返す
+   * @return メンバ変数forceSensor(ForceSensorのインスタンス)の参照
+   */
+  spikeapi::ForceSensor& getForceSensorInstance();
+  /**
+   * @brief Displayのインスタンスの参照を返す
+   * @return メンバ変数display(Displayのインスタンス)の参照
+   */
+  spikeapi::Display& getDisplayInstance();
+
+  /**
    * @brief エッジの左右判定を設定する
    * @param edge エッジの左右判定
    */
@@ -94,6 +115,12 @@ class Robot {
    */
   void setRunningStartTime(int time);
 
+  void setDecryptionKey(const char* key);
+  const char* getDecryptionKey() const;
+
+  void setTargetBrightness(int brightness);
+  int getTargetBrightness() const;
+
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
   ArmMotorController armMotorController;        // ArmMotorController インスタンス
@@ -104,5 +131,10 @@ class Robot {
   Course course;                                // コース(Left or Right)
   Edge edge;                                    // エッジの左右判定
   int runningStartTime = 0;                     // 走行開始時間
+  spikeapi::Button button;                      // Buttonインスタンス
+  spikeapi::ForceSensor forceSensor;            // ForceSensorインスタンス
+  spikeapi::Display display;
+  char decryptionKey[5] = { 0 };  // 復号キー
+  int targetBrightness = 50;      // 目標輝度
 };
 #endif

@@ -83,3 +83,35 @@ void SocketClient::shutdownServer()
   }
   Logger::info("shutdownServer: 終了");
 }
+
+bool SocketClient::executeSnapshotAction(const CameraServer::SnapshotActionRequest& request,
+                                         CameraServer::SnapshotActionResponse& response)
+{
+  return executeAction(request, response);
+}
+
+template <typename Req, typename Res>
+bool SocketClient::executeAction(const Req& request, Res& response)
+{
+  if(!isConnected) {
+    Logger::error("SocketClient:サーバーに未接続");
+    return false;
+  }
+
+  // リクエストを送信する
+  if(netSys.send(sock, reinterpret_cast<const char*>(&request), sizeof(request), 0) < 0) {
+    Logger::error("SocketClient:send()失敗");
+    return false;
+  }
+
+  // 結果を受信する
+  ssize_t bytesRead = netSys.recv(sock, reinterpret_cast<char*>(&response), sizeof(response), 0);
+  if(bytesRead < 0) {
+    Logger::error("SocketClient:recv()失敗");
+    return false;
+  } else if(bytesRead != sizeof(response)) {
+    Logger::error("SocketClient:受信データサイズが小さい");
+    return false;
+  }
+  return true;
+}

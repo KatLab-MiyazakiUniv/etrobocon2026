@@ -10,7 +10,9 @@
 #include <string>
 #include "SocketProtocol.h"
 #include "RealNetworkSystem.h"
+#include "SnapshotActionHandler.h"
 #include "Logger.h"
+#include "CameraCapture.h"
 #include <cstring>
 
 class SocketServer {
@@ -19,8 +21,10 @@ class SocketServer {
    * @brief SocketServerのコンストラクタ
    * @param _netSys 注入する具象クラス
    * @param _port デフォルトは27015
+   * @param snapshotHandler スナップショット撮影アクションハンドラ
    */
-  explicit SocketServer(INetworkSystem& _netSys, int _port = CameraServer::DEFAULT_PORT);
+  explicit SocketServer(SnapshotActionHandler& snapshotHandler, INetworkSystem& _netSys,
+                        int _port = CameraServer::DEFAULT_PORT);
 
   /**
    * @brief SocketServerのデストラクタ
@@ -74,6 +78,7 @@ class SocketServer {
   bool isRunning;                             // Serverが稼働中ならtrue
   int port;                                   // サーバーのポート番号
   static constexpr int DEFAULT_BUFLEN = 512;  // デフォルトのバッファサイズ
+  SnapshotActionHandler& snapshotHandler;     // スナップショットのハンドラー
 
   /**
    * @brief クライアントとの接続を処理する

@@ -174,19 +174,29 @@ void Calibrator::setDecryptionKey(const std::string& key)
     robot.setDecryptionKey("AAAA");
   }
 }
-
 void Calibrator::inputAndSetDecryptionKey()
 {
   std::string key;
 
-  Logger::info("4文字の復号キーを入力してください");
+  Logger::info("復号キー読み込み中...");
 
-  while(true) {
-    if(!(std::cin >> key)) {
-      // :point_down: これが超重要
-      Logger::error("入力できない環境 → AAAA使用");
-      setDecryptionKey("AAAA");
+  std::ifstream ifs;
+  ifs.open("etrobocon2026/key.txt", std::ios::in | std::ios::binary);
+
+  // ① ファイル開けたかチェック
+  if(!ifs.is_open()) {
+    Logger::error("key.txt を開けません（存在しない or パスが違う）");
+  } else {
+    // ② 読み込みチェック
+    if(!(ifs >> key)) {
+      Logger::error("key.txt 読み込み失敗（中身が空 or フォーマット不正）");
+    } else if(key.length() != 4) {
+      Logger::error("key.txt の内容が4文字ではない");
+    } else {
+      Logger::info("ファイルから復号キー取得成功");
+      setDecryptionKey(key);
       return;
     }
   }
+  ifs.close();
 }

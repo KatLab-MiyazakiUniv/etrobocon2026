@@ -29,7 +29,7 @@ void EtRobocon2026::start()
   request.hsvRanges[0].upper = { 180, 255, 30 };
   request.roi = { 320, 240, 1920, 1080 };
 
-  CameraTracking cameraTracking(robot, std::make_unique<DistanceCondition>(robot, 8000.0), 100.0,
+  CameraTracking cameraTracking(robot, std::make_unique<DistanceCondition>(robot, 80000.0), 600.0,
                                 960, camPid, request);
   cameraTracking.run();
 

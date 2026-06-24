@@ -6,12 +6,30 @@
 
 #include "ColorRegionDetectionActionHandler.h"
 
-ColorRegionDetectionActionHandler::ColorRegionDetectionActionHandler(CameraCapture& _camera)
-  : camera(_camera),
+ColorRegionDetectionActionHandler::ColorRegionDetectionActionHandler()
+  : camera(),
     detector({ { cv::Scalar(0, 0, 0, 0), cv::Scalar(180, 255, 30, 0) } },
              cv::Rect(0, 0, 1920, 1080))
 {
   LOG_CREATE("ColorRegionDetectionActionHandler");
+
+  // CameraCapture camera;
+  int cameraId = camera.findAvailableCameraID();
+  if(cameraId < 0) {
+    Logger::error("利用可能なカメラを認識失敗");
+    return;
+  }
+  camera.setCameraID(cameraId);
+  if(!camera.openCamera()) {
+    Logger::error("カメラの起動に失敗");
+    return;
+  }
+
+  cv::Mat frame;
+  if(!camera.getFrame(frame)) {
+    Logger::error("ColorRegionDetectionActionHandler:フレームの取得に失敗しました");
+    return;
+  }
 }
 
 ColorRegionDetectionActionHandler::~ColorRegionDetectionActionHandler()

@@ -14,15 +14,13 @@
 #include "FrameSave.h"
 #include "ClockUtil.h"
 
-
-
 class ColorRegionDetectionActionHandler {
  public:
   /**
    * @brief コンストラクタ
    * @param camera カメラキャプチャのインスタンス
    */
-  ColorRegionDetectionActionHandler(CameraCapture& camera);
+  ColorRegionDetectionActionHandler();
 
   /**
    * @brief デストラクタ
@@ -50,7 +48,8 @@ class ColorRegionDetectionActionHandler {
   const ColorRegionDetector& getDetector() const;
 
  private:
-  CameraCapture& camera;
+  // CameraCapture& camera;
+  CameraCapture camera;
   ColorRegionDetector detector;
 };
 

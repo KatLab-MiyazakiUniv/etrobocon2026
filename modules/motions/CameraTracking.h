@@ -54,29 +54,11 @@ class CameraTracking : public BaseMotion {
   const CameraServer::ColorRegionDetectorRequest& getDetectionRequest() const;
 
   /**
-   * @brief 色領域検出リクエストを設定する
-   * @param _detectionRequest 設定する検出リクエスト
-   */
-  void setDetectionRequest(const CameraServer::ColorRegionDetectorRequest& _detectionRequest);
-
-  /**
    * @brief モーターを停止するかどうかを取得する
    * @return true 停止する場合
    * @return false 停止しない場合
    */
   bool getIsStopMotorPower() const;
-
-  /**
-   * @brief 目標速度に対するモータパワー計算器を取得する
-   * @return const SpeedCalculator& モータパワー計算器への参照
-   */
-  const SpeedCalculator& getSpeedCalculator() const;
-
-  /**
-   * @brief カメラ画像x座標に対するPID制御器を取得する
-   * @return const Pid& PID制御器への参照
-   */
-  const Pid& getCameraPid() const;
 
  protected:
   /**

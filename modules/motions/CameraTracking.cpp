@@ -98,23 +98,7 @@ const CameraServer::ColorRegionDetectorRequest& CameraTracking::getDetectionRequ
   return detectionRequest;
 }
 
-void CameraTracking::setDetectionRequest(
-    const CameraServer::ColorRegionDetectorRequest& _detectionRequest)
-{
-  detectionRequest = _detectionRequest;
-}
-
 bool CameraTracking::getIsStopMotorPower() const
 {
   return isStopMotorPower;
-}
-
-const SpeedCalculator& CameraTracking::getSpeedCalculator() const
-{
-  return speedCalculator;
-}
-
-const Pid& CameraTracking::getCameraPid() const
-{
-  return cameraPid;
 }

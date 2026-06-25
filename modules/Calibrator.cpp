@@ -9,6 +9,32 @@
 using namespace std;
 
 Calibrator::Calibrator(Robot& _robot) : robot(_robot) {}
+void Calibrator::run(bool skipKey, bool skipCourse, bool skipBrightness, bool skipAngleCheck)
+{
+  if(!skipKey) {
+    inputAndSetDecryptionKey();
+  }
+
+  if(!skipCourse) {
+    selectAndSetCourse();
+  } else {
+    robot.setCourse(Course::Left);
+    Logger::info("デフォルトコース使用");
+  }
+
+  if(!skipBrightness) {
+    measureAndSetTargetBrightness();
+  } else {
+    robot.setTargetBrightness(50);
+    Logger::info("デフォルト輝度使用");
+  }
+
+  if(!skipAngleCheck) {
+    getAngleCheckFrame();
+  }
+
+  waitForStart();
+}
 
 void Calibrator::selectAndSetCourse()
 {
@@ -171,25 +197,40 @@ void Calibrator::setDecryptionKey(const std::string& key)
 }
 void Calibrator::inputAndSetDecryptionKey()
 {
-  std::string key;
+  std::string key1;
+  std::string key2;
 
   Logger::info("復号キー読み込み中...");
 
   std::ifstream ifs;
   ifs.open("etrobocon2026/key.txt", std::ios::in | std::ios::binary);
-
   if(!ifs.is_open()) {
     Logger::error("key.txt を開けません（存在しない or パスが違う）");
-  } else {
-    if(!(ifs >> key)) {
-      Logger::error("key.txt 読み込み失敗（中身が空 or フォーマット不正）");
-    } else if(key.length() != 4) {
-      Logger::error("key.txt の内容が4文字ではない");
-    } else {
-      Logger::info("ファイルから復号キー取得成功");
-      setDecryptionKey(key);
-      return;
-    }
+    return;
   }
+
+  if(!(ifs >> key1)) {
+    Logger::error("1行目の復号キー読み込み失敗");
+    return;
+  }
+
+  if(!(ifs >> key2)) {
+    Logger::error("2行目の復号キー読み込み失敗");
+    return;
+  }
+
+  if(key1.length() != 4 || key2.length() != 4) {
+    Logger::error("復号キーは4文字で入力してください");
+    return;
+  }
+
+  if(key1 != key2) {
+    Logger::error("復号キーが一致しません");
+    return;
+  }
+
+  Logger::info("ファイルから復号キー取得成功");
+  setDecryptionKey(key1);
+
   ifs.close();
 }

@@ -77,12 +77,11 @@ namespace etrobocon2025_test {
   }
   TEST(CalibratorTest, DecryptionKeyFromFile)
   {
-    // --- ディレクトリ作成 ---
     std::filesystem::create_directory("etrobocon2026");
 
-    // --- ファイル作成 ---
     std::ofstream ofs("etrobocon2026/key.txt");
-    ofs << "1234";
+    ofs << "1234\n";
+    ofs << "1234\n";
     ofs.close();
 
     RealNetworkSystem netSys;
@@ -95,8 +94,7 @@ namespace etrobocon2025_test {
     std::string actual = robot.getDecryptionKey();
     EXPECT_EQ("1234", actual);
 
-    // --- 後片付け ---
     std::remove("etrobocon2026/key.txt");
     std::filesystem::remove("etrobocon2026");
   }
-}  // namespace etrobocon2025_test
+}

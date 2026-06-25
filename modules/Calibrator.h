@@ -28,6 +28,16 @@ class Calibrator {
   Calibrator(Robot& _robot);
 
   /**
+   * @brief キャリブレーションを一括実行する
+   * @param skipKey 復号キー取得をスキップ
+   * @param skipCourse コース選択をスキップ
+   * @param skipBrightness 輝度測定をスキップ
+   * @param skipAngleCheck 角度調整をスキップ
+   */
+  void run(bool skipKey = false, bool skipCourse = false, bool skipBrightness = false,
+           bool skipAngleCheck = false);
+
+  /**
    * @brief 左右ボタンでLRコースを選択してisLeftCourseをセットする
    */
   void selectAndSetCourse();
@@ -61,5 +71,4 @@ class Calibrator {
  private:
   Robot& robot;  // Robotインスタンスの参照
 };
-
 #endif

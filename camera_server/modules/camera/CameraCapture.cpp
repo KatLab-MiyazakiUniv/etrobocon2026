@@ -123,11 +123,12 @@ bool CameraCapture::getFrame(cv::Mat& outFrame)
 bool CameraCapture::getFrames(vector<cv::Mat>& frames, int numFrames, int millisecondInterval)
 {
   if(numFrames <= 0) {
-    Logger::printfLog(Logger::ERROR, "フレーム数が無効です: %d", numFrames);
+    Logger::printfLog(Logger::ERROR, "フレーム数が無効です。動作を終了します。: %d", numFrames);
     return false;
   }
   if(millisecondInterval <= 0) {
-    Logger::printfLog(Logger::ERROR, "インターバルが無効です: %d ms", millisecondInterval);
+    Logger::printfLog(Logger::ERROR, "インターバルが無効です。動作を終了します。: %d ms",
+                      millisecondInterval);
     return false;
   }
 

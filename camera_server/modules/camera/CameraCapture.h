@@ -26,7 +26,7 @@ class CameraCapture {
   /**
    * @brief デストラクタ
    */
-  ~CameraCapture();
+  virtual ~CameraCapture();
 
   /**
    * @brief 利用可能なカメラIDを探索する
@@ -50,7 +50,7 @@ class CameraCapture {
 
   /**
    * @brief カメラデバイスをオープンする
-   * @return openに成功した場合はtrue、失敗した場合はfalse、
+   * @return openに成功した場合はtrue、失敗した場合はfalse
    */
   bool openCamera();
 
@@ -66,7 +66,7 @@ class CameraCapture {
    * @param outFrame 取得したフレームを格納するcv::Mat参照
    * @return フレーム取得に成功した場合はtrue、失敗した場合はfalse
    */
-  bool getFrame(cv::Mat& outFrame);
+  virtual bool getFrame(cv::Mat& outFrame);
 
   /**
    * @brief 指定した枚数だけ、指定したミリ秒間隔でカメラフレームを取得し、配列に保存する

@@ -1,16 +1,21 @@
 /**
  * @file SocketServer.cpp
  * @brief 接続を待ち、クライアントからのリクエストを処理するクラス
- * @author sadomiya-sousi, takuchi17
+ * @author sadomiya-sousi takuchi17
  */
 
 #include "SocketServer.h"
 
-SocketServer::SocketServer(INetworkSystem& _netSys, int _port)
-  : netSys(_netSys), listenSocket(-1), isRunning(false), port(_port)
+SocketServer::SocketServer(ColorRegionDetectionActionHandler& _colorRegionDetectionHandler,
+                           INetworkSystem& _netSys, int _port)
+  : netSys(_netSys),
+    listenSocket(-1),
+    isRunning(false),
+    port(_port),
+    colorRegionDetectionHandler(_colorRegionDetectionHandler)
 {
   LOG_CREATE("SocketServer");
-  Logger::printfLog(Logger::INFO, "ポート番号は%d", _port);
+  Logger::printfLog(Logger::INFO, "SocketServer:ポート番号は%d", _port);
 }
 
 SocketServer::~SocketServer()
@@ -23,14 +28,14 @@ bool SocketServer::init()
 {
   listenSocket = netSys.socket(AF_INET, SOCK_STREAM, 0);
   if(listenSocket < 0) {
-    Logger::error("init: socket()失敗");
+    Logger::error("SocketServer:init: socket()失敗");
     return false;
   }
 
   int opt = 1;
 
   if(netSys.setsockopt(listenSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
-    Logger::error("init: setsockopt()失敗");
+    Logger::error("SocketServer:init: setsockopt()失敗");
     netSys.close(listenSocket);
     return false;
   }
@@ -47,12 +52,12 @@ bool SocketServer::init()
   }
 
   if(netSys.listen(listenSocket, 3) < 0) {
-    Logger::error("init: listen()失敗");
+    Logger::error("SocketServer:init: listen()失敗");
     netSys.close(listenSocket);
     return false;
   }
 
-  Logger::info("init: 起動成功");
+  Logger::info("SocketServer:init: 起動成功");
   isRunning = true;
   return true;
 }
@@ -62,7 +67,7 @@ void SocketServer::run()
   while(isRunning) {
     int clientSocket = netSys.accept(listenSocket, (struct sockaddr*)NULL, NULL);
     if(clientSocket < 0) {
-      Logger::error("run: accept()失敗");
+      Logger::error("SocketServer:run: accept()失敗");
       if(!isRunning) {
         break;
       }
@@ -80,21 +85,29 @@ void SocketServer::shutdown()
     netSys.close(listenSocket);
     listenSocket = -1;
   }
-  Logger::info("shutdown:Socket server Shutdown");
+  Logger::info("SocketServer:shutdown: ソケットサーバーをシャットダウンします");
 }
 
 void SocketServer::handleConnection(int clientSocket)
 {
   char recvbuf[SocketServer::getDefaultBufLen()];
   ssize_t iResult;
-
   // クライアントからのデータ受信ループ
   do {
     iResult = netSys.recv(clientSocket, recvbuf, SocketServer::getDefaultBufLen(), 0);
     if(iResult > 0) {
-      if(static_cast<size_t>(iResult) == CameraServer::COMMAND_SIZE) {
+      if(static_cast<size_t>(iResult) >= CameraServer::COMMAND_SIZE) {
         CameraServer::Command cmd = *reinterpret_cast<CameraServer::Command*>(recvbuf);
         switch(cmd) {
+          case CameraServer::Command::COLOR_REGION_DETECTION: {
+            auto* request = reinterpret_cast<CameraServer::ColorRegionDetectorRequest*>(recvbuf);
+            Logger::info("SocketServer:COLOR_REGION_DETECTIONを実行中");
+            CameraServer::ColorRegionDetectorResponse response;
+            colorRegionDetectionHandler.execute(*request, response);
+            netSys.send(clientSocket, reinterpret_cast<const char*>(&response), sizeof(response),
+                        0);
+            break;
+          }
           case CameraServer::Command::SHUTDOWN:
             shutdown();
             return;
@@ -105,14 +118,51 @@ void SocketServer::handleConnection(int clientSocket)
             break;
         }
       } else {
-        Logger::printfLog(Logger::ERROR, "handleConnection: Received unexpected data size: %zd",
-                          (ssize_t)iResult);
+        Logger::printfLog(
+            Logger::ERROR,
+            "SocketServer:handleConnection: 予期しないデータサイズを受信しました: %zd",
+            (ssize_t)iResult);
       }
     } else if(iResult == 0) {
     } else {
       if(isRunning) {
-        Logger::error("handleConnection: recv failed");
+        Logger::error("SocketServer:handleConnection: 受信失敗");
       }
     }
   } while(iResult > 0);
+}
+
+int SocketServer::getListenSocket() const
+{
+  return listenSocket;
+}
+
+bool SocketServer::getIsRunning() const
+{
+  return isRunning;
+}
+
+int SocketServer::getPort() const
+{
+  return port;
+}
+
+int SocketServer::getDefaultBufLen()
+{
+  return DEFAULT_BUFLEN;
+}
+
+void SocketServer::setPort(int portNumber)
+{
+  port = portNumber;
+}
+
+INetworkSystem& SocketServer::getNetSys() const
+{
+  return netSys;
+}
+
+const ColorRegionDetectionActionHandler& SocketServer::getColorRegionDetectionHandler() const
+{
+  return colorRegionDetectionHandler;
 }

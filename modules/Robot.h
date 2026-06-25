@@ -133,8 +133,8 @@ class Robot {
   int runningStartTime = 0;                     // 走行開始時間
   spikeapi::Button button;                      // Buttonインスタンス
   spikeapi::ForceSensor forceSensor;            // ForceSensorインスタンス
-  spikeapi::Display display;
-  char decryptionKey[5] = { 0 };  // 復号キー
-  int targetBrightness = 50;      // 目標輝度
+  spikeapi::Display display;                    // Displayインスタンス
+  char decryptionKey[5] = { 0 };                // 復号キー
+  int targetBrightness = 50;                    // 目標輝度
 };
 #endif

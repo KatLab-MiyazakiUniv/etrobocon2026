@@ -171,6 +171,8 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
     }
     // ↓ 他の条件コマンドはここに追加していく
     default:
+      Logger::printfLog(Logger::WARNING, "[MotionParser] Condition %s は未実装です",
+                        params[0].c_str());
       return nullptr;
   }
 }

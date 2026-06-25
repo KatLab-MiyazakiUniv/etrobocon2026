@@ -84,8 +84,6 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
       lineNum++;
       continue;
     }
-    Logger::printfLog(Logger::INFO, "[MotionParser] Motion: %s ID=%s をロードしました",
-                      motionName.c_str(), motionId.c_str());
 
     // 条件パラメータを取得する
     vector<string> conditionParams
@@ -96,8 +94,6 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
       lineNum++;
       continue;
     }
-    Logger::printfLog(Logger::INFO, "[MotionParser] Condition: %s ID=%s をロードしました",
-                      conditionName.c_str(), conditionId.c_str());
     // 条件インスタンスを生成する
     auto condition = createConditionInstance(robot, conditionParams);
     if(!condition) {

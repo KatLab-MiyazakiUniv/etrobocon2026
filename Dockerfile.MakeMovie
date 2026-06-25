@@ -20,6 +20,7 @@ RUN python -m pip install --upgrade pip \
 
 # スクリプトをコンテナ内にコピー
 COPY create_line_trace_video.py /workspace/
+COPY camera_server/datafiles/line_trace /workspace/datafiles/line_trace/
 
 # デフォルトのエントリーポイントを設定し、引数をそのまま渡せるようにする
 ENTRYPOINT ["python", "/workspace/create_line_trace_video.py"]

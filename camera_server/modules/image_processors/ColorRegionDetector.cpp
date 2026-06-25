@@ -29,11 +29,6 @@ void ColorRegionDetector::setHsvRanges(const std::vector<ColorRegionDetector::HS
   hsvRanges = _hsvRanges;
 }
 
-const cv::Rect& ColorRegionDetector::getRoi() const
-{
-  return roi;
-}
-
 void ColorRegionDetector::setRoi(const cv::Rect& _roi)
 {
   roi = _roi;

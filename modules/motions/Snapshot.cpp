@@ -12,6 +12,7 @@
 
 Snapshot::Snapshot(Robot& _robot, const std::string& _fileName) : robot(_robot), fileName(_fileName)
 {
+  Logger::info("Snapshot生成");
 }
 
 void Snapshot::run()

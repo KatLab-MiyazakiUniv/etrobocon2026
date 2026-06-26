@@ -11,6 +11,11 @@
 #include "CsvLogger.h"
 #include "RealNetworkSystem.h"
 #include "BatteryController.h"
+#include "Robot.h"
+#include "DistanceCondition.h"
+#include "Pid.h"
+#include "CameraTracking.h"
+#include <vector>
 
 void EtRobocon2026::start()
 {

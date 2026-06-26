@@ -84,8 +84,6 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
       lineNum++;
       continue;
     }
-    Logger::printfLog(Logger::INFO, "[MotionParser] Motion: %s ID=%s をロードしました",
-                      motionName.c_str(), motionId.c_str());
 
     // 条件パラメータを取得する
     vector<string> conditionParams
@@ -96,8 +94,6 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
       lineNum++;
       continue;
     }
-    Logger::printfLog(Logger::INFO, "[MotionParser] Condition: %s ID=%s をロードしました",
-                      conditionName.c_str(), conditionId.c_str());
     // 条件インスタンスを生成する
     auto condition = createConditionInstance(robot, conditionParams);
     if(!condition) {
@@ -167,9 +163,6 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
   switch(cond) {
     case CONDITION_COMMAND::DISTANCE: {
       double targetDistance = fromString<double>(params[2]);
-      Logger::printfLog(Logger::DEBUG,
-                        "[MotionParser] DistanceCondition: targetDistance=%.1f を生成しました",
-                        targetDistance);
       return make_unique<DistanceCondition>(robot, targetDistance);
     }
     case CONDITION_COMMAND::ABSOLUTE_ANGLE: {
@@ -238,6 +231,8 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
                                                  CompoundCondition::LogicalOperator::AND);
     }
     default:
+      Logger::printfLog(Logger::WARNING, "[MotionParser] Condition %s は未実装です",
+                        params[0].c_str());
       return nullptr;
   }
 }
@@ -332,7 +327,6 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
 {
   // コマンド文字列(string)と、それに対応する列挙型MOTION_COMMANDのマッピングを定義
   static const unordered_map<string, MOTION_COMMAND> commandMap = {
-    { "EXAMPLE", MOTION_COMMAND::EXAMPLE },
     { "Straight", MOTION_COMMAND::STRAIGHT },
     { "LineTrace", MOTION_COMMAND::LINETRACE },
     { "AbsoluteRotation", MOTION_COMMAND::ABSOLUTE_ROTATION },

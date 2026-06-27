@@ -189,16 +189,16 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
   // TODO: 各動作クラスが完成したら、以下のコメントを外してswitch-caseを実装する
   MOTION_COMMAND command = convertCommand(motionParams[0]);
   switch(command) {
-    case MOTION_COMMAND::STRAIGHT: {
-      // Straight: motionParams[2]=speed(double)
-      //           motionParams[3..5]=anglePid(kp,ki,kd)
-      //           motionParams[6]=useIMU(string: "true"/"false")
-      return new Straight(robot, std::move(condition), fromString<double>(motionParams[2]),
-                          Pid::PidGain{ fromString<double>(motionParams[3]),
-                                        fromString<double>(motionParams[4]),
-                                        fromString<double>(motionParams[5]) },
-                          motionParams[6] == "true");
-    }
+    // case MOTION_COMMAND::STRAIGHT: {
+    //   // Straight: motionParams[2]=speed(double)
+    //   //           motionParams[3..5]=anglePid(kp,ki,kd)
+    //   //           motionParams[6]=useIMU(string: "true"/"false")
+    //   return new Straight(robot, std::move(condition), fromString<double>(motionParams[2]),
+    //                       Pid::PidGain{ fromString<double>(motionParams[3]),
+    //                                     fromString<double>(motionParams[4]),
+    //                                     fromString<double>(motionParams[5]) },
+    //                       motionParams[6] == "true");
+    // }
     case MOTION_COMMAND::ABSOLUTEROTATION: {
       // AbsoluteRotation: motionParams[2]=targetAngle(double)
       //                   motionParams[3..5]=anglePid(kp,ki,kd)
@@ -211,7 +211,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
     case MOTION_COMMAND::RELATIVEROTATION: {
       // AbsoluteRotation: motionParams[2]=targetAngle(double)
       //                   motionParams[3..5]=anglePid(kp,ki,kd)
-      return new RetativeRotation(robot, std::move(condition),
+      return new RelativeRotation(robot, std::move(condition),
                                   Pid::PidGain{ fromString<double>(motionParams[3]),
                                                 fromString<double>(motionParams[4]),
                                                 fromString<double>(motionParams[5]) },

@@ -1,13 +1,3 @@
-コマンド名,ID
-EXAMPLE,001
-EXAMPLE, 002
-EXAMPLE, 003
-EXAMPLE, 101
-EXAMPLE, 102
-EXAMPLE, 103
-EXAMPLE, 104
-DS,田中
-DCL,A
-CDCL,001
-CDCL,003
-CDCL,002
+動作コマンド名,動作ID,条件コマンド名,条件ID
+Straight,001,Distance,001
+Straight,002,Distance,002

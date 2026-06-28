@@ -30,7 +30,7 @@ class Snapshot : public BaseMotion {
   void executeStep() override;
 
  private:
-  std::string fileName;
+  std::string fileName;  // 保存する画像ファイル名
 };
 
 #endif

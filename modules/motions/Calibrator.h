@@ -63,6 +63,6 @@ class Calibrator : public BaseMotion {
   void setDecryptionKey(const std::string& key);
 
  private:
-  void executeStep() override;
+  void executeStep() override;  // 処理を1回実行する
 };
 #endif

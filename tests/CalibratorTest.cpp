@@ -5,6 +5,7 @@
  */
 
 #include "Calibrator.h"
+#include "RepeatCountCondition.h"
 #include <gtest/gtest.h>
 #include <iostream>
 #include <cstdio>
@@ -18,7 +19,8 @@ namespace etrobocon2025_test {
     RealNetworkSystem netSys;
     SocketClient socketClient(netSys);
     Robot robot(socketClient);
-    Calibrator calibrator(robot);
+    Calibrator calibrator(robot, std::make_unique<RepeatCountCondition>(robot, 1));
+
     testing::internal::CaptureStdout();  // 標準出力キャプチャ開始
     calibrator.waitForStart();
     string output = testing::internal::GetCapturedStdout();  // キャプチャ終了
@@ -33,7 +35,7 @@ namespace etrobocon2025_test {
     RealNetworkSystem netSys;
     SocketClient socketClient(netSys);
     Robot robot(socketClient);
-    Calibrator calibrator(robot);
+    Calibrator calibrator(robot, std::make_unique<RepeatCountCondition>(robot, 1));
 
     testing::internal::CaptureStdout();  // 標準出力キャプチャ開始
     calibrator.selectAndSetCourse();
@@ -58,7 +60,7 @@ namespace etrobocon2025_test {
     RealNetworkSystem netSys;
     SocketClient socketClient(netSys);
     Robot robot(socketClient);
-    Calibrator calibrator(robot);
+    Calibrator calibrator(robot, std::make_unique<RepeatCountCondition>(robot, 1));
 
     testing::internal::CaptureStdout();  // 標準出力キャプチャ開始
     calibrator.measureAndSetTargetBrightness();
@@ -87,7 +89,7 @@ namespace etrobocon2025_test {
     RealNetworkSystem netSys;
     SocketClient socketClient(netSys);
     Robot robot(socketClient);
-    Calibrator calibrator(robot);
+    Calibrator calibrator(robot, std::make_unique<RepeatCountCondition>(robot, 1));
 
     calibrator.inputAndSetDecryptionKey();
 
@@ -97,4 +99,4 @@ namespace etrobocon2025_test {
     std::remove("etrobocon2026/key.txt");
     std::filesystem::remove("etrobocon2026");
   }
-}
+}  // namespace etrobocon2025_test

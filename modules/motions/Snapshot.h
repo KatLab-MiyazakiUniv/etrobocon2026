@@ -7,26 +7,30 @@
 #ifndef SNAPSHOT_H
 #define SNAPSHOT_H
 
-#include "Robot.h"
+#include "BaseMotion.h"
+#include "RepeatCountCondition.h"
+#include <memory>
 #include <string>
 
-class Snapshot {
+class Snapshot : public BaseMotion {
  public:
   /**
    * コンストラクタ
    * @param _robot ロボットインスタンス
-   * @param _fileName ファイル名 (デフォルト: snapshot.jpeg)
+   * @param _fileName 保存ファイル名
+   * @param continuationCondition 継続条件
    */
-  Snapshot(Robot& _robot, const std::string& _fileName = "snapshot");
+  Snapshot(Robot& _robot, const std::string& _fileName,
+           std::unique_ptr<BaseContinuationCondition> continuationCondition);
 
+ protected:
   /**
-   * @brief サーバーに撮影を依頼する
+   * @brief 1周期分の撮影処理
    */
-  void run();
+  void executeStep() override;
 
  private:
-  std::string fileName;  // 保存するファイル名
-  Robot robot;           // robot
+  std::string fileName;
 };
 
 #endif

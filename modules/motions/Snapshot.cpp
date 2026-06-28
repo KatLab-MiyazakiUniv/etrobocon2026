@@ -5,19 +5,21 @@
  */
 
 #include "Snapshot.h"
-#include "SocketClient.h"
-#include <iostream>
-#include <string.h>
-#include "Logger.h"
 
-Snapshot::Snapshot(Robot& _robot, const std::string& _fileName) : robot(_robot), fileName(_fileName)
+#include "Logger.h"
+#include "SocketClient.h"
+#include <cstring>
+
+Snapshot::Snapshot(Robot& _robot, const std::string& _fileName,
+                   std::unique_ptr<BaseContinuationCondition> continuationCondition)
+  : BaseMotion(_robot, std::move(continuationCondition)), fileName(_fileName)
 {
   Logger::info("Snapshot生成");
 }
 
-void Snapshot::run()
+void Snapshot::executeStep()
 {
-  Logger::printfLog(Logger::INFO, "Requesting snapshot: %s", fileName);
+  Logger::printfLog(Logger::INFO, "Requesting snapshot: %s", fileName.c_str());
 
   CameraServer::SnapshotActionRequest request;
   request.command = CameraServer::Command::TAKE_SNAPSHOT;
@@ -28,6 +30,7 @@ void Snapshot::run()
   CameraServer::SnapshotActionResponse response;
 
   bool success = robot.getCameraSocketClientInstance().executeSnapshotAction(request, response);
+
   if(success) {
     Logger::info("Snapshot:撮影成功");
   } else {

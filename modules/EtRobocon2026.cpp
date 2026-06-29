@@ -35,18 +35,45 @@ void EtRobocon2026::start()
     double y;
   };
 
+  Pid::PidGain rotationPidGain(0.9, 0.7, 0.1);
+  Pid::PidGain rightPid(0.016, 0.005, 0.0015);
+  Pid::PidGain leftPid(0.016, 0.0045, 0.0015);
+  Pid::PidGain anglePid(0.036, 0.012, 0.03);
+
   Goal goal[] = { { 500.0, 0.0 }, { 500.0, 500.0 }, { 0.0, 500.0 }, { 0.0, 0.0 } };
 
   robot.getIMUControllerInstance().resetAzimuth();
 
   for(int i = 0; i < 4; i++) {
-    double calHead = nav.calculateHeading(goal[i]);
-    double calDis = nav.calculateDistance(goal[i]);
+    double calHead = nav.calculateHeading(goal[i].x, goal[i].y);
+    double calDis = nav.calculateDistance(goal[i].x, goal[i].y);
 
-    odo.update(500, robot.getIMUControllerInstance().getAzimuth());
+    auto absCondition = std::make_unique<AbsoluteAngleCondition>(robot, calHead);
+    AbsoluteRotation absRotaion(robot, std::move(absCondition), rotationPidGain, calHead);
+    absRotaion.run();
+
+    ClockUtil::wait(1000);
+
+    int32_t beforeRightAngle = robot.getWheelMotorControllerInstance().getRightCount();
+    int32_t beforeLeftAngle = robot.getWheelMotorControllerInstance().getLeftCount();
+
+    Straight straight(robot, std::make_unique<DistanceCondition>(robot, calDis), 300, rightPid,
+                      leftPid, anglePid, true);
+    straight.run();
+
+    ClockUtil::wait(1000);
+
+    int32_t afterRightAngle = robot.getWheelMotorControllerInstance().getRightCount();
+    int32_t afterLeftAngle = robot.getWheelMotorControllerInstance().getLeftCount();
+
+    double mileage = Mileage::calculateMileage((afterRightAngle - beforeRightAngle),
+                                               (afterLeftAngle - beforeLeftAngle));
+
+    odo.update(mileage, robot.getIMUControllerInstance().getAzimuth());
+
     std::cout << "num = " << pos.getX() << "\n";
     std::cout << "num = " << pos.getY() << "\n";
-    Logger::printfLog(Logger::Level info, "x = %lf", pos.getX());
-    Logger::printfLog(Logger::Level info, "y = %lf", pos.getY());
+    Logger::printfLog(Logger::INFO, "x = %lf", pos.getX());
+    Logger::printfLog(Logger::INFO, "y = %lf", pos.getY());
   }
 }

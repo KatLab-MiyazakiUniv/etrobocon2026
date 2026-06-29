@@ -309,12 +309,9 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       return new RelativeRotation(robot, std::move(condition), anglePidGain, relativeTargetAngle);
     }
     case MOTION_COMMAND::EDGECHANGE: {
-      std::string edgeString = motionParams[2];
-      if(fromString<int>(edgeString) == 1) {
-        robot.setEdge(Edge::RightEdge);
-      } else {
-        robot.setEdge(Edge::LeftEdge);
-      }
+      std::string edge = motionParams[2];
+      Logger::printfLog(Logger::DEBUG, "[MotionParser] ChangeEdge: edge = %s を生成しました", edge);
+      return new ChangeEdge(robot, std::move(condition), edge);
     }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",

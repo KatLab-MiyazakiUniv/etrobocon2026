@@ -1,7 +1,6 @@
 MAKEFILE_PATH := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 DOCKER_IMAGE   := kat_etrobo2026:arm64
-DOCKER_IMAGE_MOVIE := kat_etrobo2026_movie:latest
 DOCKER_WORKDIR := /RasPike-ART/sdk/workspace/etrobocon2026
 DOCKER_MOUNT   := -v $(MAKEFILE_PATH):$(DOCKER_WORKDIR)
 
@@ -53,12 +52,8 @@ help:
 	@echo " $$ make docker-run"
 	@echo UID/GIDを指定してDockerコンテナを起動する\(権限問題が起きた場合\)
 	@echo " $$ make docker-run-user"
-	@echo 動画作成用Dockerイメージをビルドする
-	@echo " $$ make docker-build-movie"
-	@echo 動画作成用Dockerコンテナを起動する
-	@echo " $$ make docker-run-movie"
-	@echo UID/GIDを指定して動画作成用Dockerコンテナを起動する\(権限問題が起きた場合\)
-	@echo " $$ make docker-run-movie-user"
+	@echo venvを有効化して動画を作成する
+	@echo " $$ make create-video"
 
 ## 実行関連 ##
 .PHONY: build
@@ -193,17 +188,6 @@ docker-run-user:
 		$(DOCKER_MOUNT) \
 		$(DOCKER_IMAGE) bash
 
-.PHONY: docker-build-movie docker-run-movie docker-run-movie-user
-docker-build-movie:
-	docker build -t $(DOCKER_IMAGE_MOVIE) -f Dockerfile.MakeMovie .
-
-docker-run-movie:
-	docker run -it --rm \
-		-v $(MAKEFILE_PATH):/workspace \
-		$(DOCKER_IMAGE_MOVIE) $(ARGS)
-
-docker-run-movie-user:
-	docker run -it --rm \
-		--user $$(id -u):$$(id -g) \
-		-v $(MAKEFILE_PATH):/workspace \
-		$(DOCKER_IMAGE_MOVIE) $(ARGS)
+.PHONY: create-video
+create-video:
+	source $(MAKEFILE_PATH)scripts/create_video/.venv/bin/activate && python $(MAKEFILE_PATH)scripts/create_video/create_line_trace_video.py -i $(MAKEFILE_PATH)camera_server/datafiles/line_trace/ && deactivate

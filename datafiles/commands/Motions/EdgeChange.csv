@@ -1,4 +1,4 @@
 コマンド名,ID,edge
-EdgeChange,ID,int
-EdgeChange,001,1
-EdgeChange,002,0
+EdgeChange,ID,string
+EdgeChange,001,Left
+EdgeChange,002,Right

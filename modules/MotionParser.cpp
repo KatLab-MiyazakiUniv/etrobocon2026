@@ -199,8 +199,16 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
     //                     fromString<double>(motionParams[11]) },
     //       motionParams[12] == "true");
     // }
-    // ↓ 他のコマンドはここに追加していく
-    default:
+
+    case MOTION_COMMAND::CAMERA_TRACKING: {
+      //カメラ走行クラスのインスタンス化引数をvector<string>& montionParamsの配列に代入
+
+      //動作クラスに引数を入れてインスタンス化した動作クラスインスタンスを返す
+
+    }
+
+        // ↓ 他のコマンドはここに追加していく
+        default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
                         motionParams[0].c_str());
       return nullptr;

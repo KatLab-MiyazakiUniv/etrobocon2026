@@ -14,7 +14,11 @@ Snapshot::Snapshot(Robot& _robot, const std::string& _fileName,
                    std::unique_ptr<BaseContinuationCondition> continuationCondition)
   : BaseMotion(_robot, std::move(continuationCondition)), fileName(_fileName)
 {
-  Logger::info("Snapshot生成");
+  LOG_CREATE("Snapshot");
+}
+Snapshot::~Snapshot()
+{
+  LOG_DESTROY("Snapshot");
 }
 
 void Snapshot::executeStep()

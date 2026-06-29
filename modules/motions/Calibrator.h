@@ -32,6 +32,11 @@ class Calibrator : public BaseMotion {
   Calibrator(Robot& _robot, std::unique_ptr<BaseContinuationCondition> condition);
 
   /**
+  * デストラクタ
+  */
+  ~Calibrator();
+
+  /**
    * @brief 左右ボタンでLRコースを選択してisLeftCourseをセットする
    */
   void selectAndSetCourse();

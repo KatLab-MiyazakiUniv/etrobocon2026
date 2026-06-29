@@ -11,8 +11,12 @@ using namespace std;
 Calibrator::Calibrator(Robot& _robot, std::unique_ptr<BaseContinuationCondition> condition)
   : BaseMotion(_robot, std::move(condition))
 {
+  LOG_CREATE("Calibrator");
 }
-
+Calibrator::~Calibrator()
+{
+  LOG_DESTROY("Calibrator");
+}
 void Calibrator::executeStep()
 {
   inputAndSetDecryptionKey();

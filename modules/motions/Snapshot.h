@@ -23,6 +23,11 @@ class Snapshot : public BaseMotion {
   Snapshot(Robot& _robot, const std::string& _fileName,
            std::unique_ptr<BaseContinuationCondition> continuationCondition);
 
+  /**
+ * デストラクタ
+ */
+  ~Snapshot();
+
  protected:
   /**
    * @brief 1周期分の撮影処理

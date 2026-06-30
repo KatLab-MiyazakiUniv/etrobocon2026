@@ -19,9 +19,10 @@ void EtRobocon2026::start()
   RealNetworkSystem real;
   SocketClient client(real);
   Robot robot(client);
+  robot.getCameraSocketClientInstance().connectToServer();
   robot.setCourse(Course::Left);
   // robot.setEdge(Edge::LeftEdge);
-  robot.setEdge(Edge::LeftEdge);
+  robot.setEdge(Edge::RightEdge);
   Area lineTraceArea = Area::LineTrace;
   AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
   lineTraceAreaMaster.run();

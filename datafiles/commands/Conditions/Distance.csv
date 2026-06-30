@@ -1,10 +1,10 @@
 コマンド名,ID,距離
 Distance,ID,double
-Distance,001,1000
-Distance,002,2000
-Distance,003,3000
-Distance,004,500
-Distance,005,1700
+Distance,001,430
+Distance,002,500
+Distance,003,380
+Distance,004,2307
+Distance,005,881
 Distance,006,1400
 Distance,007,800
 

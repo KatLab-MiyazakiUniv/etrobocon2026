@@ -1,6 +1,11 @@
 動作コマンド名,動作ID,条件コマンド名,条件ID
-LineTrace,006,Distance,007
-LineTrace,004,Distance,004
-LineTrace,006,Distance,005
+LineTrace,002,Distance,001
+LineTrace,003,Distance,002
+LineTrace,002,Distance,001
+LineTrace,003,Distance,002
+LineTrace,002,Distance,003
 LineTrace,003,Distance,004
-LineTrace,004,Distance,006
+LineTrace,002,Distance,005
+
+
+

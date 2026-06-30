@@ -127,8 +127,8 @@ void CameraTracking::executeStep()
   logData.currentVal = currentX;
   logData.rightPower = robot.getWheelMotorControllerInstance().getRightPower();
   logData.leftPower = robot.getWheelMotorControllerInstance().getLeftPower();
-  logData.rightSpeed = robot.getWheelMotorControllerInstance().getRightPower();
-  logData.leftSpeed = robot.getWheelMotorControllerInstance().getLeftPower();
+  logData.rightSpeed = robot.getWheelMotorControllerInstance().getRightSpeed();
+  logData.leftSpeed = robot.getWheelMotorControllerInstance().getLeftSpeed();
   logData.kp = pidGain.kp;
   logData.ki = pidGain.ki;
   logData.kd = pidGain.kd;

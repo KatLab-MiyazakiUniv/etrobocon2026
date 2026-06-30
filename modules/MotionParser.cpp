@@ -454,7 +454,10 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       request.hsvRangeCount = 1;
       request.hsvRanges[0].lower = { 0, 0, 0 };
       request.hsvRanges[0].upper = { 179, 255, 30 };
+<<<<<<< HEAD
 
+=======
+>>>>>>> 663fbdd (add:実機の残ってるファイルをpush)
       request.roi = { fromString<int>(motionParams[8]), fromString<int>(motionParams[9]),
                       fromString<int>(motionParams[10]), fromString<int>(motionParams[11]) };
 
@@ -537,7 +540,7 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH }
 
         };
-
+        
   // コマンド文字列に対応するMOTION_COMMAND値をマップから取得。なければMOTION_COMMAND::NONEを返す
   auto it = commandMap.find(str);
   if(it != commandMap.end()) {

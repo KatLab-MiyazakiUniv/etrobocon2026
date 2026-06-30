@@ -9,6 +9,9 @@
 
 #include "CameraCapture.h"
 #include "SocketProtocol.h"
+#include "FrameSave.h"
+#include <iostream>
+#include "Logger.h"
 
 class SnapshotActionHandler {
  public:

@@ -38,14 +38,14 @@ void Calibrator::selectAndSetCourse()
       robot.getDisplayInstance().showChar(course == Course::Left ? 'L' : 'R');
       // ボタンが離されるまで待機
       while(robot.getButtonInstance().isLeftPressed()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        ClockUtil::sleep();
       }
     }
     // 右ボタンが押されたときコース選択を終了
     if(robot.getButtonInstance().isRightPressed()) {
       break;
     }
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    ClockUtil::sleep();
   }
   robot.setCourse(course);
 
@@ -53,7 +53,7 @@ void Calibrator::selectAndSetCourse()
                     course == Course::Left ? "Left" : "Right");
 
   robot.getDisplayInstance().scrollText("OK", 50);
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  ClockUtil::sleep();
 }
 
 void Calibrator::measureAndSetTargetBrightness()
@@ -71,7 +71,7 @@ void Calibrator::measureAndSetTargetBrightness()
       isBrightnessMeasuring = true;
       // ボタンが離されるまで待機
       while(robot.getButtonInstance().isLeftPressed()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));  // 10ミリ秒スリープ
+        ClockUtil::sleep();
       }
     }
     // ループが開始されたら連続的に輝度を取得
@@ -83,10 +83,10 @@ void Calibrator::measureAndSetTargetBrightness()
       if(robot.getButtonInstance().isRightPressed()) {
         // 黒の輝度を確定したことをディスプレイに表示
         robot.getDisplayInstance().scrollText("OK", 50);
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));  // 1秒スリープ
+        ClockUtil::sleep(1000);
         // ボタンが離されるまで待機
         while(robot.getButtonInstance().isRightPressed()) {
-          std::this_thread::sleep_for(std::chrono::milliseconds(10));  // 10ミリ秒スリープ
+          ClockUtil::sleep();
         }
         break;
       }
@@ -103,7 +103,7 @@ void Calibrator::measureAndSetTargetBrightness()
       isBrightnessMeasuring = true;
       // ボタンが離されるまで待機
       while(robot.getButtonInstance().isLeftPressed()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));  // 10ミリ秒スリープ
+        ClockUtil::sleep();
       }
     }
     // ループが開始されたら連続的に輝度を取得
@@ -115,15 +115,15 @@ void Calibrator::measureAndSetTargetBrightness()
       if(robot.getButtonInstance().isRightPressed()) {
         // 白の輝度を確定したことをディスプレイに表示
         robot.getDisplayInstance().scrollText("OK", 50);
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));  // 1秒スリープ
+        ClockUtil::sleep();
         // ボタンが離されるまで待機
         while(robot.getButtonInstance().isRightPressed()) {
-          std::this_thread::sleep_for(std::chrono::milliseconds(10));  // 10ミリ秒スリープ
+          ClockUtil::sleep();
         }
         break;
       }
     }
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));  // 10ミリ秒スリープ
+    ClockUtil::sleep();
   }
   int target = (whiteBrightness + blackBrightness) / 2;
   robot.setTargetBrightness(target);
@@ -131,8 +131,8 @@ void Calibrator::measureAndSetTargetBrightness()
   // 目標輝度をディスプレイに表示
   robot.getDisplayInstance().showNumber(target);
   Logger::printfLog(Logger::INFO, "Calibrator:目標輝度値は %d ", target);
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));  // 1秒スリープ
-  robot.getDisplayInstance().showChar(' ');                      // ディスプレイを消灯
+  ClockUtil::sleep(1000);
+  robot.getDisplayInstance().showChar(' ');  // ディスプレイを消灯
 }
 
 void Calibrator::getAngleCheckFrame()
@@ -146,48 +146,40 @@ void Calibrator::getAngleCheckFrame()
     if(robot.getButtonInstance().isCenterPressed()) {
       // ボタンが離されるまで待機
       while(robot.getButtonInstance().isCenterPressed()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));  // 10ミリ秒スリープ
+        ClockUtil::sleep();
       }
       Snapshot snapshot(robot, fileName, std::make_unique<RepeatCountCondition>(robot, 1));
       snapshot.run();
       robot.getDisplayInstance().showChar('S');
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));  // 10ミリ秒スリープ
+      ClockUtil::sleep();
     }
     // 右ボタンで終了
     if(robot.getButtonInstance().isRightPressed()) {
       robot.getDisplayInstance().scrollText("OK", 50);
-      std::this_thread::sleep_for(std::chrono::milliseconds(1000));  // 1秒スリープ
-      // ボタンが離されるまで待機
+      ClockUtil::sleep(1000);  // ボタンが離されるまで待機
       while(robot.getButtonInstance().isRightPressed()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));  // 10ミリ秒スリープ
+        ClockUtil::sleep();
       }
       break;
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(10));  // 10ミリ秒スリープ
   }
   Logger::info("Calibrator:アングル調節完了");
-  std::this_thread::sleep_for(std::chrono::milliseconds(1000));  // 1秒スリープ
+  ClockUtil::sleep(1000);
 }
 
 void Calibrator::waitForStart()
 {
   Logger::info("Calibrator:待機中");
   while(!robot.getForceSensorInstance().isPressed(PRESS_POWER)) {
-    std::this_thread::sleep_for(std::chrono::milliseconds(10));
-  }
-}
-
-void Calibrator::setDecryptionKey(const std::string& key)
-{
-  if(key.length() == 4) {
-    robot.setDecryptionKey(key.c_str());
-  } else {
-    robot.setDecryptionKey("AAAA");
+    ClockUtil::sleep();
   }
 }
 
 void Calibrator::inputAndSetDecryptionKey()
 {
+  robot.getDisplayInstance().showChar('K');  // K: Key
+
   std::string key1;
   std::string key2;
 
@@ -197,32 +189,45 @@ void Calibrator::inputAndSetDecryptionKey()
 
   if(!ifs.is_open()) {
     Logger::error("key.txt を開けません");
+    robot.getDisplayInstance().scrollText("ERR", 50);
+    ClockUtil::sleep(1000);
     return;
   }
 
   if(!(ifs >> key1)) {
     Logger::error("1行目の復号キー読み込み失敗");
+    robot.getDisplayInstance().scrollText("ERR", 50);
+    ClockUtil::sleep(1000);
     return;
   }
 
   if(!(ifs >> key2)) {
     Logger::error("2行目の復号キー読み込み失敗");
+    robot.getDisplayInstance().scrollText("ERR", 50);
+    ClockUtil::sleep(1000);
     return;
   }
 
   if(key1.length() != 4 || key2.length() != 4) {
     Logger::error("復号キーは4文字で入力してください");
+    robot.getDisplayInstance().scrollText("ERR", 50);
+    ClockUtil::sleep(1000);
     return;
   }
 
   if(key1 != key2) {
     Logger::error("復号キーが一致しません");
+    robot.getDisplayInstance().scrollText("ERR", 50);
+    ClockUtil::sleep(1000);
     return;
   }
 
   Logger::printfLog(Logger::INFO, "復号キー: %s", key1.c_str());
 
-  setDecryptionKey(key1);
+  robot.setDecryptionKey(key1.c_str());
+
+  robot.getDisplayInstance().scrollText("OK", 50);
+  ClockUtil::sleep(1000);
 
   ifs.close();
 }

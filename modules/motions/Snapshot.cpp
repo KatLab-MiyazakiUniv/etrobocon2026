@@ -6,10 +6,6 @@
 
 #include "Snapshot.h"
 
-#include "Logger.h"
-#include "SocketClient.h"
-#include <cstring>
-
 Snapshot::Snapshot(Robot& _robot, const std::string& _fileName,
                    std::unique_ptr<BaseContinuationCondition> continuationCondition)
   : BaseMotion(_robot, std::move(continuationCondition)), fileName(_fileName)
@@ -26,7 +22,7 @@ void Snapshot::executeStep()
   Logger::printfLog(Logger::INFO, "Requesting snapshot: %s", fileName.c_str());
 
   CameraServer::SnapshotActionRequest request;
-  request.command = CameraServer::Command::TAKE_SNAPSHOT;
+  request.command = CameraServer::Command::SNAPSHOT;
 
   strncpy(request.fileName, fileName.c_str(), sizeof(request.fileName) - 1);
   request.fileName[sizeof(request.fileName) - 1] = '\0';

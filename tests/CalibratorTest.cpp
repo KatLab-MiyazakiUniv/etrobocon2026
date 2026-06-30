@@ -77,7 +77,7 @@ namespace etrobocon2025_test {
 
     EXPECT_EQ(expected, actual);  // 出力とゲッタの値が等しいかテスト
   }
-  TEST(CalibratorTest, DecryptionKeyFromFile)
+  TEST(CalibratorTest, DecryptionKeyFromFile)  // key.txtから復号キーを読み込みできるかのテスト
   {
     std::filesystem::create_directory("etrobocon2026");
 

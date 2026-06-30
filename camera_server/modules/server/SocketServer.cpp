@@ -100,7 +100,7 @@ void SocketServer::handleConnection(int clientSocket)
       if(static_cast<size_t>(iResult) == CameraServer::COMMAND_SIZE) {
         CameraServer::Command cmd = *reinterpret_cast<CameraServer::Command*>(recvbuf);
         switch(cmd) {
-          case CameraServer::Command::TAKE_SNAPSHOT: {
+          case CameraServer::Command::SNAPSHOT: {
             auto* request = reinterpret_cast<CameraServer::SnapshotActionRequest*>(recvbuf);
             CameraServer::SnapshotActionResponse response;
             snapshotHandler.execute(*request, response);

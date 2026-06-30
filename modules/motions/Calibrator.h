@@ -20,8 +20,6 @@
 #include <cstring>
 #include <fstream>
 
-#define PRESS_POWER 0.5f
-
 class Calibrator : public BaseMotion {
  public:
   /**
@@ -57,17 +55,16 @@ class Calibrator : public BaseMotion {
   void waitForStart();
 
   /**
-   * @brief 4文字の復号キーをPCサーバーから通信で取得して，メンバ変数に保存する
+   * @brief 4文字の復号キーをローカルファイルから読み込んでメンバ変数に保存
    */
   void inputAndSetDecryptionKey();
 
-  /**
-   * @brief 4文字の復号キーをメンバ変数に保存する
-   * @param key 4文字の復号キー
-   */
-  void setDecryptionKey(const std::string& key);
-
  private:
+  /**
+   * @brief スタート待機時に押下と判定する力の閾値[N]
+   */
+  static constexpr float PRESS_POWER = 0.5f;
+
   void executeStep() override;  // 処理を1回実行する
 };
 #endif

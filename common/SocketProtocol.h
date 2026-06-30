@@ -18,17 +18,17 @@ namespace CameraServer {
    * @brief サーバー側で実行可能なコマンド
    */
   enum class Command : uint8_t {
-    TAKE_SNAPSHOT = 1,  // スナップショット
-    DISCONNECT = 254,   // サーバーから切断
-    SHUTDOWN = 255      // サーバーをシャットダウン
+    SNAPSHOT = 1,      // スナップショット
+    DISCONNECT = 254,  // サーバーから切断
+    SHUTDOWN = 255     // サーバーをシャットダウン
   };
 
   constexpr size_t COMMAND_SIZE = sizeof(Command);  // コマンド型のバイトサイズ
 
   // スナップショット撮影アクションのリクエストデータ構造
   struct SnapshotActionRequest {
-    Command command = Command::TAKE_SNAPSHOT;  // TAKE_SNAPSHOTを期待
-    char fileName[64];                         // 保存するファイル名
+    Command command = Command::SNAPSHOT;  // SNAPSHOTを期待
+    char fileName[64];                    // 保存するファイル名
   };
 
   // スナップショット撮影アクションのレスポンスデータ構造

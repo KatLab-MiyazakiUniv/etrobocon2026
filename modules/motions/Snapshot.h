@@ -9,8 +9,11 @@
 
 #include "BaseMotion.h"
 #include "RepeatCountCondition.h"
+#include "Logger.h"
+#include "SocketClient.h"
 #include <memory>
 #include <string>
+#include <cstring>
 
 class Snapshot : public BaseMotion {
  public:

@@ -115,10 +115,28 @@ class Robot {
    */
   void setRunningStartTime(int time);
 
+  /**
+   * @brief 復号キーを設定する
+   * @param key 4文字の復号キー
+   */
   void setDecryptionKey(const char* key);
+
+  /**
+   * @brief 設定されている復号キーを取得する
+   * @return 復号キー
+   */
   const char* getDecryptionKey() const;
 
+  /**
+   * @brief 目標輝度値を設定する
+   * @param brightness 目標輝度値
+   */
   void setTargetBrightness(int brightness);
+
+  /**
+   * @brief 設定されている目標輝度値を取得する
+   * @return 目標輝度値
+   */
   int getTargetBrightness() const;
 
  private:

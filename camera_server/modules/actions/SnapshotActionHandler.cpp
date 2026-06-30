@@ -5,9 +5,6 @@
  */
 
 #include "SnapshotActionHandler.h"
-#include "FrameSave.h"
-#include <iostream>
-#include "Logger.h"
 
 SnapshotActionHandler::SnapshotActionHandler(CameraCapture& _camera) : camera(_camera) {}
 

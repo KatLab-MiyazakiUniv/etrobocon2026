@@ -54,22 +54,16 @@ void EtRobocon2026::start()
 
       ClockUtil::wait(1000);
 
-      int32_t beforeRightAngle = robot.getWheelMotorControllerInstance().getRightCount();
-      int32_t beforeLeftAngle = robot.getWheelMotorControllerInstance().getLeftCount();
-
       Straight straight(robot, std::make_unique<DistanceCondition>(robot, calDis), 300, rightPid,
                         leftPid, anglePid, true);
       straight.run();
 
       ClockUtil::wait(1000);
 
-      int32_t afterRightAngle = robot.getWheelMotorControllerInstance().getRightCount();
-      int32_t afterLeftAngle = robot.getWheelMotorControllerInstance().getLeftCount();
+      int32_t left = robot.getWheelMotorControllerInstance().getLeftCount();
+      int32_t right = robot.getWheelMotorControllerInstance().getRightCount();
 
-      double mileage = Mileage::calculateMileage((afterRightAngle - beforeRightAngle),
-                                                 (afterLeftAngle - beforeLeftAngle));
-
-      odo.update(mileage, robot.getIMUControllerInstance().getAzimuth());
+      odo.update(left, right, robot.getIMUControllerInstance().getAzimuth());
 
       std::cout << "num = " << pos.getX() << "\n";
       std::cout << "num = " << pos.getY() << "\n";

@@ -27,5 +27,7 @@ double Navigator::calculateHeading(double goalX, double goalY) const
   double dx = goalX - position.getX();
   double dy = goalY - position.getY();
 
-  return std::atan2(dy, dx) * RAD_TO_DEG;
+  double heading = std::atan2(dy, dx) * RAD_TO_DEG;
+
+  return AngleNormalizer::normalizeAngle(heading);
 }

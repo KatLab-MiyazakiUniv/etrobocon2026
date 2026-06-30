@@ -26,9 +26,6 @@ void EtRobocon2026::start()
   RealNetworkSystem real;
   SocketClient client(real);
   Robot robot(client);
-  Position pos;
-  Odometry odo(pos);
-  Navigator nav(pos);
 
   struct Goal {
     double x;
@@ -40,40 +37,35 @@ void EtRobocon2026::start()
   Pid::PidGain leftPid(0.016, 0.0045, 0.0015);
   Pid::PidGain anglePid(0.036, 0.012, 0.03);
 
-  Goal goal[] = { { 500.0, 0.0 }, { 500.0, 500.0 }, { 0.0, 500.0 }, { 0.0, 0.0 } };
+  Goal goal[] = { { 1000.0, 0.0 }, { 1000.0, 1000.0 }, { 0.0, 1000.0 }, { 0.0, 0.0 } };
 
   robot.getIMUControllerInstance().resetAzimuth();
+  for(int j = 0; j < 10; j++) {
+    for(int i = 0; i < 4; i++) {
+      double calHead = robot.getNavigator().calculateHeading(goal[i].x, goal[i].y);
+      double calDis = robot.getNavigator().calculateDistance(goal[i].x, goal[i].y);
 
-  for(int i = 0; i < 4; i++) {
-    double calHead = nav.calculateHeading(goal[i].x, goal[i].y);
-    double calDis = nav.calculateDistance(goal[i].x, goal[i].y);
+      auto absCondition = std::make_unique<AbsoluteAngleCondition>(robot, calHead, 0.0);
+      AbsoluteRotation absRotaion(robot, std::move(absCondition), rotationPidGain, calHead);
+      absRotaion.run();
 
-    auto absCondition = std::make_unique<AbsoluteAngleCondition>(robot, calHead);
-    AbsoluteRotation absRotaion(robot, std::move(absCondition), rotationPidGain, calHead);
-    absRotaion.run();
+      ClockUtil::wait(1000);
 
-    ClockUtil::wait(1000);
+      int32_t beforeRightAngle = robot.getWheelMotorControllerInstance().getRightCount();
+      int32_t beforeLeftAngle = robot.getWheelMotorControllerInstance().getLeftCount();
 
-    int32_t beforeRightAngle = robot.getWheelMotorControllerInstance().getRightCount();
-    int32_t beforeLeftAngle = robot.getWheelMotorControllerInstance().getLeftCount();
+      Straight straight(robot, std::make_unique<DistanceCondition>(robot, calDis), 300, rightPid,
+                        leftPid, anglePid, true);
+      straight.run();
 
-    Straight straight(robot, std::make_unique<DistanceCondition>(robot, calDis), 300, rightPid,
-                      leftPid, anglePid, true);
-    straight.run();
+      ClockUtil::wait(1000);
 
-    ClockUtil::wait(1000);
-
-    int32_t afterRightAngle = robot.getWheelMotorControllerInstance().getRightCount();
-    int32_t afterLeftAngle = robot.getWheelMotorControllerInstance().getLeftCount();
-
-    double mileage = Mileage::calculateMileage((afterRightAngle - beforeRightAngle),
-                                               (afterLeftAngle - beforeLeftAngle));
-
-    odo.update(mileage, robot.getIMUControllerInstance().getAzimuth());
-
-    std::cout << "num = " << pos.getX() << "\n";
-    std::cout << "num = " << pos.getY() << "\n";
-    Logger::printfLog(Logger::INFO, "x = %lf", pos.getX());
-    Logger::printfLog(Logger::INFO, "y = %lf", pos.getY());
+      std::cout << "angle = " << robot.getIMUControllerInstance().getAzimuth() << "\n";
+      std::cout << "x = " << robot.getPosition().getX() << "\n";
+      std::cout << "y = " << robot.getPosition().getY() << "\n";
+      Logger::printfLog(Logger::INFO, "angle = %lf", robot.getIMUControllerInstance().getAzimuth());
+      Logger::printfLog(Logger::INFO, "x = %lf", robot.getPosition().getX());
+      Logger::printfLog(Logger::INFO, "y = %lf", robot.getPosition().getY());
+    }
   }
 }

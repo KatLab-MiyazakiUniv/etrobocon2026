@@ -14,6 +14,9 @@
 #include "UltraSonicController.h"
 #include "SocketClient.h"
 #include "Course.h"
+#include "Odometry.h"
+#include "Position.h"
+#include "Navigator.h"
 
 class Robot {
  public:
@@ -94,6 +97,10 @@ class Robot {
    */
   void setRunningStartTime(int time);
 
+  Position& getPosition();
+  Odometry& getOdometry();
+  Navigator& getNavigator();
+
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
   ArmMotorController armMotorController;        // ArmMotorController インスタンス
@@ -104,5 +111,8 @@ class Robot {
   Course course;                                // コース(Left or Right)
   Edge edge;                                    // エッジの左右判定
   int runningStartTime = 0;                     // 走行開始時間
+  Position position;
+  Odometry odometry;
+  Navigator navigator;
 };
 #endif

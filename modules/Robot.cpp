@@ -12,7 +12,10 @@ Robot::Robot(SocketClient& _cameraSocketClient)
     imuController(),
     colorSensorController(),
     ultraSonicController(),
-    cameraSocketClient(_cameraSocketClient)
+    cameraSocketClient(_cameraSocketClient),
+    position(),
+    odometry(position),
+    navigator(position)
 {
 }
 
@@ -71,7 +74,17 @@ int Robot::getRunningStartTime()
   return runningStartTime;
 }
 
-void Robot::setRunningStartTime(int time)
+Position& Robot::getPosition()
 {
-  runningStartTime = time;
+  return position;
+}
+
+Odometry& Robot::getOdometry()
+{
+  return odometry;
+}
+
+Navigator& Robot::getNavigator()
+{
+  return navigator;
 }

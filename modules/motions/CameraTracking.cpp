@@ -77,8 +77,8 @@ void CameraTracking::executeStep()
   logData.currentVal = currentX;
   logData.rightPower = robot.getWheelMotorControllerInstance().getRightPower();
   logData.leftPower = robot.getWheelMotorControllerInstance().getLeftPower();
-  logData.rightSpeed = robot.getWheelMotorControllerInstance().getRightPower();
-  logData.leftSpeed = robot.getWheelMotorControllerInstance().getLeftPower();
+  logData.rightSpeed = robot.getWheelMotorControllerInstance().getRightSpeed();
+  logData.leftSpeed = robot.getWheelMotorControllerInstance().getLeftSpeed();
   logData.kp = pidGain.kp;
   logData.ki = pidGain.ki;
   logData.kd = pidGain.kd;
@@ -87,7 +87,7 @@ void CameraTracking::executeStep()
 
 void CameraTracking::wait()
 {
-  ClockUtil::sleep(30);  // カメラの撮影FPSに合わせて30ミリ秒待機する
+  // ClockUtil::sleep(0);  // カメラの撮影FPSに合わせて30ミリ秒待機する
 }
 
 void CameraTracking::finish()

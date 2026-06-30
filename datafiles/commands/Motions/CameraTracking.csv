@@ -1,0 +1,5 @@
+コマンド名,ID,speed,targetX,camera_kp,camera_ki,camera_kd,isStop,roi.x,roi.y,width,height
+CameraTracking,ID,double,int,double,double,double,bool,int,int,int,int
+CameraTracking,001,550,960,0.002,0.0005,0.001,1,300,540,1320,740
+CameraTracking,002,550,960,0.00215,0.0009,0.00101,1,300,540,1320,740
+

@@ -269,6 +269,27 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                                          fromString<double>(motionParams[5]),
                                          fromString<double>(motionParams[6]) });
     }
+    case MOTION_COMMAND::CAMERA_TRACKING: {
+      CameraServer::ColorRegionDetectorRequest request;
+      request.requireLargestColorIndex = false;
+      request.hsvRangeCount = 1;
+      request.hsvRanges[0].lower = { 0, 0, 0 };
+      request.hsvRanges[0].upper = { 179, 255, 30 };
+      request.roi = { fromString<int>(motionParams[8]), fromString<int>(motionParams[9]),
+                      fromString<int>(motionParams[10]), fromString<int>(motionParams[11]) };
+
+      int targetXCoordinate = fromString<int>(motionParams[3]);
+
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] CameraTracking: targetXCoorddinate=%.d を生成しました",
+                        targetXCoordinate);
+
+      return new CameraTracking(
+          robot, std::move(condition), fromString<double>(motionParams[2]), targetXCoordinate,
+          Pid::PidGain(fromString<double>(motionParams[4]), fromString<double>(motionParams[5]),
+                       fromString<double>(motionParams[6])),
+          request, fromString<bool>(motionParams[7]));
+    }
     case MOTION_COMMAND::ABSOLUTE_ROTATION: {
       // AbsoluteRotation:
       // motionParams[2]=anglePid.kp
@@ -323,13 +344,13 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
 MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
 {
   // コマンド文字列(string)と、それに対応する列挙型MOTION_COMMANDのマッピングを定義
-  static const unordered_map<string, MOTION_COMMAND> commandMap = {
-    { "Straight", MOTION_COMMAND::STRAIGHT },
-    { "LineTrace", MOTION_COMMAND::LINETRACE },
-    { "AbsoluteRotation", MOTION_COMMAND::ABSOLUTE_ROTATION },
-    { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
-    { "EdgeChange", MOTION_COMMAND::EDGECHANGE },
-  };
+  static const unordered_map<string, MOTION_COMMAND> commandMap
+      = { { "Straight", MOTION_COMMAND::STRAIGHT },
+          { "LineTrace", MOTION_COMMAND::LINETRACE },
+          { "AbsoluteRotation", MOTION_COMMAND::ABSOLUTE_ROTATION },
+          { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
+          { "EdgeChange", MOTION_COMMAND::EDGECHANGE },
+          { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING } };
 
   // コマンド文字列に対応するMOTION_COMMAND値をマップから取得。なければMOTION_COMMAND::NONEを返す
   auto it = commandMap.find(str);

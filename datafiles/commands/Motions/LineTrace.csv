@@ -1,12 +1,15 @@
 コマンド名,ID,speed,brightness,brightness_kp,brightness_ki,brightness_kd
 LineTrace,ID,double,int,double,double,double
 # 直線
-LineTrace,001,400,45,0.0025,0.0,0.008 
-LineTrace,002,500,45,0.035,0.0,0.018
-LineTrace,006,500,45,0.037,0.0,0.01
+LineTrace,001,400,50,0.0025,0.0,0.008 
+LineTrace,002,500,50,0.035,0.0,0.018
+LineTrace,006,500,50,0.037,0.0,0.01
 
 # カーブ
 # 右エッジ
-LineTrace,003,400,45,0.07,0.01,0.015
+LineTrace,003,350,50,0.07,0.03,0.01
 # 左エッジ
-LineTrace,004,400,45,0.06,0.03,0.013
+LineTrace,004,400,50,0.06,0.03,0.013
+
+#くねくね
+LineTrace

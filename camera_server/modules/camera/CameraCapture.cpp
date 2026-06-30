@@ -109,7 +109,7 @@ bool CameraCapture::getFrame(cv::Mat& outFrame)
     return false;
   }
 
-  for(int i = 0; i < 5; i++) {
+  for(int i = 0; i < 7; i++) {
     cap >> outFrame;
     if(!outFrame.empty()) {
       return true;

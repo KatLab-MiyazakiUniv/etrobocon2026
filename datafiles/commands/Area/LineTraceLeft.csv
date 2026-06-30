@@ -1,6 +1,12 @@
 動作コマンド名,動作ID,条件コマンド名,条件ID
-EdgeChange,001,RepeatCount,001
-EdgeChange,002,RepeatCount,001
-EdgeChange,001,RepeatCount,002
-EdgeChange,002,RepeatCount,002
+CameraTracking,002,Distance,008
+#LineTrace,006,Distance,002
+#LineTrace,003,Distance,002
+#LineTrace,006,Distance,003
+#LineTrace,003,Distance,002
+#LineTrace,003,Distance,003
+#LineTrace,003,Distance,004
+# CameraTracking,001,Distance,008
+
+
 

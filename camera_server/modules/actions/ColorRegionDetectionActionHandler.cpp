@@ -23,12 +23,17 @@ void ColorRegionDetectionActionHandler::execute(
     const CameraServer::ColorRegionDetectorRequest& request,
     CameraServer::ColorRegionDetectorResponse& response)
 {
+  int beforeFrameSaveTime = ClockUtil::now();
   cv::Mat frame;
   if(!camera.getFrame(frame)) {
     Logger::error("ColorRegionDetectionActionHandler:フレームの取得に失敗しました");
     response.result.wasDetected = false;
     return;
   }
+  int afterFrameSaveTime = ClockUtil::now();
+
+  Logger::Debug("ColorRegionAcitionHandler: フレーム取得にかかった時間は%d",
+                afterFrameSaveTime - beforeFrameSaveTime);
 
   std::vector<ColorRegionDetector::HSVRange> localHsvRanges;
   localHsvRanges.reserve(request.hsvRangeCount);

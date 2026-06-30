@@ -29,6 +29,7 @@ class Odometry {
 
  private:
   Position& position;
+  double prevHeading = 0.0;
 
   int32_t prevLeft;
   int32_t prevRight;

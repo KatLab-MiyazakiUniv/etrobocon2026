@@ -14,8 +14,8 @@
 #include "Position.h"
 #include "Navigator.h"
 #include "Straight.h"
-#include "AbsoluteRotation.h"
-#include "AbsoluteAngleCondition.h"
+#include "RelativeRotation.h"
+#include "RelativeAngleCondition.h"
 #include "DistanceCondition.h"
 #include "Mileage.h"
 
@@ -48,8 +48,8 @@ void EtRobocon2026::start()
       double calHead = nav.calculateHeading(goal[i].x, goal[i].y);
       double calDis = nav.calculateDistance(goal[i].x, goal[i].y);
 
-      auto absCondition = std::make_unique<AbsoluteAngleCondition>(robot, calHead);
-      AbsoluteRotation absRotaion(robot, std::move(absCondition), rotationPidGain, calHead);
+      auto absCondition = std::make_unique<RelativeAngleCondition>(robot, calHead);
+      RelativeRotation absRotaion(robot, std::move(absCondition), rotationPidGain, calHead);
       absRotaion.run();
 
       ClockUtil::wait(1000);

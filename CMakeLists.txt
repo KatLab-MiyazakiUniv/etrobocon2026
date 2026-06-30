@@ -44,7 +44,6 @@ set(RUNNING_INCLUDE_DIRS
   ${RUNNING_MODULE_DIR}/API
   ${RUNNING_MODULE_DIR}/client
   ${RUNNING_MODULE_DIR}/motions
-  ${RUNNING_MODULE_DIR}/actions
   ${RUNNING_MODULE_DIR}/motions/continuation_conditions
   ${PROJECT_SOURCE_DIR}/common
   ${PROJECT_SOURCE_DIR}/common/customs

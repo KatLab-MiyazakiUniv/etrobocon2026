@@ -60,9 +60,6 @@ void EtRobocon2026::start()
 
       ClockUtil::wait(1000);
 
-      std::cout << "angle = " << robot.getIMUControllerInstance().getAzimuth() << "\n";
-      std::cout << "x = " << robot.getPosition().getX() << "\n";
-      std::cout << "y = " << robot.getPosition().getY() << "\n";
       Logger::printfLog(Logger::INFO, "angle = %lf", robot.getIMUControllerInstance().getAzimuth());
       Logger::printfLog(Logger::INFO, "x = %lf", robot.getPosition().getX());
       Logger::printfLog(Logger::INFO, "y = %lf", robot.getPosition().getY());

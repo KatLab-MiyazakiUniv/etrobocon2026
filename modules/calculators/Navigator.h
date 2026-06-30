@@ -8,6 +8,7 @@
 #define NAVIGATOR_H
 
 #include "Position.h"
+#include "AngleNormalizer.h"
 
 class Navigator {
  public:

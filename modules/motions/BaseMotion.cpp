@@ -29,8 +29,6 @@ void BaseMotion::run()
 
   // 継続条件を満たしている間、1周期ずつ動作を実行する。
   while(continuationCondition->shouldContinue()) {
-    int32_t beforeRightAngle = robot.getWheelMotorControllerInstance().getRightCount();
-    int32_t beforeLeftAngle = robot.getWheelMotorControllerInstance().getLeftCount();
     double beforeAngle = robot.getIMUControllerInstance().getAzimuth();
 
     // 派生クラス固有の1周期分の動作を実行する。
@@ -39,14 +37,11 @@ void BaseMotion::run()
     // 制御を安定させるために待機する。
     wait();
 
-    int32_t afterRightAngle = robot.getWheelMotorControllerInstance().getRightCount();
-    int32_t afterLeftAngle = robot.getWheelMotorControllerInstance().getLeftCount();
-
-    double mileage = Mileage::calculateMileage((afterRightAngle - beforeRightAngle),
-                                               (afterLeftAngle - beforeLeftAngle));
+    int32_t leftAngle = robot.getWheelMotorControllerInstance().getLeftCount();
+    int32_t rightAngle = robot.getWheelMotorControllerInstance().getRightCount();
 
     double afterAngle = robot.getIMUControllerInstance().getAzimuth();
-    robot.getOdometry().update(mileage, (beforeAngle + afterAngle) / 2);
+    robot.getOdometry().update(leftAngle, rightAngle, (beforeAngle + afterAngle) / 2);
   }
 
   // モーター停止など、動作終了後の処理を行う。

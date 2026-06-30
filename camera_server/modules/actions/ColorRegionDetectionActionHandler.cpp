@@ -31,9 +31,8 @@ void ColorRegionDetectionActionHandler::execute(
     return;
   }
   int afterFrameSaveTime = ClockUtil::now();
-
-  Logger::Debug("ColorRegionAcitionHandler: フレーム取得にかかった時間は%d",
-                afterFrameSaveTime - beforeFrameSaveTime);
+  Logger::printfLog(Logger::INFO, "ColorRegionAcitionHandler: フレーム取得にかかった時間は%d",
+                    afterFrameSaveTime - beforeFrameSaveTime);
 
   std::vector<ColorRegionDetector::HSVRange> localHsvRanges;
   localHsvRanges.reserve(request.hsvRangeCount);

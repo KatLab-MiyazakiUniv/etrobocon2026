@@ -275,7 +275,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       request.hsvRangeCount = 1;
       request.hsvRanges[0].lower = { 0, 0, 0 };
       request.hsvRanges[0].upper = { 180, 255, 30 };
-      request.roi = { 320, 240, 1920, 1080 };
+      request.roi = { 0, 540, 1920, 540 };
 
       int targetXCoordinate = fromString<int>(motionParams[3]);
 

@@ -1,11 +1,17 @@
 動作コマンド名,動作ID,条件コマンド名,条件ID
-LineTrace,002,Distance,001
-LineTrace,003,Distance,002
-LineTrace,002,Distance,001
-LineTrace,003,Distance,002
-LineTrace,002,Distance,003
-LineTrace,003,Distance,004
-LineTrace,002,Distance,005
+# LineTrace,002,Distance,001
+# LineTrace,003,Distance,002
+# LineTrace,002,Distance,001
+# LineTrace,003,Distance,002
+# LineTrace,002,Distance,003
+# LineTrace,003,Distance,004
+CameraTracking,001,Distance,001
+# CameraTracking,001,Distance,002
+# CameraTracking,001,Distance,001
+# CameraTracking,001,Distance,002
+# CameraTracking,001,Distance,003
+# CameraTracking,001,Distance,004
+# CameraTracking,001,Distance,005
 
 
 

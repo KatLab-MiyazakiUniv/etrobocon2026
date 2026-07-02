@@ -50,8 +50,9 @@ void LineTrace::executeStep()
   robot.getWheelMotorControllerInstance().setLeftPower(leftPower);
 
   LogData logData;
+  logData.time = ClockUtil::now();
   logData.target = targetBrightness;
-  logData.brightness = robot.getColorSensorControllerInstance().getReflectance();
+  logData.currentVal = robot.getColorSensorControllerInstance().getReflectance();
   logData.rightPower = robot.getWheelMotorControllerInstance().getRightPower();
   logData.leftPower = robot.getWheelMotorControllerInstance().getLeftPower();
   logData.rightSpeed = robot.getWheelMotorControllerInstance().getRightPower();

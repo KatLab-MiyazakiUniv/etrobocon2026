@@ -71,6 +71,7 @@ void CameraTracking::executeStep()
   robot.getWheelMotorControllerInstance().setLeftPower(leftPower);
 
   LogData logData;
+  logData.time = ClockUtil::now();
   logData.target = targetXCoordinate;
   logData.currentVal = currentX;
   logData.rightPower = robot.getWheelMotorControllerInstance().getRightPower();

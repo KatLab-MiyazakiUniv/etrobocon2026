@@ -31,9 +31,8 @@ void ColorRegionDetectionActionHandler::execute(
     return;
   }
   int afterFrameSaveTime = ClockUtil::now();
-
-  Logger::Debug("ColorRegionAcitionHandler: フレーム取得にかかった時間は%d",
-                afterFrameSaveTime - beforeFrameSaveTime);
+  Logger::printfLog(Logger::INFO, "ColorRegionAcitionHandler: フレーム取得にかかった時間は%d",
+                    afterFrameSaveTime - beforeFrameSaveTime);
 
   std::vector<ColorRegionDetector::HSVRange> localHsvRanges;
   localHsvRanges.reserve(request.hsvRangeCount);
@@ -74,6 +73,14 @@ void ColorRegionDetectionActionHandler::execute(
   } else {
     Logger::error("ColorRegionDetectionActionHandler:色領域が検出されませんでした");
   }
+
+  beforeFrameSaveTime = ClockUtil::now();
+  // フレームを保存する（動画作成ツール用）
+  std::string directoryPath = "datafiles/line_trace";
+  FrameSave::save(frame, directoryPath, localResult);
+  Logger::printfLog(Logger::INFO, "ColorRegionAcitionHandler: フレーム保存にかかった時間は%dms",
+                    afterFrameSaveTime - beforeFrameSaveTime);
+  afterFrameSaveTime = ClockUtil::now();
 }
 
 const CameraCapture& ColorRegionDetectionActionHandler::getCamera() const

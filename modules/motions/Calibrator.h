@@ -60,10 +60,7 @@ class Calibrator : public BaseMotion {
   void inputAndSetDecryptionKey();
 
  private:
-  /**
-   * @brief スタート待機時に押下と判定する力の閾値[N]
-   */
-  static constexpr float PRESS_POWER = 0.5f;
+  static constexpr float PRESS_POWER = 0.5f;  // スタート待機時に押下と判定する力の閾値[N]
 
   void executeStep() override;  // 処理を1回実行する
 };

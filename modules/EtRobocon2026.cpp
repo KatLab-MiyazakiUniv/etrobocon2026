@@ -28,8 +28,7 @@ void EtRobocon2026::start()
   Robot robot(socketClient);
 
   std::cout << "Hello KATLAB" << std::endl;
-
-  Calibrator calibrator(robot);
+  Calibrator calibrator(robot, std::make_unique<RepeatCountCondition>(robot, 1));
 
   // 復号キー入力（Robotに保存される）
   calibrator.inputAndSetDecryptionKey();

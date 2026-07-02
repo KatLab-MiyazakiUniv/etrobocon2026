@@ -1,4 +1,3 @@
-カメラサ－バー側
 #include <iostream>
 #include "Logger.h"
 #include "SocketServer.h"

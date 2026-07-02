@@ -37,6 +37,7 @@ CameraTracking::CameraTracking(Robot& _robot,
     qrDetectionRequest(_qrDetectionRequest),
     isStopMotorPower(_isStopMotorPower),
     speedCalculator(_robot, _targetSpeed),
+    pidGain(_pidGain),
     cameraPid(_pidGain.kp, _pidGain.ki, _pidGain.kd, _targetXCoordinate)
 {
   LOG_CREATE("CameraTracking");

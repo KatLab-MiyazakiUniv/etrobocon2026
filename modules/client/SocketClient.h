@@ -45,6 +45,7 @@ class SocketClient {
    * @brief サーバーをシャットダウンする
    */
   void shutdownServer();
+
   /**
    * @brief スナップショットアクションを実行する
    * @param request リクエスト
@@ -54,6 +55,7 @@ class SocketClient {
    */
   virtual bool executeSnapshotAction(const CameraServer::SnapshotActionRequest& request,
                                      CameraServer::SnapshotActionResponse& response);
+
   /**
    * @brief 色領域検出アクションを実行する
    * @param request リクエスト
@@ -114,7 +116,7 @@ class SocketClient {
   void setServerIp(const std::string& _serverIp);
 
  private:
-  INetworkSystem& netSys;  // 注入される具所クラスのポインタ
+  INetworkSystem& netSys;  // 注入される具象クラスのポインタ
   int sock;                // ソケットファイルディスクリプタ(セッター無し)
   bool isConnected;        // サーバーへの接続状態(セッター無し)
   int port;                // サーバーのポート番号

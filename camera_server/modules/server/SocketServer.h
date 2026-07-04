@@ -1,7 +1,7 @@
 /**
  * @file SocketServer.h
  * @brief 接続を待ち、クライアントからのリクエストを処理するクラス
- * @author sadomiya-sousi, takuchi17
+ * @author sadomiya-sousi takuchi17
  */
 
 #ifndef SOCKET_SERVER_H
@@ -11,6 +11,7 @@
 #include "SocketProtocol.h"
 #include "RealNetworkSystem.h"
 #include "SnapshotActionHandler.h"
+#include "ColorRegionDetectionActionHandler.h"
 #include "Logger.h"
 #include "CameraCapture.h"
 #include <cstring>
@@ -23,8 +24,9 @@ class SocketServer {
    * @param _port デフォルトは27015
    * @param snapshotHandler スナップショット撮影アクションハンドラ
    */
-  explicit SocketServer(SnapshotActionHandler& snapshotHandler, INetworkSystem& _netSys,
-                        int _port = CameraServer::DEFAULT_PORT);
+  explicit SocketServer(SnapshotActionHandler& snapshotHandler,
+                        ColorRegionDetectionActionHandler& _colorRegionDetectionHandler,
+                        INetworkSystem& _netSys, int _port = CameraServer::DEFAULT_PORT);
 
   /**
    * @brief SocketServerのデストラクタ
@@ -47,30 +49,54 @@ class SocketServer {
    * @brief サーバーのリッスンソケットを取得する
    * @return int サーバーのリッスンソケットのファイルディスクリプタ
    */
-  int getListenSocket() const { return listenSocket; }
+  int getListenSocket() const;
 
   /**
    * @brief サーバーが稼働中かどうかを取得する
-   * @return int サーバーが稼働中なら1, そうでないなら0
+   * @return bool サーバーが稼働中ならtrue, そうでないならfalse
    */
-  int getIsRunning() const { return isRunning; }
+  bool getIsRunning() const;
 
   /**
    * @brief サーバーのポート番号を取得する
    * @return int サーバーのポート番号
    */
-  int getPort() const { return port; }
+  int getPort() const;
 
   /**
    * @brief デフォルトのバッファサイズを取得する
    * @return int デフォルトのバッファサイズ
    */
-  static int getDefaultBufLen() { return DEFAULT_BUFLEN; }
+  static int getDefaultBufLen();
+
+  /**
+   * @brief サーバーのポート番号を設定する
+   * @param portNumber 設定するポート番号
+   */
+  void setPort(int portNumber);
+
+  /**
+   * @brief ネットワークシステムを取得する
+   * @return INetworkSystem& ネットワークシステムへの参照
+   */
+  INetworkSystem& getNetSys() const;
+
+  /**
+   * @brief 色領域検出のハンドラーを取得する
+   * @return ColorRegionDetectionActionHandler& 色領域検出のハンドラーへの参照
+   */
+  const ColorRegionDetectionActionHandler& getColorRegionDetectionHandler() const;
 
   /**
    * @brief サーバーをシャットダウンする
    */
   void shutdown();
+
+  /**
+   * @brief クライアントとの接続を処理する
+   * @param clientSocket クライアントソケット
+   */
+  void handleConnection(int clientSocket);
 
  private:
   INetworkSystem& netSys;                     // 注入される具象クラスのポインタ
@@ -79,11 +105,7 @@ class SocketServer {
   int port;                                   // サーバーのポート番号
   static constexpr int DEFAULT_BUFLEN = 512;  // デフォルトのバッファサイズ
   SnapshotActionHandler& snapshotHandler;     // スナップショットのハンドラー
-
-  /**
-   * @brief クライアントとの接続を処理する
-   * @param clientSocket クライアントソケット
-   */
-  void handleConnection(int clientSocket);
+  ColorRegionDetectionActionHandler&
+      colorRegionDetectionHandler;  // 色領域検出のハンドラー(セッター不要)
 };
 #endif  // SOCKET_SERVER_H

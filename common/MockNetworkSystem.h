@@ -112,7 +112,6 @@ class MockNetworkSystem : public INetworkSystem {
       hasRecvData = false;
       return sizeOfReturnLen;
     }
-
     return -1;
   }
 

@@ -83,8 +83,8 @@ class SocketServer {
   INetworkSystem& getNetSys() const;
 
   /**
-   * @brief 色領域検出のハンドラーを取得する
-   * @return ColorRegionDetectionActionHandler& 色領域検出のハンドラーへの参照
+   * @brief 色領域検出のハンドラを取得する
+   * @return ColorRegionDetectionActionHandler& 色領域検出のハンドラへの参照
    */
   const ColorRegionDetectionActionHandler& getColorRegionDetectionHandler() const;
 
@@ -100,13 +100,12 @@ class SocketServer {
   void handleConnection(int clientSocket);
 
  private:
-  INetworkSystem& netSys;                     // 注入される具象クラスのポインタ
-  int listenSocket;                           // Severのファイルディスクリプタ
-  bool isRunning;                             // Serverが稼働中ならtrue
-  int port;                                   // サーバーのポート番号
-  static constexpr int DEFAULT_BUFLEN = 512;  // デフォルトのバッファサイズ
-  SnapshotActionHandler& snapshotHandler;     // スナップショットのハンドラー
-  ColorRegionDetectionActionHandler&
-      colorRegionDetectionHandler;  // 色領域検出のハンドラー(セッター不要)
+  INetworkSystem& netSys;                                          // 注入される具象クラスのポインタ
+  int listenSocket;                                                // Severのファイルディスクリプタ
+  bool isRunning;                                                  // Serverが稼働中ならtrue
+  int port;                                                        // サーバーのポート番号
+  static constexpr int DEFAULT_BUFLEN = 512;                       // デフォルトのバッファサイズ
+  SnapshotActionHandler& snapshotHandler;                          // スナップショットのハンドラ
+  ColorRegionDetectionActionHandler& colorRegionDetectionHandler;  // 色領域検出のハンドラ
 };
 #endif  // SOCKET_SERVER_H

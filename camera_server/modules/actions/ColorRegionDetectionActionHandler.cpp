@@ -113,6 +113,7 @@ void ColorRegionDetectionActionHandler::execute(
   response.result.wasDetected = localResult.wasDetected;
 
   if(localResult.wasDetected) {
+    Logger::info("ColorRegionDetectionActionHandler:色領域の検出に成功しました");
     response.result.topLeft.x = localResult.topLeft.x;
     response.result.topLeft.y = localResult.topLeft.y;
 
@@ -124,6 +125,8 @@ void ColorRegionDetectionActionHandler::execute(
 
     response.result.bottomRight.x = localResult.bottomRight.x;
     response.result.bottomRight.y = localResult.bottomRight.y;
+  } else {
+    Logger::error("ColorRegionDetectionActionHandler:色領域が検出されませんでした");
   }
 
   int t7 = ClockUtil::now();

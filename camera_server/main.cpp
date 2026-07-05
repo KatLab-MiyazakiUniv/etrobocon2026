@@ -24,6 +24,6 @@ int main()
 
   SocketServer server(colorRegionDetectionHandler, real);
   server.init();
-  server.run();
+  // server.run();
   return 0;
 }

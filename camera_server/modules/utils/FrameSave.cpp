@@ -36,5 +36,8 @@ void FrameSave::save(cv::Mat& frame, const std::string& filePath,
         + std::to_string(result.bottomLeft.x) + "_bly" + std::to_string(result.bottomLeft.y)
         + "_brx" + std::to_string(result.bottomRight.x) + "_bry"
         + std::to_string(result.bottomRight.y) + "_" + std::to_string(ClockUtil::now());
-  save(frame, filePath, fileName);
+  cv::Mat resized;
+  cv::resize(frame, resized, cv::Size(640, 360), 0, 0, cv::INTER_LINEAR);
+  save(resized, filePath, fileName);
+  // save(frame, filePath, fileName);
 }

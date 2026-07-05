@@ -138,7 +138,7 @@ void ColorRegionDetectionActionHandler::execute(
   // std::string directoryPath = "datafiles/line_trace";
   std::string directoryPath = "datafiles/line_trace";
 
-  FrameSave::save(frame, directoryPath, localResult);
+  FrameSave::save(frame, directoryPath, localResult, localRoi);
 
   int t8 = ClockUtil::now();
 

@@ -24,7 +24,7 @@ def parse_args():
                       help="入力JPEG画像のディレクトリのパス")
   parser.add_argument("-o", "--output", default="line_trace.mp4",
                       help="出力動画のファイルパス")
-  parser.add_argument("-r", "--fps", type=int, default=30,
+  parser.add_argument("-r", "--fps", type=int, default=15,
                       help="出力動画のFPS")
   parser.add_argument("-s", "--scale", type=float, default=1.0,
                       help="画像の縮小比率 (0.1 〜 1.0)")
@@ -39,18 +39,17 @@ def collect_and_sort_images(input_dir):
   """
   @brief ディレクトリ内の 'det_' で始まり、拡張子がJPEG/jpg/png等のファイルを収集し、
          ファイル名末尾のタイムスタンプ数値順（昇順）にソートして、
-         (ファイルパス, was_detected, tlx, tly, trx, try_val, blx, bly, brx, bry) のリストを返す。
-         ファイル名形式: det_d{wasDetected}_tlx{topLeft.x}_tly{topLeft.y}_trx{topRight.x}_try{topRight.y}_blx{bottomLeft.x}_bly{bottomLeft.y}_brx{bottomRight.x}_bry{bottomRight.y}_{timestamp}.JPEG
+         (ファイルパス, was_detected, tlx, tly, trx, try_val, blx, bly, brx, bry, rx, ry, rw, rh) のリストを返す。
+         ファイル名形式: det_d{wasDetected}_tlx{topLeft.x}_tly{topLeft.y}_trx{topRight.x}_try{topRight.y}_blx{bottomLeft.x}_bly{bottomLeft.y}_brx{bottomRight.x}_bry{bottomRight.y}_rx{roi.x}_ry{roi.y}_rw{roi.width}_rh{roi.height}_{timestamp}.JPEG
   @param input_dir 入力JPEG画像のディレクトリのパス
-  @return ソート後の (ファイルパス, was_detected, tlx, tly, trx, try_val, blx, bly, brx, bry) のリスト
+  @return ソート後の (ファイルパス, was_detected, tlx, tly, trx, try_val, blx, bly, brx, bry, rx, ry, rw, rh) のリスト
   """
   pattern = os.path.join(input_dir, "det_*")
   files = glob.glob(pattern)
 
   # 正規表現でファイル名から座標とタイムスタンプを抽出
-  #globパターンマッチングから正規表現への変換を行っている。>訳ではなく正規表現のパターンをコンパイルして高速化してるらしい
   regex = re.compile(
-      r'det_d(\d+)_tlx(\d+)_tly(\d+)_trx(\d+)_try(\d+)_blx(\d+)_bly(\d+)_brx(\d+)_bry(\d+)_(\d+)\.(?:[jJ][pP][eE]?[gG]|[pP][nN][gG])'
+      r'det_d(\d+)_tlx(\d+)_tly(\d+)_trx(\d+)_try(\d+)_blx(\d+)_bly(\d+)_brx(\d+)_bry(\d+)_rx(\d+)_ry(\d+)_rw(\d+)_rh(\d+)_(\d+)\.(?:[jJ][pP][eE]?[gG]|[pP][nN][gG])'
   )
 
   image_list = []
@@ -68,10 +67,14 @@ def collect_and_sort_images(input_dir):
       bly = int(match.group(7))
       brx = int(match.group(8))
       bry = int(match.group(9))
-      timestamp = int(match.group(10))
+      rx = int(match.group(10))
+      ry = int(match.group(11))
+      rw = int(match.group(12))
+      rh = int(match.group(13))
+      timestamp = int(match.group(14))
       image_list.append((
           filepath, timestamp, was_detected, tlx, tly, trx, try_val, blx, bly,
-          brx, bry
+          brx, bry, rx, ry, rw, rh
       ))
 
   # タイムスタンプ順で昇順ソート
@@ -80,7 +83,7 @@ def collect_and_sort_images(input_dir):
   # ソート後はタイムスタンプを除外したリストを返す
   return [
       (item[0], item[2], item[3], item[4], item[5], item[6], item[7], item[8],
-       item[9], item[10])
+       item[9], item[10], item[11], item[12], item[13], item[14])
       for item in image_list
   ]
 
@@ -164,7 +167,7 @@ def main():
   processed_files = []
 
   try:
-    for idx, (path, was_detected, tlx, tly, trx, try_val, blx, bly, brx, bry) in enumerate(images):
+    for idx, (path, was_detected, tlx, tly, trx, try_val, blx, bly, brx, bry, rx, ry, rw, rh) in enumerate(images):
       # 最初の有効画像は再読込せず流用する
       if idx == first_idx and success_count == 0:
         img = first_img
@@ -177,6 +180,13 @@ def main():
 
       # 画像のリサイズ
       resized = cv2.resize(img, (width, height))
+
+      # ROIの描画 (緑色: (0, 255, 0), 太さ2)
+      rrx = int(rx * args.scale)
+      rry = int(ry * args.scale)
+      rrw = int(rw * args.scale)
+      rrh = int(rh * args.scale)
+      cv2.rectangle(resized, (rrx, rry), (rrx + rrw, rry + rrh), (0, 255, 0), 2)
 
       if was_detected == 1:
         # BoundingBoxの4つの頂点
@@ -194,19 +204,43 @@ def main():
         pts = pts.reshape((-1, 1, 2))
         cv2.polylines(resized, [pts], isClosed=True, color=(0, 0, 255), thickness=2)
 
-        # テキスト情報の重畳 (検出結果の座標を表示)
-        text = f"Detected: TL({tlx},{tly}), BR({brx},{bry})"
+      # テキスト情報の重畳 (複数行表示)
+      info_texts = []
+      if was_detected == 1:
+        info_texts.append(f"Detected: TL({tlx},{tly}), BR({brx},{bry})")
       else:
-        # テキスト情報の重畳 (未検出を表示)
-        text = "Detected: False"
+        info_texts.append("Detected: False")
+      info_texts.append(f"ROI: ({rx},{ry}) {rw}x{rh}")
 
       # フォントサイズや位置を適宜調整
       font_scale = 0.5 * (width / 400.0) # 画像幅に応じた自動調整
-      font_scale = max(0.4, min(font_scale, 1.0))
-      cv2.putText(
-          resized, text, (10, int(30 * font_scale * 1.5)),
-          cv2.FONT_HERSHEY_SIMPLEX, font_scale, (0, 0, 255), 1, cv2.LINE_AA
-      )
+      font_scale = max(0.4, min(font_scale, 0.8))
+      
+      y_offset = int(30 * font_scale * 1.5)
+      line_height = int(25 * font_scale * 1.5)
+
+      for i, text in enumerate(info_texts):
+        pos = (10, y_offset + i * line_height)
+        # 黒縁を描画（視認性の確保）
+        cv2.putText(
+            resized, text, pos,
+            cv2.FONT_HERSHEY_SIMPLEX, font_scale, (0, 0, 0), 2, cv2.LINE_AA
+        )
+        
+        # 色分け
+        if "Detected: False" in text:
+          color = (128, 128, 255)  # 薄い赤/ピンク
+        elif "Detected:" in text:
+          color = (0, 0, 255)      # 赤
+        elif "ROI:" in text:
+          color = (0, 255, 0)      # 緑
+        else:
+          color = (255, 255, 255)  # 白
+
+        cv2.putText(
+            resized, text, pos,
+            cv2.FONT_HERSHEY_SIMPLEX, font_scale, color, 1, cv2.LINE_AA
+        )
 
       # FFmpegの標準入力に生画像バイナリを書き込む
       proc.stdin.write(resized.tobytes())

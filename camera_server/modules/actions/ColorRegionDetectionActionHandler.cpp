@@ -136,7 +136,7 @@ void ColorRegionDetectionActionHandler::execute(
   t1 = ClockUtil::now();
 
   // std::string directoryPath = "datafiles/line_trace";
-  std::string directoryPath = "/media/katlab/Verbatim/datafiles/line_trace";
+  std::string directoryPath = "datafiles/line_trace";
 
   FrameSave::save(frame, directoryPath, localResult);
 

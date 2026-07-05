@@ -20,12 +20,12 @@ class SocketServer {
  public:
   /**
    * @brief SocketServerのコンストラクタ
-   * @param snapshotHandler スナップショット撮影アクションハンドラ
-   * @param colorRegionDetectionHandler 色領域検出アクションハンドラ
+   * @param _snapshotHandler スナップショット撮影アクションハンドラ
+   * @param _colorRegionDetectionHandler 色領域検出アクションハンドラ
    * @param _netSys 注入する具象クラス
    * @param _port デフォルトは27015
    */
-  explicit SocketServer(SnapshotActionHandler& snapshotHandler,
+  explicit SocketServer(SnapshotActionHandler& _snapshotHandler,
                         ColorRegionDetectionActionHandler& _colorRegionDetectionHandler,
                         INetworkSystem& _netSys, int _port = CameraServer::DEFAULT_PORT);
 

@@ -48,12 +48,14 @@ def collect_and_sort_images(input_dir):
   files = glob.glob(pattern)
 
   # 正規表現でファイル名から座標とタイムスタンプを抽出
+  #globパターンマッチングから正規表現への変換を行っている。>訳ではなく正規表現のパターンをコンパイルして高速化してるらしい
   regex = re.compile(
       r'det_d(\d+)_tlx(\d+)_tly(\d+)_trx(\d+)_try(\d+)_blx(\d+)_bly(\d+)_brx(\d+)_bry(\d+)_(\d+)\.(?:[jJ][pP][eE]?[gG]|[pP][nN][gG])'
   )
 
   image_list = []
   for filepath in files:
+    #dirを除いた末尾のファイル名を返す
     basename = os.path.basename(filepath)
     match = regex.match(basename)
     if match:
@@ -90,15 +92,15 @@ def main():
   args = parse_args()
 
   if not os.path.exists(args.input_dir):
-    print(f"ERROR: 入力ディレクトリ '{args.input_dir}' が存在しません。", file=sys.stderr)
+    print(f"ERROR:入力ディレクトリ '{args.input_dir}' が存在しません。", file=sys.stderr)
     sys.exit(1)
 
-  print(f"INFO画像ファイルをスキャン中: {args.input_dir}")
+  print(f"INFO:画像ファイルをスキャン中: {args.input_dir}")
   images = collect_and_sort_images(args.input_dir)
   total_images = len(images)
 
   if total_images == 0:
-    print("WARNING: 処理対象の画像ファイルが見つかりませんでした。", file=sys.stderr)
+    print("WARNING:処理対象の画像ファイルが見つかりませんでした。", file=sys.stderr)
     sys.exit(0)
 
   print(f"INFO:合計 {total_images} 枚の画像を見つけました。")

@@ -33,6 +33,9 @@ void FrameSave::save(cv::Mat& frame, const std::string& filePath,
   double scaleX = 640.0 / frame.cols;
   double scaleY = 360.0 / frame.rows;
 
+  // ROIとフレームの重複領域（切り出し領域）を取得してスケーリング
+  cv::Rect roiRect = roi & cv::Rect(0, 0, frame.cols, frame.rows);
+
   std::string fileName
       = "det_d" + std::to_string(result.wasDetected ? 1 : 0) + "_tlx"
         + std::to_string(static_cast<int>(result.topLeft.x * scaleX)) + "_tly"
@@ -43,10 +46,10 @@ void FrameSave::save(cv::Mat& frame, const std::string& filePath,
         + std::to_string(static_cast<int>(result.bottomLeft.y * scaleY)) + "_brx"
         + std::to_string(static_cast<int>(result.bottomRight.x * scaleX)) + "_bry"
         + std::to_string(static_cast<int>(result.bottomRight.y * scaleY)) + "_rx"
-        + std::to_string(static_cast<int>(roi.x * scaleX)) + "_ry"
-        + std::to_string(static_cast<int>(roi.y * scaleY)) + "_rw"
-        + std::to_string(static_cast<int>(roi.width * scaleX)) + "_rh"
-        + std::to_string(static_cast<int>(roi.height * scaleY)) + "_"
+        + std::to_string(static_cast<int>(roiRect.x * scaleX)) + "_ry"
+        + std::to_string(static_cast<int>(roiRect.y * scaleY)) + "_rw"
+        + std::to_string(static_cast<int>(roiRect.width * scaleX)) + "_rh"
+        + std::to_string(static_cast<int>(roiRect.height * scaleY)) + "_"
         + std::to_string(ClockUtil::now());
   cv::Mat resized;
   cv::resize(frame, resized, cv::Size(640, 360), 0, 0, cv::INTER_LINEAR);

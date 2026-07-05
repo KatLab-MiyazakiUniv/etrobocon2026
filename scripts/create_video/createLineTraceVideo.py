@@ -215,7 +215,7 @@ def main():
       # フォントサイズや位置を適宜調整
       font_scale = 0.5 * (width / 400.0) # 画像幅に応じた自動調整
       font_scale = max(0.4, min(font_scale, 0.8))
-      
+
       y_offset = int(30 * font_scale * 1.5)
       line_height = int(25 * font_scale * 1.5)
 
@@ -226,7 +226,7 @@ def main():
             resized, text, pos,
             cv2.FONT_HERSHEY_SIMPLEX, font_scale, (0, 0, 0), 2, cv2.LINE_AA
         )
-        
+
         # 色分け
         if "Detected: False" in text:
           color = (128, 128, 255)  # 薄い赤/ピンク

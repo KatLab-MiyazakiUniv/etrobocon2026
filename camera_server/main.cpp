@@ -2,6 +2,7 @@
 #include "Logger.h"
 #include "SocketServer.h"
 #include "RealNetworkSystem.h"
+#include "FrameSave.h"
 
 int main()
 {
@@ -20,8 +21,21 @@ int main()
     return -1;
   }
 
-  ColorRegionDetectionActionHandler colorRegionDetectionHandler(camera);
+  // cv::Mat frame;
+  // // フレームを取得
+  // if(!camera.getFrame(frame)) {
+  //   std::cerr << "フレームの取得に失敗しました" << std::endl;
+  //   return -1;
+  // }
 
+  // // フレームを１枚保存
+  // std::string filepath = "./frames";
+  // std::string filename = "test_800_602";
+
+  // // フレームを保存
+  // FrameSave::save(frame, filepath, filename);
+
+  ColorRegionDetectionActionHandler colorRegionDetectionHandler(camera);
   SocketServer server(colorRegionDetectionHandler, real);
   server.init();
   server.run();

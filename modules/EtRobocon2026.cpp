@@ -37,11 +37,13 @@ void EtRobocon2026::start()
   Pid::PidGain leftPid(0.016, 0.0045, 0.0015);
   Pid::PidGain anglePid(0.036, 0.012, 0.03);
 
-  Goal goal[] = { { 1000.0, 0.0 }, { 1000.0, 1000.0 }, { 0.0, 1000.0 }, { 0.0, 0.0 } };
+  Goal goal[]
+      = { { 1000.0, 0.0 }, { 1000.0, 500.0 }, { 250.0, 500.0 }, { 250.0, 1250.0 }, { 0.0, 1250.0 },
+          { 0.0, 250.0 },  { -500.0, 250.0 }, { -500.0, 0.0 },  { 0.0, 0.0 } };
 
   robot.getIMUControllerInstance().resetAzimuth();
-  for(int j = 0; j < 10; j++) {
-    for(int i = 0; i < 4; i++) {
+  for(int j = 0; j < 3; j++) {
+    for(int i = 0; i < 9; i++) {
       double calHead = robot.getNavigator().calculateHeading(goal[i].x, goal[i].y);
       double calDis = robot.getNavigator().calculateDistance(goal[i].x, goal[i].y);
 

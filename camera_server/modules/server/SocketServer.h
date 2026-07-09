@@ -10,6 +10,7 @@
 #include <string>
 #include "SocketProtocol.h"
 #include "RealNetworkSystem.h"
+#include "SnapshotActionHandler.h"
 #include "ColorRegionDetectionActionHandler.h"
 #include "Logger.h"
 #include "CameraCapture.h"
@@ -19,10 +20,13 @@ class SocketServer {
  public:
   /**
    * @brief SocketServerのコンストラクタ
+   * @param _snapshotHandler スナップショット撮影アクションハンドラ
+   * @param _colorRegionDetectionHandler 色領域検出アクションハンドラ
    * @param _netSys 注入する具象クラス
    * @param _port デフォルトは27015
    */
-  explicit SocketServer(ColorRegionDetectionActionHandler& _colorRegionDetectionHandler,
+  explicit SocketServer(SnapshotActionHandler& _snapshotHandler,
+                        ColorRegionDetectionActionHandler& _colorRegionDetectionHandler,
                         INetworkSystem& _netSys, int _port = CameraServer::DEFAULT_PORT);
 
   /**
@@ -79,8 +83,8 @@ class SocketServer {
   INetworkSystem& getNetSys() const;
 
   /**
-   * @brief 色領域検出のハンドラーを取得する
-   * @return ColorRegionDetectionActionHandler& 色領域検出のハンドラーへの参照
+   * @brief 色領域検出のハンドラを取得する
+   * @return ColorRegionDetectionActionHandler& 色領域検出のハンドラへの参照
    */
   const ColorRegionDetectionActionHandler& getColorRegionDetectionHandler() const;
 
@@ -96,12 +100,12 @@ class SocketServer {
   void handleConnection(int clientSocket);
 
  private:
-  INetworkSystem& netSys;                     // 注入される具象クラスのポインタ
-  int listenSocket;                           // Severのファイルディスクリプタ(セッター不要)
-  bool isRunning;                             // Serverが稼働中ならtrue(セッター不要)
-  int port;                                   // サーバーのポート番号
-  static constexpr int DEFAULT_BUFLEN = 512;  // デフォルトのバッファサイズ
-  ColorRegionDetectionActionHandler&
-      colorRegionDetectionHandler;  // 色領域検出のハンドラー(セッター不要)
+  INetworkSystem& netSys;                                          // 注入される具象クラスのポインタ
+  int listenSocket;                                                // Severのファイルディスクリプタ
+  bool isRunning;                                                  // Serverが稼働中ならtrue
+  int port;                                                        // サーバーのポート番号
+  static constexpr int DEFAULT_BUFLEN = 512;                       // デフォルトのバッファサイズ
+  SnapshotActionHandler& snapshotHandler;                          // スナップショットのハンドラ
+  ColorRegionDetectionActionHandler& colorRegionDetectionHandler;  // 色領域検出のハンドラ
 };
 #endif  // SOCKET_SERVER_H

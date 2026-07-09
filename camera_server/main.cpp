@@ -21,22 +21,9 @@ int main()
     return -1;
   }
 
-  // cv::Mat frame;
-  // // フレームを取得
-  // if(!camera.getFrame(frame)) {
-  //   std::cerr << "フレームの取得に失敗しました" << std::endl;
-  //   return -1;
-  // }
-
-  // // フレームを１枚保存
-  // std::string filepath = "./frames";
-  // std::string filename = "test_800_602";
-
-  // // フレームを保存
-  // FrameSave::save(frame, filepath, filename);
-
   ColorRegionDetectionActionHandler colorRegionDetectionHandler(camera);
-  SocketServer server(colorRegionDetectionHandler, real);
+  SnapshotActionHandler snapshotHandler(camera);
+  SocketServer server(snapshotHandler, colorRegionDetectionHandler, real);
   server.init();
   server.run();
   return 0;

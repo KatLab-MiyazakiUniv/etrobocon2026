@@ -1,0 +1,39 @@
+/**
+ * @file   Snapshot.cpp
+ * @brief  サーバーに写真撮影を依頼するクラス
+ * @author sadomiya-sousi
+ */
+
+#include "Snapshot.h"
+
+Snapshot::Snapshot(Robot& _robot, const std::string& _fileName,
+                   std::unique_ptr<BaseContinuationCondition> continuationCondition)
+  : BaseMotion(_robot, std::move(continuationCondition)), fileName(_fileName)
+{
+  LOG_CREATE("Snapshot");
+}
+Snapshot::~Snapshot()
+{
+  LOG_DESTROY("Snapshot");
+}
+
+void Snapshot::executeStep()
+{
+  Logger::printfLog(Logger::INFO, "Requesting snapshot: %s", fileName.c_str());
+
+  CameraServer::SnapshotActionRequest request;
+  request.command = CameraServer::Command::SNAPSHOT;
+
+  strncpy(request.fileName, fileName.c_str(), sizeof(request.fileName) - 1);
+  request.fileName[sizeof(request.fileName) - 1] = '\0';
+
+  CameraServer::SnapshotActionResponse response;
+
+  bool success = robot.getCameraSocketClientInstance().executeSnapshotAction(request, response);
+
+  if(success) {
+    Logger::info("Snapshot:撮影成功");
+  } else {
+    Logger::error("Snapshot:撮影失敗");
+  }
+}

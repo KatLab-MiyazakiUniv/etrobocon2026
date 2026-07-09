@@ -25,10 +25,10 @@ def parse_args():
   parser.add_argument("-i", "--input-dir", default="datafiles/line_trace",
                       help="入力JPEG画像のディレクトリのパス")
   parser.add_argument("-o", "--output", default="line_trace.mp4",
-                      help="出力動画のファイルパス")
+                      help="出力動画 of ファイルパス")
   parser.add_argument("-r", "--fps", type=int, default=15,
                       help="出力動画のFPS")
-  parser.add_argument("-s", "--scale", type=float, default=0.3,
+  parser.add_argument("-s", "--scale", type=float, default=1.0,
                       help="画像の縮小比率 (0.1 〜 1.0)")
   parser.add_argument("-g", "--gpu", action="store_true", default=False,
                       help="NVIDIA GPUエンコーダー (h264_nvenc) を使用するかどうか")
@@ -91,6 +91,42 @@ def collect_and_sort_images(input_dir):
   ]
 
 
+def scale_coords(scale, *coords):
+  """
+  @brief 複数の座標値をスケール比率に合わせて整数型に変換する
+  """
+  return [int(c * scale) for c in coords]
+
+
+def draw_outlined_text(img, text, pos, font_scale, color):
+  """
+  @brief 黒い縁取りを施したテキストを描画する
+  """
+  # 黒縁を描画（視認性の確保）
+  cv2.putText(
+      img, text, pos,
+      cv2.FONT_HERSHEY_SIMPLEX, font_scale, (0, 0, 0), 2, cv2.LINE_AA
+  )
+  # 前景色を描画
+  cv2.putText(
+      img, text, pos,
+      cv2.FONT_HERSHEY_SIMPLEX, font_scale, color, 1, cv2.LINE_AA
+  )
+
+
+def get_text_color(text):
+  """
+  @brief テキストの内容に応じて色を選択する (BGR)
+  """
+  if "Detected: False" in text:
+    return (128, 128, 255)  # 薄い赤/ピンク
+  if "Detected:" in text:
+    return (0, 0, 255)      # 赤
+  if "ROI:" in text:
+    return (0, 255, 0)      # 緑
+  return (255, 255, 255)    # 白
+
+
 def draw_frame_annotations(img, item, scale, width):
   """
   @brief 画像に対してROI枠、検出BoundingBox、および関連テキストを描画する
@@ -102,22 +138,14 @@ def draw_frame_annotations(img, item, scale, width):
   (_, was_detected, tlx, tly, trx, try_val, blx, bly, brx, bry, rx, ry, rw, rh) = item
 
   # ROIの描画 (緑色: (0, 255, 0), 太さ2)
-  rrx = int(rx * scale)
-  rry = int(ry * scale)
-  rrw = int(rw * scale)
-  rrh = int(rh * scale)
+  rrx, rry, rrw, rrh = scale_coords(scale, rx, ry, rw, rh)
   cv2.rectangle(img, (rrx, rry), (rrx + rrw, rry + rrh), (0, 255, 0), 2)
 
   if was_detected == 1:
-    # BoundingBoxの4つの頂点
-    rtlx = int(tlx * scale)
-    rtly = int(tly * scale)
-    rtrx = int(trx * scale)
-    rtry = int(try_val * scale)
-    rblx = int(blx * scale)
-    rbly = int(bly * scale)
-    rbrx = int(brx * scale)
-    rbry = int(bry * scale)
+    # BoundingBoxの頂点をスケーリング
+    rtlx, rtly, rtrx, rtry, rblx, rbly, rbrx, rbry = scale_coords(
+        scale, tlx, tly, trx, try_val, blx, bly, brx, bry
+    )
 
     # 頂点を結びポリゴンを描画（太さ2, BGR赤: (0, 0, 255)）
     pts = np.array([[rtlx, rtly], [rtrx, rtry], [rbrx, rbry], [rblx, rbly]], np.int32)
@@ -141,26 +169,8 @@ def draw_frame_annotations(img, item, scale, width):
 
   for i, text in enumerate(info_texts):
     pos = (10, y_offset + i * line_height)
-    # 黒縁を描画（視認性の確保）
-    cv2.putText(
-        img, text, pos,
-        cv2.FONT_HERSHEY_SIMPLEX, font_scale, (0, 0, 0), 2, cv2.LINE_AA
-    )
-
-    # 色分け
-    if "Detected: False" in text:
-      color = (128, 128, 255)  # 薄い赤/ピンク
-    elif "Detected:" in text:
-      color = (0, 0, 255)      # 赤
-    elif "ROI:" in text:
-      color = (0, 255, 0)      # 緑
-    else:
-      color = (255, 255, 255)  # 白
-
-    cv2.putText(
-        img, text, pos,
-        cv2.FONT_HERSHEY_SIMPLEX, font_scale, color, 1, cv2.LINE_AA
-    )
+    color = get_text_color(text)
+    draw_outlined_text(img, text, pos, font_scale, color)
 
 
 def cleanup_files(files, file_to_remove=None):

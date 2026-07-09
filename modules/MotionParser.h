@@ -15,6 +15,7 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include <fstream>
 #include <sstream>
 #include <memory>
+// 連想配列>pythonの辞書型に相当するを提供する標準ライブラリ
 #include <unordered_map>
 #include "Logger.h"
 #include "DistanceCondition.h"

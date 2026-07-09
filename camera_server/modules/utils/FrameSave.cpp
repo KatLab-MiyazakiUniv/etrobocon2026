@@ -1,29 +1,35 @@
 /**
  * @file   FrameSave.cpp
  * @brief  フレームを保存するクラス
- * @author okuyama0528
+ * @author okuyama0528 sadomiya-sousi
  */
 
 #include "FrameSave.h"
 #include "ClockUtil.h"
+#include <thread>
 
 void FrameSave::save(cv::Mat& frame, const std::string& filePath, const std::string& fileName)
 {
   if(frame.empty()) {
-    Logger::error("保存するフレームがありません。");
+    Logger::error("FrameSave:保存するフレームがありません。");
+    return;
   }
 
-  // ディレクトリが存在しない場合は作成
   if(!std::filesystem::exists(filePath)) {
     if(!std::filesystem::create_directories(filePath)) {
-      Logger::printfLog(Logger::ERROR, "ディレクトリの作成に失敗しました: %s", filePath.c_str());
+      Logger::printfLog(Logger::ERROR, "FrameSave:ディレクトリの作成に失敗しました: %s",
+                        filePath.c_str());
+      return;
     }
   }
 
   std::string imagePath = filePath + "/" + fileName + ".JPEG";
   if(!cv::imwrite(imagePath, frame)) {
-    Logger::printfLog(Logger::ERROR, "フレームの保存に失敗しました: %s", imagePath.c_str());
+    Logger::printfLog(Logger::ERROR, "FrameSave:フレームの保存に失敗しました: %s",
+                      imagePath.c_str());
+    return;
   }
+  return;
 }
 
 void FrameSave::save(cv::Mat& frame, const std::string& filePath,
@@ -31,26 +37,33 @@ void FrameSave::save(cv::Mat& frame, const std::string& filePath,
 {
   double scaleX = 640.0 / frame.cols;
   double scaleY = 360.0 / frame.rows;
+  std::string fileName
+      = "det_d" + std::to_string(result.wasDetected ? 1 : 0) +
+      "_tlx" + toStrInt(result.topLeft.x * scaleX) +
+      "_tly"+ toStrInt(result.topLeft.y * scaleY) +
+      "_trx" + toStrInt(result.topRight.x * scaleX) +
+      "_try" + toStrInt(result.topRight.y * scaleY) +
+      "_blx" + toStrInt(result.bottomLeft.x * scaleX) +
+      "_bly" + toStrInt(result.bottomLeft.y * scaleY) +
+      "_brx" + toStrInt(result.bottomRight.x * scaleX) +
+      "_bry" + toStrInt(result.bottomRight.y * scaleY) +
+      "_rx" + toStrInt(roi.x * scaleX) +
+      "_ry" + toStrInt(roi.y * scaleY) +
+      "_rw" + toStrInt(roi.width * scaleX) +
+      "_rh" + toStrInt(roi.height * scaleY) +
+      "_" + std::to_string(ClockUtil::now());
 
-  // ROIとフレームの重複領域（切り出し領域）を取得してスケーリング
-  cv::Rect roiRect = roi & cv::Rect(0, 0, frame.cols, frame.rows);
+  std::thread([clonedFrame = frame.clone(), filePath, fileName]() mutable {
+    if(clonedFrame.empty()) return;
 
-  std::string fileName = "det_d" + std::to_string(result.wasDetected ? 1 : 0) + "_tlx"
-                         + std::to_string(static_cast<int>(result.topLeft.x * scaleX)) + "_tly"
-                         + std::to_string(static_cast<int>(result.topLeft.y * scaleY)) + "_trx"
-                         + std::to_string(static_cast<int>(result.topRight.x * scaleX)) + "_try"
-                         + std::to_string(static_cast<int>(result.topRight.y * scaleY)) + "_blx"
-                         + std::to_string(static_cast<int>(result.bottomLeft.x * scaleX)) + "_bly"
-                         + std::to_string(static_cast<int>(result.bottomLeft.y * scaleY)) + "_brx"
-                         + std::to_string(static_cast<int>(result.bottomRight.x * scaleX)) + "_bry"
-                         + std::to_string(static_cast<int>(result.bottomRight.y * scaleY)) + "_rx"
-                         + std::to_string(static_cast<int>(roiRect.x * scaleX)) + "_ry"
-                         + std::to_string(static_cast<int>(roiRect.y * scaleY)) + "_rw"
-                         + std::to_string(static_cast<int>(roiRect.width * scaleX)) + "_rh"
-                         + std::to_string(static_cast<int>(roiRect.height * scaleY)) + "_"
-                         + std::to_string(ClockUtil::now());
-  cv::Mat resized;
-  cv::resize(frame, resized, cv::Size(640, 360), 0, 0, cv::INTER_LINEAR);
-  // cv::resize(frame, resized, cv::Size(1920, 1080), 0, 0, cv::INTER_LINEAR);
-  save(resized, filePath, fileName);
+    cv::Mat resized;
+    cv::resize(clonedFrame, resized, cv::Size(640, 360), 0, 0, cv::INTER_LINEAR);
+    save(resized, filePath, fileName);
+  }).detach();
+
+}
+
+std::string FrameSave::toStrInt(double value)
+{
+  return std::to_string(static_cast<int>(value));
 }

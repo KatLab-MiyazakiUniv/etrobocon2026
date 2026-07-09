@@ -1,7 +1,7 @@
 /**
  * @file   FrameSave.h
  * @brief  フレームを保存するクラス
- * @author okuyama0528
+ * @author okuyama0528 sadomiya-sousi
  */
 
 #ifndef FRAME_SAVE_H
@@ -35,6 +35,13 @@ class FrameSave {
 
  private:
   FrameSave();  // インスタンス化の禁止
+
+  /**
+   * @brief 値をint型にキャストして文字列に変換するヘルパー関数
+   * @param value 変換する値
+   * @return std::string 変換後の文字列
+   */
+  static std::string toStrInt(double value);
 };
 
 #endif  // FRAME_SAVE_H

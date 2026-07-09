@@ -5,6 +5,7 @@
  */
 
 #include "ColorRegionDetectionActionHandler.h"
+#include <thread>
 
 ColorRegionDetectionActionHandler::ColorRegionDetectionActionHandler(CameraCapture& _camera)
   : camera(_camera),

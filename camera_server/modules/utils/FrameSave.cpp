@@ -6,7 +6,6 @@
 
 #include "FrameSave.h"
 #include "ClockUtil.h"
-#include <thread>
 
 void FrameSave::save(cv::Mat& frame, const std::string& filePath, const std::string& fileName)
 {
@@ -53,14 +52,12 @@ void FrameSave::save(cv::Mat& frame, const std::string& filePath,
       "_rh" + toStrInt(roi.height * scaleY) +
       "_" + std::to_string(ClockUtil::now());
 
-  std::thread([clonedFrame = frame.clone(), filePath, fileName]() mutable {
-    if(clonedFrame.empty()) return;
+  if(frame.empty()) return;
 
-    cv::Mat resized;
-    cv::resize(clonedFrame, resized, cv::Size(640, 360), 0, 0, cv::INTER_LINEAR);
-    save(resized, filePath, fileName);
-  }).detach();
+  cv::Mat resized;
+  cv::resize(frame, resized, cv::Size(640, 360), 0, 0, cv::INTER_LINEAR);
 
+  save(resized, filePath, fileName);
 }
 
 std::string FrameSave::toStrInt(double value)

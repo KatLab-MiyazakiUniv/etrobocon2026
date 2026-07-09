@@ -5,6 +5,7 @@
  */
 
 #include "ColorRegionDetectionActionHandler.h"
+#include <thread>
 
 ColorRegionDetectionActionHandler::ColorRegionDetectionActionHandler(CameraCapture& _camera)
   : camera(_camera),
@@ -138,10 +139,12 @@ void ColorRegionDetectionActionHandler::execute(
   //---------------------------------
   t1 = ClockUtil::now();
 
-  // std::string directoryPath = "datafiles/line_trace";
   std::string directoryPath = "datafiles/line_trace";
 
-  FrameSave::save(frame, directoryPath, localResult, localRoi);
+  // クローンしたフレームを使い、別スレッドでリサイズと保存を実行
+  std::thread([clonedFrame = frame.clone(), directoryPath, localResult, localRoi]() mutable {
+    FrameSave::save(clonedFrame, directoryPath, localResult, localRoi);
+  }).detach();
 
   int t8 = ClockUtil::now();
 

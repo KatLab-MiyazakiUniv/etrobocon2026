@@ -334,6 +334,9 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       Logger::printfLog(Logger::DEBUG, "[MotionParser] ChangeEdge: edge = %s を生成しました", edge);
       return new ChangeEdge(robot, std::move(condition), edge);
     }
+    case MOTION_COMMAND::CALIBRATOR: {
+      return new Calibrator(robot, std::move(condition));
+    }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
                         motionParams[0].c_str());
@@ -350,7 +353,10 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "AbsoluteRotation", MOTION_COMMAND::ABSOLUTE_ROTATION },
           { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
           { "EdgeChange", MOTION_COMMAND::EDGECHANGE },
-          { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING } };
+          { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING },
+          { "Calibrator", MOTION_COMMAND::CALIBRATOR }
+
+        };
 
   // コマンド文字列に対応するMOTION_COMMAND値をマップから取得。なければMOTION_COMMAND::NONEを返す
   auto it = commandMap.find(str);

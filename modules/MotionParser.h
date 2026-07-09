@@ -31,6 +31,7 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "RelativeRotation.h"
 #include "ChangeEdge.h"
 #include "CameraTracking.h"
+#include "Calibrator.h"
 #include "./../common/ImageProcessingColor.h"
 
 class MotionParser {
@@ -44,6 +45,7 @@ class MotionParser {
     RELATIVE_ROTATION,
     ABSOLUTE_ROTATION,
     EDGECHANGE,
+    CALIBRATOR,
     NONE
   };
   // 条件コマンド名を持つ列挙型クラス

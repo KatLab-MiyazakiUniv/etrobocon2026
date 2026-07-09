@@ -1,6 +1,6 @@
 """
-@file   create_line_trace_video.py
-@brief  保存された連続JPEG画像から、BoundingBox・文字を描画しつつ、FFmpegを利用し高速に動画を作成する
+@file   createLineTraceVideo.py
+@brief  保存された連続JPEG画像から、BoundingBox・文字を描画しつつ、FFmpegを利用し並列プロセスで高速に動画を作成する
 @author sadomiya-sousi
 """
 
@@ -10,8 +10,10 @@ import re
 import glob
 import argparse
 import subprocess
+import time
 import cv2
 import numpy as np
+from concurrent.futures import ProcessPoolExecutor
 
 
 def parse_args():
@@ -32,6 +34,8 @@ def parse_args():
                       help="NVIDIA GPUエンコーダー (h264_nvenc) を使用するかどうか")
   parser.add_argument("-c", "--clean", action="store_true", default=False,
                       help="動画作成完了後に、入力画像ディレクトリ内のファイルをすべて削除するかどうか")
+  parser.add_argument("-w", "--num-workers", type=int, default=0,
+                      help="並列処理のプロセス数 (0の場合は自動設定)")
   return parser.parse_args()
 
 
@@ -54,7 +58,6 @@ def collect_and_sort_images(input_dir):
 
   image_list = []
   for filepath in files:
-    #dirを除いた末尾のファイル名を返す
     basename = os.path.basename(filepath)
     match = regex.match(basename)
     if match:
@@ -88,6 +91,170 @@ def collect_and_sort_images(input_dir):
   ]
 
 
+def draw_frame_annotations(img, item, scale, width):
+  """
+  @brief 画像に対してROI枠、検出BoundingBox、および関連テキストを描画する
+  @param img アノテーションを描画する画像オブジェクト (cv::Mat)
+  @param item 描画に必要なアノテーション情報タプル
+  @param scale 画像の縮小比率
+  @param width 画像の横幅 (フォントサイズ調整用)
+  """
+  (_, was_detected, tlx, tly, trx, try_val, blx, bly, brx, bry, rx, ry, rw, rh) = item
+
+  # ROIの描画 (緑色: (0, 255, 0), 太さ2)
+  rrx = int(rx * scale)
+  rry = int(ry * scale)
+  rrw = int(rw * scale)
+  rrh = int(rh * scale)
+  cv2.rectangle(img, (rrx, rry), (rrx + rrw, rry + rrh), (0, 255, 0), 2)
+
+  if was_detected == 1:
+    # BoundingBoxの4つの頂点
+    rtlx = int(tlx * scale)
+    rtly = int(tly * scale)
+    rtrx = int(trx * scale)
+    rtry = int(try_val * scale)
+    rblx = int(blx * scale)
+    rbly = int(bly * scale)
+    rbrx = int(brx * scale)
+    rbry = int(bry * scale)
+
+    # 頂点を結びポリゴンを描画（太さ2, BGR赤: (0, 0, 255)）
+    pts = np.array([[rtlx, rtly], [rtrx, rtry], [rbrx, rbry], [rblx, rbly]], np.int32)
+    pts = pts.reshape((-1, 1, 2))
+    cv2.polylines(img, [pts], isClosed=True, color=(0, 0, 255), thickness=2)
+
+  # テキスト情報の重畳 (複数行表示)
+  info_texts = []
+  if was_detected == 1:
+    info_texts.append(f"Detected: TL({tlx},{tly}), BR({brx},{bry})")
+  else:
+    info_texts.append("Detected: False")
+  info_texts.append(f"ROI: ({rx},{ry}) {rw}x{rh}")
+
+  # フォントサイズや位置を適宜調整
+  font_scale = 0.5 * (width / 400.0) # 画像幅に応じた自動調整
+  font_scale = max(0.4, min(font_scale, 0.8))
+
+  y_offset = int(30 * font_scale * 1.5)
+  line_height = int(25 * font_scale * 1.5)
+
+  for i, text in enumerate(info_texts):
+    pos = (10, y_offset + i * line_height)
+    # 黒縁を描画（視認性の確保）
+    cv2.putText(
+        img, text, pos,
+        cv2.FONT_HERSHEY_SIMPLEX, font_scale, (0, 0, 0), 2, cv2.LINE_AA
+    )
+
+    # 色分け
+    if "Detected: False" in text:
+      color = (128, 128, 255)  # 薄い赤/ピンク
+    elif "Detected:" in text:
+      color = (0, 0, 255)      # 赤
+    elif "ROI:" in text:
+      color = (0, 255, 0)      # 緑
+    else:
+      color = (255, 255, 255)  # 白
+
+    cv2.putText(
+        img, text, pos,
+        cv2.FONT_HERSHEY_SIMPLEX, font_scale, color, 1, cv2.LINE_AA
+    )
+
+
+def cleanup_files(files, file_to_remove=None):
+  """
+  @brief 指定されたファイルを削除してクリーンアップする
+  @param files 削除するファイルパスのリスト
+  @param file_to_remove 個別に削除する単一のファイルパス (オプション)
+  """
+  if file_to_remove and os.path.exists(file_to_remove):
+    try:
+      os.remove(file_to_remove)
+    except Exception as e:
+      print(f"WARNING: ファイルの削除に失敗しました: {file_to_remove} ({e})", file=sys.stderr)
+  for path in files:
+    if os.path.exists(path):
+      try:
+        os.remove(path)
+      except Exception as e:
+        print(f"WARNING: 一時ファイルの削除に失敗しました: {path} ({e})", file=sys.stderr)
+
+
+def process_chunk(chunk_index, image_subset, args, width, height, temp_output_path):
+  """
+  @brief 割り当てられた画像リストの処理を行い、部分動画ファイルを生成する
+  """
+  vcodec = "h264_nvenc" if args.gpu else "libx264"
+  ffmpeg_cmd = [
+      "ffmpeg",
+      "-y",               # 既存ファイルの強制上書き
+      "-f", "rawvideo",   # 生画像入力
+      "-vcodec", "rawvideo",
+      "-s", f"{width}x{height}",
+      "-pix_fmt", "bgr24",
+      "-r", str(args.fps),
+      "-i", "-",          # 標準入力から受け取る
+      "-c:v", vcodec,
+      "-pix_fmt", "yuv420p",
+      temp_output_path
+  ]
+
+  try:
+    proc = subprocess.Popen(
+        ffmpeg_cmd,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.PIPE
+    )
+  except FileNotFoundError:
+    print(f"ERROR [Chunk {chunk_index}]: ffmpeg コマンドが見つかりませんでした。PATHに登録されているか確認してください。",
+          file=sys.stderr)
+    return False
+
+  success_count = 0
+  try:
+    for idx, item in enumerate(image_subset):
+      path = item[0]
+      img = cv2.imread(path)
+      if img is None:
+        print(f"WARNING: 画像の読み込みに失敗しました。スキップします: {path}", file=sys.stderr)
+        continue
+
+      # 画像のリサイズ
+      resized = cv2.resize(img, (width, height))
+
+      # アノテーションの描画
+      draw_frame_annotations(resized, item, args.scale, width)
+
+      # FFmpegの標準入力に生画像バイナリを書き込む
+      proc.stdin.write(resized.tobytes())
+      success_count += 1
+
+      # 進捗表示
+      if success_count % 100 == 0 or success_count == len(image_subset):
+        print(f"INFO [Chunk {chunk_index}]: {success_count} / {len(image_subset)} 枚処理完了")
+
+  except IOError as e:
+    print(f"ERROR [Chunk {chunk_index}]: FFmpegへの書き込み中にパイプエラーが発生しました: {e}", file=sys.stderr)
+  finally:
+    if proc.stdin:
+      proc.stdin.close()
+    stderr_data = b""
+    if proc.stderr:
+      stderr_data = proc.stderr.read()
+    return_code = proc.wait()
+
+  if return_code != 0:
+    print(f"ERROR [Chunk {chunk_index}]: FFmpegが異常終了しました (終了コード: {return_code})", file=sys.stderr)
+    if stderr_data:
+      print(stderr_data.decode('utf-8', errors='ignore'), file=sys.stderr)
+    return False
+
+  return True
+
+
 def main():
   """
   @brief 画像をつなげて動画化
@@ -110,11 +277,9 @@ def main():
 
   # 最初の有効な画像を読み込んでサイズを決定する
   first_img = None
-  first_idx = 0
-  for idx, (path, *_) in enumerate(images):
+  for path, *_ in images:
     first_img = cv2.imread(path)
     if first_img is not None:
-      first_idx = idx
       break
 
   if first_img is None:
@@ -134,150 +299,94 @@ def main():
 
   print(f"INFO:動画出力サイズ: {width}x{height} (縮小率: {args.scale})")
 
-  # FFmpegコマンドの設定
-  vcodec = "h264_nvenc" if args.gpu else "libx264"
-  ffmpeg_cmd = [
-      "ffmpeg",
-      "-y",               # 既存ファイルの強制上書き
-      "-f", "rawvideo",   # 生画像入力
-      "-vcodec", "rawvideo",
-      "-s", f"{width}x{height}",
-      "-pix_fmt", "bgr24",
-      "-r", str(args.fps),
-      "-i", "-",          # 標準入力から受け取る
-      "-c:v", vcodec,
-      "-pix_fmt", "yuv420p",
-      args.output
-  ]
+  # 並列処理のワーカー数の決定
+  num_workers = args.num_workers
+  if num_workers <= 0:
+    num_workers = min(4, os.cpu_count() or 1)
+  num_workers = min(num_workers, total_images)
 
-  print(f"INFO:FFmpegを起動中: {' '.join(ffmpeg_cmd)}")
-  try:
-    proc = subprocess.Popen(
-        ffmpeg_cmd,
-        stdin=subprocess.PIPE,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.PIPE
-    )
-  except FileNotFoundError:
-    print("ERROR: ffmpeg コマンドが見つかりませんでした。PATHに登録されているか確認してください。",
-          file=sys.stderr)
+  # 画像リストをチャンクに分割
+  chunk_size = int(np.ceil(total_images / num_workers))
+  chunks = [images[i * chunk_size : (i + 1) * chunk_size] for i in range(num_workers)]
+  chunks = [c for c in chunks if len(c) > 0]
+  num_workers = len(chunks)
+
+  start_time = time.time()
+
+  # 一時ファイルパスの設定
+  temp_files = [f"{args.output}.temp_{i}.mp4" for i in range(num_workers)]
+
+  print(f"INFO: {num_workers} 個のプロセスで並列処理を開始します...")
+  success = True
+  with ProcessPoolExecutor(max_workers=num_workers) as executor:
+    futures = []
+    for i in range(num_workers):
+      futures.append(executor.submit(
+          process_chunk, i, chunks[i], args, width, height, temp_files[i]
+      ))
+
+    for i, future in enumerate(futures):
+      try:
+        res = future.result()
+        if not res:
+          success = False
+      except Exception as e:
+        print(f"ERROR: プロセス {i} の実行中に例外が発生しました: {e}", file=sys.stderr)
+        success = False
+
+  if not success:
+    print("ERROR: 一部の並列処理が失敗しました。動画化を中止します。", file=sys.stderr)
+    cleanup_files(temp_files)
     sys.exit(1)
 
-  success_count = 0
-  processed_files = []
-
+  # 動画の結合 (FFmpeg concat demuxer)
+  concat_file = f"{args.output}.concat.txt"
   try:
-    for idx, (path, was_detected, tlx, tly, trx, try_val, blx, bly, brx, bry, rx, ry, rw, rh) in enumerate(images):
-      # 最初の有効画像は再読込せず流用する
-      if idx == first_idx and success_count == 0:
-        img = first_img
-      else:
-        img = cv2.imread(path)
+    with open(concat_file, "w", encoding="utf-8") as f:
+      for path in temp_files:
+        # 絶対パスに変換し、Windows環境用にバックスラッシュをスラッシュに置換
+        abs_path = os.path.abspath(path).replace("\\", "/")
+        f.write(f"file '{abs_path}'\n")
 
-      if img is None:
-        print(f"WARNING: 画像の読み込みに失敗しました。スキップします: {path}", file=sys.stderr)
-        continue
+    concat_cmd = [
+        "ffmpeg",
+        "-y",
+        "-f", "concat",
+        "-safe", "0",
+        "-i", concat_file,
+        "-c", "copy",
+        args.output
+    ]
+    print(f"INFO: 動画を結合中: {' '.join(concat_cmd)}")
+    subprocess.run(concat_cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
 
-      # 画像のリサイズ
-      resized = cv2.resize(img, (width, height))
-
-      # ROIの描画 (緑色: (0, 255, 0), 太さ2)
-      rrx = int(rx * args.scale)
-      rry = int(ry * args.scale)
-      rrw = int(rw * args.scale)
-      rrh = int(rh * args.scale)
-      cv2.rectangle(resized, (rrx, rry), (rrx + rrw, rry + rrh), (0, 255, 0), 2)
-
-      if was_detected == 1:
-        # BoundingBoxの4つの頂点
-        rtlx = int(tlx * args.scale)
-        rtly = int(tly * args.scale)
-        rtrx = int(trx * args.scale)
-        rtry = int(try_val * args.scale)
-        rblx = int(blx * args.scale)
-        rbly = int(bly * args.scale)
-        rbrx = int(brx * args.scale)
-        rbry = int(bry * args.scale)
-
-        # 頂点を結びポリゴンを描画（太さ2, BGR赤: (0, 0, 255)）
-        pts = np.array([[rtlx, rtly], [rtrx, rtry], [rbrx, rbry], [rblx, rbly]], np.int32)
-        pts = pts.reshape((-1, 1, 2))
-        cv2.polylines(resized, [pts], isClosed=True, color=(0, 0, 255), thickness=2)
-
-      # テキスト情報の重畳 (複数行表示)
-      info_texts = []
-      if was_detected == 1:
-        info_texts.append(f"Detected: TL({tlx},{tly}), BR({brx},{bry})")
-      else:
-        info_texts.append("Detected: False")
-      info_texts.append(f"ROI: ({rx},{ry}) {rw}x{rh}")
-
-      # フォントサイズや位置を適宜調整
-      font_scale = 0.5 * (width / 400.0) # 画像幅に応じた自動調整
-      font_scale = max(0.4, min(font_scale, 0.8))
-
-      y_offset = int(30 * font_scale * 1.5)
-      line_height = int(25 * font_scale * 1.5)
-
-      for i, text in enumerate(info_texts):
-        pos = (10, y_offset + i * line_height)
-        # 黒縁を描画（視認性の確保）
-        cv2.putText(
-            resized, text, pos,
-            cv2.FONT_HERSHEY_SIMPLEX, font_scale, (0, 0, 0), 2, cv2.LINE_AA
-        )
-
-        # 色分け
-        if "Detected: False" in text:
-          color = (128, 128, 255)  # 薄い赤/ピンク
-        elif "Detected:" in text:
-          color = (0, 0, 255)      # 赤
-        elif "ROI:" in text:
-          color = (0, 255, 0)      # 緑
-        else:
-          color = (255, 255, 255)  # 白
-
-        cv2.putText(
-            resized, text, pos,
-            cv2.FONT_HERSHEY_SIMPLEX, font_scale, color, 1, cv2.LINE_AA
-        )
-
-      # FFmpegの標準入力に生画像バイナリを書き込む
-      proc.stdin.write(resized.tobytes())
-
-      success_count += 1
-      processed_files.append(path)
-
-      # 定期的な進捗出力（50枚ごと）
-      if success_count % 50 == 0 or success_count == total_images:
-        print(f"INFO: {success_count} / {total_images} 枚処理完了")
-
-  except IOError as e:
-    print(f"ERROR: FFmpegへの書き込み中にパイプエラーが発生しました: {e}", file=sys.stderr)
+  except subprocess.CalledProcessError as e:
+    print(f"ERROR: 動画の結合に失敗しました: {e}", file=sys.stderr)
+    if e.stderr:
+      print(e.stderr.decode('utf-8', errors='ignore'), file=sys.stderr)
+    success = False
   finally:
-    if proc.stdin:
-      proc.stdin.close()
-    stderr_data = b""
-    if proc.stderr:
-      stderr_data = proc.stderr.read()
-    return_code = proc.wait()
+    # クリーンアップ
+    cleanup_files(temp_files, concat_file)
 
-  if return_code != 0:
-    print(f"ERROR: FFmpegが異常終了しました (終了コード: {return_code})", file=sys.stderr)
-    if stderr_data:
-      print(stderr_data.decode('utf-8', errors='ignore'), file=sys.stderr)
+  if not success:
     sys.exit(1)
+
+  end_time = time.time()
+  elapsed_time = end_time - start_time
+  average_fps = total_images / elapsed_time if elapsed_time > 0 else 0
 
   print(
-      f"INFO:動画の作成が完了しました: {args.output} "
-      f"(正常処理: {success_count}枚 / 総数: {total_images}枚)"
+      f"INFO:動画の作成が完了しました: {args.output} \n"
+      f"  - 総処理時間: {elapsed_time:.2f} 秒\n"
+      f"  - 平均FPS: {average_fps:.2f}"
   )
 
-  # クリーンアップ処理
-  if args.clean and success_count > 0:
+  # クリーンアップ処理 (元のJPEG画像)
+  if args.clean and len(images) > 0:
     print("INFO:入力画像ファイルのクリーンアップ中...")
     deleted_count = 0
-    for path in processed_files:
+    for path, *_ in images:
       try:
         if os.path.exists(path):
           os.remove(path)

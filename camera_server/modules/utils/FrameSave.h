@@ -11,6 +11,7 @@
 #include <filesystem>
 #include <string>
 #include "Logger.h"
+#include "ImageRecognitionResults.h"
 
 class FrameSave {
  public:
@@ -21,6 +22,17 @@ class FrameSave {
    * @param fileName 保存するフレームの名前
    */
   static void save(cv::Mat& frame, const std::string& filePath, const std::string& fileName);
+
+  /**
+   * @brief 検出結果とROIを含んだファイル名でフレームを保存する
+   * @param frame 保存するフレームを格納するcv::Mat参照
+   * @param filePath フレーム保存先のディレクトリパス
+   * @param result 検出結果を格納するBoundingBoxDetectionResult構造体の参照
+   * @param roi 検出対象の領域(ROI)
+   */
+  static void save(cv::Mat& frame, const std::string& filePath,
+                   const BoundingBoxDetectionResult& result,
+                   const cv::Rect& roi);
 
  private:
   FrameSave();  // インスタンス化の禁止

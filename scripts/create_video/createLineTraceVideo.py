@@ -28,7 +28,7 @@ def parse_args():
                       help="出力動画のファイルパス")
   parser.add_argument("-r", "--fps", type=int, default=15,
                       help="出力動画のFPS")
-  parser.add_argument("-s", "--scale", type=float, default=1.0,
+  parser.add_argument("-s", "--scale", type=float, default=0.3,
                       help="画像の縮小比率 (0.1 〜 1.0)")
   parser.add_argument("-g", "--gpu", action="store_true", default=False,
                       help="NVIDIA GPUエンコーダー (h264_nvenc) を使用するかどうか")

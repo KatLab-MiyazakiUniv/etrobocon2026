@@ -69,6 +69,12 @@ void ColorRegionDetectionActionHandler::execute(
   } else {
     Logger::error("ColorRegionDetectionActionHandler:色領域が検出されませんでした");
   }
+
+  //   // クローンしたフレームを使い、別スレッドでリサイズと保存を実行
+  std::string directoryPath = "datafiles/line_trace";
+  std::thread([clonedFrame = frame.clone(), directoryPath, localResult, localRoi]() mutable {
+    FrameSave::save(clonedFrame, directoryPath, localResult, localRoi);
+  }).detach();
 }
 
 const CameraCapture& ColorRegionDetectionActionHandler::getCamera() const

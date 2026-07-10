@@ -26,11 +26,11 @@ void EtRobocon2026::start()
   robot.setCourse(Course::Left);
   // robot.setEdge(Edge::LeftEdge);
   robot.setEdge(Edge::RightEdge);
-  // Area lineTraceArea = Area::LineTrace;
-  // AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
-  // lineTraceAreaMaster.run();
-  Area BottleCarryArea = Area::BottleCarry;
-  AreaMaster BottleCarryAreaMaster(robot, BottleCarryArea);
-  BottleCarryAreaMaster.run();
+  Area lineTraceArea = Area::LineTrace;
+  AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
+  lineTraceAreaMaster.run();
+  // Area BottleCarryArea = Area::BottleCarry;
+  // AreaMaster BottleCarryAreaMaster(robot, BottleCarryArea);
+  // BottleCarryAreaMaster.run();
   CsvLogger::outputToFile();
 }

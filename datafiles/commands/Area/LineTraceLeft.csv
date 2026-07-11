@@ -7,11 +7,12 @@
 # LineTrace,003,Distance,003
 # LineTrace,003,Distance,004
 # カメラ走行
-#CameraTracking,001,Distance,055
-#CameraTracking,002,Distance,040
-#CameraTracking,001,Distance,040
-#CameraTracking,003,Distance,035
-#CameraTracking,004,Distance,230
+#CameraTracking,001,Distance,038
+#CameraTracking,002,Distance,056
+#CameraTracking,012,Distance,090
+#CameraTracking,004,Distance,050
+#CameraTracking,013,Distance,080
+#CameraTracking,005,Distance,090
 #CameraTracking,001,Distance,080
 #CameraTracking,000,Distance,000
 
@@ -30,8 +31,8 @@
 #CameraTracking,010,Distance,035
 #CameraTracking,009,Distance,030
 #CameraTracking,000,Distance,000
-AbsoluteRotation,001,AbsoluteAngle,001
+
 
 
 # キャリブレイター
-# Calibrator,001,RepeatCount,001
+#Calibrator,001,RepeatCount,001

@@ -109,15 +109,9 @@ bool CameraCapture::getFrame(cv::Mat& outFrame)
     return false;
   }
 
-  for(int i = 0; i < 7; i++) {
-    // cap >> outFrame;
-    int t1 = ClockUtil::now();
+  for(int i = 0; i < 5; i++) {
     cap >> outFrame;
-    int t2 = ClockUtil::now();
-    Logger::printfLog(Logger::INFO, "cap grab time=%d", t2 - t1);
-
     if(!outFrame.empty()) {
-      Logger::printfLog(Logger::INFO, "フレームの取得にかかったカウントは:%d", i);
       return true;
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(5));

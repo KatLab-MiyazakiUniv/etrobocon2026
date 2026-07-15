@@ -60,7 +60,7 @@ void EtRobocon2026::start()
                         leftPid, anglePid, true);
       straight.run();
 
-      ClockUtil::wait(1000);
+      ClockUtil::wait(3000);
 
       Logger::printfLog(Logger::INFO, "angle = %lf", robot.getIMUControllerInstance().getAzimuth());
       Logger::printfLog(Logger::INFO, "x = %lf", robot.getPosition().getX());

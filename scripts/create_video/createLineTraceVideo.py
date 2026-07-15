@@ -28,11 +28,11 @@ def parse_args():
                       help="出力動画 of ファイルパス")
   parser.add_argument("-r", "--fps", type=int, default=15,
                       help="出力動画のFPS")
-  parser.add_argument("-s", "--scale", type=float, default=1.0,
+  parser.add_argument("-s", "--scale", type=float, default=0.4,
                       help="画像の縮小比率 (0.1 〜 1.0)")
   parser.add_argument("-g", "--gpu", action="store_true", default=False,
                       help="NVIDIA GPUエンコーダー (h264_nvenc) を使用するかどうか")
-  parser.add_argument("-c", "--clean", action="store_true", default=False,
+  parser.add_argument("-c", "--clean", action="store_true", default=True,
                       help="動画作成完了後に、入力画像ディレクトリ内のファイルをすべて削除するかどうか")
   parser.add_argument("-w", "--num-workers", type=int, default=0,
                       help="並列処理のプロセス数 (0の場合は自動設定)")
@@ -389,7 +389,7 @@ def main():
   print(
       f"INFO:動画の作成が完了しました: {args.output} \n"
       f"  - 総処理時間: {elapsed_time:.2f} 秒\n"
-      f"  - 平均FPS: {average_fps:.2f}"
+      f"  - 動画化のフレーム連結の平均FPS: {average_fps:.2f}"
   )
 
   # クリーンアップ処理 (元のJPEG画像)

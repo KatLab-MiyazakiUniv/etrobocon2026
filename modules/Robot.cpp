@@ -15,7 +15,8 @@ Robot::Robot(SocketClient& _cameraSocketClient)
     cameraSocketClient(_cameraSocketClient),
     button(),
     forceSensor(EPort::PORT_D),
-    display() position(),
+    display(),
+    position(),
     odometry(position),
     navigator(position)
 {

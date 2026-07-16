@@ -82,3 +82,10 @@ double Pid::calculatePid(double currentValue, double delta)
   // 操作量 = P制御 + I制御 + D制御
   return (p + i + d);
 }
+
+void Pid::reset()
+{
+  prevDeviation = 0.0;
+  integral = 0.0;
+  filteredDerivative = 0.0;
+}

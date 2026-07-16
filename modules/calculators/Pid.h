@@ -60,6 +60,11 @@ class Pid {
    */
   double calculatePid(double currentValue, double delta = defaultDelta);
 
+  /**
+   * @brief PIDの内部状態をリセットする
+   */
+  void reset();
+
  private:
   PidGain pidGain;
   static constexpr double defaultDelta = 0.01;  // 周期

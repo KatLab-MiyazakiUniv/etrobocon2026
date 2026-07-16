@@ -15,7 +15,9 @@ Robot::Robot(SocketClient& _cameraSocketClient)
     cameraSocketClient(_cameraSocketClient),
     button(),
     forceSensor(EPort::PORT_D),
-    display()
+    display() position(),
+    odometry(position),
+    navigator(position)
 {
 }
 
@@ -113,4 +115,19 @@ void Robot::setTargetBrightness(int brightness)
 int Robot::getTargetBrightness() const
 {
   return targetBrightness;
+}
+
+Position& Robot::getPosition()
+{
+  return position;
+}
+
+Odometry& Robot::getOdometry()
+{
+  return odometry;
+}
+
+Navigator& Robot::getNavigator()
+{
+  return navigator;
 }

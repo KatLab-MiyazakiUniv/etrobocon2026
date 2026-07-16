@@ -1,0 +1,3 @@
+コマンド名,ID,目標相対角度,許容誤差
+RelativeAngle,ID,double,double
+RelativeAngle,90,90,2

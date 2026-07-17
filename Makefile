@@ -1,4 +1,3 @@
-SHELL := /bin/bash
 MAKEFILE_PATH := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 DOCKER_IMAGE   := kat_etrobo2026:arm64
@@ -191,4 +190,6 @@ docker-run-user:
 
 .PHONY: create-video
 create-video:
-	source $(MAKEFILE_PATH)scripts/create_video/venv/bin/activate && python $(MAKEFILE_PATH)scripts/create_video/createLineTraceVideo.py -i $(MAKEFILE_PATH)camera_server/datafiles/line_trace/ && deactivate
+	$(MAKEFILE_PATH)scripts/create_video/venv/bin/python \
+    $(MAKEFILE_PATH)scripts/create_video/createLineTraceVideo.py \
+    -i $(MAKEFILE_PATH)camera_server/datafiles/line_trace/

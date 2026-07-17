@@ -8,16 +8,19 @@
 
 #include <cmath>
 
-GoalNavigation::GoalNavigation(Robot& robot,
-                               std::unique_ptr<BaseContinuationCondition> continuationCondition,
-                               double goalX, double goalY, double speed,
-                               const Pid::PidGain& anglePidGain)
-  : BaseMotion(robot, std::move(continuationCondition)),
+GoalNavigation::GoalNavigation(Robot& _robot,
+                               std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+                               double _goalX, double _goalY, double _targetSpeed,
+                               const Pid::PidGain& _rightPid, const Pid::PidGain& _leftPid,
+                               const Pid::PidGain& _anglePidGain)
+  : BaseMotion(_robot, std::move(_continuationCondition)),
     state(State::ROTATE),
-    goalX(goalX),
-    goalY(goalY),
-    speed(speed),
-    anglePid(anglePidGain.kp, anglePidGain.ki, anglePidGain.kd, 0.0)
+    goalX(_goalX),
+    goalY(_goalY),
+    targetSpeed(_targetSpeed),
+    anglePid(_anglePidGain.kp, _anglePidGain.ki, _anglePidGain.kd, 0.0),
+    speedCalculator(_robot, _rightPid, _leftPid, _targetSpeed),
+    targetAngle(0.0)
 {
   LOG_CREATE("GoalNavigation");
 }
@@ -27,38 +30,73 @@ GoalNavigation::~GoalNavigation()
   LOG_DESTROY("GoalNavigation");
 }
 
+bool GoalNavigation::canStart()
+{
+  if(targetSpeed == 0.0) {
+    return false;
+  }
+
+  return true;
+}
+
+void GoalNavigation::prepare()
+{
+  state = State::ROTATE;
+
+  robot.getOdometry().reset();
+
+  robot.getOdometry().initialize(robot.getWheelMotorControllerInstance().getLeftCount(),
+                                 robot.getWheelMotorControllerInstance().getRightCount());
+
+  targetAngle = robot.getNavigator().calculateHeading(goalX, goalY);
+}
+
 void GoalNavigation::executeStep()
 {
-  // 現在位置から目標方位を計算
-  double targetHeading = robot.getNavigator().calculateHeading(goalX, goalY);
+  // オドメトリ更新
+  robot.getOdometry().update(robot.getWheelMotorControllerInstance().getLeftCount(),
+                             robot.getWheelMotorControllerInstance().getRightCount(),
+                             robot.getIMUControllerInstance().getAzimuth());
 
-  // IMUから現在方位を取得
-  double currentHeading = robot.getIMUControllerInstance().getAzimuth();
+  // 現在位置から目標方向を毎周期更新
+  targetAngle = robot.getNavigator().calculateHeading(goalX, goalY);
 
-  // 方位誤差
-  double error = AngleNormalizer::normalizeAngle(targetHeading - currentHeading);
+  double currentAngle = robot.getIMUControllerInstance().getAzimuth();
+
+  double angleDeviation = AngleNormalizer::normalizeAngle(targetAngle - currentAngle);
 
   switch(state) {
+    //--------------------------------------------------
+    // 回頭
+    //--------------------------------------------------
     case State::ROTATE: {
-      double turn = anglePid.calculatePid(error);
+      double turningPower = anglePid.calculatePid(angleDeviation);
 
-      robot.getWheelMotorControllerInstance().setRightPower(turn);
-      robot.getWheelMotorControllerInstance().setLeftPower(-turn);
+      robot.getWheelMotorControllerInstance().setRightPower(turningPower);
+      robot.getWheelMotorControllerInstance().setLeftPower(-turningPower);
 
-      // 目標方位を向いたら直進へ
-      if(std::fabs(error) <= ANGLE_TOLERANCE) {
+      // 十分向けたら直進へ
+      if(std::fabs(angleDeviation) <= ANGLE_TOLERANCE) {
+        anglePid.reset();  // PIDの内部状態をリセット
         state = State::STRAIGHT;
-        anglePid.reset();
       }
 
       break;
     }
 
+    //--------------------------------------------------
+    // 直進
+    //--------------------------------------------------
     case State::STRAIGHT: {
-      double turn = anglePid.calculatePid(error);
+      double requiredRightPower = speedCalculator.calculateRightMotorPower();
 
-      robot.getWheelMotorControllerInstance().setRightPower(speed + turn);
-      robot.getWheelMotorControllerInstance().setLeftPower(speed - turn);
+      double requiredLeftPower = speedCalculator.calculateLeftMotorPower();
+
+      double turningPower = anglePid.calculatePid(angleDeviation);
+
+      robot.getWheelMotorControllerInstance().setRightPower(requiredRightPower + turningPower);
+
+      robot.getWheelMotorControllerInstance().setLeftPower(requiredLeftPower - turningPower);
 
       break;
     }
@@ -68,5 +106,4 @@ void GoalNavigation::executeStep()
 void GoalNavigation::finish()
 {
   robot.getWheelMotorControllerInstance().stopBoth();
-  robot.getWheelMotorControllerInstance().resetBothPower();
 }

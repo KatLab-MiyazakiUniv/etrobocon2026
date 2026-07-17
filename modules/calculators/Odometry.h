@@ -21,17 +21,23 @@ class Odometry {
   explicit Odometry(Position& position);
 
   /**
+   * @brief Positionをリセット
+   */
+  void reset();
+
+  /**
+   * @brief エンコード値をセット
+   * @param left 左エンコーダ値[deg]
+   * @param right 右エンコーダ値[deg]
+   */
+  void initialize(int32_t left, int32_t right);
+  /**
    * @brief エンコーダとIMUから自己位置を更新
    * @param left 左エンコーダ値[deg]
    * @param right 右エンコーダ値[deg]
    * @param heading IMU方位角[deg]
    */
   void update(int32_t left, int32_t right, double heading);
-
-  /**
-   * @brief エンコーダ値をリセット
-   */
-  void reset();
 
  private:
   Position& position;

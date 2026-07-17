@@ -5,9 +5,7 @@
  */
 
 #include "Odometry.h"
-
 #include <cmath>
-
 #include "AngleNormalizer.h"
 #include "Mileage.h"
 
@@ -15,9 +13,15 @@ Odometry::Odometry(Position& position) : position(position), prevLeft(0), prevRi
 
 void Odometry::reset()
 {
-  prevLeft = 0;
-  prevRight = 0;
+  // Positionをリセット
   position.set(0.0, 0.0, 0.0);
+}
+
+void Odometry::initialize(int32_t left, int32_t right)
+{
+  // エンコーダ値をセット
+  prevLeft = left;
+  prevRight = right;
 }
 
 void Odometry::update(int32_t left, int32_t right, double heading)

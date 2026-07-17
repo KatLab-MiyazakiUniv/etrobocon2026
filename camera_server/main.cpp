@@ -24,6 +24,5 @@ int main()
   SnapshotActionHandler snapshotHandler(camera);
   SocketServer server(snapshotHandler, colorRegionDetectionHandler, real);
   server.init();
-  server.run();
   return 0;
 }

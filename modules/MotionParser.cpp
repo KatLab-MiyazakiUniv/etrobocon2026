@@ -34,7 +34,6 @@ T fromString(const std::string& s)
   return val;
 }
 
-// BaseMotionを継承した動作クラスの動的配列が返り値
 vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& commandFilePath)
 {
   int lineNum = 1;
@@ -50,26 +49,21 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
 
   string line;
 
-  // 読み込む行がなければ終了する
+  // ヘッダ行をスキップ
   if(!getline(file, line)) return motionList;
-  // ヘッダ行をスキップ?>どの行の処理と対応してる?>解析処理はwhile()なのでwhile()に入る前に行を読み込み始めるカウントを事前に増やしてる?>これはerror時の注目している行数を出力のためだけ。
-  // なので,ヘッダ行を自動で読み飛ばしてるか,他に読み飛ばしのための処理がある
   lineNum++;
 
   // fileから1行ずつ文字列として line に読み込む
   while(getline(file, line)) {
-    // 文字列をストリームに変換する>getline()で区切り文字での分析を出来るようにするため
     stringstream ss(line);
 
     // カンマ区切りで (動作コマンド名, 動作ID, 条件コマンド名, 条件ID) を取り出す
     vector<string> params;
     for(string token; getline(ss, token, SEPARATOR);) {
-      // trim()>スペースとTabを削除した文字列で置き換える
       trim(token);
       params.push_back(move(token));
     }
 
-    // Area.csvの不正なフォーマットがあれば行数を示して警告し、次の行を解析する>while()のやり直し
     if(params.size() < 4) {
       Logger::printfLog(Logger::ERROR, "%s:%d フォーマットが不正です（4列必要）",
                         commandFilePath.c_str(), lineNum);
@@ -91,17 +85,16 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
       continue;
     }
 
-    // 条件パラメータを記述しているfileへのpathを取得する
+    // 条件パラメータを取得する
     vector<string> conditionParams
         = extractParamsFromID(CONDITIONS_PATH + conditionName + ".csv", conditionId);
     if(conditionParams.empty()) {
       Logger::printfLog(Logger::ERROR, "Conditions: %s ID=%s が見つかりませんでした",
                         conditionName.c_str(), conditionId.c_str());
       lineNum++;
-      // while()を抜ける?>?>存在しないfile名を指してたら
       continue;
     }
-    // 条件インスタンスを生成する＞continucationConditionはなぜにauto?基底クラス型の*じゃなくて?>基底クラスが無いからか
+    // 条件インスタンスを生成する
     auto condition = createConditionInstance(robot, conditionParams);
     if(!condition) {
       Logger::printfLog(Logger::ERROR, "条件インスタンスの生成に失敗しました: %s %s",
@@ -112,7 +105,6 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
 
     // 動作インスタンスを生成してリストに追加する
     BaseMotion* motion = createMotionInstance(robot, motionParams, std::move(condition));
-    // nullptrなら
     if(motion) {
       motionList.push_back(motion);
       Logger::printfLog(Logger::INFO, "[MotionParser] motionList[%zu]: %s ID=%s (条件: %s ID=%s)",
@@ -144,7 +136,6 @@ vector<string> MotionParser::extractParamsFromID(const string& filePath, const s
 
   string line;
   vector<string> result;
-  // なんでwhile()?複数行にまたがって記述はないだろうし?継続条件インスタンスに対応する引数の記述は1行だしね?>?同じ走行クラスでも数値を変えたもの複数パターン用意するから複数行読み込んでる?>1つのファイルに対して同じidの行が複数ある場合のエラー検出を行うため
   while(getline(file, line)) {
     stringstream ss(line);
     vector<string> row;
@@ -152,12 +143,9 @@ vector<string> MotionParser::extractParamsFromID(const string& filePath, const s
       trim(token);
       row.push_back(move(token));
     }
-
     if(row.size() >= 2 && row[1] == id) {
-      // 空ならfalseだからか
-      // この条件式わからんな>loggerのエラー文と対応してないような>
       if(!result.empty()) {
-        Logger::printfLog(Logger::ERROR, "%s に id=%s が重複しています", filePath.c_str(),
+        Logger::printfLog(Logger::ERROR, "%s に ID=%s が重複しています", filePath.c_str(),
                           id.c_str());
         return {};
       }

@@ -31,8 +31,22 @@ class Position {
    */
   void setHeading(double heading);
 
+  /**
+   * @brief X座標取得
+   * @return 現在のX座標
+   */
   double getX() const;
+
+  /**
+   * @brief Y座標取得
+   * @return 現在のY座標
+   */
   double getY() const;
+
+  /**
+   * @brief 機体の向き取得
+   * @return 現在の機体の向き
+   */
   double getHeading() const;
 
  private:

@@ -44,6 +44,8 @@ SOURCES := main.cpp $(shell find $(SRCDIR) -name '*.cpp')
 SOURCES += $(wildcard ../common/*.cpp)
 SOURCES += $(wildcard ../modules/API/*.cpp)
 
+OBJS := $(addprefix $(OBJDIR)/,$(SOURCES:.cpp=.o))
+
 # デフォルトターゲット
 all: $(TARGET)
 

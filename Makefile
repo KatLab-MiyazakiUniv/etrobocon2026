@@ -211,5 +211,5 @@ docker-run-user:
 .PHONY: create-video
 create-video:
 	$(MAKEFILE_PATH)scripts/create_video/venv/bin/python \
-    $(MAKEFILE_PATH)scripts/create_video/createLineTraceVideo.py \
+    $(MAKEFILE_PATH)scripts/create_video/createVideo.py \
     -i $(MAKEFILE_PATH)camera_server/datafiles/line_trace/

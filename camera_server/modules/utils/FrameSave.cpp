@@ -5,7 +5,6 @@
  */
 
 #include "FrameSave.h"
-#include "ClockUtil.h"
 
 void FrameSave::save(cv::Mat& frame, const std::string& filePath, const std::string& fileName)
 {
@@ -34,23 +33,24 @@ void FrameSave::save(cv::Mat& frame, const std::string& filePath, const std::str
 void FrameSave::save(cv::Mat& frame, const std::string& filePath,
                      const BoundingBoxDetectionResult& result, const cv::Rect& roi)
 {
-  int startTime = ClockUtil::now();
+  // clang-format off
+  std::string fileName = "det_d" + std::to_string(result.wasDetected ? 1 : 0) +
+                          "_tlx" + toStrInt(result.topLeft.x) +
+                          "_tly" + toStrInt(result.topLeft.y) +
+                          "_trx" + toStrInt(result.topRight.x) +
+                          "_try" + toStrInt(result.topRight.y) +
+                          "_blx" + toStrInt(result.bottomLeft.x) +
+                          "_bly" + toStrInt(result.bottomLeft.y) +
+                          "_brx" + toStrInt(result.bottomRight.x) +
+                          "_bry" + toStrInt(result.bottomRight.y) +
+                          "_rx"  + toStrInt(roi.x) +
+                          "_ry"  + toStrInt(roi.y) +
+                          "_rw"  + toStrInt(roi.width) +
+                          "_rh"  + toStrInt(roi.height) +
+                          "_"    + std::to_string(ClockUtil::now());
+  // clang-format on
 
-  std::string fileName = "det_d" + std::to_string(result.wasDetected ? 1 : 0) + "_tlx"
-                         + toStrInt(result.topLeft.x) + "_tly" + toStrInt(result.topLeft.y) + "_trx"
-                         + toStrInt(result.topRight.x) + "_try" + toStrInt(result.topRight.y)
-                         + "_blx" + toStrInt(result.bottomLeft.x) + "_bly"
-                         + toStrInt(result.bottomLeft.y) + "_brx" + toStrInt(result.bottomRight.x)
-                         + "_bry" + toStrInt(result.bottomRight.y) + "_rx" + toStrInt(roi.x) + "_ry"
-                         + toStrInt(roi.y) + "_rw" + toStrInt(roi.width) + "_rh"
-                         + toStrInt(roi.height) + "_" + std::to_string(ClockUtil::now());
-
-  if(frame.empty()) return;
-  cv::Mat resized;
   save(frame, filePath, fileName);
-  int endTime = ClockUtil::now();
-  Logger::printfLog(Logger::DEBUG, "別スレッドで行ったフレームの保存にかかった時間は: %d ms",
-                    endTime - startTime);
 }
 
 std::string FrameSave::toStrInt(double value)

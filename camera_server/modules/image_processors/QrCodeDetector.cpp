@@ -88,6 +88,7 @@ QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
   for(int i = 0; i < 4; ++i) {
     result.corners[i] = corners[i];
   }
+  return result;
 }
 cv::Mat QrCodeDetector::rectify(const cv::Mat& frame, const std::vector<cv::Point2f>& corners) const
 {

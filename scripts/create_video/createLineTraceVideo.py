@@ -1,5 +1,5 @@
 """
-@file   createLineTraceVideo.py
+@file   createLVideo.py
 @brief  保存された連続JPEG画像から、BoundingBox・文字を描画しつつ、FFmpegを利用し並列プロセスで高速に動画を作成する
 @author sadomiya-sousi
 """
@@ -25,7 +25,7 @@ def parse_args():
   parser.add_argument("-i", "--input-dir", default="datafiles/line_trace",
                       help="入力JPEG画像のディレクトリのパス")
   parser.add_argument("-o", "--output", default="line_trace.mp4",
-                      help="出力動画 of ファイルパス")
+                      help="出力動画のファイルパス")
   parser.add_argument("-r", "--fps", type=int, default=15,
                       help="出力動画のFPS")
   parser.add_argument("-s", "--scale", type=float, default=0.4,

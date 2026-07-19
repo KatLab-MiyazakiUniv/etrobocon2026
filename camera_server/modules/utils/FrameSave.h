@@ -10,7 +10,9 @@
 #include <opencv2/opencv.hpp>
 #include <filesystem>
 #include <string>
+
 #include "Logger.h"
+#include "ClockUtil.h"
 #include "ImageRecognitionResults.h"
 
 class FrameSave {
@@ -24,7 +26,7 @@ class FrameSave {
   static void save(cv::Mat& frame, const std::string& filePath, const std::string& fileName);
 
   /**
-   * @brief 検出結果とROIを含んだファイル名でフレームを保存する
+   * @brief 検出結果とROIを含んだファイル名を作成し,フレームを保存する
    * @param frame 保存するフレームを格納するcv::Mat参照
    * @param filePath フレーム保存先のディレクトリパス
    * @param result 検出結果を格納するBoundingBoxDetectionResult構造体の参照

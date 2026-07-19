@@ -43,10 +43,14 @@ QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
     return result;
   }
   // 透視変換で正面化
+  Logger::info("1");
   cv::Mat rectifiedFrame = rectify(frame, corners);
+  Logger::printfLog(Logger::INFO, "rectified size = %d x %d", rectifiedFrame.cols,
+                    rectifiedFrame.rows);
 
   // グレースケール化
   cv::Mat gray;
+  Logger::info("2");
   cv::cvtColor(rectifiedFrame, gray, cv::COLOR_BGR2GRAY);
 
   // ノイズ除去
@@ -61,13 +65,17 @@ QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
 
   // 二値化
   cv::Mat binary;
+  Logger::info("3");
   cv::adaptiveThreshold(sharpened, binary, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY,
                         21, 10);
 
   // 正面化したフレームをデコード
+  Logger::info("4");
   ZXing::ImageView iv(binary.data, binary.cols, binary.rows, ZXing::ImageFormat::Lum,
                       static_cast<int>(binary.step));
+  Logger::info("5");
   auto qrCode = ZXing::ReadBarcode(iv, options);
+  Logger::info("6");
 
   if(!qrCode.isValid()) {
     Logger::error("ZXing decode failed");

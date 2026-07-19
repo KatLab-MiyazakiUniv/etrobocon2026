@@ -5,6 +5,7 @@
  */
 
 #include <gtest/gtest.h>
+#include <thread>
 #include <chrono>
 #include <atomic>
 #include <stdexcept>
@@ -13,8 +14,6 @@
 #include "Logger.h"
 
 namespace etrobocon2026_test {
-
-  TEST(MultiThreadTest, WrapFrameSave) {}
 
   // 引数なしのラムダ関数を実行
   TEST(MultiThreadTest, WrapNoArgument)
@@ -114,7 +113,7 @@ namespace etrobocon2026_test {
 
     EXPECT_TRUE(done);
     // 別スレッドで実行されるため、メインスレッドのIDとは異なる。
-    EXPECT_NE(main_thread_id, child_thread_id);  // 意図的に失敗するアサーション
+    EXPECT_NE(main_thread_id, child_thread_id);
   }
 
   // ダミークラスの定義
@@ -128,22 +127,17 @@ namespace etrobocon2026_test {
     void memberFunc(DummyClassB& b) { b.value = 100; }
   };
 
-  // 7. 他のクラスの参照を引数に持つメンバ関数を非同期で実行するテスト
+  // 他のクラスの参照を引数に持つメンバ関数を非同期で実行するテスト
   TEST(MultiThreadTest, WrapMemberFunctionWithRefArgTest)
   {
     DummyClassA objA;
     DummyClassB objB;
-
     // メンバ関数ポインタ、対象オブジェクトポインタ、引数（参照）を渡して非同期実行
-
     MultiThread::wrap(&DummyClassA::memberFunc, &objA, std::ref(objB));
-    // MultiThread::wrap(objA.memberFunc, std::ref(objB));
-
-    // 実行完了を待つ (最大1秒)
-    for(int i = 0; i < 100 && objB.value == 0; ++i) {
+    // 実行完了を待つ
+    for(int i = 0; i < 3 && objB.value == 0; ++i) {
       std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
-
     // 値が 100 に書き換わっていることを確認
     EXPECT_EQ(objB.value, 100);
   }

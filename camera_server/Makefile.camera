@@ -40,8 +40,9 @@ INCLUDES := $(shell find $(INCLUDEDIR) -type d -printf '-I%p ') \
 
 # すべての .cpp ファイルを探す
 SOURCES := main.cpp $(shell find $(SRCDIR) -name '*.cpp')
-SOURCES += ../common/*.cpp
-OBJS := $(addprefix $(OBJDIR)/,$(SOURCES:.cpp=.o))
+
+SOURCES += $(wildcard ../common/*.cpp)
+SOURCES += $(wildcard ../modules/API/*.cpp)
 
 # デフォルトターゲット
 all: $(TARGET)

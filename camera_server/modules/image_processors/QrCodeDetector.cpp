@@ -37,9 +37,27 @@ QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
   // 透視変換で正面化
   cv::Mat rectifiedFrame = rectify(frame, corners);
 
+  // グレースケール化
+  cv::Mat gray;
+  cv::cvtColor(rectifiedFrame, gray, cv::COLOR_BGR2GRAY);
+
+  // ノイズ除去
+  cv::Mat denoised;
+  cv::medianBlur(gray, denoised, 3);
+
+  // シャープ化
+  cv::Mat sharpened;
+  cv::Mat kernel = (cv::Mat_<float>(3, 3) << 0, -1, 0, -1, 5, -1, 0, -1, 0);
+
+  cv::filter2D(denoised, sharpened, -1, kernel);
+
+  cv::Mat binary;
+  cv::adaptiveThreshold(sharpened, binary, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY,
+                        21, 10);
+
   // 正面化したフレームをデコード
-  ZXing::ImageView iv(rectifiedFrame.data, rectifiedFrame.cols, rectifiedFrame.rows,
-                      ZXing::ImageFormat::BGR, static_cast<int>(rectifiedFrame.step));
+  ZXing::ImageView iv(binary.data, binary.cols, binary.rows, ZXing::ImageFormat::Lum,
+                      static_cast<int>(binary.step));
   auto qrCode = ZXing::ReadBarcode(iv, options);
 
   if(qrCode.isValid()) {

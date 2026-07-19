@@ -42,8 +42,8 @@ INCLUDES := $(shell find $(INCLUDEDIR) -type d -printf '-I%p ') \
 SOURCES := main.cpp $(shell find $(SRCDIR) -name '*.cpp')
 
 SOURCES += $(wildcard ../common/*.cpp)
-SOURCES += $(wildcard ../modules/API/*.cpp)
 
+SOURCES += ../modules/API/ClockUtil.cpp
 OBJS := $(addprefix $(OBJDIR)/,$(SOURCES:.cpp=.o))
 
 # デフォルトターゲット

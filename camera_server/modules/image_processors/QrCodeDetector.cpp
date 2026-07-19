@@ -30,10 +30,18 @@ QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
 
   // QRコードの各頂点の位置を検出
   std::vector<cv::Point2f> corners;
-  if(!detector.detect(frame, corners) || corners.size() != 4) {
+
+  if(!detector.detect(frame, corners)) {
+    Logger::error("OpenCV detect failed");
     return result;
   }
 
+  Logger::printfLog(Logger::INFO, "corners.size() = %zu", corners.size());
+
+  if(corners.size() != 4) {
+    Logger::error("corners.size() != 4");
+    return result;
+  }
   // 透視変換で正面化
   cv::Mat rectifiedFrame = rectify(frame, corners);
 
@@ -51,6 +59,7 @@ QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
 
   cv::filter2D(denoised, sharpened, -1, kernel);
 
+  // 二値化
   cv::Mat binary;
   cv::adaptiveThreshold(sharpened, binary, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY,
                         21, 10);
@@ -60,14 +69,17 @@ QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
                       static_cast<int>(binary.step));
   auto qrCode = ZXing::ReadBarcode(iv, options);
 
-  if(qrCode.isValid()) {
-    result.wasDetected = true;
-    result.content = qrCode.text();
-    for(int i = 0; i < 4; ++i) {
-      result.corners[i] = corners[i];
-    }
+  if(!qrCode.isValid()) {
+    Logger::error("ZXing decode failed");
+    return result;
   }
-  return result;
+
+  result.wasDetected = true;
+  result.content = qrCode.text();
+
+  for(int i = 0; i < 4; ++i) {
+    result.corners[i] = corners[i];
+  }
 }
 cv::Mat QrCodeDetector::rectify(const cv::Mat& frame, const std::vector<cv::Point2f>& corners) const
 {

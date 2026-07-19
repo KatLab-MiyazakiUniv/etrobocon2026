@@ -20,10 +20,9 @@ class MultiThread {
    * @param Args 関数オブジェクトを実行するための引数
    * @example
    *  静的メンバ関数の場合:
-   *  MultiThread::wrap(FrameSave::save, frame, filePath, fileName);
+   *   MultiThread::wrap([&]() { FrameSave::save(frame, filePath, fileName); });
    *  メンバ関数の場合:
-   *  MultiThread::wrap(&class名::メンバ関数, &インスタンス, 引数1,引数2, 引数3...)
-   *  引数が参照型の場合はstd::ref()でのキャストが必要
+   *   MultiThread::wrap([&]() { インスタンス.メンバ関数(引数1, 引数2, 引数3,...); });
    */
   template <typename Func, typename... Args>
   static void wrap(Func&& func, Args&&... args)

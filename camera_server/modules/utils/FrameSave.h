@@ -9,9 +9,8 @@
 
 #include <opencv2/opencv.hpp>
 #include <filesystem>
-#include <string>
-
 #include "Logger.h"
+#include "Utils.h"
 #include "ClockUtil.h"
 #include "ImageRecognitionResults.h"
 
@@ -37,13 +36,6 @@ class FrameSave {
 
  private:
   FrameSave();  // インスタンス化の禁止
-
-  /**
-   * @brief 値をint型にキャストして文字列に変換するヘルパー関数
-   * @param value 変換する値
-   * @return std::string 変換後の文字列
-   */
-  static std::string toStrInt(double value);
 };
 
 #endif  // FRAME_SAVE_H

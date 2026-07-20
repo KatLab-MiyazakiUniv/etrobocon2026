@@ -25,6 +25,11 @@ class Rotation : public BaseMotion {
   double targetAngle;  // 回頭制御で使用する目標角度(°)
 
   /**
+   * @brief 動作を開始する前に必要な準備を行う
+   */
+  virtual void prepare() override;
+
+  /**
    * @brief 回頭動作を1ステップ実行する
    */
   void executeStep() override;

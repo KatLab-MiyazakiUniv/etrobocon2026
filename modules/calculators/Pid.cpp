@@ -53,7 +53,7 @@ void Pid::setInitTime()
 
 double Pid::calculatePid(double currentValue)
 {
-  if(prevTime < 0) {
+  if(prevTime <= 0) {
     prevTime = ClockUtil::now();
   }
   // 現在の時間を取得

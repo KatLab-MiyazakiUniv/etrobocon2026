@@ -39,6 +39,8 @@ void Straight::prepare()
   if(shouldUseIMU) {
     targetAngle = robot.getIMUControllerInstance().getAzimuth();
   }
+
+  anglePid.setInitTime();
 }
 
 void Straight::executeStep()

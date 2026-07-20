@@ -15,6 +15,7 @@ Pid::Pid(double _kp, double _ki, double _kd, double _targetValue, double _maxInt
 {
 }
 
+// カメラトラッキングはこれだけど
 Pid::Pid(double _kp, double _ki, double _kd, double _targetValue)
   : Pid(_kp, _ki, _kd, _targetValue, 100.0, -100.0)
 {
@@ -67,16 +68,20 @@ double Pid::calculatePid(double currentValue)
   if(delta <= 0) delta = 0.01;
 
   // 現在の目標値との偏差を求める
+  // 10
   double currentDeviation = targetValue - currentValue;
   // 積分の処理を行う
   integral += (currentDeviation + prevDeviation) * delta / 2.0;
-  // 累積する積分値の大きさ制限
+  // 累積する積分値の大きさ制限>蓄積してるので偏差が1度だけマイナスになるだけでなく、連続してマイナスにならなければ逆方向に転換しない。
+  // >最大値を下げることで,安定性が下がる代わりにコースを外れた後の復旧のための逆方向の転換の応答速度が上がる。
+  // maxIntegral=100
   if(integral > maxIntegral) {
     integral = maxIntegral;
   } else if(integral < minIntegral) {
+    // minIntegral=-100
     integral = minIntegral;
   }
-  // 微分の処理を行う
+  // 微分の処理を行う>
   double currentDerivative = (currentDeviation - prevDeviation) / delta;
   /**
    * 微分項にローパスフィルタを適用

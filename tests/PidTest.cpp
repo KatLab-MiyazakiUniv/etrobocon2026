@@ -57,6 +57,7 @@ namespace etrobocon2026_test {
   TEST(PidTest, CalculatePid)
   {
     Pid actualPid(1.0, 0.02, 0.0075, 70.0, 100.0, -100.0);
+    actualPid.setInitTime();
     double currentValue = 20.0;
 
     /** 計算過程
@@ -81,6 +82,7 @@ namespace etrobocon2026_test {
   TEST(PidTest, CalculatePidGainZero)
   {
     Pid actualPid(0.0, 0.0, 0.0, 70.0, 100.0, -100.0);
+    actualPid.setInitTime();
     double currentValue = 20.0;
     /** 計算過程
      * 1. 前回の誤差
@@ -100,57 +102,11 @@ namespace etrobocon2026_test {
     EXPECT_DOUBLE_EQ(expected, actualPid.calculatePid(currentValue));
   }
 
-  // 周期がデフォルト値 (0.01) 以外かつ正常な値の場合に正しく計算できるかのテスト
-  TEST(PidTest, CalculatePidChangeDelta)
-  {
-    double delta = 0.03;
-    Pid actualPid(0.6, 0.02, 0.03, 70.0, 100.0, -100.0);
-    double currentValue = 55.0;
-    /** 計算過程
-     * 1. 前回の誤差
-     * prevDeviation = 0
-     * 2. 現在の誤差
-     * currentDeviation = (70 - 55) = 15
-     * 3. 誤差の積分を計算
-     * integral = 0 + (15 + 0) * 0.03 / 2 = 0.225
-     * 4. 微分の処理を行う
-     * currentDerivative = (15 - 0) / 0.03 = 500
-     *  4.1 微分項にローパスフィルタを適用
-     * filteredDerivative = 0.8 * 500 + (1 - 0.8) * 0 = 400
-     * 5. PID制御を計算
-     * expected = 0.6 * 15 + 0.02 * 0.225 + 0.03 * 400 = 21.0045
-     */
-    double expected = 21.0045;
-    EXPECT_DOUBLE_EQ(expected, actualPid.calculatePid(currentValue, delta));
-  }
-
-  // 周期に0を渡したとき、内部でデフォルトの0.01が使用されるかをテスト
-  TEST(PidTest, CalculatePidChangeDeltaZero)
-  {
-    Pid actualPid(0.6, 0.02, 0.03, 70.0, 100.0, -100.0);
-    double currentValue = 55.0;
-    /** 計算過程
-     * 1. 前回の誤差
-     * prevDeviation = 0
-     * 2. 現在の誤差
-     * currentDeviation = (70 - 55) = 15
-     * 3. 誤差の積分を計算
-     * integral = 0 + (15 + 0) * 0.01 / 2 = 0.075
-     * 4. 微分の処理を行う
-     * currentDerivative = (15 - 0) / 0.01 = 1500
-     *  4.1 微分項にローパスフィルタを適用
-     * filteredDerivative = 0.8 * 1500 + (1 - 0.8) * 0 = 1200
-     * 5. PID制御を計算
-     * expected = 0.6 * 15 + 0.02 * 0.075 + 0.03 * 1200 = 45.0015
-     */
-    double expected = 45.0015;
-    EXPECT_DOUBLE_EQ(expected, actualPid.calculatePid(currentValue, 0.0));
-  }
-
   // setPidGainでゲイン変更後にPID計算が新しいゲインを使用しているかをテスト
   TEST(PidTest, CalculatePidAfterSetNewGain)
   {
     Pid actualPid(0.6, 0.05, 0.01, 70.0, 100.0, -100.0);
+    actualPid.setInitTime();
     double prevValue = 60.0;
     /** 計算過程
      * 1. 前回の誤差

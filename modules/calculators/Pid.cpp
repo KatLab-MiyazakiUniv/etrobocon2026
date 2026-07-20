@@ -53,6 +53,9 @@ void Pid::setInitTime()
 
 double Pid::calculatePid(double currentValue)
 {
+  if(prevTime < 0) {
+    prevTime = ClockUtil::now();
+  }
   // 現在の時間を取得
   double currentTime = ClockUtil::now();
   // 周期を計算
@@ -61,7 +64,7 @@ double Pid::calculatePid(double currentValue)
   prevTime = currentTime;
 
   // 0除算を避けるために delta=0 の場合はデフォルト周期0.01とする
-  if(delta == 0) delta = 0.01;
+  if(delta < 0) delta = 0.01;
 
   // 現在の目標値との偏差を求める
   double currentDeviation = targetValue - currentValue;

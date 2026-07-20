@@ -39,11 +39,6 @@ class LineTrace : public BaseMotion {
   void prepare() override;
 
   /**
-   * @brief 動作を開始する前に必要な準備を行う
-   */
-  virtual void prepare() override;
-
-  /**
    * @brief 1周期分の動作を実行する
    */
   void executeStep() override;

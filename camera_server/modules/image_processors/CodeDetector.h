@@ -7,6 +7,7 @@
 #ifndef CODE_DETECTOR_H
 #define CODE_DETECTOR_H
 
+// opencvの基本的な画像処理や構造体定義のライブラリ
 #include <opencv2/core.hpp>
 
 template <typename TResult>

@@ -55,7 +55,8 @@ class Pid {
   /**
    * @brief PIDを計算する
    * @param currentValue 現在値
-   * @param delta 周期[ms](デフォルト値0.01[10ms]、省略可)
+   * @param delta
+   * 周期[ms](デフォルト値0.01[10ms]、省略可)>渡会さんが言ってた,要修正の引数(他のブランチで修正済み)>default値なんて入れるな>SpeedCalculator()では、デフォルト値を使用してる部分はないけど..>
    * @return PIDの計算結果(操作量)
    */
   double calculatePid(double currentValue, double delta = defaultDelta);

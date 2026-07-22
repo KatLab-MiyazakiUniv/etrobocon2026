@@ -114,3 +114,13 @@ int Robot::getTargetBrightness() const
 {
   return targetBrightness;
 }
+
+const CameraServer::HSVRangeData Robot::getHsvRangeOfLabel() const
+{
+  return hsvRangeOfLabel;
+}
+
+void Robot::setHsvRangeOfLabel(CameraServer::HSVRangeData _hsvRangeOfLabel)
+{
+  hsvRangeOfLabel = _hsvRangeOfLabel;
+}

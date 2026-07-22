@@ -13,6 +13,10 @@
 #include "ColorSensorController.h"
 #include "UltraSonicController.h"
 #include "SocketClient.h"
+
+// 走行プログラムには、そんなファイルない,,定義をcommonに移動するか?データ型をSocketProtcolの定義し、変換するようにする?
+// #include "ColorRegionDetector.h"
+
 #include "Course.h"
 #include "Button.h"
 #include "ForceSensor.h"
@@ -139,6 +143,18 @@ class Robot {
    */
   int getTargetBrightness() const;
 
+  /**
+   * @brief ボトルキャリーで取得した色範囲を返す
+   * @return hsvRangeOfLabel ボトルキャリーで取得した色範囲
+   */
+  const CameraServer::HSVRangeData getHsvRangeOfLabel() const;
+
+  /**
+   * @brief ボトルキャリーで取得した色範囲を設定する
+   * @param hsvRangeOfLabel ボトルキャリーで取得した色範囲
+   */
+  void setHsvRangeOfLabel(CameraServer::HSVRangeData _hsvRangeOfLabel);
+
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
   ArmMotorController armMotorController;        // ArmMotorController インスタンス
@@ -154,5 +170,6 @@ class Robot {
   spikeapi::Display display;                    // Displayインスタンス
   char decryptionKey[5] = { 0 };                // 復号キー
   int targetBrightness = 50;                    // 目標輝度
+  CameraServer::HSVRangeData hsvRangeOfLabel;   // ボトルキャリーで取得した色範囲
 };
 #endif

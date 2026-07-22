@@ -56,6 +56,12 @@ void CameraTracking::executeStep()
     return;
   }
 
+  // 最大面積の色範囲取得
+  if(detectionRequest.requireLargestColorIndex) {
+    Logger::printfLog(Logger::INFO, "CameraTracking:インデックスは%d", response.largestColorIndex);
+    robot.setHsvRangeOfLabel(detectionRequest.hsvRanges[response.largestColorIndex]);
+  }
+
   // バウンディングボックスの中心X座標を計算
   double currentX = (response.result.topLeft.x + response.result.bottomRight.x) / 2.0;
 

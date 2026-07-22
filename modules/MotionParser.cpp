@@ -271,7 +271,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
     }
     case MOTION_COMMAND::CAMERA_TRACKING: {
       CameraServer::ColorRegionDetectorRequest request;
-      request.requireLargestColorIndex = false;
+      request.requireLargestColorIndex = formString<bool>(motionParams[12]);
       request.hsvRangeCount = 1;
       request.hsvRanges[0].lower = { 0, 0, 0 };
       request.hsvRanges[0].upper = { 179, 255, 30 };

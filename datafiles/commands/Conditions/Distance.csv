@@ -1,9 +1,9 @@
 コマンド名,ID,距離
 Distance,ID,double
 # 第一、二直線
-Distance,001,10000
-Distance,002,1500
-Distance,003,380
+Distance,001,10
+Distance,002,50
+Distance,003,100
 Distance,004,2307
 Distance,005,900
 Distance,006,1400

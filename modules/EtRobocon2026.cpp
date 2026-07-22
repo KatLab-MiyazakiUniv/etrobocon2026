@@ -26,8 +26,12 @@ void EtRobocon2026::start()
   robot.setCourse(Course::Left);
   // robot.setEdge(Edge::LeftEdge);
   robot.setEdge(Edge::RightEdge);
-  Area lineTraceArea = Area::LineTrace;
-  AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
-  lineTraceAreaMaster.run();
+  // Area lineTraceArea = Area::LineTrace;
+  // lineTraceAreaMaster.run();
+
+  Area redArea = Area::Red;
+  AreaMaster redAreaMaster(robot, redArea);
+  redAreaMaster.run();
+
   CsvLogger::outputToFile();
 }

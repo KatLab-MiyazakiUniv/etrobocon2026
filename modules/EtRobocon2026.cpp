@@ -29,9 +29,20 @@ void EtRobocon2026::start()
   // Area lineTraceArea = Area::LineTrace;
   // lineTraceAreaMaster.run();
 
-  Area redArea = Area::Red;
-  AreaMaster redAreaMaster(robot, redArea);
-  redAreaMaster.run();
+  if(robot.getIndexOfLabel() == 2) {
+    Area yellowArea = Area::Yellow;
+    AreaMaster carryAreaMaster(robot, yellowArea);
+    carryAreaMaster.run();
+  } else if(robot.getIndexOfLabel() == 1) {
+    Area blueArea = Area::Blue;
+    AreaMaster carryAreaMaster(robot, blueArea);
+    carryAreaMaster.run();
+
+  } else {
+    Area redArea = Area::Red;
+    AreaMaster carryAreaMaster(robot, redArea);
+    carryAreaMaster.run();
+  }
 
   CsvLogger::outputToFile();
 }

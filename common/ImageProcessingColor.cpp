@@ -1,7 +1,7 @@
 /**
  * @file ImageProcessingColor.cpp
  * @brief 画像処理で使用する色定義とHSV変換処理
- * @author takuchi17
+ * @author takuchi17 sadomiy-asousi
  */
 
 #include "ImageProcessingColor.h"

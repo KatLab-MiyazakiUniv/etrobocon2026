@@ -1,6 +1,5 @@
 #include <opencv2/imgcodecs.hpp>
 #include "CameraCapture.h"
-#include "Decode.h"
 #include "FrameSave.h"
 #include "Logger.h"
 #include "QrCodeDetector.h"

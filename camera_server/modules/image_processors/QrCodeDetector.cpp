@@ -69,6 +69,12 @@ QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
   cv::adaptiveThreshold(sharpened, binary, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY,
                         21, 10);
 
+  cv::imwrite("rectifiedFrame.png", rectifiedFrame);
+  cv::imwrite("gray.png", gray);
+  cv::imwrite("binary.png", binary);
+
+  Logger::info("Debug images saved.");
+
   // 正面化したフレームをデコード
   Logger::info("4");
   ZXing::ImageView iv(binary.data, binary.cols, binary.rows, ZXing::ImageFormat::Lum,

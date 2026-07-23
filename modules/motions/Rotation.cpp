@@ -16,7 +16,7 @@ Rotation::Rotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _co
 
 void Rotation::prepare()
 {
-  anglePid.setInitTime();
+  anglePid.prepare();
 }
 
 /**

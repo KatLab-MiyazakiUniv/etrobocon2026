@@ -144,16 +144,16 @@ class Robot {
   int getTargetBrightness() const;
 
   /**
-   * @brief ボトルキャリーで取得した色範囲を返す
-   * @return hsvRangeOfLabel ボトルキャリーで取得した色範囲
+   * @brief ボトルキャリーで取得した色範囲のインデックス設定する
+   * @param _indexOfLabel ボトルキャリーで取得した色範囲のインデックス
    */
-  const CameraServer::HSVRangeData getHsvRangeOfLabel() const;
+  void setIndexOfLabel(int _indexOfLabel);
 
   /**
-   * @brief ボトルキャリーで取得した色範囲を設定する
-   * @param hsvRangeOfLabel ボトルキャリーで取得した色範囲
+   * @brief ボトルキャリーで取得した色範囲のインデックス設定する
+   * @return indexOfLabel ボトルキャリーで取得した色範囲のインデックス
    */
-  void setHsvRangeOfLabel(CameraServer::HSVRangeData _hsvRangeOfLabel);
+  int getIndexOfLabel();
 
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス

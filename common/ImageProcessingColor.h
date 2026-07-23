@@ -1,12 +1,13 @@
 /**
  * @file ImageProcessingColor.h
  * @brief 画像処理で使用する色定義とHSV変換処理
- * @author takuchi17
+ * @author takuchi17 sadomiya-sousi
  */
 
 #ifndef IMAGE_PROCESSING_COLOR_H
 #define IMAGE_PROCESSING_COLOR_H
 
+#include <vector>
 #include "SocketProtocol.h"
 
 /**
@@ -26,6 +27,13 @@ class ImageProcessingColor {
     GRAY,    // 灰(正確な値が不明なので0)
     WHITE    // 白(正確な値が不明なので0)
   };
+
+  /**
+   * @brief 赤、青、黄、黒のHSV範囲を持つ構造体
+   */
+  const std::vector<CameraServer::HSVRangeData> BottleColors
+      = { getHSVRangeFromColor(RED), getHSVRangeFromColor(BLUE), getHSVRangeFromColor(YELLOW),
+          getHSVRangeFromColor(BLACK) };
 
   /**
    * @brief 色に対応するHSV範囲を取得する

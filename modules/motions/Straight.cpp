@@ -40,7 +40,7 @@ void Straight::prepare()
     targetAngle = robot.getIMUControllerInstance().getAzimuth();
   }
 
-  anglePid.setInitTime();
+  anglePid.prepare();
 }
 
 void Straight::executeStep()

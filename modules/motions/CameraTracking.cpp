@@ -39,7 +39,7 @@ bool CameraTracking::canStart()
 
 void CameraTracking::prepare()
 {
-  cameraPid.setInitTime();
+  cameraPid.prepare();
 }
 
 void CameraTracking::executeStep()

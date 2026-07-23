@@ -57,7 +57,7 @@ namespace etrobocon2026_test {
   TEST(PidTest, CalculatePid)
   {
     Pid actualPid(1.0, 0.02, 0.0075, 70.0, 100.0, -100.0);
-    actualPid.setInitTime();
+    actualPid.prepare();
     double currentValue = 20.0;
 
     /** 計算過程
@@ -82,7 +82,7 @@ namespace etrobocon2026_test {
   TEST(PidTest, CalculatePidGainZero)
   {
     Pid actualPid(0.0, 0.0, 0.0, 70.0, 100.0, -100.0);
-    actualPid.setInitTime();
+    actualPid.prepare();
     double currentValue = 20.0;
     /** 計算過程
      * 1. 前回の誤差
@@ -106,7 +106,7 @@ namespace etrobocon2026_test {
   TEST(PidTest, CalculatePidAfterSetNewGain)
   {
     Pid actualPid(0.6, 0.05, 0.01, 70.0, 100.0, -100.0);
-    actualPid.setInitTime();
+    actualPid.prepare();
     double prevValue = 60.0;
     /** 計算過程
      * 1. 前回の誤差

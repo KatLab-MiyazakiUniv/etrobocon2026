@@ -1,100 +1,72 @@
 /**
  * @file   GoalNavigation.h
- * @brief 目標座標まで移動するクラス
+ * @brief  目標地点への回頭と直進を実行するクラス
  * @author yutaro-1214
  */
 
 #ifndef GOAL_NAVIGATION_H
 #define GOAL_NAVIGATION_H
 
-#include <memory>
-
-#include "AngleNormalizer.h"
-#include "BaseContinuationCondition.h"
 #include "BaseMotion.h"
+#include "Navigator.h"
+#include "AbsoluteRotation.h"
+#include "AbsoluteAngleContinuationCondition.h"
+#include "Straight.h"
+#include "DistanceCondition.h"
 #include "Pid.h"
-#include "SpeedCalculator.h"
+#include "Logger.h"
 
-/**
- * @brief 目標座標まで移動する動作クラス
- *
- * 動作は以下の2段階で行う。
- * 1. 目標地点の方向へその場回頭
- * 2. 目標地点まで方位補正しながら直進
- *
- * 終了判定は GoalDistanceCondition が行う。
- */
 class GoalNavigation : public BaseMotion {
  public:
   /**
    * @brief コンストラクタ
-   * @param _robot Robotクラス
-   * @param _continuationCondition 継続条件
-   * @param _goalX 目標X座標(mm)
-   * @param _goalY 目標Y座標(mm)
-   * @param _targetSpeed 目標速度(mm/s)
-   * @param _rightPid 右モータ速度PID
-   * @param _leftPid 左モータ速度PID
-   * @param _anglePidGain 方位制御PID
+   * @param _robot ロボットクラスのインスタンス
+   * @param _continuationCondition GoalNavigation全体の継続条件
+   * @param _targetX 目標地点のX座標[mm]
+   * @param _targetY 目標地点のY座標[mm]
+   * @param _targetSpeed 直進時の目標速度[mm/s]
+   * @param _rotationPid 回頭制御用PIDゲイン
+   * @param _rightPid 右タイヤ速度制御用PIDゲイン
+   * @param _leftPid 左タイヤ速度制御用PIDゲイン
+   * @param _straightAnglePid 直進時の角度制御用PIDゲイン
    */
   GoalNavigation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                 double _goalX, double _goalY, double _targetSpeed, const Pid::PidGain& _rightPid,
-                 const Pid::PidGain& _leftPid, const Pid::PidGain& _anglePidGain);
+                 double _targetX, double _targetY, double _targetSpeed,
+                 const Pid::PidGain& _rotationPid, const Pid::PidGain& _rightPid,
+                 const Pid::PidGain& _leftPid, const Pid::PidGain& _straightAnglePid);
 
-  /**
-   * @brief デストラクタ
-   */
   ~GoalNavigation();
 
  protected:
   /**
-   * @brief 動作開始前の確認
-   * @return true:開始可能 false:開始不可
-   */
-  bool canStart() override;
-
-  /**
-   * @brief 動作開始前の準備
+   * @brief 目標地点までの距離と方位角を計算する
    */
   void prepare() override;
 
   /**
-   * @brief 1周期分の制御
+   * @brief 回頭と直進を実行する
    */
   void executeStep() override;
 
   /**
-   * @brief 動作終了処理
+   * @brief 動作終了時にモーターを停止する
    */
   void finish() override;
 
  private:
-  /**
-   * @brief 動作状態
-   */
-  enum class State {
-    ROTATE,   ///< その場回頭
-    STRAIGHT  ///< 直進
-  };
+  Navigator& navigator;
 
-  State state;
-
-  double goalX;
-  double goalY;
-
+  double targetX;
+  double targetY;
   double targetSpeed;
 
-  /// 回頭・方位補正用PID
-  Pid anglePid;
+  double targetDistance;
+  double targetHeading;
 
-  /// 左右速度PID計算
-  SpeedCalculator speedCalculator;
-
-  /// 現在向くべき目標角度
-  double targetAngle;
-
-  /// 回頭完了と判定する角度誤差(°)
-  static constexpr double ANGLE_TOLERANCE = 2.0;
+  Pid::PidGain rotationPid;
+  Pid::PidGain rightPid;
+  Pid::PidGain leftPid;
+  Pid::PidGain straightAnglePid;
 };
 
-#endif
+#endif  // GOAL_NAVIGATION_H

@@ -54,9 +54,9 @@ class Pid {
   void setPidGain(double _kp, double _ki, double _kd);
 
   /**
-   * @brief Pidの初回呼び出し時間を取得する
+   * @brief Pidの初回呼び出し時間を設定する
    */
-  void setInitTime();
+  void prepare();
 
   /**
    * @brief PIDを計算する

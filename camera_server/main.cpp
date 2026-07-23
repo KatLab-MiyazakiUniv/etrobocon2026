@@ -1,4 +1,3 @@
-```markdown
 #include <opencv2/imgcodecs.hpp>
 #include "CameraCapture.h"
 #include "Decode.h"
@@ -66,5 +65,3 @@ int main()
   Logger::outputToFile();
   return 0;
 }
-
-```

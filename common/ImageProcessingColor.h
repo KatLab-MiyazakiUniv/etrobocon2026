@@ -32,8 +32,10 @@ class ImageProcessingColor {
    * @brief 赤、青、黄、黒のHSV範囲を持つ構造体
    */
   const std::vector<CameraServer::HSVRangeData> BottleColors
-      = { getHSVRangeFromColor(RED), getHSVRangeFromColor(BLUE), getHSVRangeFromColor(YELLOW),
-          getHSVRangeFromColor(BLACK) };
+      = { RED_HSV, BLUE_HSV, YELLOW_HSV, BLACK_HSV };
+  // const std::vector<CameraServer::HSVRangeData> BottleColors
+  //     = { getHSVRangeFromColor(RED), getHSVRangeFromColor(BLUE), getHSVRangeFromColor(YELLOW),
+  //         getHSVRangeFromColor(BLACK) };
 
   /**
    * @brief 色に対応するHSV範囲を取得する

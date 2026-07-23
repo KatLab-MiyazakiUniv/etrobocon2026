@@ -8,7 +8,9 @@
 #define ETROBOCON2026_H
 
 #include <iostream>
-#include "Logger.h"
+#include "Straight.h"
+#include "DistanceCondition.h"
+#include "Robot.h"
 
 class EtRobocon2026 {
  public:

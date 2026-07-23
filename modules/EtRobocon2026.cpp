@@ -1,39 +1,67 @@
+/**
+ * @file   EtRobocon2026.cpp
+ * @brief  全体を制御するクラス
+ * @author HaruArima08
+ */
+
+#include "EtRobocon2026.h"
+#include "Robot.h"
+#include "SocketClient.h"
+#include "RealNetworkSystem.h"
+#include "Straight.h"
+#include "DistanceCondition.h"
+#include "Pid.h"
+
+
 void EtRobocon2026::start()
 {
   Logger::info("Hello KATLAB");
 
+
   RealNetworkSystem real;
+
   SocketClient client(real);
 
   Robot robot(client);
 
-  robot.getCameraSocketClientInstance().connectToServer();
 
-
-  Pid::PidGain camPid{0.002, 0.0005, 0.001};
-  Pid::PidGain rightPid{0.00535, 0.00115, 0.00};
-  Pid::PidGain leftPid{0.00578, 0.0008535, 0.00};
-
-
-  CameraServer::ColorRegionDetectorRequest request;
-  request.requireLargestColorIndex = true;
-  request.hsvRangeCount = 1;
-  request.hsvRanges[0].lower = {0,0,0,0};
-  request.hsvRanges[0].upper = {180,255,30,0};
-  request.roi = {0,0,1920,1080};
-  request.resolution = {1920,1080};
-
-
-  CameraTracking cameraTracking(
-      robot,
-      std::make_unique<DistanceCondition>(robot,1500.0),
-      300.0,
-      960,
-      camPid,
-      rightPid,
-      leftPid,
-      request
+  // PID設定
+  Pid::PidGain rightPid(
+      0.016,
+      0.005,
+      0.0015
   );
 
-  cameraTracking.run();
+  Pid::PidGain leftPid(
+      0.016,
+      0.0045,
+      0.0015
+  );
+
+  Pid::PidGain anglePid(
+      0.036,
+      0.012,
+      0.03
+  );
+
+
+  // 指定距離だけ直進
+  Straight straight(
+      robot,
+      std::make_unique<DistanceCondition>(
+          robot,
+          1000.0   // mm
+      ),
+      300,       // 速度
+      rightPid,
+      leftPid,
+      anglePid,
+      true
+  );
+
+
+  straight.run();
+
+
+  Logger::info("Straight finished");
 }

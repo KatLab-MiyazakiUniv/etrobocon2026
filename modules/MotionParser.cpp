@@ -270,21 +270,32 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                                          fromString<double>(motionParams[6]) });
     }
     case MOTION_COMMAND::CAMERA_TRACKING: {
+      Logger::info("1");
       CameraServer::ColorRegionDetectorRequest request;
+      Logger::info("2");
       request.requireLargestColorIndex = fromString<bool>(motionParams[12]);
+      Logger::info("3");
       request.hsvRangeCount = 1;
+      Logger::info("4");
       // request.hsvRanges[0].lower = { 0, 0, 0 };
       // request.hsvRanges[0].upper = { 179, 255, 30 };
       // request.hsvRanges = ImageProcessingColor::BottleColors;
+      Logger::info("5");
       request.hsvRanges[0] = ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::RED);
+      Logger::info("6");
       request.hsvRanges[1] = ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::BLUE);
+      Logger::info("7");
       request.hsvRanges[2]
           = ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::YELLOW);
+      Logger::info("8");
       request.hsvRanges[3]
           = ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::BLACK);
+
+      Logger::info("9");
       request.roi = { fromString<int>(motionParams[8]), fromString<int>(motionParams[9]),
                       fromString<int>(motionParams[10]), fromString<int>(motionParams[11]) };
 
+      Logger::info("10");
       int targetXCoordinate = fromString<int>(motionParams[3]);
 
       Logger::printfLog(Logger::DEBUG,

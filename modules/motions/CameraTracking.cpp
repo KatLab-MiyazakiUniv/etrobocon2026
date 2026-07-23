@@ -52,7 +52,10 @@ void CameraTracking::executeStep()
 
   // 通信失敗、または検出できなかった場合は、出力を更新せずに終了する
   if(!success || !response.result.wasDetected) {
-    Logger::warning("CameraTracking:色領域が検出されませんでした");
+    Logger::printfLog(
+        Logger::DEBUG,
+        "CameraTracking:色領域が検出されませんでした。success:%d  response.result.wasDetected:%d",
+        success, response.result.wasDetected);
     return;
   }
 

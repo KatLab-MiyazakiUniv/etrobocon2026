@@ -17,12 +17,11 @@ namespace {
 
 }  // namespace
 
-GoalNavigation::GoalNavigation(Robot& _robot,
-                               std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+GoalNavigation::GoalNavigation(Robot& _robot, std::unique_ptr<BaseCondition> _Condition,
                                double _targetX, double _targetY, double _targetSpeed,
                                const Pid::PidGain& _rotationPid, const Pid::PidGain& _rightPid,
                                const Pid::PidGain& _leftPid, const Pid::PidGain& _straightAnglePid)
-  : BaseMotion(_robot, std::move(_continuationCondition)),
+  : BaseMotion(_robot, std::move(_Condition)),
     navigator(_robot.getNavigatorInstance()),
     targetX(_targetX),
     targetY(_targetY),
@@ -71,8 +70,8 @@ void GoalNavigation::executeStep()
    * 目標方向との角度差が許容誤差より大きい場合だけ回頭する。
    */
   if(std::abs(angleDifference) > ROTATION_TOLERANCE) {
-    auto rotationCondition = std::make_unique<AbsoluteAngleContinuationCondition>(
-        robot, targetHeading, ROTATION_TOLERANCE);
+    auto rotationCondition
+        = std::make_unique<AbsoluteAngleCondition>(robot, targetHeading, ROTATION_TOLERANCE);
 
     AbsoluteRotation rotation(robot, std::move(rotationCondition), rotationPid, targetHeading);
 

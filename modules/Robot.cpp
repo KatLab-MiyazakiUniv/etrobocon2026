@@ -118,17 +118,17 @@ int Robot::getTargetBrightness() const
   return targetBrightness;
 }
 
-Position& Robot::getPosition()
+Position& Robot::getPositionInstance()
 {
   return position;
 }
 
-Odometry& Robot::getOdometry()
+Odometry& Robot::getOdometryInstance()
 {
   return odometry;
 }
 
-Navigator& Robot::getNavigator()
+Navigator& Robot::getNavigatorInstance()
 {
   return navigator;
 }

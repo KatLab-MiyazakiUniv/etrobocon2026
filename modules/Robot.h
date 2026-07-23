@@ -76,19 +76,19 @@ class Robot {
    * @brief Positionのインスタンスの参照を返す
    * @return メンバ変数 Position(Position のインスタンス) の参照
    */
-  Position& getPosition();
+  Position& getPositionInstance();
 
   /**
    * @brief Odometryのインスタンスの参照を返す
    * @return メンバ変数 Odometry(Odometry のインスタンス) の参照
    */
-  Odometry& getOdometry();
+  Odometry& getOdometryInstance();
 
   /**
    * @brief Navigatorのインスタンスの参照を返す
    * @return メンバ変数 Navigator(Navigator のインスタンス) の参照
    */
-  Navigator& getNavigator();
+  Navigator& getNavigatorInstance();
 
   /**
    * @brief コースを設定する

@@ -10,7 +10,7 @@
 #include "BaseMotion.h"
 #include "Navigator.h"
 #include "AbsoluteRotation.h"
-#include "AbsoluteAngleContinuationCondition.h"
+#include "AbsoluteAngleCondition.h"
 #include "Straight.h"
 #include "DistanceCondition.h"
 #include "Pid.h"
@@ -21,7 +21,7 @@ class GoalNavigation : public BaseMotion {
   /**
    * @brief コンストラクタ
    * @param _robot ロボットクラスのインスタンス
-   * @param _continuationCondition GoalNavigation全体の継続条件
+   * @param _Condition GoalNavigation全体の継続条件
    * @param _targetX 目標地点のX座標[mm]
    * @param _targetY 目標地点のY座標[mm]
    * @param _targetSpeed 直進時の目標速度[mm/s]
@@ -30,10 +30,10 @@ class GoalNavigation : public BaseMotion {
    * @param _leftPid 左タイヤ速度制御用PIDゲイン
    * @param _straightAnglePid 直進時の角度制御用PIDゲイン
    */
-  GoalNavigation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                 double _targetX, double _targetY, double _targetSpeed,
-                 const Pid::PidGain& _rotationPid, const Pid::PidGain& _rightPid,
-                 const Pid::PidGain& _leftPid, const Pid::PidGain& _straightAnglePid);
+  GoalNavigation(Robot& _robot, std::unique_ptr<BaseCondition> _Condition, double _targetX,
+                 double _targetY, double _targetSpeed, const Pid::PidGain& _rotationPid,
+                 const Pid::PidGain& _rightPid, const Pid::PidGain& _leftPid,
+                 const Pid::PidGain& _straightAnglePid);
 
   ~GoalNavigation();
 

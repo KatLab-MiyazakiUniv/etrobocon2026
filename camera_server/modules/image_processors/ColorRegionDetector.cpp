@@ -21,7 +21,8 @@ ColorRegionDetector::ColorRegionDetector(
 
   // 各HSVレンジの中身も詳細に見たい場合
   for(size_t i = 0; i < hsvRanges.size(); ++i) {
-    Logger::printfLog(Logger::DEBUG, "  [%d] lower(H:%d, S:%d, V:%d) ~ upper(H:%d, S:%d,V:%d)", i,
+    Logger::printfLog(Logger::DEBUG,
+                      "  [%d] lower(H:%lf, S:%lf, V:%lf) ~ upper(H:%lf, S:%lf,V:%lf)", i,
                       hsvRanges[i].lower[0], hsvRanges[i].lower[1], hsvRanges[i].lower[2],
                       hsvRanges[i].upper[0], hsvRanges[i].upper[1], hsvRanges[i].upper[2]);
   }
@@ -39,7 +40,24 @@ const std::vector<ColorRegionDetector::HSVRange>& ColorRegionDetector::getHsvRan
 
 void ColorRegionDetector::setHsvRanges(const std::vector<ColorRegionDetector::HSVRange>& _hsvRanges)
 {
+  Logger::debug(
+      "##################################################代入前##############################");
+  for(size_t i = 0; i < hsvRanges.size(); ++i) {
+    Logger::printfLog(Logger::DEBUG,
+                      "  [%d] lower(H:%lf, S:%lf, V:%lf) ~ upper(H:%lf, S:%lf,V:%lf)", i,
+                      hsvRanges[i].lower[0], hsvRanges[i].lower[1], hsvRanges[i].lower[2],
+                      hsvRanges[i].upper[0], hsvRanges[i].upper[1], hsvRanges[i].upper[2]);
+  }
   hsvRanges = _hsvRanges;
+
+  Logger::debug(
+      "##################################################代入後##############################");
+  for(size_t i = 0; i < hsvRanges.size(); ++i) {
+    Logger::printfLog(Logger::DEBUG,
+                      "  [%d] lower(H:%lf, S:%lf, V:%lf) ~ upper(H:%lf, S:%lf,V:%lf)", i,
+                      hsvRanges[i].lower[0], hsvRanges[i].lower[1], hsvRanges[i].lower[2],
+                      hsvRanges[i].upper[0], hsvRanges[i].upper[1], hsvRanges[i].upper[2]);
+  }
 }
 
 void ColorRegionDetector::setRoi(const cv::Rect& _roi)

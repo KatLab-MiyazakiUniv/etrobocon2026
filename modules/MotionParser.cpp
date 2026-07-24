@@ -468,6 +468,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
           Pid::PidGain(fromString<double>(motionParams[4]), fromString<double>(motionParams[5]),
                        fromString<double>(motionParams[6])),
           request, fromString<bool>(motionParams[7]));
+      // ここでCameraTrackigのメンバ変数のdetectorのメンバ変数のhsvRangesをセットする
     }
     case MOTION_COMMAND::ABSOLUTE_ROTATION: {
       // AbsoluteRotation:

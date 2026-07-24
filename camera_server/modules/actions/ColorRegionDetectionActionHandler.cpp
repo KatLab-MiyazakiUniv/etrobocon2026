@@ -8,7 +8,8 @@
 
 ColorRegionDetectionActionHandler::ColorRegionDetectionActionHandler(CameraCapture& _camera)
   : camera(_camera),
-    detector({ { cv::Scalar(0, 0, 0, 0), cv::Scalar(180, 255, 30, 0) } },
+    // detector({ { cv::Scalar(0, 0, 0, 0), cv::Scalar(180, 255, 30, 0) } },
+    detector({ { cv::Scalar(0, 0, 0, 0), cv::Scalar(255, 255, 255, 255) } },
              cv::Rect(0, 0, 1920, 1080))
 {
   LOG_CREATE("ColorRegionDetectionActionHandler");

@@ -46,7 +46,7 @@ void CameraTracking::executeStep()
   // 色領域検出処理の呼び出し。
   SocketClient& client = robot.getCameraSocketClientInstance();
   CameraServer::ColorRegionDetectorResponse response;
-  // run()の中でColorRegionDetectorインスタンスが繰り返し生死。インスタンスの生死のlogが重い処理>そうでもなかった>logの出力は軽い処理だった
+  // run()の中でColorRegionDetectorインスタンスが繰り返し生死。インスタンスの生死のlogが重い処理
   bool success = client.executeColorRegionDetection(detectionRequest, response);
 
   // 通信失敗、または検出できなかった場合は、出力を更新せずに終了する
@@ -58,7 +58,7 @@ void CameraTracking::executeStep()
   // バウンディングボックスの中心X座標を計算
   double currentX = (response.result.topLeft.x + response.result.bottomRight.x) / 2.0;
 
-  // 旋回値の計算>?>BoundingBoxの真ん中の座標をPidに入れてどうなるんだっけ?
+  // 旋回値の計算
   double turningPower = cameraPid.calculatePid(currentX) * -1;
 
   // モータのPower値をセット（前進の時0を下回らないように，後進の時0を上回らないようにセット）
@@ -73,15 +73,13 @@ void CameraTracking::executeStep()
 
 void CameraTracking::wait()
 {
-  // ClockUtil::sleep(30);  // カメラの撮影FPSに合わせて30ミリ秒待機する
+  ClockUtil::sleep(30);  // カメラの撮影FPSに合わせて30ミリ秒待機する
 }
 
 void CameraTracking::finish()
 {
   if(isStopMotorPower) {
     robot.getWheelMotorControllerInstance().stopBoth();
-    // robot.getWheelMotorControllerInstance().brakeBoth();
-    // robot.getWheelMotorControllerInstance().resetBothPower();
   }
 }
 

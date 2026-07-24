@@ -15,15 +15,16 @@
 class MultiThread {
  public:
   /**
-   * @brief 関数を別スレッドで実行するラッパー
+   * @brief 関数を別スレッドで実行するラッパー。関数呼び出しに0~1msかかる。
    * @param Func 関数オブジェクト
    * @param Args 関数オブジェクトを実行するための引数
    * @example
    *  静的メンバ関数の場合:
-   *   MultiThread::wrap([&]() { FrameSave::save(frame, filePath, fileName); });
+   *   MultiThread::wrap([=]() mutable { FrameSave::save(frame, filePath, fileName); });
    *  メンバ関数の場合:
-   *   MultiThread::wrap([&]() { インスタンス.メンバ関数(引数1, 引数2, 引数3,...); });
+   *   MultiThread::wrap([=]() mutable { インスタンス.メンバ関数(引数1, 引数2, 引数3,...); });
    */
+
   template <typename Func, typename... Args>
   static void wrap(Func&& func, Args&&... args)
   {

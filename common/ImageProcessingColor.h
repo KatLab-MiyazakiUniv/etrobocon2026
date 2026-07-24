@@ -37,6 +37,8 @@ class ImageProcessingColor {
   //     = { getHSVRangeFromColor(RED), getHSVRangeFromColor(BLUE), getHSVRangeFromColor(YELLOW),
   //         getHSVRangeFromColor(BLACK) };
 
+  // request.hsvRanges[0] = ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::RED);
+
   /**
    * @brief 色に対応するHSV範囲を取得する
    * @param color 画像処理用の色

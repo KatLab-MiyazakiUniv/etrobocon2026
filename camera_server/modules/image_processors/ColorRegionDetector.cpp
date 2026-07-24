@@ -12,6 +12,19 @@ ColorRegionDetector::ColorRegionDetector(
 {
   validateParameters();
   LOG_CREATE("ColorRegionDetector");
+
+  // --- ここでインスタンス化時の引数を出力する ---
+  Logger::debug("スパイクのボタンを押さなくても変更を反映");
+  Logger::printfLog(Logger::DEBUG,
+                    "ColorRegionDetector 生成: ROI [x=%d, y=%d, w=%d, h=%d], HSV範囲の数=%zu",
+                    roi.x, roi.y, roi.width, roi.height, hsvRanges.size());
+
+  // 各HSVレンジの中身も詳細に見たい場合
+  for(size_t i = 0; i < hsvRanges.size(); ++i) {
+    Logger::printfLog(Logger::DEBUG, "  [%d] lower(H:%d, S:%d, V:%d) ~ upper(H:%d, S:%d,V:%d)", i,
+                      hsvRanges[i].lower[0], hsvRanges[i].lower[1], hsvRanges[i].lower[2],
+                      hsvRanges[i].upper[0], hsvRanges[i].upper[1], hsvRanges[i].upper[2]);
+  }
 }
 
 ColorRegionDetector::~ColorRegionDetector()
@@ -120,13 +133,32 @@ bool ColorRegionDetector::detectBoundingBox(const cv::Mat& frame,
   cv::findContours(combinedMask.clone(), contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
   // 小さいノイズを除外して、一番大きい領域だけ選ぶ
+
   double maxArea = 0;
+  //?なぜか2が入ってる
+  Logger::printfLog(Logger::DEBUG, "maxAreaの値は:%lf", maxArea);
   std::vector<cv::Point> largestContour;
+  // for(const auto& contour : contours) {
+  //   double area = cv::contourArea(contour);
+  //   Logger::printfLog(Logger::DEBUG, "forループに入りました。:%lf", area);
+  //   if(area > MIN_CONTOUR_AREA && area > maxArea) {
+  //     maxArea = area;
+  //     // 最大輪郭が同面積の場合は更新しない
+  //     largestContour = contour;
+  //   }
+  // }
   for(const auto& contour : contours) {
     double area = cv::contourArea(contour);
-    if(area > MIN_CONTOUR_AREA && area > maxArea) {
+    Logger::printfLog(Logger::DEBUG, "forループに入りました。エリア: %lf", area);
+
+    // 最小面積未満ならスキップ
+    if(area <= MIN_CONTOUR_AREA) {
+      continue;
+    }
+
+    // maxAreaより「大きい」場合のみ更新（同面積なら更新しない）
+    if(area > maxArea) {
       maxArea = area;
-      // 最大輪郭が同面積の場合は更新しない
       largestContour = contour;
     }
   }

@@ -281,15 +281,19 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       // request.hsvRanges[0].upper = { 179, 255, 30 };
       // request.hsvRanges = ImageProcessingColor::BottleColors;
       Logger::info("5");
-      request.hsvRanges[0] = ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::RED);
+      // request.hsvRanges[0] =
+      // ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::RED);
       Logger::info("6");
-      request.hsvRanges[1] = ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::BLUE);
+      // request.hsvRanges[1] =
+      // ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::BLUE);
       Logger::info("7");
-      request.hsvRanges[2]
-          = ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::YELLOW);
+      // request.hsvRanges[2]
+      //     = ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::YELLOW);
       Logger::info("8");
-      request.hsvRanges[3]
-          = ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::BLACK);
+      // request.hsvRanges[0]
+      //     = ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::BLACK);
+      request.hsvRanges[0].lower = { 0, 0, 0 };
+      request.hsvRanges[0].upper = { 180, 255, 30 };
 
       Logger::info("9");
       request.roi = { fromString<int>(motionParams[8]), fromString<int>(motionParams[9]),

@@ -1,7 +1,4 @@
-#include <opencv2/imgcodecs.hpp>
-#include "CameraCapture.h"
-#include "Decode.h"
-#include "FrameSave.h"
+#include <iostream>
 #include "Logger.h"
 #include "SocketServer.h"
 #include "RealNetworkSystem.h"
@@ -10,21 +7,22 @@
 
 int main()
 {
-  Logger::init();
+  Logger::info("Hello KATLAB");
+  RealNetworkSystem real;
 
   CameraCapture camera;
   int cameraId = camera.findAvailableCameraID();
   if(cameraId < 0) {
-    Logger::error("No available camera found.");
-    return 1;
+    Logger::error("利用可能なカメラを認識失敗");
+    return -1;
   }
   camera.setCameraID(cameraId);
   if(!camera.openCamera()) {
-    Logger::error("Failed to open camera.");
-    return 1;
+    Logger::error("カメラの起動に失敗");
+    return -1;
   }
 
-   if(!camera.getFrame(frame) || frame.empty()) {
+  if(!camera.getFrame(frame) || frame.empty()) {
     Logger::error("Failed to get frame from camera.");
     Logger::outputToFile();
     return 1;

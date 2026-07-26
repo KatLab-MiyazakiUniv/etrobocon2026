@@ -8,7 +8,6 @@
 #define QR_CODE_DETECTOR_H
 
 #include <opencv2/core.hpp>
-#include <opencv2/imgproc.hpp>
 #include <ZXing/ReadBarcode.h>
 #include <ZXing/ReaderOptions.h>
 #include "CodeDetector.h"

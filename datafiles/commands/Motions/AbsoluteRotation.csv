@@ -1,2 +1,0 @@
-コマンド名,ID,目標角度,kp,ki,kd
-AbsoluteRotation,ID,double,double,double,double

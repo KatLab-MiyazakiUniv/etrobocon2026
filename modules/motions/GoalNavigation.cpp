@@ -1,26 +1,38 @@
 /**
  * @file   GoalNavigation.cpp
- * @brief 目標座標まで移動するクラス
+ * @brief  目標地点への回頭と直進を実行するクラス
  * @author yutaro-1214
  */
 
 #include "GoalNavigation.h"
 
 #include <cmath>
+#include <memory>
+#include <utility>
+
+namespace {
+
+  constexpr double ROTATION_TOLERANCE = 2.0;
+  constexpr double DISTANCE_TOLERANCE = 10.0;
+
+}  // namespace
 
 GoalNavigation::GoalNavigation(Robot& _robot,
-                               std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                               double _goalX, double _goalY, double _targetSpeed,
-                               const Pid::PidGain& _rightPid, const Pid::PidGain& _leftPid,
-                               const Pid::PidGain& _anglePidGain)
-  : BaseMotion(_robot, std::move(_continuationCondition)),
-    state(State::ROTATE),
-    goalX(_goalX),
-    goalY(_goalY),
+                               std::unique_ptr<BaseContinuationCondition> _ContinuationCondition,
+                               double _targetX, double _targetY, double _targetSpeed,
+                               const Pid::PidGain& _rotationPid, const Pid::PidGain& _rightPid,
+                               const Pid::PidGain& _leftPid, const Pid::PidGain& _straightAnglePid)
+  : BaseMotion(_robot, std::move(_ContinuationCondition)),
+    navigator(_robot.getNavigatorInstance()),
+    targetX(_targetX),
+    targetY(_targetY),
     targetSpeed(_targetSpeed),
-    anglePid(_anglePidGain.kp, _anglePidGain.ki, _anglePidGain.kd, 0.0),
-    speedCalculator(_robot, _rightPid, _leftPid, _targetSpeed),
-    targetAngle(0.0)
+    targetDistance(0.0),
+    targetHeading(0.0),
+    rotationPid(_rotationPid),
+    rightPid(_rightPid),
+    leftPid(_leftPid),
+    straightAnglePid(_straightAnglePid)
 {
   LOG_CREATE("GoalNavigation");
 }
@@ -30,77 +42,52 @@ GoalNavigation::~GoalNavigation()
   LOG_DESTROY("GoalNavigation");
 }
 
-bool GoalNavigation::canStart()
-{
-  if(targetSpeed == 0.0) {
-    return false;
-  }
-
-  return true;
-}
-
 void GoalNavigation::prepare()
 {
-  state = State::ROTATE;
+  // 現在位置から目標地点までの距離を計算する
+  targetDistance = navigator.calculateDistance(targetX, targetY);
 
-  robot.getOdometry().reset();
+  // 現在位置から目標地点への絶対方位角を計算する
+  targetHeading = navigator.calculateHeading(targetX, targetY);
 
-  robot.getOdometry().initialize(robot.getWheelMotorControllerInstance().getLeftCount(),
-                                 robot.getWheelMotorControllerInstance().getRightCount());
-
-  targetAngle = robot.getNavigator().calculateHeading(goalX, goalY);
+  Logger::printfLog(Logger::INFO,
+                    "GoalNavigation: target=(%.2f, %.2f), "
+                    "distance=%.2f, heading=%.2f",
+                    targetX, targetY, targetDistance, targetHeading);
 }
 
 void GoalNavigation::executeStep()
 {
-  // オドメトリ更新
-  robot.getOdometry().update(robot.getWheelMotorControllerInstance().getLeftCount(),
-                             robot.getWheelMotorControllerInstance().getRightCount(),
-                             robot.getIMUControllerInstance().getAzimuth());
-
-  // 現在位置から目標方向を毎周期更新
-  targetAngle = robot.getNavigator().calculateHeading(goalX, goalY);
-
-  double currentAngle = robot.getIMUControllerInstance().getAzimuth();
-
-  double angleDeviation = AngleNormalizer::normalizeAngle(targetAngle - currentAngle);
-
-  switch(state) {
-    //--------------------------------------------------
-    // 回頭
-    //--------------------------------------------------
-    case State::ROTATE: {
-      double turningPower = anglePid.calculatePid(angleDeviation);
-
-      robot.getWheelMotorControllerInstance().setRightPower(turningPower);
-      robot.getWheelMotorControllerInstance().setLeftPower(-turningPower);
-
-      // 十分向けたら直進へ
-      if(std::fabs(angleDeviation) <= ANGLE_TOLERANCE) {
-        anglePid.reset();  // PIDの内部状態をリセット
-        state = State::STRAIGHT;
-      }
-
-      break;
-    }
-
-    //--------------------------------------------------
-    // 直進
-    //--------------------------------------------------
-    case State::STRAIGHT: {
-      double requiredRightPower = speedCalculator.calculateRightMotorPower();
-
-      double requiredLeftPower = speedCalculator.calculateLeftMotorPower();
-
-      double turningPower = anglePid.calculatePid(angleDeviation);
-
-      robot.getWheelMotorControllerInstance().setRightPower(requiredRightPower + turningPower);
-
-      robot.getWheelMotorControllerInstance().setLeftPower(requiredLeftPower - turningPower);
-
-      break;
-    }
+  // すでに目標地点付近にいる場合は何もしない
+  if(targetDistance <= DISTANCE_TOLERANCE) {
+    return;
   }
+
+  const double currentHeading = robot.getIMUControllerInstance().getAzimuth();
+
+  const double angleDifference = AngleNormalizer::normalizeAngle(targetHeading - currentHeading);
+
+  /*
+   * 目標方向との角度差が許容誤差より大きい場合だけ回頭する。
+   */
+  if(std::abs(angleDifference) > ROTATION_TOLERANCE) {
+    auto rotationCondition
+        = std::make_unique<AbsoluteAngleCondition>(robot, targetHeading, ROTATION_TOLERANCE);
+
+    AbsoluteRotation rotation(robot, std::move(rotationCondition), rotationPid, targetHeading);
+
+    rotation.run();
+  }
+
+  /*
+   * prepare()で計算した距離だけ直進する。
+   */
+  auto distanceCondition = std::make_unique<DistanceCondition>(robot, targetDistance);
+
+  Straight straight(robot, std::move(distanceCondition), targetSpeed, rightPid, leftPid,
+                    straightAnglePid, true);
+
+  straight.run();
 }
 
 void GoalNavigation::finish()

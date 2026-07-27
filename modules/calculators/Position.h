@@ -13,21 +13,27 @@ class Position {
 
   /**
    * @brief 位置と方位を設定
+   * @param x 設定するX座標の値
+   * @param y 設定するY座標の値
+   * @param heading 設定する向きの値
    */
   void set(double x, double y, double heading);
 
   /**
    * @brief X座標設定
+   * @param x 設定するX座標の値
    */
   void setX(double x);
 
   /**
    * @brief Y座標設定
+   * @param y 設定するY座標の値
    */
   void setY(double y);
 
   /**
    * @brief 方位角設定
+   * @param heading 設定する向きの値
    */
   void setHeading(double heading);
 

@@ -9,7 +9,9 @@
 #include "AngleNormalizer.h"
 #include "Mileage.h"
 
-Odometry::Odometry(Position& position) : position(position), prevLeft(0), prevRight(0) {}
+Odometry::Odometry(Position& position) : position(position), prevEncoderLeft(0), prevEncoderRight(0)
+{
+}
 
 void Odometry::reset()
 {
@@ -17,25 +19,25 @@ void Odometry::reset()
   position.set(0.0, 0.0, 0.0);
 }
 
-void Odometry::initialize(int32_t left, int32_t right)
+void Odometry::initialize(int32_t encoderLeft, int32_t encoderRight)
 {
   // エンコーダ値をセット
-  prevLeft = left;
-  prevRight = right;
+  prevEncoderLeft = encoderLeft;
+  prevEncoderRight = encoderRight;
 }
 
-void Odometry::update(int32_t left, int32_t right, double heading)
+void Odometry::update(int32_t encoderLeft, int32_t encoderRight, double heading)
 {
   // エンコーダ差分
-  int32_t dLeft = left - prevLeft;
-  int32_t dRight = right - prevRight;
+  int32_t dEncoderLeft = encoderLeft - prevEncoderLeft;
+  int32_t dEncoderRight = encoderRight - prevEncoderRight;
 
   // 差分から移動距離を計算
-  double distance = Mileage::calculateMileage(dRight, dLeft);
+  double distance = Mileage::calculateMileage(dEncoderRight, dEncoderLeft);
 
   // 現在値を保存
-  prevLeft = left;
-  prevRight = right;
+  prevEncoderLeft = encoderLeft;
+  prevEncoderRight = encoderRight;
 
   // IMU角度を正規化
   heading = AngleNormalizer::normalizeAngle(heading);

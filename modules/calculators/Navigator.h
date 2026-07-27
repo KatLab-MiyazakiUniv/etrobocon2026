@@ -9,6 +9,7 @@
 
 #include "Position.h"
 #include "AngleNormalizer.h"
+#include "SystemInfo.h"
 
 class Navigator {
  public:
@@ -31,7 +32,7 @@ class Navigator {
   double calculateHeading(double goalX, double goalY) const;
 
  private:
-  const Position& position;
+  const Position& position;  // 更新対象となるロボットの位置情報
 };
 
 #endif

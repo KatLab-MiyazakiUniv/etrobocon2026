@@ -30,10 +30,10 @@ class GoalNavigation : public BaseMotion {
    * @param _leftPid 左タイヤ速度制御用PIDゲイン
    * @param _straightAnglePid 直進時の角度制御用PIDゲイン
    */
-  GoalNavigation(Robot& _robot, std::unique_ptr<BaseCondition> _Condition, double _targetX,
-                 double _targetY, double _targetSpeed, const Pid::PidGain& _rotationPid,
-                 const Pid::PidGain& _rightPid, const Pid::PidGain& _leftPid,
-                 const Pid::PidGain& _straightAnglePid);
+  GoalNavigation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _Condition,
+                 double _targetX, double _targetY, double _targetSpeed,
+                 const Pid::PidGain& _rotationPid, const Pid::PidGain& _rightPid,
+                 const Pid::PidGain& _leftPid, const Pid::PidGain& _straightAnglePid);
 
   ~GoalNavigation();
 

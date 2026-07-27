@@ -17,11 +17,12 @@ namespace {
 
 }  // namespace
 
-GoalNavigation::GoalNavigation(Robot& _robot, std::unique_ptr<BaseCondition> _Condition,
+GoalNavigation::GoalNavigation(Robot& _robot,
+                               std::unique_ptr<BaseContinuationCondition> _ContinuationCondition,
                                double _targetX, double _targetY, double _targetSpeed,
                                const Pid::PidGain& _rotationPid, const Pid::PidGain& _rightPid,
                                const Pid::PidGain& _leftPid, const Pid::PidGain& _straightAnglePid)
-  : BaseMotion(_robot, std::move(_Condition)),
+  : BaseMotion(_robot, std::move(_ContinuationCondition)),
     navigator(_robot.getNavigatorInstance()),
     targetX(_targetX),
     targetY(_targetY),

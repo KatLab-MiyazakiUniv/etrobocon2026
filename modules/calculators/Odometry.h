@@ -27,23 +27,23 @@ class Odometry {
 
   /**
    * @brief エンコード値をセット
-   * @param left 左エンコーダ値[deg]
-   * @param right 右エンコーダ値[deg]
+   * @param encoderLeft 左エンコーダ値[deg]
+   * @param encoderRight 右エンコーダ値[deg]
    */
-  void initialize(int32_t left, int32_t right);
+  void initialize(int32_t encoderLeft, int32_t encoderRight);
   /**
    * @brief エンコーダとIMUから自己位置を更新
-   * @param left 左エンコーダ値[deg]
-   * @param right 右エンコーダ値[deg]
+   * @param encoderLeft 左エンコーダ値[deg]
+   * @param encoderRight 右エンコーダ値[deg]
    * @param heading IMU方位角[deg]
    */
-  void update(int32_t left, int32_t right, double heading);
+  void update(int32_t encoderLeft, int32_t encoderRight, double heading);
 
  private:
-  Position& position;
+  Position& position;  // 更新対象となるロボットの位置情報
 
-  int32_t prevLeft;
-  int32_t prevRight;
+  int32_t prevEncoderLeft;   // 前回取得した左車輪のエンコーダ値
+  int32_t prevEncoderRight;  // 前回取得した右車輪のエンコーダ値
 };
 
 #endif

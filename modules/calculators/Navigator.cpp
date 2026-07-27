@@ -8,10 +8,6 @@
 
 #include <cmath>
 
-namespace {
-  constexpr double RAD_TO_DEG = 180.0 / M_PI;
-}
-
 Navigator::Navigator(const Position& position) : position(position) {}
 
 double Navigator::calculateDistance(double goalX, double goalY) const

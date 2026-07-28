@@ -1,0 +1,5 @@
+RepeatCount
+Command,ID,targetRepeats
+RepeatCount,RC001,1
+RepeatCount,RC002,2
+RepeatCount,RC003,3

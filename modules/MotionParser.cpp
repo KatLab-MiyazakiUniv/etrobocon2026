@@ -175,6 +175,24 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
       double tolerance = fromString<double>(params[3]);
       return make_unique<RelativeAngleCondition>(robot, targetAngle, tolerance);
     }
+    case CONDITION_COMMAND::REPEATCOUNT: {
+      if(params.size() < 3) {
+        Logger::printfLog(Logger::ERROR,
+                          "[MotionParser] RepeatCountのパラメータが不足しています: %zu列",
+                          params.size());
+        return nullptr;
+      }
+
+      int targetRepeats = fromString<int>(params[2]);
+
+      if(targetRepeats < 0) {
+        Logger::printfLog(Logger::ERROR, "[MotionParser] RepeatCountの繰り返し回数が不正です: %d",
+                          targetRepeats);
+        return nullptr;
+      }
+
+      return make_unique<RepeatCountCondition>(robot, targetRepeats);
+    }
     // ↓ 他の条件コマンドはここに追加していく
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Condition %s は未実装です",
@@ -217,6 +235,37 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                                                 fromString<double>(motionParams[5]) },
                                   fromString<double>(motionParams[2]));
     }
+    case MOTION_COMMAND::GOALNAVIGATION: {
+      if(motionParams.size() < 17) {
+        Logger::printfLog(Logger::ERROR,
+                          "[MotionParser] GoalNavigationのパラメータが不足しています: %zu列",
+                          motionParams.size());
+        return nullptr;
+      }
+
+      const double targetX = fromString<double>(motionParams[2]);
+      const double targetY = fromString<double>(motionParams[3]);
+      const double targetSpeed = fromString<double>(motionParams[4]);
+
+      const Pid::PidGain rotationPid{ fromString<double>(motionParams[5]),
+                                      fromString<double>(motionParams[6]),
+                                      fromString<double>(motionParams[7]) };
+
+      const Pid::PidGain rightPid{ fromString<double>(motionParams[8]),
+                                   fromString<double>(motionParams[9]),
+                                   fromString<double>(motionParams[10]) };
+
+      const Pid::PidGain leftPid{ fromString<double>(motionParams[11]),
+                                  fromString<double>(motionParams[12]),
+                                  fromString<double>(motionParams[13]) };
+
+      const Pid::PidGain straightAnglePid{ fromString<double>(motionParams[14]),
+                                           fromString<double>(motionParams[15]),
+                                           fromString<double>(motionParams[16]) };
+
+      return new GoalNavigation(robot, std::move(condition), targetX, targetY, targetSpeed,
+                                rotationPid, rightPid, leftPid, straightAnglePid);
+    }
     // ↓ 他のコマンドはここに追加していく
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
@@ -232,6 +281,7 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
     { "Straight", MOTION_COMMAND::STRAIGHT },
     { "AbsoluteRotation", MOTION_COMMAND::ABSOLUTEROTATION },
     { "RelativeRotation", MOTION_COMMAND::RELATIVEROTATION },
+    { "GoalNavigation", MOTION_COMMAND::GOALNAVIGATION },
   };
 
   // コマンド文字列に対応するMOTION_COMMAND値をマップから取得。なければMOTION_COMMAND::NONEを返す
@@ -250,6 +300,7 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
     { "Distance", CONDITION_COMMAND::DISTANCE },
     { "AbsoluteAngle", CONDITION_COMMAND::ABSOLUTEANGLE },
     { "RelativeAngle", CONDITION_COMMAND::RELATIVEANGLE },
+    { "RepeatCount", CONDITION_COMMAND::REPEATCOUNT },
   };
 
   // 条件コマンド文字列に対応するCONDITION_COMMAND値をマップから取得。なければCONDITION_COMMAND::NONEを返す

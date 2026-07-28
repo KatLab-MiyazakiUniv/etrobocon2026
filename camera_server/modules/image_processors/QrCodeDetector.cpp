@@ -29,126 +29,105 @@ QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
     return result;
   }
 
-//① 元のコード
-ZXing::ImageView iv(frame.data, frame.cols, frame.rows,
-                    ZXing::ImageFormat::BGR,
-                    static_cast<int>(frame.step));
+  // ① 元のコード
+  ZXing::ImageView iv(frame.data, frame.cols, frame.rows, ZXing::ImageFormat::BGR,
+                      static_cast<int>(frame.step));
 
+  /*② グレースケールのみ
+  cv::Mat gray;
+  cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
 
+  ZXing::ImageView iv(gray.data, gray.cols, gray.rows,
+                      ZXing::ImageFormat::Lum,
+                      static_cast<int>(gray.step));
+  */
 
+  /*③ グレースケール＋シャープ化
+  cv::Mat gray;
+  cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
 
-/*② グレースケールのみ
-cv::Mat gray;
-cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
+  cv::Mat sharpened;
+  cv::Mat kernel = (cv::Mat_<float>(3, 3) <<
+       0, -1,  0,
+      -1,  5, -1,
+       0, -1,  0);
 
-ZXing::ImageView iv(gray.data, gray.cols, gray.rows,
-                    ZXing::ImageFormat::Lum,
-                    static_cast<int>(gray.step));
-*/
+  cv::filter2D(gray, sharpened, -1, kernel);
 
+  ZXing::ImageView iv(sharpened.data,
+                      sharpened.cols,
+                      sharpened.rows,
+                      ZXing::ImageFormat::Lum,
+                      static_cast<int>(sharpened.step));
+  */
 
+  /*④ グレースケール＋ノイズ除去
+  cv::Mat gray;
+  cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
 
-/*③ グレースケール＋シャープ化
-cv::Mat gray;
-cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
+  // ノイズ除去（どちらか一方を使用）
+  cv::medianBlur(gray, gray, 3);
+  // cv::GaussianBlur(gray, gray, cv::Size(3,3), 0);
 
-cv::Mat sharpened;
-cv::Mat kernel = (cv::Mat_<float>(3, 3) <<
-     0, -1,  0,
-    -1,  5, -1,
-     0, -1,  0);
+  ZXing::ImageView iv(gray.data,
+                      gray.cols,
+                      gray.rows,
+                      ZXing::ImageFormat::Lum,
+                      static_cast<int>(gray.step));
+  */
 
-cv::filter2D(gray, sharpened, -1, kernel);
+  /*⑤ グレースケール＋二値化
+  cv::Mat gray;
+  cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
 
-ZXing::ImageView iv(sharpened.data,
-                    sharpened.cols,
-                    sharpened.rows,
-                    ZXing::ImageFormat::Lum,
-                    static_cast<int>(sharpened.step));
-*/
+  cv::Mat binary;
+  cv::adaptiveThreshold(gray,
+                        binary,
+                        255,
+                        cv::ADAPTIVE_THRESH_GAUSSIAN_C,
+                        cv::THRESH_BINARY,
+                        21,
+                        10);
 
+  ZXing::ImageView iv(binary.data,
+                      binary.cols,
+                      binary.rows,
+                      ZXing::ImageFormat::Lum,
+                      static_cast<int>(binary.step));
+  */
 
+  /*⑥ 一番おすすめ（全部入り）
+  cv::Mat gray;
+  cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
 
+  // ノイズ除去
+  cv::medianBlur(gray, gray, 3);
 
-/*④ グレースケール＋ノイズ除去
-cv::Mat gray;
-cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
+  // シャープ化
+  cv::Mat sharpened;
+  cv::Mat kernel = (cv::Mat_<float>(3,3) <<
+       0,-1,0,
+      -1, 5,-1,
+       0,-1,0);
 
-// ノイズ除去（どちらか一方を使用）
-cv::medianBlur(gray, gray, 3);
-// cv::GaussianBlur(gray, gray, cv::Size(3,3), 0);
+  cv::filter2D(gray, sharpened, -1, kernel);
 
-ZXing::ImageView iv(gray.data,
-                    gray.cols,
-                    gray.rows,
-                    ZXing::ImageFormat::Lum,
-                    static_cast<int>(gray.step));
-*/
+  // 二値化
+  cv::Mat binary;
+  cv::adaptiveThreshold(sharpened,
+                        binary,
+                        255,
+                        cv::ADAPTIVE_THRESH_GAUSSIAN_C,
+                        cv::THRESH_BINARY,
+                        21,
+                        10);
 
-
-
-/*⑤ グレースケール＋二値化
-cv::Mat gray;
-cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
-
-cv::Mat binary;
-cv::adaptiveThreshold(gray,
-                      binary,
-                      255,
-                      cv::ADAPTIVE_THRESH_GAUSSIAN_C,
-                      cv::THRESH_BINARY,
-                      21,
-                      10);
-
-ZXing::ImageView iv(binary.data,
-                    binary.cols,
-                    binary.rows,
-                    ZXing::ImageFormat::Lum,
-                    static_cast<int>(binary.step));
-*/
-
-
-
-
-
-/*⑥ 一番おすすめ（全部入り）
-cv::Mat gray;
-cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
-
-// ノイズ除去
-cv::medianBlur(gray, gray, 3);
-
-// シャープ化
-cv::Mat sharpened;
-cv::Mat kernel = (cv::Mat_<float>(3,3) <<
-     0,-1,0,
-    -1, 5,-1,
-     0,-1,0);
-
-cv::filter2D(gray, sharpened, -1, kernel);
-
-// 二値化
-cv::Mat binary;
-cv::adaptiveThreshold(sharpened,
-                      binary,
-                      255,
-                      cv::ADAPTIVE_THRESH_GAUSSIAN_C,
-                      cv::THRESH_BINARY,
-                      21,
-                      10);
-
-ZXing::ImageView iv(binary.data,
-                    binary.cols,
-                    binary.rows,
-                    ZXing::ImageFormat::Lum,
-                    static_cast<int>(binary.step));
-*/
-
-
-
-
-
-
+  ZXing::ImageView iv(binary.data,
+                      binary.cols,
+                      binary.rows,
+                      ZXing::ImageFormat::Lum,
+                      static_cast<int>(binary.step));
+  */
 
   // 処理対象のフレームからQRコードを検出し、デコード結果を取得
   auto qrCode = ZXing::ReadBarcode(iv, options);

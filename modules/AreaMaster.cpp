@@ -30,6 +30,7 @@ void AreaMaster::run()
     commandFilePath = basePath + areaCommandNames[static_cast<int>(area)]
                       + (robot.getCourse() == Course::Left ? "Left" : "Right") + ".csv";
   }
+  Logger::printfLog(Logger::INFO, "%s を開きました", commandFilePath.c_str());
   // 動作インスタンスのリストを生成する
   motionList = MotionParser::createMotionList(robot, commandFilePath);
   // 動作インスタンスのリストを生成する

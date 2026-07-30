@@ -26,26 +26,14 @@ void EtRobocon2026::start()
   robot.setCourse(Course::Left);
   // robot.setEdge(Edge::LeftEdge);
   robot.setEdge(Edge::RightEdge);
+  // LineTrace走行
   Area lineTraceArea = Area::LineTrace;
-
-  AreaMaster lineTraceAreaMaster(robot, Area::LineTrace);
-
+  AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
   lineTraceAreaMaster.run();
-
-  if(robot.getIndexOfLabel() == 2) {
-    Area yellowArea = Area::Yellow;
-    AreaMaster carryAreaMaster(robot, Area::Yellow);
-    carryAreaMaster.run();
-  } else if(robot.getIndexOfLabel() == 1) {
-    Area blueArea = Area::Blue;
-    AreaMaster carryAreaMaster(robot, Area::Blue);
-    carryAreaMaster.run();
-
-  } else {
-    Area redArea = Area::Red;
-    AreaMaster carryAreaMaster(robot, Area::Red);
-    carryAreaMaster.run();
-  }
+  // BotlleDelivery走行
+  Area bottleDeliveryArea = Area::BottleDelivery;
+  AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
+  bottleDeliveryAreaMaster.run();
 
   CsvLogger::outputToFile();
 }

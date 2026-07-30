@@ -23,14 +23,28 @@ void AreaMaster::run()
   vector<BaseMotion*> motionList;
 
   // コマンドファイルパスを作成する
-  string commandFilePath = basePath + areaCommandNames[static_cast<int>(area)]
-                           + (robot.getCourse() == Course::Left ? "Left" : "Right") + ".csv";
+  if(area == Area::BottleDelivery) {
+    string commandFilePath = basePath
+                             + areaCommandNames[robot.getIndexOfLabel() + static_cast<int>(area)]
+                             + (robot.getCourse() == Course::Left ? "Left" : "Right") + ".csv";
+    // 動作インスタンスのリストを生成する
+    motionList = MotionParser::createMotionList(robot, commandFilePath);
+    // 動作インスタンスのリストを生成する
+    motionList = MotionParser::createMotionList(robot, commandFilePath);
 
-  // 動作インスタンスのリストを生成する
-  motionList = MotionParser::createMotionList(robot, commandFilePath);
+    // 各動作を実行し、動作し終えたらメモリを開放する
+    executeMotions(motionList);
+  } else {
+    string commandFilePath = basePath + areaCommandNames[static_cast<int>(area)]
+                             + (robot.getCourse() == Course::Left ? "Left" : "Right") + ".csv";
+    // 動作インスタンスのリストを生成する
+    motionList = MotionParser::createMotionList(robot, commandFilePath);
+    // 動作インスタンスのリストを生成する
+    motionList = MotionParser::createMotionList(robot, commandFilePath);
 
-  // 各動作を実行し、動作し終えたらメモリを開放する
-  executeMotions(motionList);
+    // 各動作を実行し、動作し終えたらメモリを開放する
+    executeMotions(motionList);
+  }
 }
 
 void AreaMaster::executeMotions(vector<BaseMotion*>& motionList)

@@ -281,11 +281,9 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       // request.hsvRanges[3]
       //     = ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::BLACK);
 
-      Logger::info("9");
       request.roi = { fromString<int>(motionParams[8]), fromString<int>(motionParams[9]),
                       fromString<int>(motionParams[10]), fromString<int>(motionParams[11]) };
 
-      Logger::info("10");
       int targetXCoordinate = fromString<int>(motionParams[3]);
 
       Logger::printfLog(Logger::DEBUG,

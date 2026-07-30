@@ -24,7 +24,7 @@ void AreaMaster::run()
 
   // コマンドファイルパスを作成する
   if(area == Area::BottleDelivery) {
-    commandFilePath = basePath + areaCommandNames[robot.getIndexOfLabel() + static_cast<int>(area)]
+    commandFilePath = basePath + areaCommandNames[static_cast<int>(area) + robot.getIndexOfLabel()]
                       + (robot.getCourse() == Course::Left ? "Left" : "Right") + ".csv";
   } else {
     commandFilePath = basePath + areaCommandNames[static_cast<int>(area)]

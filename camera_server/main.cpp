@@ -56,9 +56,6 @@ int main()
 
         Logger::printfLog(Logger::INFO, "QR detected: %s", result.content.c_str());
 
-        // 暗号化QRの場合
-        std::string decrypted = Decode::decrypt("1234", result.content);
-
         if(!decrypted.empty()) {
           Logger::printfLog(Logger::INFO, "Decrypted: %s", decrypted.c_str());
         }

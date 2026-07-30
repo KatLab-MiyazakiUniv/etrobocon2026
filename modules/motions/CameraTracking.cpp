@@ -61,7 +61,8 @@ void CameraTracking::executeStep()
 
   // 黒を除く最大面積の色範囲取得
   if(detectionRequest.requireLargestColorIndex || response.largestColorIndex != 3) {
-    Logger::printfLog(Logger::INFO, "CameraTracking:インデックスは%d", response.largestColorIndex);
+    Logger::printfLog(Logger::INFO, "CameraTracking:最大検出色は%s",
+                      largestColor[response.largestColorIndex].c_str());
     robot.setIndexOfLabel(response.largestColorIndex);
   }
 

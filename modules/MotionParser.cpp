@@ -5,6 +5,8 @@
  */
 
 #include "MotionParser.h"
+#include "CameraTracking.h"
+#include "SocketProtocol.h"
 
 using namespace std;
 
@@ -199,6 +201,18 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
     //                     fromString<double>(motionParams[11]) },
     //       motionParams[12] == "true");
     // }
+    case MOTION_COMMAND::QR_CODE_TRACKING: {
+      // QrCodeTracking: motionParams[2]=speed(double)
+      //                 motionParams[3]=targetXCoordinate(int)
+      //                 motionParams[4..6]=cameraPid(kp,ki,kd)
+      //                 motionParams[7]=isStopMotorPower(string: "true"/"false")
+      return new CameraTracking(robot, std::move(condition), fromString<double>(motionParams[2]),
+                                fromString<int>(motionParams[3]),
+                                Pid::PidGain{ fromString<double>(motionParams[4]),
+                                              fromString<double>(motionParams[5]),
+                                              fromString<double>(motionParams[6]) },
+                                CameraServer::QrCodeDetectorRequest(), motionParams[7] == "true");
+    }
     // ↓ 他のコマンドはここに追加していく
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
@@ -212,6 +226,7 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
   // コマンド文字列(string)と、それに対応する列挙型MOTION_COMMANDのマッピングを定義
   static const unordered_map<string, MOTION_COMMAND> commandMap = {
     { "Straight", MOTION_COMMAND::STRAIGHT },
+    { "QrCodeTracking", MOTION_COMMAND::QR_CODE_TRACKING },
   };
 
   // コマンド文字列に対応するMOTION_COMMAND値をマップから取得。なければMOTION_COMMAND::NONEを返す

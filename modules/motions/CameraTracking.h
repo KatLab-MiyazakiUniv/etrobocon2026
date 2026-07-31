@@ -1,7 +1,7 @@
 /**
  * @file   CameraTracking.h
  * @brief  カメラを使ったPID走行クラス
- * @author sadomiya-sousi
+ * @author sadomiya-sousi HaruArima08
  */
 
 #ifndef CAMERA_TRACKING_H
@@ -15,19 +15,43 @@
 class CameraTracking : public BaseMotion {
  public:
   /**
+   * @brief 検出方式の種類
+   */
+  enum class DetectionMode {
+    COLOR_REGION,  // 色領域検出
+    QR_CODE        // QRコード検出
+  };
+
+  /**
    * コンストラクタ
-   * @brief カメラ画像を使ったPID走行クラスを初期化する
+   * @brief カメラ画像(色領域検出)を使ったPID走行クラスを初期化する
    * @param _robot ロボットインスタンス
    * @param _continuationCondition 継続条件クラスのインスタンス
    * @param _targetSpeed 目標速度
    * @param _targetXCoordinate 目標x座標
    * @param _pidGain カメラ制御用PIDゲイン
-   * @param _detectionRequest 検出リクエスト
+   * @param _detectionRequest 色領域検出リクエスト
    * @param _isStopMotorPower モーターを停止するかどうか
    */
   CameraTracking(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                  double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
                  const CameraServer::ColorRegionDetectorRequest& _detectionRequest,
+                 bool _isStopMotorPower = true);
+
+  /**
+   * コンストラクタ
+   * @brief カメラ画像(QRコード検出)を使ったPID走行クラスを初期化する
+   * @param _robot ロボットインスタンス
+   * @param _continuationCondition 継続条件クラスのインスタンス
+   * @param _targetSpeed 目標速度
+   * @param _targetXCoordinate 目標x座標
+   * @param _pidGain カメラ制御用PIDゲイン
+   * @param _qrDetectionRequest QRコード検出リクエスト
+   * @param _isStopMotorPower モーターを停止するかどうか
+   */
+  CameraTracking(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+                 double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
+                 const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
                  bool _isStopMotorPower = true);
 
   /**
@@ -52,6 +76,18 @@ class CameraTracking : public BaseMotion {
    * @return const CameraServer::ColorRegionDetectorRequest& 検出リクエストへの参照
    */
   const CameraServer::ColorRegionDetectorRequest& getDetectionRequest() const;
+
+  /**
+   * @brief QRコード検出リクエストを取得する
+   * @return const CameraServer::QrCodeDetectorRequest& QRコード検出リクエストへの参照
+   */
+  const CameraServer::QrCodeDetectorRequest& getQrDetectionRequest() const;
+
+  /**
+   * @brief 検出方式を取得する
+   * @return DetectionMode 検出方式
+   */
+  DetectionMode getDetectionMode() const;
 
   /**
    * @brief モーターを停止するかどうかを取得する
@@ -89,7 +125,9 @@ class CameraTracking : public BaseMotion {
  private:
   double targetSpeed;                                         // 目標速度
   int targetXCoordinate;                                      // 目標X座標
-  CameraServer::ColorRegionDetectorRequest detectionRequest;  // 検出リクエスト
+  DetectionMode detectionMode;                                // 検出方式
+  CameraServer::ColorRegionDetectorRequest detectionRequest;  // 色領域検出リクエスト
+  CameraServer::QrCodeDetectorRequest qrDetectionRequest;     // QRコード検出リクエスト
   bool isStopMotorPower;                                      // モーターを停止するかどうか
   SpeedCalculator speedCalculator;                            // 目標速度に対するモータパワー計算
   Pid cameraPid;                                              // カメラ画像x座標に対するPID制御

@@ -1,7 +1,7 @@
 /**
  * @file    SocketClient.cpp
  * @brief   カメラサーバーと通信するクラス
- * @author  sadomiya-sousi okuyama0528
+ * @author  sadomiya-sousi okuyama0528 HaruArima08
  */
 
 #include "SocketClient.h"
@@ -95,6 +95,12 @@ bool SocketClient::executeSnapshotAction(const CameraServer::SnapshotActionReque
 bool SocketClient::executeColorRegionDetection(
     const CameraServer::ColorRegionDetectorRequest& request,
     CameraServer::ColorRegionDetectorResponse& response)
+{
+  return executeAction(request, response);
+}
+
+bool SocketClient::executeQrCodeDetection(const CameraServer::QrCodeDetectorRequest& request,
+                                          CameraServer::QrCodeDetectorResponse& response)
 {
   return executeAction(request, response);
 }

@@ -1,7 +1,7 @@
 /**
  * @file   SocketClient.h
  * @brief  サーバーと通信するクラス
- * @author sadomiya-sousi okuyama0528
+ * @author sadomiya-sousi okuyama0528 HaruArima08
  */
 
 #ifndef SOCKET_CLIENT_H
@@ -65,6 +65,16 @@ class SocketClient {
    */
   virtual bool executeColorRegionDetection(const CameraServer::ColorRegionDetectorRequest& request,
                                            CameraServer::ColorRegionDetectorResponse& response);
+
+  /**
+   * @brief QRコード検出アクションを実行する
+   * @param request リクエスト
+   * @param response レスポンス
+   * @return true アクションの実行に成功した場合
+   * @return false アクションの実行に失敗した場合
+   */
+  virtual bool executeQrCodeDetection(const CameraServer::QrCodeDetectorRequest& request,
+                                      CameraServer::QrCodeDetectorResponse& response);
 
   /**
    * @brief サーバーにリクエストを送信し、レスポンスを受信するtemplate関数

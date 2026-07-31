@@ -21,8 +21,9 @@ int main()
   }
 
   ColorRegionDetectionActionHandler colorRegionDetectionHandler(camera);
+  QrCodeDetectionActionHandler qrCodeDetectionHandler(camera);
   SnapshotActionHandler snapshotHandler(camera);
-  SocketServer server(snapshotHandler, colorRegionDetectionHandler, real);
+  SocketServer server(snapshotHandler, colorRegionDetectionHandler, qrCodeDetectionHandler, real);
   server.init();
   return 0;
 }

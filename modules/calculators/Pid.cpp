@@ -5,7 +5,6 @@
  */
 
 #include "Pid.h"
-#include <iostream>
 
 Pid::Pid(double _kp, double _ki, double _kd, double _targetValue, double _maxIntegral,
          double _minIntegral)
@@ -45,10 +44,27 @@ void Pid::setPidGain(double _kp, double _ki, double _kd)
   pidGain.ki = (_ki < 0) ? 0.0 : _ki;
   pidGain.kd = (_kd < 0) ? 0.0 : _kd;
 }
-double Pid::calculatePid(double currentValue, double delta)
+
+void Pid::prepare()
 {
+  prevTime = ClockUtil::now();
+}
+
+double Pid::calculatePid(double currentValue)
+{
+  if(prevTime <= 0) {
+    prevTime = ClockUtil::now();
+    Logger::warning("PIDの初回呼び出し時間が設定されていません");
+  }
+  // 現在の時間を取得
+  double currentTime = ClockUtil::now();
+  // 周期を計算
+  double delta = (currentTime - prevTime) / 1000;
+  // 前回の時間を更新する
+  prevTime = currentTime;
+
   // 0除算を避けるために delta=0 の場合はデフォルト周期0.01とする
-  if(delta == 0) delta = defaultDelta;
+  if(delta <= 0) delta = 0.01;
 
   // 現在の目標値との偏差を求める
   double currentDeviation = targetValue - currentValue;

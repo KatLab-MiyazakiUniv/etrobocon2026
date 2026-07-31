@@ -37,6 +37,11 @@ bool CameraTracking::canStart()
   return true;
 }
 
+void CameraTracking::prepare()
+{
+  cameraPid.prepare();
+}
+
 void CameraTracking::executeStep()
 {
   // 初期Speed値を計算
@@ -73,7 +78,7 @@ void CameraTracking::executeStep()
 
 void CameraTracking::wait()
 {
-  ClockUtil::sleep(30);  // カメラの撮影FPSに合わせて30ミリ秒待機する
+  ClockUtil::sleep(0);
 }
 
 void CameraTracking::finish()

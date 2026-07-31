@@ -126,7 +126,7 @@ namespace CameraServer {
    * @brief QRコード検出のレスポンス構造体
    */
   struct QrCodeDetectorResponse {
-    bool wasDetected = false;                     // 検出できたかどうか
+    bool wasDetected = false;                      // 検出できたかどうか
     PointData corners[QR_CODE_CORNER_COUNT] = {};  // QRコードの各頂点の座標(左上から時計回りの順)
   };
 }  // namespace CameraServer

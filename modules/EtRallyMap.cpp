@@ -13,7 +13,7 @@ EtRallyMap::EtRallyMap()
       nodes[x][y].gridX = x;
       nodes[x][y].gridY = y;
 
-      // x座標
+      // X座標
       if(x == 0) {
         nodes[x][y].x = 0;
       } else if(x == 1) {
@@ -22,8 +22,12 @@ EtRallyMap::EtRallyMap()
         nodes[x][y].x = FIRST_X_GRID_SIZE + (x - 1) * GRID_SIZE;
       }
 
-      // y座標
-      nodes[x][y].y = y * GRID_SIZE;
+      // Y座標
+      if(y < Y_GRID_NUM) {
+        nodes[x][y].y = y * GRID_SIZE;
+      } else {
+        nodes[x][y].y = (Y_GRID_NUM - 1) * GRID_SIZE + LAST_Y_GRID_SIZE;
+      }
     }
   }
 }

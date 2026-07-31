@@ -1,7 +1,7 @@
 /**
  * @file SocketServer.cpp
  * @brief 接続を待ち、クライアントからのリクエストを処理するクラス
- * @author sadomiya-sousi takuchi17
+ * @author sadomiya-sousi takuchi17 HaruArima08
  */
 
 #include "SocketServer.h"
@@ -9,13 +9,15 @@
 
 SocketServer::SocketServer(SnapshotActionHandler& _snapshotHandler,
                            ColorRegionDetectionActionHandler& _colorRegionDetectionHandler,
+                           QrCodeDetectionActionHandler& _qrCodeDetectionHandler,
                            INetworkSystem& _netSys, int _port)
   : netSys(_netSys),
     listenSocket(-1),
     isRunning(false),
     port(_port),
     snapshotHandler(_snapshotHandler),
-    colorRegionDetectionHandler(_colorRegionDetectionHandler)
+    colorRegionDetectionHandler(_colorRegionDetectionHandler),
+    qrCodeDetectionHandler(_qrCodeDetectionHandler)
 {
   LOG_CREATE("SocketServer");
   Logger::printfLog(Logger::INFO, "SocketServer:ポート番号は%d", _port);
@@ -121,6 +123,15 @@ void SocketServer::handleConnection(int clientSocket)
                         0);
             break;
           }
+          case CameraServer::Command::QR_CODE_DETECTION: {
+            auto* request = reinterpret_cast<CameraServer::QrCodeDetectorRequest*>(recvbuf);
+            Logger::info("SocketServer:QR_CODE_DETECTIONを実行中");
+            CameraServer::QrCodeDetectorResponse response;
+            qrCodeDetectionHandler.execute(*request, response);
+            netSys.send(clientSocket, reinterpret_cast<const char*>(&response), sizeof(response),
+                        0);
+            break;
+          }
           case CameraServer::Command::SHUTDOWN:
             shutdown();
             return;
@@ -178,4 +189,9 @@ INetworkSystem& SocketServer::getNetSys() const
 const ColorRegionDetectionActionHandler& SocketServer::getColorRegionDetectionHandler() const
 {
   return colorRegionDetectionHandler;
+}
+
+const QrCodeDetectionActionHandler& SocketServer::getQrCodeDetectionHandler() const
+{
+  return qrCodeDetectionHandler;
 }

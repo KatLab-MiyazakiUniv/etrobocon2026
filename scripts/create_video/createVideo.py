@@ -15,7 +15,6 @@ import cv2
 import numpy as np
 from concurrent.futures import ProcessPoolExecutor
 
-
 def parse_args():
   """
   @brief コマンドライン引数をパースする
@@ -107,25 +106,6 @@ def draw_outlined_text(img, text, pos, font_scale, color):
       cv2.FONT_HERSHEY_SIMPLEX, font_scale, color, 1, cv2.LINE_AA
   )
 
-# def draw_outlined_text(img, text, pos, font_scale, color):
-#   """
-#   @brief 黒い縁取りを施したテキストを描画する
-#   """
-#   x, y = pos
-#   # 黒い縁取りを綺麗に出すため、上下左右の微小な位置に黒文字を描画する
-#   for dx, dy in [(-1, -1), (-1, 1), (1, -1), (1, 1), (0, -1), (0, 1), (-1, 0), (1, 0)]:
-#     cv2.putText(
-#         img, text, (x + dx, y + dy),
-#         cv2.FONT_HERSHEY_SIMPLEX, font_scale, (0, 0, 0), 2, cv2.LINE_AA
-#     )
-#   # 中央に前景色を描画
-#   cv2.putText(
-#       img, text, pos,
-#       cv2.FONT_HERSHEY_SIMPLEX, font_scale, color, 1, cv2.LINE_AA
-#   )
-
-
-
 def get_text_color(text):
   """
   @brief テキストの内容に応じて色を選択する (BGR)
@@ -137,7 +117,6 @@ def get_text_color(text):
   if "ROI:" in text:
     return (0, 255, 0)      # 緑
   return (255, 255, 255)    # 白
-
 
 def draw_frame_annotations(img, item, scale, width):
   """
@@ -158,8 +137,6 @@ def draw_frame_annotations(img, item, scale, width):
     rtlx, rtly, rtrx, rtry, rblx, rbly, rbrx, rbry = scale_coords(
         scale, tlx, tly, trx, try_val, blx, bly, brx, bry
     )
-
-
 
     # 頂点を結びポリゴンを描画（太さ1, BGR赤: (0, 0, 255)）
     pts = np.array([[rtlx, rtly], [rtrx, rtry], [rbrx, rbry], [rblx, rbly]], np.int32)
@@ -288,7 +265,6 @@ def main():
   if args.fps < 1:
     print(f"ERROR:FPSは1より大きい値を指定してください。入力値:{args.fps}" ,file=sys.stderr)
     sys.exit(1)
-
 
   if args.scale <= 0:
     print(f"ERROR:scaleは0より大きい値を入力してください。入力値:{args.fps}" ,file=sys.stderr)

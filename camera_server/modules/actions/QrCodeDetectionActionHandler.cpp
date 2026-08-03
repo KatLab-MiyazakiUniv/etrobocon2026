@@ -43,6 +43,16 @@ void QrCodeDetectionActionHandler::execute(const CameraServer::QrCodeDetectorReq
   } else {
     Logger::error("QrCodeDetectionActionHandler:QRコードが検出されませんでした");
   }
+
+  std::string directoryPath = "datafiles/line_trace";
+
+  cv::Mat saveFrame = frame.clone();
+  QrCodeDetectionResult saveResult = result;
+  cv::Rect saveRoi = localRoi;
+
+  MultiThread::wrap([saveFrame, directoryPath, saveResult, saveRoi]() mutable {
+    FrameSave::save(saveFrame, directoryPath, saveResult, saveRoi);
+  });
 }
 
 const CameraCapture& QrCodeDetectionActionHandler::getCamera() const

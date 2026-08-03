@@ -14,6 +14,7 @@
 
 #include "ClockUtil.h"
 #include "ImageRecognitionResults.h"
+#include "QrCodeDetectionResult.h"
 
 class FrameSave {
  public:
@@ -34,6 +35,11 @@ class FrameSave {
    */
   static void save(cv::Mat& frame, const std::string& filePath,
                    const BoundingBoxDetectionResult& result, const cv::Rect& roi);
+
+  static void save(cv::Mat& frame,
+                 const std::string& filePath,
+                 const QrCodeDetectionResult& result,
+                 const cv::Rect& roi);
 
  private:
   FrameSave();  // インスタンス化の禁止

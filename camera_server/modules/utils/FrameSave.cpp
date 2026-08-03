@@ -52,3 +52,27 @@ void FrameSave::save(cv::Mat& frame, const std::string& filePath,
 
   save(frame, filePath, fileName);
 }
+
+void FrameSave::save(cv::Mat& frame,
+                     const std::string& filePath,
+                     const QrCodeDetectionResult& result,
+                     const cv::Rect& roi)
+{
+  std::string fileName =
+      "det_d" + std::to_string(result.wasDetected ? 1 : 0) +
+      "_tlx" + Utils::toStrInt(result.corners[0].x) +
+      "_tly" + Utils::toStrInt(result.corners[0].y) +
+      "_trx" + Utils::toStrInt(result.corners[1].x) +
+      "_try" + Utils::toStrInt(result.corners[1].y) +
+      "_blx" + Utils::toStrInt(result.corners[3].x) +
+      "_bly" + Utils::toStrInt(result.corners[3].y) +
+      "_brx" + Utils::toStrInt(result.corners[2].x) +
+      "_bry" + Utils::toStrInt(result.corners[2].y) +
+      "_rx" + Utils::toStrInt(roi.x) +
+      "_ry" + Utils::toStrInt(roi.y) +
+      "_rw" + Utils::toStrInt(roi.width) +
+      "_rh" + Utils::toStrInt(roi.height) +
+      "_" + std::to_string(ClockUtil::now());
+
+  save(frame, filePath, fileName);
+}

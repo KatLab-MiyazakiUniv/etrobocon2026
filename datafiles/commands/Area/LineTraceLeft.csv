@@ -1,2 +1,2 @@
 動作コマンド名,動作ID,条件コマンド名,条件ID
-QrCodeTracking,001,Distance,001
+QRTracking,001,Distance,001

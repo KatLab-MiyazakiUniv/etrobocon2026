@@ -12,6 +12,9 @@
 #include "SocketProtocol.h"
 #include "QrCodeDetector.h"
 #include <cmath>
+#include <functional>
+#include "MultiThread.h"
+#include "FrameSave.h"
 
 class QrCodeDetectionActionHandler {
  public:

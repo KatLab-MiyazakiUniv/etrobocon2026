@@ -1,3 +1,0 @@
-コマンド名,"ID",speed,targetX,kp,ki,kd,isStopMotorPower
-QrCodeTracking,"ID",double,int,double,double,double,string
-QrCodeTracking,001,50,320,0.1,0.0,0.0,true

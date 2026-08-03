@@ -14,6 +14,11 @@ Rotation::Rotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _co
 {
 }
 
+void Rotation::prepare()
+{
+  anglePid.prepare();
+}
+
 /**
  * @brief 回頭動作を1ステップ実行する
  *

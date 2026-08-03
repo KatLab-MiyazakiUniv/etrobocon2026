@@ -7,15 +7,10 @@
 #ifndef COLOR_REGION_DETECTION_ACTION_HANDLER_H
 #define COLOR_REGION_DETECTION_ACTION_HANDLER_H
 
-#include <functional>
-
 #include "SystemInfo.h"
 #include "CameraCapture.h"
 #include "SocketProtocol.h"
 #include "ColorRegionDetector.h"
-
-#include "MultiThread.h"
-#include "FrameSave.h"
 
 class ColorRegionDetectionActionHandler {
  public:

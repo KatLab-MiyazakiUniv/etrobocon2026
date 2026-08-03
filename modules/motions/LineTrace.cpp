@@ -13,9 +13,9 @@ LineTrace::LineTrace(Robot& _robot,
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
     targetBrightness(_targetBrightness),
-    brightnessPidGain(_brightnessPidGain),
-    speedCalculator(_robot, _targetSpeed),
-    pid(brightnessPidGain.kp, brightnessPidGain.ki, brightnessPidGain.kd, targetBrightness)
+    brightnessPid(_brightnessPidGain.kp, _brightnessPidGain.ki, _brightnessPidGain.kd,
+                  _targetBrightness),
+    speedCalculator(_robot, _targetSpeed)
 {
   LOG_CREATE("LineTrace");
 }
@@ -28,6 +28,8 @@ LineTrace::~LineTrace()
 void LineTrace::prepare()
 {
   edgeSign = (robot.getEdge() == Edge::LeftEdge) ? -1 : 1;
+
+  brightnessPid.prepare();
 }
 
 void LineTrace::executeStep()
@@ -38,7 +40,8 @@ void LineTrace::executeStep()
 
   // PIDで旋回値を計算
   double turningPower
-      = pid.calculatePid(robot.getColorSensorControllerInstance().getReflectance()) * edgeSign;
+      = brightnessPid.calculatePid(robot.getColorSensorControllerInstance().getReflectance())
+        * edgeSign;
 
   // ライントレースに必要なPower値を算出（前進の時0を下回らないように，後進の時0を上回らないように計算
   double rightPower = baseRightPower > 0.0 ? std::max(baseRightPower - turningPower, 0.0)
@@ -57,9 +60,10 @@ void LineTrace::executeStep()
   logData.leftPower = robot.getWheelMotorControllerInstance().getLeftPower();
   logData.rightSpeed = robot.getWheelMotorControllerInstance().getRightPower();
   logData.leftSpeed = robot.getWheelMotorControllerInstance().getLeftPower();
-  logData.kp = brightnessPidGain.kp;
-  logData.ki = brightnessPidGain.ki;
-  logData.kd = brightnessPidGain.kd;
+  logData.kp = brightnessPid.getPidGain().kp;
+  logData.ki = brightnessPid.getPidGain().ki;
+  logData.kd = brightnessPid.getPidGain().kd;
+
   CsvLogger::add(logData);
 }
 

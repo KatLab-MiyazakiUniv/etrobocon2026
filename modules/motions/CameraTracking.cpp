@@ -38,6 +38,11 @@ bool CameraTracking::canStart()
   return true;
 }
 
+void CameraTracking::prepare()
+{
+  cameraPid.prepare();
+}
+
 void CameraTracking::executeStep()
 {
   // 初期Speed値を計算

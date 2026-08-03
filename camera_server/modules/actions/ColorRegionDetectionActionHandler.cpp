@@ -8,8 +8,7 @@
 
 ColorRegionDetectionActionHandler::ColorRegionDetectionActionHandler(CameraCapture& _camera)
   : camera(_camera),
-    // detector({ { cv::Scalar(0, 0, 0, 0), cv::Scalar(180, 255, 30, 0) } },
-    detector({ { cv::Scalar(0, 0, 0, 0), cv::Scalar(255, 255, 255, 255) } },
+    detector({ { cv::Scalar(0, 0, 0, 0), cv::Scalar(180, 255, 30, 0) } },
              cv::Rect(0, 0, 1920, 1080))
 {
   LOG_CREATE("ColorRegionDetectionActionHandler");
@@ -70,13 +69,6 @@ void ColorRegionDetectionActionHandler::execute(
   } else {
     Logger::error("ColorRegionDetectionActionHandler:色領域が検出されませんでした");
   }
-
-  std::string directoryPath = "datafiles/line_trace";
-  int t1 = ClockUtil::now();
-  MultiThread::wrap(
-      [=]() mutable { FrameSave::save(frame, directoryPath, localResult, localRoi); });
-  int t2 = ClockUtil::now();
-  Logger::printfLog(Logger::ERROR, "並列関数の呼び出しにかかった時間は%d", t2 - t1);
 }
 
 const CameraCapture& ColorRegionDetectionActionHandler::getCamera() const

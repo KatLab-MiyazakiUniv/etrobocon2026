@@ -53,9 +53,8 @@ class LineTrace : public BaseMotion {
   double targetSpeed;               // 目標速度(mm/秒)
   int targetBrightness;             // 目標とする明るさの値(%)
   int edgeSign;                     // エッジの左右判定に基づく符号（左エッジ: -1, 右エッジ: 1）
-  Pid::PidGain brightnessPidGain;   // ライントレース用の輝度値に対するPIDゲイン
+  Pid brightnessPid;                // ライントレース用の輝度値に対するPID
   SpeedCalculator speedCalculator;  // 目標速度に対する左右車輪のPID制御を行うクラスのインスタンス
-  Pid pid;
 };
 
 #endif

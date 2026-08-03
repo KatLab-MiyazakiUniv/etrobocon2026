@@ -7,6 +7,7 @@
 #ifndef PID_H
 #define PID_H
 #include "Logger.h"
+#include "ClockUtil.h"
 
 class Pid {
  public:
@@ -53,23 +54,32 @@ class Pid {
   void setPidGain(double _kp, double _ki, double _kd);
 
   /**
+   * @brief PIDゲインを取得する
+   */
+  const PidGain& getPidGain() const;
+
+  /**
+   * @brief Pidの初回呼び出し時間を設定する
+   */
+  void prepare();
+
+  /**
    * @brief PIDを計算する
    * @param currentValue 現在値
-   * @param delta 周期[ms](デフォルト値0.01[10ms]、省略可)
    * @return PIDの計算結果(操作量)
    */
-  double calculatePid(double currentValue, double delta = defaultDelta);
+  double calculatePid(double currentValue);
 
  private:
   PidGain pidGain;
-  static constexpr double defaultDelta = 0.01;  // 周期
-  double prevDeviation = 0.0;                   // 前回の偏差
-  double integral = 0.0;                        // 偏差の累積
-  double filteredDerivative = 0.0;              // フィルタされた微分項を保持する変数
-  double targetValue;                           // 目標値
-  double maxIntegral = 100.0;                   // 累積積分値の最大値
-  double minIntegral = -100.0;                  // 累積積分値の最小値
-  static constexpr double alpha = 0.8;          // ローパスフィルタの係数
+  double prevTime = -1.0;               // 前回の時間
+  double prevDeviation = 0.0;           // 前回の偏差
+  double integral = 0.0;                // 偏差の累積
+  double filteredDerivative = 0.0;      // フィルタされた微分項を保持する変数
+  double targetValue;                   // 目標値
+  double maxIntegral = 100.0;           // 累積積分値の最大値
+  double minIntegral = -100.0;          // 累積積分値の最小値
+  static constexpr double alpha = 0.8;  // ローパスフィルタの係数
 };
 
 #endif  // PID_H

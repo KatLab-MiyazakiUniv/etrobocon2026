@@ -120,6 +120,7 @@ namespace CameraServer {
    */
   struct QrCodeDetectorRequest {
     Command command = Command::QR_CODE_DETECTION;  // QRコード検出コマンド
+    RectData roi;                                  // 検出対象の領域
   };
 
   /**

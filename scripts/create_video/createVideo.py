@@ -1,6 +1,6 @@
 """
 @file   createVideo.py
-@brief  保存された連続JPEG画像から、BoundingBox・文字を描画しつつ、FFmpegを利用し並列プロセスで高速に動画を作成する
+@brief  走行ログ可視化動画を作成する
 @author sadomiya-sousi
 """
 
@@ -28,7 +28,7 @@ def parse_args():
                       help="出力動画のファイルパス")
   parser.add_argument("-r", "--fps", type=int, default=15,
                       help="出力動画のFPS")
-  parser.add_argument("-s", "--scale", type=float, default=0.4,
+  parser.add_argument("-s", "--scale", type=float, default=0.5,
                       help="画像の縮小比率 (0.1 〜 1.0)")
   parser.add_argument("-g", "--gpu", action="store_true", default=False,
                       help="NVIDIA GPUエンコーダー (h264_nvenc) を使用するかどうか")
@@ -225,7 +225,7 @@ def process_chunk(chunk_index, image_subset, args, width, height, temp_output_pa
 
   success_count = 0
   try:
-    for idx, item in enumerate(image_subset):
+    for item in image_subset:
       path = item[0]
       img = cv2.imread(path)
       if img is None:
@@ -270,6 +270,12 @@ def main():
   @brief 画像をつなげて動画化
   """
   args = parse_args()
+
+  # 追加>未検証
+  #################
+  if args.fps <= 0:
+    print(f"ERROR:FPSは1以上を指定してください。入力値:{args.fps}" ,file=sys.stderr)
+  #################
 
   if not os.path.exists(args.input_dir):
     print(f"ERROR:入力ディレクトリ '{args.input_dir}' が存在しません。", file=sys.stderr)

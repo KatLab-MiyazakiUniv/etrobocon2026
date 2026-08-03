@@ -13,13 +13,15 @@
 #include "CodeDetector.h"
 #include "Logger.h"
 #include "QrCodeDetectionResult.h"
+#include "SystemInfo.h"
 
 class QrCodeDetector : public CodeDetector<QrCodeDetectionResult> {
  public:
   /**
    * @brief コンストラクタ
+   * @param roi 注目領域
    */
-  QrCodeDetector();
+  explicit QrCodeDetector(const cv::Rect& roi);
 
   /**
    * @brief デストラクタ
@@ -33,8 +35,20 @@ class QrCodeDetector : public CodeDetector<QrCodeDetectionResult> {
    */
   QrCodeDetectionResult detect(const cv::Mat& frame) override;
 
+  /**
+   * @brief ROIを設定する
+   * @param _roi 設定するROI
+   */
+  void setRoi(const cv::Rect& _roi);
+
  private:
   ZXing::ReaderOptions options;  // ZXingのデコードオプション
+  cv::Rect roi;                  // フレーム全体に対するROI
+
+  /**
+   * @brief ROIがフレーム内に収まるように補正する
+   */
+  void validateParameters();
 };
 
 #endif  // QR_CODE_DETECTOR_H

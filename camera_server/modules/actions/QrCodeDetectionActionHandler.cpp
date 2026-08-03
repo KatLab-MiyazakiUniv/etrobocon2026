@@ -7,7 +7,7 @@
 #include "QrCodeDetectionActionHandler.h"
 
 QrCodeDetectionActionHandler::QrCodeDetectionActionHandler(CameraCapture& _camera)
-  : camera(_camera), detector()
+  : camera(_camera), detector(cv::Rect(0, 0, CAM_MAX_WIDTH, CAM_MAX_HEIGHT))
 {
   LOG_CREATE("QrCodeDetectionActionHandler");
 }
@@ -26,6 +26,9 @@ void QrCodeDetectionActionHandler::execute(const CameraServer::QrCodeDetectorReq
     response.wasDetected = false;
     return;
   }
+
+  cv::Rect localRoi(request.roi.x, request.roi.y, request.roi.width, request.roi.height);
+  detector.setRoi(localRoi);
 
   QrCodeDetectionResult result = detector.detect(frame);
 

@@ -96,4 +96,45 @@ namespace etrobocon2026_test {
     EXPECT_TRUE(tracking.getIsStopMotorPower());
   }
 
+  // QRコード検出用コンストラクタでメンバ変数が正しく初期化されているかを検証
+  TEST(CameraTrackingTest, QrConstructorInitializesMembersCorrectly)
+  {
+    MockNetworkSystem mockNet;
+    SocketClient mockClient(mockNet);
+    Robot robot(mockClient);
+
+    Pid::PidGain gain(0.1, 0.0, 0.0);
+    CameraServer::QrCodeDetectorRequest req;
+
+    double speed = 60.0;
+    int targetX = 320;
+
+    TestCameraTracking tracking(robot, std::make_unique<SimpleContinuationCondition>(robot), speed,
+                                targetX, gain, req);
+
+    EXPECT_DOUBLE_EQ(tracking.getTargetSpeed(), speed);
+    EXPECT_EQ(tracking.getTargetXCoordinate(), targetX);
+    EXPECT_EQ(tracking.getDetectionMode(), CameraTracking::DetectionMode::QR_CODE);
+    EXPECT_TRUE(tracking.getIsStopMotorPower());
+  }
+
+  // 色領域検出用コンストラクタで初期化した場合、検出方式がCOLOR_REGIONになるか検証
+  TEST(CameraTrackingTest, ColorRegionConstructorSetsColorRegionMode)
+  {
+    MockNetworkSystem mockNet;
+    SocketClient mockClient(mockNet);
+    Robot robot(mockClient);
+
+    Pid::PidGain gain(0.1, 0.0, 0.0);
+    CameraServer::ColorRegionDetectorRequest req;
+    req.hsvRangeCount = 1;
+    req.hsvRanges[0] = ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::BLACK);
+    req.roi = { 0, 0, 640, 480 };
+
+    TestCameraTracking tracking(robot, std::make_unique<SimpleContinuationCondition>(robot), 50.0,
+                                320, gain, req);
+
+    EXPECT_EQ(tracking.getDetectionMode(), CameraTracking::DetectionMode::COLOR_REGION);
+  }
+
 }  // namespace etrobocon2026_test

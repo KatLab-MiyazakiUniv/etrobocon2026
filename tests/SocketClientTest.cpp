@@ -114,6 +114,24 @@ namespace etrobocon2026_test {
     EXPECT_EQ(mockNet.lastSentCommand, expectedCmd);
   }
 
+  // executeQrCodeDetection の正常系テスト
+  TEST(SocketClientTest, ExecuteQrCodeDetectionSuccess)
+  {
+    MockNetworkSystem mockNet;
+    SocketClient client(mockNet);
+    EXPECT_TRUE(client.connectToServer());
+
+    CameraServer::QrCodeDetectorRequest request;
+
+    mockNet.hasRecvData = true;
+    mockNet.sizeOfReturnLen = sizeof(CameraServer::QrCodeDetectorResponse);
+
+    CameraServer::QrCodeDetectorResponse actualResponse;
+    EXPECT_TRUE(client.executeQrCodeDetection(request, actualResponse));
+    uint8_t expectedCmd = static_cast<uint8_t>(CameraServer::Command::QR_CODE_DETECTION);
+    EXPECT_EQ(mockNet.lastSentCommand, expectedCmd);
+  }
+
   // executeActionが成功しtrueを返すことを確認するテスト
   TEST(SocketClientTest, ExecuteActionSuccess)
   {

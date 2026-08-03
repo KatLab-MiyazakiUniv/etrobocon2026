@@ -9,14 +9,10 @@
 
 #include <iostream>
 #include "Logger.h"
-#include "Course.h"
 
 class EtRobocon2026 {
  public:
   static void start();
-
- private:
-  static constexpr Course RUNNING_COURSE = Course::Left;
 };
 
 #endif

@@ -13,11 +13,11 @@ class EtRallyMap {
    * @brief 右上を原点とした交点情報
    */
   struct Node {
-    int gridX;  // 格子座標X
-    int gridY;  // 格子座標Y
+    int gridX;     // 格子座標X
+    int gridY;     // 格子座標Y
 
-    double x;  // 実座標X(mm)
-    double y;  // 実座標Y(mm)
+    double x;      // 実座標X(mm)
+    double y;      // 実座標Y(mm)
   };
 
   /**
@@ -26,7 +26,7 @@ class EtRallyMap {
   EtRallyMap();
 
   /**
-   * @brief 指定した格子座標に対応する交点情報を取得する
+   * @brief 指定した格子座標の交点情報を取得する
    * @param gridX X方向の格子番号
    * @param gridY Y方向の格子番号
    * @return 指定位置の交点情報(Node)
@@ -34,20 +34,21 @@ class EtRallyMap {
   Node getNode(int gridX, int gridY) const;
 
  private:
-  // 最初のX方向の間隔(mm)
+  // X方向の最初の区間(mm)
   static constexpr double FIRST_X_GRID_SIZE = 171.0;
 
-  // 通常の格子間隔(mm)
-  static constexpr double GRID_SIZE = 995.0 / 8.0;
+  // X方向の通常の区間(mm)
+  static constexpr double GRID_SIZE = 104.0;
 
-  // Y方向の最後の線の間隔(mm)
-  static constexpr double LAST_Y_GRID_SIZE = 234.0;
+  // Y方向の全長(mm)
+  static constexpr double MAP_HEIGHT = 1135.0;
 
-  // X方向の線の数（原点を含まない）
-  static constexpr int X_GRID_NUM = 9;
+  // Y方向の区間(mm)
+  static constexpr double GRID_SIZE_Y = MAP_HEIGHT / 10.0;
 
-  // Y方向の線の数（原点を含まない）
-  static constexpr int Y_GRID_NUM = 9;
+  // 格子数（原点を含めて11本）
+  static constexpr int X_GRID_NUM = 10;
+  static constexpr int Y_GRID_NUM = 10;
 
   Node nodes[X_GRID_NUM + 1][Y_GRID_NUM + 1];
 };

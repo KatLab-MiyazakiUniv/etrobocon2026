@@ -26,13 +26,13 @@ def parse_args():
                       help="入力JPEG画像のディレクトリのパス")
   parser.add_argument("-o", "--output", default="line_trace.mp4",
                       help="出力動画のファイルパス")
-  parser.add_argument("-r", "--fps", type=int, default=15,
+  parser.add_argument("-r", "--fps", type=int, default= 15,
                       help="出力動画のFPS")
-  parser.add_argument("-s", "--scale", type=float, default=0.5,
+  parser.add_argument("-s", "--scale", type=float, default=1.0,
                       help="画像の縮小比率 (0.1 〜 1.0)")
   parser.add_argument("-g", "--gpu", action="store_true", default=False,
                       help="NVIDIA GPUエンコーダー (h264_nvenc) を使用するかどうか")
-  parser.add_argument("-c", "--clean", action="store_true", default=True,
+  parser.add_argument("-c", "--clean", action="store_true", default=False,
                       help="動画作成完了後に、入力画像ディレクトリ内のファイルをすべて削除するかどうか")
   parser.add_argument("-w", "--num-workers", type=int, default=0,
                       help="並列処理のプロセス数 (0の場合は自動設定)")
@@ -62,22 +62,22 @@ def collect_and_sort_images(input_dir):
     match = regex.match(basename)
     if match:
       was_detected = int(match.group(1))
-      tlx = int(match.group(2))
-      tly = int(match.group(3))
-      trx = int(match.group(4))
-      try_val = int(match.group(5))
-      blx = int(match.group(6))
-      bly = int(match.group(7))
-      brx = int(match.group(8))
-      bry = int(match.group(9))
-      rx = int(match.group(10))
-      ry = int(match.group(11))
-      rw = int(match.group(12))
-      rh = int(match.group(13))
+      tl_x = int(match.group(2))
+      tl_y = int(match.group(3))
+      tr_x = int(match.group(4))
+      tr_y = int(match.group(5))
+      bl_x = int(match.group(6))
+      bl_y = int(match.group(7))
+      br_x = int(match.group(8))
+      br_y = int(match.group(9))
+      r_x = int(match.group(10))
+      r_y = int(match.group(11))
+      r_w = int(match.group(12))
+      r_h = int(match.group(13))
       timestamp = int(match.group(14))
       image_list.append((
-          filepath, timestamp, was_detected, tlx, tly, trx, try_val, blx, bly,
-          brx, bry, rx, ry, rw, rh
+          filepath, timestamp, was_detected, tl_x, tl_y, tr_x, tr_y, bl_x, bl_y,
+          br_x, br_y, r_x, r_y, r_w, r_h
       ))
 
   # タイムスタンプ順で昇順ソート
@@ -100,18 +100,30 @@ def scale_coords(scale, *coords):
 
 def draw_outlined_text(img, text, pos, font_scale, color):
   """
-  @brief 黒い縁取りを施したテキストを描画する
+  @brief テキストを描画
   """
-  # 黒縁を描画（視認性の確保）
-  cv2.putText(
-      img, text, pos,
-      cv2.FONT_HERSHEY_SIMPLEX, font_scale, (0, 0, 0), 2, cv2.LINE_AA
-  )
-  # 前景色を描画
   cv2.putText(
       img, text, pos,
       cv2.FONT_HERSHEY_SIMPLEX, font_scale, color, 1, cv2.LINE_AA
   )
+
+# def draw_outlined_text(img, text, pos, font_scale, color):
+#   """
+#   @brief 黒い縁取りを施したテキストを描画する
+#   """
+#   x, y = pos
+#   # 黒い縁取りを綺麗に出すため、上下左右の微小な位置に黒文字を描画する
+#   for dx, dy in [(-1, -1), (-1, 1), (1, -1), (1, 1), (0, -1), (0, 1), (-1, 0), (1, 0)]:
+#     cv2.putText(
+#         img, text, (x + dx, y + dy),
+#         cv2.FONT_HERSHEY_SIMPLEX, font_scale, (0, 0, 0), 2, cv2.LINE_AA
+#     )
+#   # 中央に前景色を描画
+#   cv2.putText(
+#       img, text, pos,
+#       cv2.FONT_HERSHEY_SIMPLEX, font_scale, color, 1, cv2.LINE_AA
+#   )
+
 
 
 def get_text_color(text):
@@ -147,7 +159,9 @@ def draw_frame_annotations(img, item, scale, width):
         scale, tlx, tly, trx, try_val, blx, bly, brx, bry
     )
 
-    # 頂点を結びポリゴンを描画（太さ2, BGR赤: (0, 0, 255)）
+
+
+    # 頂点を結びポリゴンを描画（太さ1, BGR赤: (0, 0, 255)）
     pts = np.array([[rtlx, rtly], [rtrx, rtry], [rbrx, rbry], [rblx, rbly]], np.int32)
     pts = pts.reshape((-1, 1, 2))
     cv2.polylines(img, [pts], isClosed=True, color=(0, 0, 255), thickness=2)
@@ -271,11 +285,14 @@ def main():
   """
   args = parse_args()
 
-  # 追加>未検証
-  #################
-  if args.fps <= 0:
-    print(f"ERROR:FPSは1以上を指定してください。入力値:{args.fps}" ,file=sys.stderr)
-  #################
+  if args.fps < 1:
+    print(f"ERROR:FPSは1より大きい値を指定してください。入力値:{args.fps}" ,file=sys.stderr)
+    sys.exit(1)
+
+
+  if args.scale <= 0:
+    print(f"ERROR:scaleは0より大きい値を入力してください。入力値:{args.fps}" ,file=sys.stderr)
+    sys.exit(1)
 
   if not os.path.exists(args.input_dir):
     print(f"ERROR:入力ディレクトリ '{args.input_dir}' が存在しません。", file=sys.stderr)

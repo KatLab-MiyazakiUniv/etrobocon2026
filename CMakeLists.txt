@@ -30,6 +30,8 @@ set(RUNNING_MODULE_DIR ${PROJECT_SOURCE_DIR}/modules)
 set(RUNNING_TEST_DIR ${PROJECT_SOURCE_DIR}/tests)
 set(CAMERA_MODULE_DIR ${PROJECT_SOURCE_DIR}/camera_server/modules)
 set(CAMERA_TEST_DIR ${PROJECT_SOURCE_DIR}/camera_server/tests)
+set(DECRYPT_MODULE_DIR ${PROJECT_SOURCE_DIR}/decrypt_server/modules)
+set(DECRYPT_TEST_DIR ${PROJECT_SOURCE_DIR}/decrypt_server/tests)
 
 # テスト設定
 enable_testing()
@@ -43,6 +45,7 @@ set(RUNNING_INCLUDE_DIRS
   ${RUNNING_MODULE_DIR}/calculators
   ${RUNNING_MODULE_DIR}/API
   ${RUNNING_MODULE_DIR}/client
+  ${RUNNING_MODULE_DIR}/decrypt
   ${RUNNING_MODULE_DIR}/motions
   ${RUNNING_MODULE_DIR}/motions/continuation_conditions
   ${PROJECT_SOURCE_DIR}/common
@@ -88,7 +91,6 @@ if(ENABLE_CAMERA_TESTS)
   find_package(OpenCV REQUIRED)
   find_package(PkgConfig REQUIRED)
   pkg_check_modules(ZXING REQUIRED zxing)
-  pkg_check_modules(OPENSSL REQUIRED openssl)
 
   # 必要なインクルードディレクトリの設定 (適宜登録)
   set(CAMERA_INCLUDE_DIRS
@@ -118,8 +120,8 @@ if(ENABLE_CAMERA_TESTS)
 
   # ライブラリターゲットを作成
   add_library(camera_server_impl STATIC ${CAMERA_SOURCES})
-  target_include_directories(camera_server_impl PUBLIC ${CAMERA_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} ${ZXING_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIRS})
-  target_link_libraries(camera_server_impl ${OpenCV_LIBS} ${ZXING_LIBRARIES} ${OPENSSL_LIBRARIES})
+  target_include_directories(camera_server_impl PUBLIC ${CAMERA_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} ${ZXING_INCLUDE_DIRS})
+  target_link_libraries(camera_server_impl ${OpenCV_LIBS} ${ZXING_LIBRARIES})
 
   # camera_server/tests ディレクトリ内の *Test.cpp をすべてテストソースとして登録
   file(GLOB CAMERA_TEST_SOURCES
@@ -141,5 +143,65 @@ if(ENABLE_CAMERA_TESTS)
 
   # テストの登録
   gtest_discover_tests(camera_server_test)
+
+endif()
+
+## 復号システム ##
+
+# テスト有効化オプション
+option(ENABLE_DECRYPT_TESTS "Build decrypt tests" ON)
+
+if(ENABLE_DECRYPT_TESTS)
+  find_package(PkgConfig REQUIRED)
+  # IMPORTED_TARGETを使い、ライブラリの探索パスもリンク設定へ引き継ぐ
+  pkg_check_modules(OPENSSL REQUIRED IMPORTED_TARGET openssl)
+
+  # 必要なインクルードディレクトリの設定 (適宜登録)
+  set(DECRYPT_INCLUDE_DIRS
+    ${DECRYPT_MODULE_DIR}
+    ${DECRYPT_MODULE_DIR}/utils
+    ${DECRYPT_MODULE_DIR}/actions
+    ${DECRYPT_MODULE_DIR}/server
+    ${DECRYPT_MODULE_DIR}/service
+    ${DECRYPT_MODULE_DIR}/benchmark
+    ${PROJECT_SOURCE_DIR}/common
+    ${PROJECT_SOURCE_DIR}/common/customs
+    ${RUNNING_MODULE_DIR}/API
+    ${RUNNING_MODULE_DIR}/client
+    ${RUNNING_MODULE_DIR}/decrypt
+    ${RUNNING_TEST_DIR}/dummy
+    ${DECRYPT_TEST_DIR}/dummy
+  )
+
+  # ソースファイルの登録 (適宜登録)
+  # 走行アプリへOpenSSL依存を持ち込まないため、modules/からは復号に必要なファイルのみを指定する
+  file(GLOB_RECURSE DECRYPT_SOURCES
+    "${DECRYPT_MODULE_DIR}/*.cpp"
+    "${PROJECT_SOURCE_DIR}/common/*.cpp"
+    "${RUNNING_MODULE_DIR}/API/ClockUtil.cpp"
+    "${RUNNING_MODULE_DIR}/client/DecryptClient.cpp"
+    "${RUNNING_MODULE_DIR}/decrypt/*.cpp"
+  )
+
+  # ライブラリターゲットを作成
+  add_library(decrypt_server_impl STATIC ${DECRYPT_SOURCES})
+  target_include_directories(decrypt_server_impl PUBLIC ${DECRYPT_INCLUDE_DIRS})
+  target_link_libraries(decrypt_server_impl PkgConfig::OPENSSL)
+
+  # decrypt_server/tests ディレクトリ内の *Test.cpp をすべてテストソースとして登録
+  file(GLOB DECRYPT_TEST_SOURCES
+    "${DECRYPT_TEST_DIR}/*Test.cpp"
+  )
+
+  # テスト実行可能ファイルの作成
+  add_executable(decrypt_server_test ${DECRYPT_TEST_SOURCES})
+  target_link_libraries(decrypt_server_test
+    PRIVATE
+      decrypt_server_impl
+      gtest_main
+  )
+
+  # テストの登録
+  gtest_discover_tests(decrypt_server_test)
 
 endif()

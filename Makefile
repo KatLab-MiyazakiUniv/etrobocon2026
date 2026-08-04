@@ -12,12 +12,18 @@ help:
 	@echo " $$ make build-running"
 	@echo 撮影システムをビルドする
 	@echo " $$ make build-camera"
+	@echo 復号システムをビルドする
+	@echo " $$ make build-decrypt"
 	@echo 走行を開始する\(実機限定\)
 	@echo " $$ make start"
 	@echo 走行システムを開始する
 	@echo " $$ make start-running"
 	@echo 撮影システムを開始する
 	@echo " $$ make start-camera"
+	@echo 復号システムを開始する
+	@echo " $$ make start-decrypt"
+	@echo 復号性能のベンチマークを実行する
+	@echo " $$ make bench-decrypt"
 	@echo 指定ファイルをフォーマットする
 	@echo " $$ make format FILES=<ディレクトリ名>/<ファイル名>.cpp"
 	@echo すべての変更ファイルをフォーマットする
@@ -36,18 +42,24 @@ help:
 	@echo " $$ make test-build-running"
 	@echo 撮影システムのテストをビルドする
 	@echo " $$ make test-build-camera"
+	@echo 復号システムのテストをビルドする
+	@echo " $$ make test-build-decrypt"
 	@echo 全システムのテストを実行する
 	@echo " $$ make test-exec"
 	@echo 走行システムのテストを実行する
 	@echo " $$ make test-exec-running"
 	@echo 撮影システムのテストを実行する
 	@echo " $$ make test-exec-camera"
+	@echo 復号システムのテストを実行する
+	@echo " $$ make test-exec-decrypt"
 	@echo 全システムのテストをビルドして実行する
 	@echo " $$ make test"
 	@echo 走行システムのテストをビルドして実行する
 	@echo " $$ make test-running"
 	@echo 撮影システムのテストをビルドして実行する
 	@echo " $$ make test-camera"
+	@echo 復号システムのテストをビルドして実行する
+	@echo " $$ make test-decrypt"
 	@echo テスト用の'test_build'ディレクトリを削除する
 	@echo " $$ make clean"
 	@echo 環境が変わっている場合のみ test_build ディレクトリを削除する
@@ -63,7 +75,7 @@ help:
 
 ## 実行関連 ##
 .PHONY: build
-build: build-running build-camera
+build: build-running build-camera build-decrypt
 
 # 走行システムをビルドする
 build-running:
@@ -72,6 +84,10 @@ build-running:
 # 撮影システムをビルドする
 build-camera:
 	cd $(MAKEFILE_PATH)camera_server && make -f Makefile.camera -j5
+
+# 復号システムをビルドする
+build-decrypt:
+	cd $(MAKEFILE_PATH)decrypt_server && make -f Makefile.decrypt -j5
 
 # 実機の場合、走行を開始する
 start: start-camera start-running
@@ -83,6 +99,14 @@ start-running:
 # 撮影システムを開始する
 start-camera:
 	cd $(MAKEFILE_PATH)camera_server && ./camera_app
+
+# 復号システムを開始する
+start-decrypt:
+	cd $(MAKEFILE_PATH)decrypt_server && ./decrypt_app
+
+# 復号性能のベンチマークを実行する（例: make bench-decrypt ARGS="--remote-ip 192.168.11.10"）
+bench-decrypt:
+	cd $(MAKEFILE_PATH)decrypt_server && ./decrypt_bench $(ARGS)
 
 ## 開発関連 ##
 FORMAT_FILES := find . \
@@ -127,15 +151,20 @@ test-build:
 # 走行システムのテストをビルドする
 test-build-running:
 	@mkdir -p $(MAKEFILE_PATH)test_build
-	cd $(MAKEFILE_PATH)test_build && cmake .. -DENABLE_CAMERA_TESTS=OFF && make running_test
+	cd $(MAKEFILE_PATH)test_build && cmake .. -DENABLE_CAMERA_TESTS=OFF -DENABLE_DECRYPT_TESTS=OFF && make running_test
 
 # 撮影システムのテストをビルドする
 test-build-camera:
 	@mkdir -p $(MAKEFILE_PATH)test_build
-	cd $(MAKEFILE_PATH)test_build && cmake .. -DENABLE_CAMERA_TESTS=ON && make camera_server_test
+	cd $(MAKEFILE_PATH)test_build && cmake .. -DENABLE_CAMERA_TESTS=ON -DENABLE_DECRYPT_TESTS=OFF && make camera_server_test
+
+# 復号システムのテストをビルドする
+test-build-decrypt:
+	@mkdir -p $(MAKEFILE_PATH)test_build
+	cd $(MAKEFILE_PATH)test_build && cmake .. -DENABLE_CAMERA_TESTS=OFF -DENABLE_DECRYPT_TESTS=ON && make decrypt_server_test
 
 # 全システムのテストを実行する
-test-exec: test-exec-running test-exec-camera
+test-exec: test-exec-running test-exec-camera test-exec-decrypt
 
 # 走行システムのテストを実行する
 test-exec-running:
@@ -155,6 +184,15 @@ test-exec-camera:
 	fi
 	cd $(MAKEFILE_PATH)test_build && ./camera_server_test
 
+# 復号システムのテストを実行する
+test-exec-decrypt:
+	@if [ ! -f $(MAKEFILE_PATH)test_build/decrypt_server_test ]; then \
+		echo "テスト実行ファイルが見つかりません。まずビルドを実行してください。"; \
+		echo " $$ make test-build-decrypt"; \
+		exit 1; \
+	fi
+	cd $(MAKEFILE_PATH)test_build && ./decrypt_server_test
+
 # 全システムのテストをビルドして実行する
 test: smart-clean test-build test-exec
 
@@ -163,6 +201,9 @@ test-running: smart-clean test-build-running test-exec-running
 
 # 撮影システムのテストをビルドして実行する
 test-camera: smart-clean test-build-camera test-exec-camera
+
+# 復号システムのテストをビルドして実行する
+test-decrypt: smart-clean test-build-decrypt test-exec-decrypt
 
 # test_build ディレクトリを完全に削除する
 clean:

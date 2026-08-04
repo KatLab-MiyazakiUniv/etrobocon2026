@@ -20,6 +20,7 @@ APPL_DIRS += \
   $(mkfile_path)modules/calculators \
   $(mkfile_path)modules/API \
   $(mkfile_path)modules/client \
+  $(mkfile_path)modules/decrypt \
   $(mkfile_path)modules/motions \
   $(mkfile_path)modules/motions/continuation_conditions \
   $(mkfile_path)common \
@@ -30,6 +31,7 @@ INCLUDES += \
   -I$(mkfile_path)modules/calculators \
   -I$(mkfile_path)modules/API \
   -I$(mkfile_path)modules/client \
+  -I$(mkfile_path)modules/decrypt \
   -I$(mkfile_path)modules/motions \
   -I$(mkfile_path)modules/motions/continuation_conditions \
   -I$(mkfile_path)common \

@@ -7,4 +7,6 @@ datafiles/logfiles/
 
 # 実行ファイル
 camera_app
+decrypt_app
+decrypt_bench
 scripts/CheckType

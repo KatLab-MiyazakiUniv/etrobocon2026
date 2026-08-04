@@ -18,7 +18,6 @@ CameraTracking::CameraTracking(Robot& _robot,
     detectionRequest(_detectionRequest),
     isStopMotorPower(_isStopMotorPower),
     speedCalculator(_robot, _targetSpeed),
-    pidGain(_pidGain),
     cameraPid(_pidGain.kp, _pidGain.ki, _pidGain.kd, _targetXCoordinate)
 {
   LOG_CREATE("CameraTracking");
@@ -58,7 +57,7 @@ void CameraTracking::executeStep()
   // 通信失敗、または検出できなかった場合は、出力を更新せずに終了する
   if(!success || !response.result.wasDetected) {
     Logger::printfLog(
-        Logger::DEBUG,
+        Logger::WARNING,
         "CameraTracking:色領域が検出されませんでした。success:%d  response.result.wasDetected:%d",
         success, response.result.wasDetected);
     return;
@@ -66,8 +65,6 @@ void CameraTracking::executeStep()
 
   // 黒を除く最大面積の色範囲取得
   if(detectionRequest.requireLargestColorIndex || response.largestColorIndex != 3) {
-    Logger::printfLog(Logger::INFO, "CameraTracking:最大検出色は%s",
-                      largestColor[response.largestColorIndex].c_str());
     robot.setIndexOfLabel(response.largestColorIndex);
   }
 
@@ -94,16 +91,14 @@ void CameraTracking::executeStep()
   logData.leftPower = robot.getWheelMotorControllerInstance().getLeftPower();
   logData.rightSpeed = robot.getWheelMotorControllerInstance().getRightSpeed();
   logData.leftSpeed = robot.getWheelMotorControllerInstance().getLeftSpeed();
-  logData.kp = pidGain.kp;
-  logData.ki = pidGain.ki;
-  logData.kd = pidGain.kd;
+  logData.kp = cameraPid.getPidGain().kp;
+  logData.ki = cameraPid.getPidGain().ki;
+  logData.kd = cameraPid.getPidGain().kd;
+
   CsvLogger::add(logData);
 }
 
-void CameraTracking::wait()
-{
-  // ClockUtil::sleep(0);  // カメラの撮影FPSに合わせて30ミリ秒待機する
-}
+void CameraTracking::wait() {}
 
 void CameraTracking::finish()
 {

@@ -2,7 +2,6 @@
 #include "Logger.h"
 #include "SocketServer.h"
 #include "RealNetworkSystem.h"
-#include "FrameSave.h"
 
 int main()
 {
@@ -25,6 +24,5 @@ int main()
   SnapshotActionHandler snapshotHandler(camera);
   SocketServer server(snapshotHandler, colorRegionDetectionHandler, real);
   server.init();
-  server.run();
   return 0;
 }

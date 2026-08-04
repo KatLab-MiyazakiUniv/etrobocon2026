@@ -9,6 +9,8 @@
 #include "DistanceCondition.h"
 #include "Mileage.h"
 
+#include "MockNetworkSystem.h"
+
 namespace etrobocon2026_test {
   class LineTraceTest : public ::testing::Test {
    protected:
@@ -17,12 +19,14 @@ namespace etrobocon2026_test {
   };
 
   // 目標距離が正の時、run()でライントレース後、走行距離が目標距離だけ増加するかテスト（誤差あり）
+  // 目標距離が300のときは通り、400のときは通らない
   TEST_F(LineTraceTest, Run)
   {
-    RealNetworkSystem netSys;
+    MockNetworkSystem netSys;
     SocketClient socketClient(netSys);
+
     Robot robot(socketClient);
-    double targetSpeed = 1000.0;   // 目標速度
+    double targetSpeed = 300.0;    // 目標速度
     double targetDistance = 10.0;  // 目標距離
     int targetBrightness = 50;     // 目標とする明るさの値(%)
 
@@ -30,10 +34,14 @@ namespace etrobocon2026_test {
     int32_t rightCount = robot.getWheelMotorControllerInstance().getRightCount();
     int32_t leftCount = robot.getWheelMotorControllerInstance().getLeftCount();
 
+    Logger::printfLog(Logger::DEBUG, "スタート前の右の角度は%d", rightCount);
+    Logger::printfLog(Logger::DEBUG, "スタート前の左の角度は%d", leftCount);
     // 走行体全体の累計走行距離を計算
     double startMileage
         = Mileage::calculateMileage(robot.getWheelMotorControllerInstance().getRightCount(),
                                     robot.getWheelMotorControllerInstance().getLeftCount());
+
+    Logger::printfLog(Logger::DEBUG, "スタート前の距離は%lf", startMileage);
 
     // ライントレース動作を実行
     LineTrace lineTrace(robot, std::make_unique<DistanceCondition>(robot, targetDistance),

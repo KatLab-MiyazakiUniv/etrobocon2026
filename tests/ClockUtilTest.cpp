@@ -84,4 +84,27 @@ namespace etrobocon2026_test {
     EXPECT_LE(end - start, 5);
   }
 
+  // nowMicro()がマイクロ秒を返し、now()のミリ秒と整合することを確認するテスト
+  TEST(ClockUtilTest, NowMicroIsConsistentWithNow)
+  {
+    uint64_t micro = ClockUtil::nowMicro();
+    int milli = ClockUtil::now();
+
+    // nowMicro()を先に取得しているので、ミリ秒へ丸めた値は必ずnow()以下になる
+    EXPECT_LE(static_cast<int>(micro / 1000), milli);
+  }
+
+  // nowMicro()がsleep()した分だけ進むことを確認するテスト
+  TEST(ClockUtilTest, NowMicroAdvancesAfterSleep)
+  {
+    uint64_t start = ClockUtil::nowMicro();
+
+    ClockUtil::sleep(10);  // 10ミリ秒 = 10000マイクロ秒
+
+    uint64_t end = ClockUtil::nowMicro();
+
+    // クロックの誤差を考慮して、スリープ時間の8割以上進んでいれば良しとする
+    EXPECT_GE(end - start, static_cast<uint64_t>(8000));
+  }
+
 }  // namespace etrobocon2026_test

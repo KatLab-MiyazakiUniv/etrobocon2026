@@ -6,6 +6,7 @@
 #ifndef CLOCK_UTIL_H
 #define CLOCK_UTIL_H
 #include "Clock.h"
+#include <cstdint>
 
 class ClockUtil {
  public:
@@ -14,6 +15,12 @@ class ClockUtil {
    * @return 経過時間(ミリ秒)
    */
   static int now();
+
+  /**
+   * @brief 開始時間からの経過時間取得（マイクロ秒）
+   * @return 経過時間(マイクロ秒)
+   */
+  static uint64_t nowMicro();
 
   /**
    * @brief 自タスクススリープ（デフォルトは10ミリ秒）

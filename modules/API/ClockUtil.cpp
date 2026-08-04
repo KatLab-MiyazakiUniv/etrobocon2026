@@ -13,6 +13,12 @@ int ClockUtil::now()
   return static_cast<int>(getClockInstance().now() / 1000);
 }
 
+uint64_t ClockUtil::nowMicro()
+{
+  // 内部のクロックはマイクロ秒を返すため、単位変換せずそのままreturn
+  return getClockInstance().now();
+}
+
 void ClockUtil::sleep(int milliSec)
 {
   if(milliSec <= 0) {

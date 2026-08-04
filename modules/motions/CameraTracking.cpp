@@ -37,7 +37,6 @@ CameraTracking::CameraTracking(Robot& _robot,
     qrDetectionRequest(_qrDetectionRequest),
     isStopMotorPower(_isStopMotorPower),
     speedCalculator(_robot, _targetSpeed),
-    pidGain(_pidGain),
     cameraPid(_pidGain.kp, _pidGain.ki, _pidGain.kd, _targetXCoordinate)
 {
   LOG_CREATE("CameraTracking");
@@ -129,9 +128,10 @@ void CameraTracking::executeStep()
   logData.leftPower = robot.getWheelMotorControllerInstance().getLeftPower();
   logData.rightSpeed = robot.getWheelMotorControllerInstance().getRightSpeed();
   logData.leftSpeed = robot.getWheelMotorControllerInstance().getLeftSpeed();
-  logData.kp = pidGain.kp;
-  logData.ki = pidGain.ki;
-  logData.kd = pidGain.kd;
+  logData.kp = cameraPid.getPidGain().kp;
+  logData.ki = cameraPid.getPidGain().ki;
+  logData.kd = cameraPid.getPidGain().kd;
+
   CsvLogger::add(logData);
 }
 

@@ -1,0 +1,71 @@
+# Debian/arm64向け 復号サーバー用Makefile
+
+# コンパイラ
+CXX := g++
+
+# ディレクトリ
+SRCDIR := modules
+INCLUDEDIR := modules
+TARGET_DIR := bin
+OBJDIR := $(TARGET_DIR)/obj
+TARGET := decrypt_app
+BENCH_TARGET := decrypt_bench
+
+# コンパイラとリンカのフラグ
+# ラズパイとPCで公正に比較するため、両環境で同じ最適化レベルを用いること
+CXXFLAGS := -std=c++17 -Wall -Wextra -O2 -pthread
+
+# OpenSSLのフラグを取得
+OPENSSL_CFLAGS := $(shell pkg-config --cflags openssl)
+OPENSSL_LIBS := $(shell pkg-config --libs openssl)
+
+# フラグを追加
+CXXFLAGS += $(OPENSSL_CFLAGS)
+LIBS := $(OPENSSL_LIBS)
+
+# インクルードパス
+INCLUDES := $(shell find $(INCLUDEDIR) -type d -printf '-I%p ') \
+            -I../common \
+            -I../common/customs \
+            -I../modules/API \
+            -I../modules/client \
+            -I../modules/decrypt
+
+# --- ビルドルール ---
+
+# サーバーとベンチマークで共有するソース
+COMMON_SOURCES := $(shell find $(SRCDIR) -name '*.cpp')
+COMMON_SOURCES += $(wildcard ../common/*.cpp)
+COMMON_SOURCES += ../modules/API/ClockUtil.cpp
+COMMON_SOURCES += ../modules/client/DecryptClient.cpp
+COMMON_SOURCES += $(wildcard ../modules/decrypt/*.cpp)
+
+SERVER_SOURCES := main.cpp $(COMMON_SOURCES)
+BENCH_SOURCES := bench_main.cpp $(COMMON_SOURCES)
+
+SERVER_OBJS := $(addprefix $(OBJDIR)/,$(SERVER_SOURCES:.cpp=.o))
+BENCH_OBJS := $(addprefix $(OBJDIR)/,$(BENCH_SOURCES:.cpp=.o))
+
+# デフォルトターゲット
+all: $(TARGET) $(BENCH_TARGET)
+
+# 復号サーバーの実行ファイルをリンクするルール
+$(TARGET): $(SERVER_OBJS)
+	@mkdir -p $(TARGET_DIR)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
+
+# ベンチマークの実行ファイルをリンクするルール
+$(BENCH_TARGET): $(BENCH_OBJS)
+	@mkdir -p $(TARGET_DIR)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
+
+# 任意の .cpp ファイルを対応する .o ファイルにコンパイルするルール
+$(OBJDIR)/%.o: %.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) $(INCLUDES) -c $< -o $@
+
+# 中間ファイルを削除
+clean:
+	rm -rf $(OBJDIR) $(TARGET_DIR) $(TARGET) $(BENCH_TARGET)
+
+.PHONY: all clean

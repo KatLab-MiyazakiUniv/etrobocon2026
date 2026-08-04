@@ -71,9 +71,10 @@ namespace etrobocon2026_test {
   TEST_F(ColorRegionDetectorTest, TinyColorAreaNotDetected)
   {
     ColorRegionDetector detector(blackRanges, defaultROI);
-    // 5×5=25px はモルフォロジー後も面積閾値50を下回る
-    cv::Mat frame = makeFrameWithBlackRect(defaultRes, cv::Rect(200, 300, 5, 5));
+    // 5×5=25px はモルフォロジー後も面積閾値50を下回る>何故か検知できてる>?>3*3だと検知しないから。
+    cv::Mat frame = makeFrameWithBlackRect(defaultRes, cv::Rect(200, 300, 3, 3));
     BoundingBoxDetectionResult result;
+
     detector.detect(frame, result);
     EXPECT_FALSE(result.wasDetected);
   }

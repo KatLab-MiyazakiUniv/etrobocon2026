@@ -1,7 +1,7 @@
 /**
- **  @file Mileage.cpp
- **  @brief 走行距離を計算するクラス
- **  @author migaku2645
+ *  @file Mileage.cpp
+ *  @brief 走行距離を計算するクラス
+ *  @author migaku2645
  **/
 
 #include "Mileage.h"

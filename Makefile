@@ -58,6 +58,8 @@ help:
 	@echo " $$ make docker-run"
 	@echo UID/GIDを指定してDockerコンテナを起動する\(権限問題が起きた場合\)
 	@echo " $$ make docker-run-user"
+	@echo venvを有効化して動画を作成する
+	@echo " $$ make create-video"
 
 ## 実行関連 ##
 .PHONY: build
@@ -205,3 +207,9 @@ docker-run-user:
 		--user $$(id -u):$$(id -g) \
 		$(DOCKER_MOUNT) \
 		$(DOCKER_IMAGE) bash
+
+.PHONY: create-video
+create-video:
+	$(MAKEFILE_PATH)scripts/create_video/venv/bin/python \
+    $(MAKEFILE_PATH)scripts/create_video/createVideo.py \
+    -i $(MAKEFILE_PATH)camera_server/datafiles/line_trace/

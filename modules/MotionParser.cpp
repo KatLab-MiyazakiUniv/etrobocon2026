@@ -165,12 +165,12 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
       double targetDistance = fromString<double>(params[2]);
       return make_unique<DistanceCondition>(robot, targetDistance);
     }
-    case CONDITION_COMMAND::ABSOLUTEANGLE: {
+    case CONDITION_COMMAND::ABSOLUTE_ANGLE: {
       double targetAngle = fromString<double>(params[2]);
       double tolerance = fromString<double>(params[3]);
       return make_unique<AbsoluteAngleCondition>(robot, targetAngle, tolerance);
     }
-    case CONDITION_COMMAND::RELATIVEANGLE: {
+    case CONDITION_COMMAND::RELATIVE_ANGLE: {
       double targetAngle = fromString<double>(params[2]);
       double tolerance = fromString<double>(params[3]);
       return make_unique<RelativeAngleCondition>(robot, targetAngle, tolerance);
@@ -230,8 +230,8 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
   // コマンド文字列(string)と、それに対応する列挙型MOTION_COMMANDのマッピングを定義
   static const unordered_map<string, MOTION_COMMAND> commandMap = {
     { "Straight", MOTION_COMMAND::STRAIGHT },
-    { "AbsoluteRotation", MOTION_COMMAND::ABSOLUTEROTATION },
-    { "RelativeRotation", MOTION_COMMAND::RELATIVEROTATION },
+    { "AbsoluteRotation", MOTION_COMMAND::ABSOLUTE_ROTATION },
+    { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
   };
 
   // コマンド文字列に対応するMOTION_COMMAND値をマップから取得。なければMOTION_COMMAND::NONEを返す

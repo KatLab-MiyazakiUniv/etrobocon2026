@@ -11,12 +11,14 @@
 
 #include "Position.h"
 #include "SystemInfo.h"
+#include "AngleNormalizer.h"
+#include "Mileage.h"
 
 class Odometry {
  public:
   /**
    * @brief コンストラクタ
-   * @param position 更新対象
+   * @param position 更新する位置情報
    */
   explicit Odometry(Position& position);
 

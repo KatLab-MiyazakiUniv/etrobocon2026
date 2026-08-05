@@ -10,13 +10,6 @@
 #include <memory>
 #include <utility>
 
-namespace {
-
-  constexpr double ROTATION_TOLERANCE = 2.0;
-  constexpr double DISTANCE_TOLERANCE = 10.0;
-
-}  // namespace
-
 GoalNavigation::GoalNavigation(Robot& _robot,
                                std::unique_ptr<BaseContinuationCondition> _ContinuationCondition,
                                double _targetX, double _targetY, double _targetSpeed,
@@ -47,9 +40,6 @@ void GoalNavigation::prepare()
   // 現在位置から目標地点までの距離を計算する
   targetDistance = navigator.calculateDistance(targetX, targetY);
 
-  // 現在位置から目標地点への絶対方位角を計算する
-  targetHeading = navigator.calculateHeading(targetX, targetY);
-
   Logger::printfLog(Logger::INFO,
                     "GoalNavigation: target=(%.2f, %.2f), "
                     "distance=%.2f, heading=%.2f",
@@ -67,9 +57,7 @@ void GoalNavigation::executeStep()
 
   const double angleDifference = AngleNormalizer::normalizeAngle(targetHeading - currentHeading);
 
-  /*
-   * 目標方向との角度差が許容誤差より大きい場合だけ回頭する。
-   */
+  // 目標方向との角度差が許容誤差より大きい場合だけ回頭する。
   if(std::abs(angleDifference) > ROTATION_TOLERANCE) {
     auto rotationCondition
         = std::make_unique<AbsoluteAngleCondition>(robot, targetHeading, ROTATION_TOLERANCE);
@@ -79,9 +67,10 @@ void GoalNavigation::executeStep()
     rotation.run();
   }
 
-  /*
-   * prepare()で計算した距離だけ直進する。
-   */
+  // 回頭後の位置からの距離を計算する
+  targetHeading = navigator.calculateHeading(targetX, targetY);
+
+  // 計算した距離だけ直進する。
   auto distanceCondition = std::make_unique<DistanceCondition>(robot, targetDistance);
 
   Straight straight(robot, std::move(distanceCondition), targetSpeed, rightPid, leftPid,

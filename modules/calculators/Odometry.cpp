@@ -6,8 +6,6 @@
 
 #include "Odometry.h"
 #include <cmath>
-#include "AngleNormalizer.h"
-#include "Mileage.h"
 
 Odometry::Odometry(Position& position) : position(position), prevEncoderLeft(0), prevEncoderRight(0)
 {

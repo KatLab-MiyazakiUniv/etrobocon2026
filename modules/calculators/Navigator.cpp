@@ -6,8 +6,6 @@
 
 #include "Navigator.h"
 
-#include <cmath>
-
 Navigator::Navigator(const Position& position) : position(position) {}
 
 double Navigator::calculateDistance(double goalX, double goalY) const

@@ -11,6 +11,8 @@
 #include "AngleNormalizer.h"
 #include "SystemInfo.h"
 
+#include <cmath>
+
 class Navigator {
  public:
   explicit Navigator(const Position& position);

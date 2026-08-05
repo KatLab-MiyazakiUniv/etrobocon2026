@@ -30,9 +30,9 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 class MotionParser {
  public:
   // 動作コマンド名を持つ列挙型クラス
-  enum class MOTION_COMMAND { STRAIGHT, ABSOLUTEROTATION, RELATIVEROTATION, NONE };
+  enum class MOTION_COMMAND { STRAIGHT, ABSOLUTE_ROTATION, RELATIVE_ROTATION, NONE };
   // 条件コマンド名を持つ列挙型クラス
-  enum class CONDITION_COMMAND { DISTANCE, ABSOLUTEANGLE, RELATIVEANGLE, NONE };
+  enum class CONDITION_COMMAND { DISTANCE, ABSOLUTE_ANGLE, RELATIVE_ANGLE, NONE };
 
   /**
    * @brief Area CSVファイルを解析して動作インスタンスのリストを生成する

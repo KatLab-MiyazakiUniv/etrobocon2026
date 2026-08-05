@@ -199,7 +199,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
     //                                     fromString<double>(motionParams[5]) },
     //                       motionParams[6] == "true");
     // }
-    case MOTION_COMMAND::ABSOLUTEROTATION: {
+    case MOTION_COMMAND::ABSOLUTE_ROTATION: {
       // AbsoluteRotation: motionParams[2]=targetAngle(double)
       //                   motionParams[3..5]=anglePid(kp,ki,kd)
       return new AbsoluteRotation(robot, std::move(condition),
@@ -208,7 +208,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                                                 fromString<double>(motionParams[5]) },
                                   fromString<double>(motionParams[2]));
     }
-    case MOTION_COMMAND::RELATIVEROTATION: {
+    case MOTION_COMMAND::RELATIVE_ROTATION: {
       // AbsoluteRotation: motionParams[2]=targetAngle(double)
       //                   motionParams[3..5]=anglePid(kp,ki,kd)
       return new RelativeRotation(robot, std::move(condition),
@@ -248,8 +248,8 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
   // 条件コマンド文字列と、それに対応する列挙型CONDITION_COMMANDのマッピングを定義
   static const unordered_map<string, CONDITION_COMMAND> conditionMap = {
     { "Distance", CONDITION_COMMAND::DISTANCE },
-    { "AbsoluteAngle", CONDITION_COMMAND::ABSOLUTEANGLE },
-    { "RelativeAngle", CONDITION_COMMAND::RELATIVEANGLE },
+    { "AbsoluteAngle", CONDITION_COMMAND::ABSOLUTE_ANGLE },
+    { "RelativeAngle", CONDITION_COMMAND::RELATIVE_ANGLE },
   };
 
   // 条件コマンド文字列に対応するCONDITION_COMMAND値をマップから取得。なければCONDITION_COMMAND::NONEを返す

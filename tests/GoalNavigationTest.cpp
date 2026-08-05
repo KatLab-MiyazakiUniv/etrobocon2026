@@ -42,14 +42,6 @@ namespace etrobocon2026_test {
     double targetX = 100.0;
     double targetY = 0.0;
 
-    /*
-     * 初期位置：(0, 0)
-     * 目標位置：(100, 0)
-     *
-     * 目標地点はX軸の正方向にあるため、
-     * 約100mm直進する。
-     */
-
     GoalNavigation goalNavigation(robot, std::make_unique<RepeatCountCondition>(robot, 1), targetX,
                                   targetY, targetSpeed, rotationPid, rightPid, leftPid,
                                   straightAnglePid);
@@ -74,14 +66,6 @@ namespace etrobocon2026_test {
     double targetX = 0.0;
     double targetY = 100.0;
 
-    /*
-     * 初期位置：(0, 0)
-     * 目標位置：(0, 100)
-     *
-     * 目標地点の方位角は90度なので、
-     * 90度付近まで回頭してから約100mm直進する。
-     */
-
     GoalNavigation goalNavigation(robot, std::make_unique<RepeatCountCondition>(robot, 1), targetX,
                                   targetY, targetSpeed, rotationPid, rightPid, leftPid,
                                   straightAnglePid);
@@ -104,20 +88,6 @@ namespace etrobocon2026_test {
 
     double targetX = 100.0;
     double targetY = 100.0;
-
-    /*
-     * 初期位置：(0, 0)
-     * 目標位置：(100, 100)
-     *
-     * 目標地点までの距離：
-     * sqrt(100^2 + 100^2)
-     * = sqrt(20000)
-     * ≒ 141.42mm
-     *
-     * 目標地点への方位角：
-     * atan2(100, 100)
-     * = 45度
-     */
 
     GoalNavigation goalNavigation(robot, std::make_unique<RepeatCountCondition>(robot, 1), targetX,
                                   targetY, targetSpeed, rotationPid, rightPid, leftPid,
@@ -150,14 +120,6 @@ namespace etrobocon2026_test {
     double targetX = 100.0;
     double targetY = 100.0;
 
-    /*
-     * 初期位置：(0, 0)
-     * 目標位置：(100, 100)
-     *
-     * 目標方位角：
-     * atan2(100, 100) = 45度
-     */
-
     double expectedHeading = 45.0;
 
     GoalNavigation goalNavigation(robot, std::make_unique<RepeatCountCondition>(robot, 1), targetX,
@@ -184,15 +146,6 @@ namespace etrobocon2026_test {
 
     double targetX = -100.0;
     double targetY = 0.0;
-
-    /*
-     * 初期位置：(0, 0)
-     * 初期方位角：0度
-     * 目標位置：(-100, 0)
-     *
-     * 目標地点はロボットの後方にあるため、
-     * 約180度回頭してから直進する。
-     */
 
     GoalNavigation goalNavigation(robot, std::make_unique<RepeatCountCondition>(robot, 1), targetX,
                                   targetY, targetSpeed, rotationPid, rightPid, leftPid,
@@ -221,11 +174,6 @@ namespace etrobocon2026_test {
 
     double targetX = 0.0;
     double targetY = 0.0;
-
-    /*
-     * 初期位置と目標地点が同じなので、
-     * GoalNavigation::executeStep()では何も実行しない。
-     */
 
     GoalNavigation goalNavigation(robot, std::make_unique<RepeatCountCondition>(robot, 1), targetX,
                                   targetY, targetSpeed, rotationPid, rightPid, leftPid,

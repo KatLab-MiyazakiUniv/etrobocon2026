@@ -16,14 +16,6 @@ namespace etrobocon2026_test {
   {
     Position position;
 
-    /*
-     * コンストラクタでは次の値が設定される。
-     *
-     * x = 0.0
-     * y = 0.0
-     * heading = 0.0
-     */
-
     double expectedX = 0.0;
     double expectedY = 0.0;
     double expectedHeading = 0.0;
@@ -46,14 +38,6 @@ namespace etrobocon2026_test {
     double x = 100.0;
     double y = 200.0;
     double heading = 45.0;
-
-    /*
-     * set(100.0, 200.0, 45.0)を実行する。
-     *
-     * x = 100.0
-     * y = 200.0
-     * heading = 45.0
-     */
 
     position.set(x, y, heading);
 
@@ -79,18 +63,6 @@ namespace etrobocon2026_test {
 
     double x = 100.0;
 
-    /*
-     * 更新前：
-     * x = 10.0
-     * y = 20.0
-     * heading = 30.0
-     *
-     * setX(100.0)実行後：
-     * x = 100.0
-     * y = 20.0
-     * heading = 30.0
-     */
-
     position.setX(x);
 
     double expectedX = 100.0;
@@ -115,18 +87,6 @@ namespace etrobocon2026_test {
 
     double y = 200.0;
 
-    /*
-     * 更新前：
-     * x = 10.0
-     * y = 20.0
-     * heading = 30.0
-     *
-     * setY(200.0)実行後：
-     * x = 10.0
-     * y = 200.0
-     * heading = 30.0
-     */
-
     position.setY(y);
 
     double expectedX = 10.0;
@@ -150,18 +110,6 @@ namespace etrobocon2026_test {
     position.set(10.0, 20.0, 30.0);
 
     double heading = 90.0;
-
-    /*
-     * 更新前：
-     * x = 10.0
-     * y = 20.0
-     * heading = 30.0
-     *
-     * setHeading(90.0)実行後：
-     * x = 10.0
-     * y = 20.0
-     * heading = 90.0
-     */
 
     position.setHeading(heading);
 
@@ -188,12 +136,6 @@ namespace etrobocon2026_test {
     double y = -200.0;
     double heading = -90.0;
 
-    /*
-     * Positionクラスでは値の範囲制限や正規化を行っていない。
-     *
-     * そのため、負の値をそのまま保持する。
-     */
-
     position.set(x, y, heading);
 
     double expectedX = -100.0;
@@ -219,11 +161,6 @@ namespace etrobocon2026_test {
     double y = -78.901;
     double heading = 45.678;
 
-    /*
-     * double型の小数値を設定し、
-     * 同じ値が取得できるかを確認する。
-     */
-
     position.set(x, y, heading);
 
     double expectedX = 123.456;
@@ -248,20 +185,6 @@ namespace etrobocon2026_test {
     position.set(10.0, 20.0, 30.0);
     position.set(100.0, 200.0, 90.0);
 
-    /*
-     * 1回目：
-     * x = 10.0
-     * y = 20.0
-     * heading = 30.0
-     *
-     * 2回目：
-     * x = 100.0
-     * y = 200.0
-     * heading = 90.0
-     *
-     * 最後に設定した値が保持される。
-     */
-
     double expectedX = 100.0;
     double expectedY = 200.0;
     double expectedHeading = 90.0;
@@ -284,14 +207,6 @@ namespace etrobocon2026_test {
     position.setX(100.0);
     position.setY(-200.0);
     position.setHeading(135.0);
-
-    /*
-     * setX(100.0)
-     * setY(-200.0)
-     * setHeading(135.0)
-     *
-     * それぞれ独立して値を更新する。
-     */
 
     double expectedX = 100.0;
     double expectedY = -200.0;

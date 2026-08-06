@@ -14,9 +14,6 @@
 #include "UltraSonicController.h"
 #include "SocketClient.h"
 
-// 走行プログラムには、そんなファイルない,,定義をcommonに移動するか?データ型をSocketProtcolの定義し、変換するようにする?
-// #include "ColorRegionDetector.h"
-
 #include "Course.h"
 #include "Button.h"
 #include "ForceSensor.h"

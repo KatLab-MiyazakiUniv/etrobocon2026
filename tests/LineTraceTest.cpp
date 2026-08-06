@@ -34,14 +34,10 @@ namespace etrobocon2026_test {
     int32_t rightCount = robot.getWheelMotorControllerInstance().getRightCount();
     int32_t leftCount = robot.getWheelMotorControllerInstance().getLeftCount();
 
-    Logger::printfLog(Logger::DEBUG, "スタート前の右の角度は%d", rightCount);
-    Logger::printfLog(Logger::DEBUG, "スタート前の左の角度は%d", leftCount);
     // 走行体全体の累計走行距離を計算
     double startMileage
         = Mileage::calculateMileage(robot.getWheelMotorControllerInstance().getRightCount(),
                                     robot.getWheelMotorControllerInstance().getLeftCount());
-
-    Logger::printfLog(Logger::DEBUG, "スタート前の距離は%lf", startMileage);
 
     // ライントレース動作を実行
     LineTrace lineTrace(robot, std::make_unique<DistanceCondition>(robot, targetDistance),

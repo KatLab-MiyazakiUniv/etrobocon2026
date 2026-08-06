@@ -57,7 +57,7 @@ class GoalNavigation : public BaseMotion {
   static constexpr double ROTATION_TOLERANCE = 2.0;   // 回頭完了と判定する角度の許容誤差（度）
   static constexpr double DISTANCE_TOLERANCE = 10.0;  // 目標地点到達と判定する距離の許容誤差（mm）
 
-  Navigator& navigator;  // 現在位置から目標地点までの距離と方位角を計算するクラスの参照
+  Navigator navigator;  // 現在位置から目標地点までの距離と方位角を計算するクラスの参照
 
   double targetX;      // 目標地点のX座標（mm）
   double targetY;      // 目標地点のY座標（mm）

@@ -22,7 +22,6 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "RelativeAngleCondition.h"
 #include "AbsoluteAngleCondition.h"
 
-#include "BaseMotion.h"
 #include "RelativeRotation.h"
 #include "AbsoluteRotation.h"
 #include "Straight.h"

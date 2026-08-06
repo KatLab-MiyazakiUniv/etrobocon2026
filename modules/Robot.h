@@ -20,7 +20,6 @@
 #include <cstring>
 #include "Position.h"
 #include "Odometry.h"
-#include "Navigator.h"
 
 class Robot {
  public:
@@ -83,12 +82,6 @@ class Robot {
    * @return メンバ変数 Odometry(Odometry のインスタンス) の参照
    */
   Odometry& getOdometryInstance();
-
-  /**
-   * @brief Navigatorのインスタンスの参照を返す
-   * @return メンバ変数 Navigator(Navigator のインスタンス) の参照
-   */
-  Navigator& getNavigatorInstance();
 
   /**
    * @brief コースを設定する
@@ -177,6 +170,5 @@ class Robot {
   int targetBrightness = 50;                    // 目標輝度
   Position position;                            // Position インスタンス
   Odometry odometry;                            // Odometry インスタンス
-  Navigator navigator;                          // Navigator インスタンス
 };
 #endif

@@ -8,7 +8,6 @@
 #include "LineTrace.h"
 #include "DistanceCondition.h"
 #include "Mileage.h"
-
 #include "MockNetworkSystem.h"
 
 namespace etrobocon2026_test {

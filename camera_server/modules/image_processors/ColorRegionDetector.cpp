@@ -120,7 +120,6 @@ bool ColorRegionDetector::detectBoundingBox(const cv::Mat& frame,
   cv::findContours(combinedMask.clone(), contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
 
   // 小さいノイズを除外して、一番大きい領域だけ選ぶ
-
   double maxArea = 0;
   std::vector<cv::Point> largestContour;
 

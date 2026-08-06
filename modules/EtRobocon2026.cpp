@@ -17,8 +17,6 @@
 
 void EtRobocon2026::start()
 {
-  CsvLogger::init();
-  CsvLogger::writeHeader();
   Logger::info("Hello KATLAB");
     RealNetworkSystem networkSystem;
   SocketClient cameraSocketClient(networkSystem);

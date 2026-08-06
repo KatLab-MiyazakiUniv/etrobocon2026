@@ -14,9 +14,6 @@
 #include "UltraSonicController.h"
 #include "SocketClient.h"
 
-// 走行プログラムには、そんなファイルない,,定義をcommonに移動するか?データ型をSocketProtcolの定義し、変換するようにする?
-// #include "ColorRegionDetector.h"
-
 #include "Course.h"
 #include "Button.h"
 #include "ForceSensor.h"
@@ -170,6 +167,6 @@ class Robot {
   spikeapi::Display display;                    // Displayインスタンス
   char decryptionKey[5] = { 0 };                // 復号キー
   int targetBrightness = 50;                    // 目標輝度
-  int indexOfLabel = 0;  // ボトルキャリーで取得した色範囲のインデックスのデフォルトは赤
+  int indexOfLabel = 0;                         // ボトルキャリーで取得した色範囲のインデックス
 };
 #endif

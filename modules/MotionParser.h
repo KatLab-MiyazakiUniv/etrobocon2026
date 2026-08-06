@@ -29,7 +29,6 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "Straight.h"
 #include "AbsoluteRotation.h"
 #include "RelativeRotation.h"
-#include "ChangeEdge.h"
 #include "CameraTracking.h"
 #include "./../common/ImageProcessingColor.h"
 

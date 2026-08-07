@@ -7,17 +7,19 @@
 #ifndef ET_RALLY_MAP_H
 #define ET_RALLY_MAP_H
 
+#include "SystemInfo.h"
+
 class EtRallyMap {
  public:
   /**
-   * @brief 右上を原点とした交点情報
+   * @brief 右上のY座標一つ下を原点とした交点情報
    */
   struct Node {
-    int gridX;     // 格子座標X
-    int gridY;     // 格子座標Y
+    int gridX;
+    int gridY;  // -1～9
 
-    double x;      // 実座標X(mm)
-    double y;      // 実座標Y(mm)
+    double x;
+    double y;
   };
 
   /**
@@ -26,31 +28,38 @@ class EtRallyMap {
   EtRallyMap();
 
   /**
-   * @brief 指定した格子座標の交点情報を取得する
-   * @param gridX X方向の格子番号
-   * @param gridY Y方向の格子番号
-   * @return 指定位置の交点情報(Node)
+   * @brief 指定した交点情報を取得
    */
   Node getNode(int gridX, int gridY) const;
 
+  /**
+   * @brief マップ寸法の設定
+   * @param value X方向の最初の区間(mm)
+   */
+  void setFirstXGridSize(double value);
+
+  /**
+   * @brief マップ寸法の設定
+   * @param value X方向の通常の区間(mm)
+   */
+  void setGridSize(double value);
+
+  /**
+   * @brief マップ寸法の設定
+   * @param value Y方向の区間(mm)
+   */
+  void setGridSizeY(double value);
+
  private:
-  // X方向の最初の区間(mm)
-  static constexpr double FIRST_X_GRID_SIZE = 171.0;
+  // SystemInfoの値を初期値として保持
+  double firstXGridSize = SystemInfo::FIRST_X_GRID_SIZE;     // X方向の最初の区間(mm)
+  double gridSize = SystemInfo::GRID_SIZE;                   // X方向の通常の区間(mm)
+  double gridSizeY = SystemInfo::GRID_SIZE_Y;                // Y方向の区間(mm)
+  static constexpr int X_GRID_NUM = SystemInfo::X_GRID_NUM;  // X方向の区間数
+  static constexpr int Y_GRID_NUM = SystemInfo::Y_GRID_NUM;  // Y方向の区間数（-1～9を使用）
 
-  // X方向の通常の区間(mm)
-  static constexpr double GRID_SIZE = 104.0;
-
-  // Y方向の全長(mm)
-  static constexpr double MAP_HEIGHT = 1135.0;
-
-  // Y方向の区間(mm)
-  static constexpr double GRID_SIZE_Y = MAP_HEIGHT / 10.0;
-
-  // 格子数（原点を含めて11本）
-  static constexpr int X_GRID_NUM = 10;
-  static constexpr int Y_GRID_NUM = 10;
-
-  Node nodes[X_GRID_NUM + 1][Y_GRID_NUM + 1];
+  // gridY=-1～9なので+2
+  Node nodes[X_GRID_NUM + 1][Y_GRID_NUM + 2];  // 交点情報
 };
 
 #endif

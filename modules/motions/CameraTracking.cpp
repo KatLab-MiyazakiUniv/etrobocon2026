@@ -92,7 +92,7 @@ void CameraTracking::executeStep()
 
 void CameraTracking::wait()
 {
-  // ClockUtil::sleep(0);  // カメラの撮影FPSに合わせて30ミリ秒待機する
+  ClockUtil::sleep(0);
 }
 
 void CameraTracking::finish()

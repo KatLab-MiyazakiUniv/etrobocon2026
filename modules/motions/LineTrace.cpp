@@ -12,9 +12,9 @@ LineTrace::LineTrace(Robot& _robot,
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
     targetBrightness(_targetBrightness),
-    speedCalculator(_robot, _targetSpeed),
-    brightnessPidGain(_brightnessPidGain),
-    brightnessPid(_brightnessPidGain.kp, _brightnessPidGain.ki, _brightnessPidGain.kd, _targetBrightness)
+    brightnessPid(_brightnessPidGain.kp, _brightnessPidGain.ki, _brightnessPidGain.kd,
+                  _targetBrightness),
+    speedCalculator(_robot, _targetSpeed)
 {
   LOG_CREATE("LineTrace");
 }

@@ -211,7 +211,7 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
                         targetCount);
       return make_unique<RepeatCountCondition>(robot, targetCount);
     }
-    case CONDITION_COMMAND::DISTANCE_AND_SCOLOR: {
+    case CONDITION_COMMAND::DISTANCE_AND_COLOR: {
       double targetDistance = fromString<double>(params[2]);
       std::string targetColorName = params[3];
 
@@ -229,6 +229,25 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
       return std::make_unique<CompoundCondition>(robot, std::move(distanceCondition),
                                                  std::move(colorCondition),
                                                  CompoundCondition::LogicalOperator::AND);
+    }
+    case CONDITION_COMMAND::DISTANCE_OR_COLOR: {
+      double targetDistance = fromString<double>(params[2]);
+      std::string targetColorName = params[3];
+
+      auto targetColor = ColorSensorController::convertStringToColor(targetColorName);
+
+      Logger::printfLog(
+          Logger::DEBUG,
+          "[MotionParser] DistanceAndColor: targetDistance=%.1f, targetColor=%s を生成しました",
+          targetDistance, targetColorName.c_str());
+
+      auto distanceCondition = std::make_unique<DistanceCondition>(robot, targetDistance);
+
+      auto colorCondition = std::make_unique<SensorColorCondition>(robot, targetColor);
+
+      return std::make_unique<CompoundCondition>(robot, std::move(distanceCondition),
+                                                 std::move(colorCondition),
+                                                 CompoundCondition::LogicalOperator::OR);
     }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Condition %s は未実装です",
@@ -378,7 +397,8 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
     { "RunningTime", CONDITION_COMMAND::RUNNING_TIME },
     { "MotionTime", CONDITION_COMMAND::MOTION_TIME },
     { "RepeatCount", CONDITION_COMMAND::REPEAT_COUNT },
-    { "DistanceAndColor", CONDITION_COMMAND::DISTANCE_AND_SCOLOR },
+    { "DistanceAndColor", CONDITION_COMMAND::DISTANCE_AND_COLOR },
+    { "DistanceOrColor", CONDITION_COMMAND::DISTANCE_OR_COLOR }
   };
 
   // 条件コマンド文字列に対応するCONDITION_COMMAND値をマップから取得。なければCONDITION_COMMAND::NONEを返す

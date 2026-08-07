@@ -24,7 +24,7 @@ EtRallyMap::EtRallyMap()
       }
 
       // Y座標
-      nodes[x][y].y = (y - 1) * gridSizeY;
+      nodes[x][y].y = -(y - 1) * gridSizeY;
     }
   }
 }

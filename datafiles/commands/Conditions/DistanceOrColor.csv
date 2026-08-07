@@ -1,0 +1,6 @@
+コマンド名,ID,targetDistance,targetColor
+DistanceOrColor,ID,double,COLOR
+DistanceOrColor,001,500,RED
+DistanceOrColor,002,1000,BLUE
+DistanceOrColor,003,300,BLACK
+DistanceOrColor,004,1500,BLACK

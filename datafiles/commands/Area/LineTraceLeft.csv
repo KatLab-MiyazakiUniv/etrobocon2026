@@ -22,7 +22,7 @@
 # CameraTracking,001,Distance,008
 # CameraTracking,001,Distance,008
 
-#bottle
+#bottleDelivery
 #CameraTracking,007,Distance,030
 #CameraTracking,011,Distance,015
 #CameraTracking,008,Distance,023
@@ -31,6 +31,9 @@
 #CameraTracking,010,Distance,035
 #CameraTracking,009,Distance,030
 #CameraTracking,000,Distance,000
+
+#相撲
+CameraTracking,014,DistanceOrColor,004
 
 
 

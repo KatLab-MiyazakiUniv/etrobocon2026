@@ -37,7 +37,7 @@ GoalNavigation::~GoalNavigation()
 
 void GoalNavigation::prepare()
 {
-  // 現在位置からの距離を計算する
+  // 現在位置からの距離を計算する(移動する必要があるか)
   targetDistance = navigator.calculateDistance(targetX, targetY);
 
   // 現在位置から目標地点までの方向を計算する

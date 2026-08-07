@@ -12,6 +12,11 @@
 #include "SocketProtocol.h"
 #include "ColorRegionDetector.h"
 
+
+#include <functional>
+#include "MultiThread.h"
+#include "FrameSave.h"
+
 class ColorRegionDetectionActionHandler {
  public:
   /**

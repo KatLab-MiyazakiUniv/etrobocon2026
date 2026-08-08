@@ -17,8 +17,7 @@ Robot::Robot(SocketClient& _cameraSocketClient)
     forceSensor(EPort::PORT_D),
     display(),
     position(),
-    odometry(position),
-    navigator(position)
+    odometry(position)
 {
 }
 
@@ -126,9 +125,4 @@ Position& Robot::getPositionInstance()
 Odometry& Robot::getOdometryInstance()
 {
   return odometry;
-}
-
-Navigator& Robot::getNavigatorInstance()
-{
-  return navigator;
 }

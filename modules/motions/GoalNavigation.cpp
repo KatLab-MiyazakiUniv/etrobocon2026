@@ -16,7 +16,7 @@ GoalNavigation::GoalNavigation(Robot& _robot,
                                const Pid::PidGain& _rotationPid, const Pid::PidGain& _rightPid,
                                const Pid::PidGain& _leftPid, const Pid::PidGain& _straightAnglePid)
   : BaseMotion(_robot, std::move(_ContinuationCondition)),
-    navigator(_robot.getNavigatorInstance()),
+    navigator(_robot.getPositionInstance()),
     targetX(_targetX),
     targetY(_targetY),
     targetSpeed(_targetSpeed),
@@ -37,8 +37,11 @@ GoalNavigation::~GoalNavigation()
 
 void GoalNavigation::prepare()
 {
-  // 現在位置から目標地点までの距離を計算する
+  // 現在位置からの距離を計算する(移動する必要があるか)
   targetDistance = navigator.calculateDistance(targetX, targetY);
+
+  // 現在位置から目標地点までの方向を計算する
+  targetHeading = navigator.calculateHeading(targetX, targetY);
 
   Logger::printfLog(Logger::INFO,
                     "GoalNavigation: target=(%.2f, %.2f), "
@@ -68,7 +71,7 @@ void GoalNavigation::executeStep()
   }
 
   // 回頭後の位置からの距離を計算する
-  targetHeading = navigator.calculateHeading(targetX, targetY);
+  targetDistance = navigator.calculateDistance(targetX, targetY);
 
   // 計算した距離だけ直進する。
   auto distanceCondition = std::make_unique<DistanceCondition>(robot, targetDistance);

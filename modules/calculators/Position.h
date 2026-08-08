@@ -56,9 +56,9 @@ class Position {
   double getHeading() const;
 
  private:
-  double x;
-  double y;
-  double heading;
+  double x;        // 機体のX座標
+  double y;        // 機体のY座標
+  double heading;  // 機体の向き
 };
 
 #endif

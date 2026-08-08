@@ -249,6 +249,30 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
                                                  std::move(colorCondition),
                                                  CompoundCondition::LogicalOperator::OR);
     }
+    case CONDITION_COMMAND::DISTANCE_OR_ULTRA_SONIC: {
+      double targetDistance = fromString<double>(params[2]);
+      double targetSonicDistance = fromString<double>(params[3]);
+
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] DistanceORUltraSonic: targetDistance=%.1f, "
+                        "targetSonicDistacnce=%.1f を生成しました",
+                        targetDistance, targetSonicDistance);
+
+      auto distanceCondition = std::make_unique<DistanceCondition>(robot, targetDistance);
+
+      auto UltraSonicCondition = std::make_unique<SensorColorCondition>(robot, targetSonicDistance);
+
+      return std::make_unique<CompoundCondition>(robot, std::move(distanceCondition),
+                                                 std::move(UltraSonicCondition),
+                                                 CompoundCondition::LogicalOperator::OR);
+    }
+    case CONDITION_COMMAND::ULTRA_SONIC: {
+      double targetDistance = fromString<double>(params[2]);
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] UltraSonicCondition: targetDistance =%.1f を生成しました",
+                        targetDistance);
+      return make_unique<UltraSonicCondition>(robot, targetDistance);
+    }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Condition %s は未実装です",
                         params[0].c_str());
@@ -389,17 +413,17 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
 MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str)
 {
   // 条件コマンド文字列と、それに対応する列挙型CONDITION_COMMANDのマッピングを定義
-  static const unordered_map<string, CONDITION_COMMAND> conditionMap = {
-    { "Distance", CONDITION_COMMAND::DISTANCE },
-    { "AbsoluteAngle", CONDITION_COMMAND::ABSOLUTE_ANGLE },
-    { "RelativeAngle", CONDITION_COMMAND::RELATIVE_ANGLE },
-    { "SensorColor", CONDITION_COMMAND::SENSOR_COLOR },
-    { "RunningTime", CONDITION_COMMAND::RUNNING_TIME },
-    { "MotionTime", CONDITION_COMMAND::MOTION_TIME },
-    { "RepeatCount", CONDITION_COMMAND::REPEAT_COUNT },
-    { "DistanceAndColor", CONDITION_COMMAND::DISTANCE_AND_COLOR },
-    { "DistanceOrColor", CONDITION_COMMAND::DISTANCE_OR_COLOR }
-  };
+  static const unordered_map<string, CONDITION_COMMAND> conditionMap
+      = { { "Distance", CONDITION_COMMAND::DISTANCE },
+          { "AbsoluteAngle", CONDITION_COMMAND::ABSOLUTE_ANGLE },
+          { "RelativeAngle", CONDITION_COMMAND::RELATIVE_ANGLE },
+          { "SensorColor", CONDITION_COMMAND::SENSOR_COLOR },
+          { "RunningTime", CONDITION_COMMAND::RUNNING_TIME },
+          { "MotionTime", CONDITION_COMMAND::MOTION_TIME },
+          { "RepeatCount", CONDITION_COMMAND::REPEAT_COUNT },
+          { "DistanceAndColor", CONDITION_COMMAND::DISTANCE_AND_COLOR },
+          { "DistanceOrColor", CONDITION_COMMAND::DISTANCE_OR_COLOR },
+          { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC } };
 
   // 条件コマンド文字列に対応するCONDITION_COMMAND値をマップから取得。なければCONDITION_COMMAND::NONEを返す
   auto it = conditionMap.find(str);

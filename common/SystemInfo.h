@@ -20,4 +20,14 @@ static constexpr int CAM_MIN_HEIGHT = 240;   // カメラ撮影解像度の高�
 static constexpr int CAM_MAX_WIDTH = 1920;   // カメラ撮影解像度の幅（最大値）[px]
 static constexpr int CAM_MAX_HEIGHT = 1080;  // カメラ撮影解像度の高さ（最大値）[px]
 
+class SystemInfo {
+ public:
+  // ETラリーMapの定義
+  static constexpr double FIRST_X_GRID_SIZE = 175.0;  // X方向の最初の区間(mm)
+  static constexpr double GRID_SIZE = 122.5;          // X方向の通常の区間(mm)
+  static constexpr double GRID_SIZE_Y = 122.5;        // Y方向の区間(mm)
+  static constexpr int X_GRID_NUM = 11;               // X方向の区間数
+  static constexpr int Y_GRID_NUM = 10;               // Y方向の区間数（-1～10を使用）
+};
+
 #endif

@@ -5,17 +5,6 @@
  */
 
 #include "EtRobocon2026.h"
-#include "AreaMaster.h"
-#include "Robot.h"
-#include "Course.h"
-#include "CsvLogger.h"
-#include "RealNetworkSystem.h"
-#include "BatteryController.h"
-#include "Robot.h"
-#include "DistanceCondition.h"
-#include "Pid.h"
-#include "CameraTracking.h"
-#include <vector>
 
 #include <chrono>
 
@@ -70,26 +59,75 @@ namespace {
 
 void EtRobocon2026::start()
 {
-  Logger::info("GateRoutePlanner sequential test start");
+  Logger::info("GateRoutePlanner test start");
+
+  // ==========================================
+  // マップ情報を保持するクラス
+  // ==========================================
 
   MapData mapData;
 
+  /*
+   * 本番では、ここをカメラやQRコードなどから
+   * 取得したマップ情報に置き換える。
+   *
+   * 今回は動作確認のため直接登録する。
+   */
+
+  // 赤ゲート
+  mapData.setGate(GoalColor::RED, { 1, 3 }, { 3, 3 });
+
+  // 青ゲート
+  mapData.setGate(GoalColor::BLUE, { 7, 3 }, { 7, 5 });
+
+  // 黄ゲート
+  mapData.setGate(GoalColor::YELLOW, { 3, 7 }, { 5, 7 });
+
+  // ==========================================
+  // 経路探索クラス
+  // ==========================================
+
   GateRoutePlanner routePlanner(mapData);
+
+  // ==========================================
+  // 初期位置
+  // ==========================================
 
   int currentX = 0;
   int currentY = 0;
 
+  /*
+   * 座標系
+   *
+   * UP    : Yが減る
+   * RIGHT : Xが減る
+   * DOWN  : Yが増える
+   * LEFT  : Xが増える
+   */
   Direction currentDirection = Direction::LEFT;
+
+  // ==========================================
+  // 通過するゲートの順番
+  // ==========================================
 
   constexpr GoalColor TARGETS[] = { GoalColor::RED, GoalColor::BLUE, GoalColor::YELLOW };
 
+  // ==========================================
+  // 各ゲートについて経路探索
+  // ==========================================
+
   for(const GoalColor targetColor : TARGETS) {
-    Logger::printfLog(Logger::INFO, "--------------------------------");
+    Logger::info("--------------------------------");
 
-    Logger::printfLog(Logger::INFO, "Current: (%d, %d), direction=%s", currentX, currentY,
-                      directionToString(currentDirection));
+    Logger::printfLog(Logger::INFO, "Current position: (%d, %d)", currentX, currentY);
 
-    Logger::printfLog(Logger::INFO, "Next gate: %s", colorToString(targetColor));
+    Logger::printfLog(Logger::INFO, "Current direction: %s", directionToString(currentDirection));
+
+    Logger::printfLog(Logger::INFO, "Target gate: %s", colorToString(targetColor));
+
+    // ========================================
+    // 探索時間計測開始
+    // ========================================
 
     auto startTime = std::chrono::high_resolution_clock::now();
 
@@ -97,22 +135,43 @@ void EtRobocon2026::start()
 
     auto endTime = std::chrono::high_resolution_clock::now();
 
+    // ========================================
+    // 探索時間
+    // ========================================
+
     auto elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
 
     Logger::printfLog(Logger::INFO, "Search time: %lld us",
                       static_cast<long long>(elapsedTime.count()));
 
+    // ========================================
+    // 探索失敗
+    // ========================================
+
     if(!result.found) {
-      Logger::printfLog(Logger::ERROR, "Route to %s not found", colorToString(targetColor));
+      Logger::printfLog(Logger::ERROR, "Route to %s was not found", colorToString(targetColor));
 
       return;
     }
 
-    Logger::printfLog(Logger::INFO, "Cost: %d", result.cost);
+    // ========================================
+    // 探索結果
+    // ========================================
 
-    Logger::printfLog(Logger::INFO, "Entrance: (%d, %d)", result.entrance.x, result.entrance.y);
+    Logger::printfLog(Logger::INFO, "Total cost: %d", result.cost);
 
-    Logger::printfLog(Logger::INFO, "Exit: (%d, %d)", result.exit.x, result.exit.y);
+    Logger::printfLog(Logger::INFO, "Gate entrance: (%d, %d)", result.entrance.x,
+                      result.entrance.y);
+
+    Logger::printfLog(Logger::INFO, "Gate exit: (%d, %d)", result.exit.x, result.exit.y);
+
+    Logger::printfLog(Logger::INFO, "Exit direction: %s", directionToString(result.exitDirection));
+
+    Logger::printfLog(Logger::INFO, "Route size: %d", static_cast<int>(result.route.size()));
+
+    // ========================================
+    // 圧縮後の経路を表示
+    // ========================================
 
     for(size_t i = 0; i < result.route.size(); ++i) {
       const RouteState& state = result.route[i];
@@ -121,16 +180,18 @@ void EtRobocon2026::start()
                         state.x, state.y, directionToString(state.direction));
     }
 
-    /*
-     * ゲートをくぐり切ったものとして、
-     * 次回探索の開始状態を更新する。
-     */
+    // ========================================
+    // ゲートを通過したものとして現在位置更新
+    // ========================================
+
     currentX = result.exit.x;
 
     currentY = result.exit.y;
 
     currentDirection = result.exitDirection;
+
+    Logger::printfLog(Logger::INFO, "Gate %s passed", colorToString(targetColor));
   }
 
-  Logger::info("GateRoutePlanner sequential test end");
+  Logger::info("GateRoutePlanner test finished");
 }

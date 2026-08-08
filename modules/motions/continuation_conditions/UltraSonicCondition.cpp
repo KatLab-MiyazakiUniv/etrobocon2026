@@ -29,17 +29,17 @@ void UltraSonicCondition::prepare()
 bool UltraSonicCondition::shouldContinue()
 {
   // 超音波センサーの距離を取得
-  double detectDistance = robot.getUltrasonicSensorInstance().getDistance();
+  double detectDistance = robot.getUltraSonicControllerInstance().getDistance();
 
   // 現在の超音波距離が指定した超音波距離と一致していればカウント増加、違えばリセット
-  if(targetSpeed > 0.0) {
+  // if(targetSpeed > 0.0) {
     // 前進時、指定距離以下かつ正常値のときカウント増加
     if(detectDistance <= targetDistance && detectDistance > 0.0) {
       detectCount++;
     } else {
       detectCount = 0;
     }
-  }
+  // }
   //  else {
   //   // 後退時、指定距離以上かつ正常値のときカウント増加
   //   if(detectDistance >= targetDistance && detectDistance > 0.0) {

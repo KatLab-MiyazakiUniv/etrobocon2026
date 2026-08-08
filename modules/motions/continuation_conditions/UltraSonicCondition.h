@@ -10,7 +10,6 @@
 #include "BaseContinuationCondition.h"
 #include "Mileage.h"
 #include "Logger.h"
-#include ""
 
 class UltraSonicCondition : public BaseContinuationCondition {
  public:
@@ -36,7 +35,7 @@ class UltraSonicCondition : public BaseContinuationCondition {
    * @brief 動作を継続するかを判定する
    * @return true/動作を継続する、false/動作を継続しない
    */
-  virtual bool shouldContinue() = 0;
+  bool shouldContinue() override;
 
  protected:
   double targetDistance = 0;

@@ -1,4 +1,3 @@
-```cpp
 /**
  * @file   EtRobocon2026.cpp
  * @brief  3色のゲートを順番に経路探索して走行するテスト
@@ -271,4 +270,3 @@ void EtRobocon2026::start()
 
   Logger::info("Three gate navigation test finished");
 }
-```

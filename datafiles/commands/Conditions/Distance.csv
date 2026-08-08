@@ -1,4 +1,5 @@
 コマンド名,ID,距離
+<<<<<<< HEAD
 Distance,ID,double
 # 第一、二直線
 Distance,000,00
@@ -304,3 +305,8 @@ Distance,299,2990
 Distance,300,3000
 
 
+=======
+Distance,ID,int
+Distance,001,1000
+Distance,002,2000
+>>>>>>> ticket-KL26-142

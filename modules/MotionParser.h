@@ -17,7 +17,9 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include <memory>
 #include <unordered_map>
 #include "Logger.h"
+
 #include "DistanceCondition.h"
+<<<<<<< HEAD
 #include "SensorColorCondition.h"
 #include "RunningTimeCondition.h"
 #include "MotionTimeCondition.h"
@@ -33,10 +35,20 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "CameraTracking.h"
 #include "Calibrator.h"
 #include "./../common/ImageProcessingColor.h"
+=======
+#include "RelativeAngleCondition.h"
+#include "AbsoluteAngleCondition.h"
+
+#include "BaseMotion.h"
+#include "RelativeRotation.h"
+#include "AbsoluteRotation.h"
+#include "Straight.h"
+>>>>>>> ticket-KL26-142
 
 class MotionParser {
  public:
   // 動作コマンド名を持つ列挙型クラス
+<<<<<<< HEAD
   enum class MOTION_COMMAND {
     EXAMPLE,
     STRAIGHT,
@@ -61,6 +73,11 @@ class MotionParser {
     REPEAT_COUNT,
     NONE
   };
+=======
+  enum class MOTION_COMMAND { STRAIGHT, ABSOLUTE_ROTATION, RELATIVE_ROTATION, NONE };
+  // 条件コマンド名を持つ列挙型クラス
+  enum class CONDITION_COMMAND { DISTANCE, ABSOLUTE_ANGLE, RELATIVE_ANGLE, NONE };
+>>>>>>> ticket-KL26-142
 
   /**
    * @brief Area CSVファイルを解析して動作インスタンスのリストを生成する

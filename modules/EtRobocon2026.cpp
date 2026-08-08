@@ -59,6 +59,7 @@ namespace {
 
 void EtRobocon2026::start()
 {
+<<<<<<< HEAD
   Logger::info("GateRoutePlanner test start");
 
   // ==========================================
@@ -194,4 +195,7 @@ void EtRobocon2026::start()
   }
 
   Logger::info("GateRoutePlanner test finished");
+=======
+  Logger::info("Hello KATLAB");
+>>>>>>> ticket-KL26-142
 }

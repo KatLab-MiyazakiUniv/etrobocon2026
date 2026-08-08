@@ -34,6 +34,12 @@ void EtRobocon2026::start()
   Area lineTraceArea = Area::LineTrace;
   AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
   lineTraceAreaMaster.run();
+
+  // ColorSensorController::HSV hsv;
+  // while(1){
+  //   robot.getColorSensorControllerInstance().getRawHSV(hsv, true);
+  //   Logger::printfLog(Logger::INFO,"%d,%d,%d",hsv.h,hsv.s,hsv.v);
+  // }
   // Area BottleCarryArea = Area::BottleCarry;
   // AreaMaster BottleCarryAreaMaster(robot, BottleCarryArea);
   // BottleCarryAreaMaster.run();

@@ -44,6 +44,9 @@ void GoalNavigation::prepare()
                     "GoalNavigation: target=(%.2f, %.2f), "
                     "distance=%.2f, heading=%.2f",
                     targetX, targetY, targetDistance, targetHeading);
+
+  // 現在位置から目標地点までの方位角を計算する
+targetHeading = navigator.calculateHeading( targetX, targetY);
 }
 
 void GoalNavigation::executeStep()

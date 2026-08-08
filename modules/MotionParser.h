@@ -19,23 +19,6 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "Logger.h"
 
 #include "DistanceCondition.h"
-<<<<<<< HEAD
-#include "SensorColorCondition.h"
-#include "RunningTimeCondition.h"
-#include "MotionTimeCondition.h"
-#include "CompoundCondition.h"
-#include "RelativeAngleCondition.h"
-#include "AbsoluteAngleCondition.h"
-#include "RepeatCountCondition.h"
-#include "LineTrace.h"
-#include "Straight.h"
-#include "AbsoluteRotation.h"
-#include "RelativeRotation.h"
-#include "ChangeEdge.h"
-#include "CameraTracking.h"
-#include "Calibrator.h"
-#include "./../common/ImageProcessingColor.h"
-=======
 #include "RelativeAngleCondition.h"
 #include "AbsoluteAngleCondition.h"
 
@@ -43,41 +26,13 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "RelativeRotation.h"
 #include "AbsoluteRotation.h"
 #include "Straight.h"
->>>>>>> ticket-KL26-142
 
 class MotionParser {
  public:
   // 動作コマンド名を持つ列挙型クラス
-<<<<<<< HEAD
-  enum class MOTION_COMMAND {
-    EXAMPLE,
-    STRAIGHT,
-    LINETRACE,
-    CAMERA_TRACKING,
-    RELATIVE_ROTATION,
-    ABSOLUTE_ROTATION,
-    EDGECHANGE,
-    CALIBRATOR,
-    NONE
-  };
-  // 条件コマンド名を持つ列挙型クラス
-  enum class CONDITION_COMMAND {
-    DISTANCE,
-    ABSOLUTE_ANGLE,
-    RELATIVE_ANGLE,
-    SENSOR_COLOR,
-    RUNNING_TIME,
-    MOTION_TIME,
-    DISTANCE_AND_COLOR,
-    DISTANCE_OR_COLOR,
-    REPEAT_COUNT,
-    NONE
-  };
-=======
   enum class MOTION_COMMAND { STRAIGHT, ABSOLUTE_ROTATION, RELATIVE_ROTATION, NONE };
   // 条件コマンド名を持つ列挙型クラス
   enum class CONDITION_COMMAND { DISTANCE, ABSOLUTE_ANGLE, RELATIVE_ANGLE, NONE };
->>>>>>> ticket-KL26-142
 
   /**
    * @brief Area CSVファイルを解析して動作インスタンスのリストを生成する

@@ -1,7 +1,6 @@
-```cpp
 /**
  * @file   EtRobocon2026.cpp
- * @brief  全体を制御するクラス
+ * @brief  経路探索とGoalNavigationを使用したテスト走行
  * @author HaruArima08
  */
 
@@ -11,33 +10,39 @@
 
 #include "EtRallyMap.h"
 #include "GateRoutePlanner.h"
+#include "GoalNavigation.h"
+#include "Logger.h"
 #include "MapData.h"
+#include "Pid.h"
+#include "RealNetworkSystem.h"
 #include "RepeatCountCondition.h"
+#include "Robot.h"
 #include "RouteTypes.h"
+#include "SocketClient.h"
 
-    namespace
+namespace {
+
+/**
+ * @brief Directionを文字列へ変換する
+ */
+const char* directionToString(Direction direction)
 {
-  /**
-   * @brief Directionを文字列へ変換する
-   */
-  const char* directionToString(Direction direction)
-  {
-    switch(direction) {
-      case Direction::UP:
-        return "UP";
+  switch(direction) {
+    case Direction::UP:
+      return "UP";
 
-      case Direction::RIGHT:
-        return "RIGHT";
+    case Direction::RIGHT:
+      return "RIGHT";
 
-      case Direction::DOWN:
-        return "DOWN";
+    case Direction::DOWN:
+      return "DOWN";
 
-      case Direction::LEFT:
-        return "LEFT";
-    }
-
-    return "UNKNOWN";
+    case Direction::LEFT:
+      return "LEFT";
   }
+
+  return "UNKNOWN";
+}
 
 }  // namespace
 
@@ -46,159 +51,285 @@ void EtRobocon2026::start()
   Logger::info("Map navigation test start");
 
   // =========================================================
-  // 1. MAP情報を用意
+  // 1. Robot生成
+  // =========================================================
+
+  RealNetworkSystem networkSystem;
+
+  SocketClient cameraSocketClient(
+      networkSystem);
+
+  Robot robot(
+      cameraSocketClient);
+
+  // =========================================================
+  // 2. マップ情報を保持するクラス
   // =========================================================
 
   MapData mapData;
 
   /*
-   * 本番では、走行中に取得したMAP情報を
-   * setGate()で登録する。
+   * 本番では走行中に取得したゲート情報を
+   * MapData::setGate()で登録する。
    *
-   * 今回は実走テストなので仮の値を直接登録する。
+   * 今回はテストなので仮のゲート情報を登録する。
    */
 
   // 赤ゲート
-  mapData.setGate(GoalColor::RED, { 1, 3 }, { 3, 3 });
+  mapData.setGate(
+      GoalColor::RED,
+      { 5, 1 },
+      { 7, 1 });
 
   // 青ゲート
-  mapData.setGate(GoalColor::BLUE, { 7, 3 }, { 7, 5 });
+  mapData.setGate(
+      GoalColor::BLUE,
+      { 1, 5 },
+      { 1, 7 });
 
   // 黄ゲート
-  mapData.setGate(GoalColor::YELLOW, { 3, 7 }, { 5, 7 });
+  mapData.setGate(
+      GoalColor::YELLOW,
+      { 7, 3 },
+      { 9, 3 });
 
   // =========================================================
-  // 2. 経路探索と実座標変換用クラス
+  // 3. 経路探索クラス・実座標変換クラス
   // =========================================================
 
-  GateRoutePlanner routePlanner(mapData);
+  GateRoutePlanner routePlanner(
+      mapData);
 
   EtRallyMap etRallyMap;
 
   // =========================================================
-  // 3. 現在の格子座標・向き
+  // 4. 現在位置
   // =========================================================
 
-  int currentGridX = 0;
-  int currentGridY = 0;
-
   /*
+   * 格子座標
+   *
    * UP    : Yが減る
    * RIGHT : Xが減る
    * DOWN  : Yが増える
    * LEFT  : Xが増える
    */
-  Direction currentDirection = Direction::LEFT;
+
+  int currentGridX = 0;
+  int currentGridY = 0;
+
+  Direction currentDirection
+      = Direction::LEFT;
 
   // =========================================================
-  // 4. 今回向かうゲート
+  // 5. 今回向かうゲート
   // =========================================================
 
-  constexpr GoalColor TARGET_COLOR = GoalColor::RED;
+  constexpr GoalColor TARGET_COLOR
+      = GoalColor::RED;
 
   // =========================================================
-  // 5. PID設定
+  // 6. PID設定
   // =========================================================
 
-  const Pid::PidGain rotationPid = { 1.3, 1.0, 0.0 };
+  const Pid::PidGain rotationPid = {
+    1.3,
+    1.0,
+    0.0
+  };
 
-  const Pid::PidGain rightPid = { 0.016, 0.005, 0.0015 };
+  const Pid::PidGain rightPid = {
+    0.016,
+    0.005,
+    0.0015
+  };
 
-  const Pid::PidGain leftPid = { 0.016, 0.0045, 0.0015 };
+  const Pid::PidGain leftPid = {
+    0.016,
+    0.0045,
+    0.0015
+  };
 
-  const Pid::PidGain straightAnglePid = { 0.02, 0.006, 0.003 };
+  const Pid::PidGain straightAnglePid = {
+    0.02,
+    0.006,
+    0.003
+  };
 
-  // 直進速度[mm/s]
-  constexpr double TARGET_SPEED = 300.0;
+  // テストなので低めの速度
+  constexpr double TARGET_SPEED
+      = 200.0;
 
   // =========================================================
-  // 6. オドメトリ初期化
+  // 7. オドメトリ初期化
   // =========================================================
 
-  WheelMotorController& wheelMotorController = robot.getWheelMotorControllerInstance();
+  WheelMotorController& wheelMotorController
+      = robot.getWheelMotorControllerInstance();
 
-  Odometry& odometry = robot.getOdometryInstance();
+  Odometry& odometry
+      = robot.getOdometryInstance();
 
-  odometry.initialize(wheelMotorController.getLeftCount(), wheelMotorController.getRightCount());
+  odometry.initialize(
+      wheelMotorController.getLeftCount(),
+      wheelMotorController.getRightCount());
 
   // =========================================================
-  // 7. 経路探索
+  // 8. ゲートまで経路探索
   // =========================================================
 
   GateRouteResult routeResult
-      = routePlanner.search(currentGridX, currentGridY, currentDirection, TARGET_COLOR);
+      = routePlanner.search(
+          currentGridX,
+          currentGridY,
+          currentDirection,
+          TARGET_COLOR);
 
   if(!routeResult.found) {
-    Logger::error("Route not found");
+    Logger::error(
+        "Route not found");
+
     return;
   }
 
-  Logger::printfLog(Logger::INFO, "Gate entrance: (%d, %d)", routeResult.entrance.x,
-                    routeResult.entrance.y);
+  // =========================================================
+  // 9. 探索結果表示
+  // =========================================================
 
-  Logger::printfLog(Logger::INFO, "Gate exit: (%d, %d)", routeResult.exit.x, routeResult.exit.y);
+  Logger::printfLog(
+      Logger::INFO,
+      "Route cost: %d",
+      routeResult.cost);
 
-  Logger::printfLog(Logger::INFO, "Route cost: %d", routeResult.cost);
+  Logger::printfLog(
+      Logger::INFO,
+      "Gate entrance: (%d, %d)",
+      routeResult.entrance.x,
+      routeResult.entrance.y);
 
-  Logger::printfLog(Logger::INFO, "Route size: %d", static_cast<int>(routeResult.route.size()));
+  Logger::printfLog(
+      Logger::INFO,
+      "Gate exit: (%d, %d)",
+      routeResult.exit.x,
+      routeResult.exit.y);
+
+  Logger::printfLog(
+      Logger::INFO,
+      "Exit direction: %s",
+      directionToString(
+          routeResult.exitDirection));
+
+  Logger::printfLog(
+      Logger::INFO,
+      "Compressed route size: %d",
+      static_cast<int>(
+          routeResult.route.size()));
 
   // =========================================================
-  // 8. 圧縮された経路を順番に走る
+  // 10. 圧縮された経路を順番に走行
   // =========================================================
 
   /*
-   * route[0]は現在位置なので、
-   * route[1]から走行する。
+   * route[0]は現在地点なので、
+   * route[1]からGoalNavigationで走る。
    */
 
-  for(size_t i = 1; i < routeResult.route.size(); ++i) {
-    const RouteState& targetState = routeResult.route[i];
+  for(size_t i = 1;
+      i < routeResult.route.size();
+      ++i) {
 
-    // ===============================================
+    const RouteState& targetState
+        = routeResult.route[i];
+
+    // -------------------------------------------------------
     // 格子座標 → 実座標[mm]
-    // ===============================================
+    // -------------------------------------------------------
 
-    EtRallyMap::Node targetNode = etRallyMap.getNode(targetState.x, targetState.y);
+    EtRallyMap::Node targetNode
+        = etRallyMap.getNode(
+            targetState.x,
+            targetState.y);
 
-    double targetX = targetNode.x;
+    double targetX
+        = targetNode.x;
 
-    double targetY = targetNode.y;
+    double targetY
+        = targetNode.y;
 
-    Logger::printfLog(Logger::INFO, "Target[%d]: grid=(%d,%d), position=(%.2f,%.2f), direction=%s",
-                      static_cast<int>(i), targetState.x, targetState.y, targetX, targetY,
-                      directionToString(targetState.direction));
+    Logger::printfLog(
+        Logger::INFO,
+        "Target[%d]: grid=(%d,%d), position=(%.2f, %.2f), direction=%s",
+        static_cast<int>(i),
+        targetState.x,
+        targetState.y,
+        targetX,
+        targetY,
+        directionToString(
+            targetState.direction));
 
-    // ===============================================
-    // GoalNavigationを1回だけ実行
-    // ===============================================
+    // -------------------------------------------------------
+    // GoalNavigation実行
+    // -------------------------------------------------------
+Position& position = robot.getPositionInstance(); 
+Logger::printfLog( Logger::INFO, "Current real position: (%.2f, %.2f), heading=%.2f", position.getX(), position.getY(), position.getHeading());
 
-    auto condition = std::make_unique<RepeatCountCondition>(robot, 1);
 
-    GoalNavigation goalNavigation(robot, std::move(condition), targetX, targetY, TARGET_SPEED,
-                                  rotationPid, rightPid, leftPid, straightAnglePid);
+
+
+
+    auto condition
+        = std::make_unique<
+            RepeatCountCondition>(
+                robot,
+                1);
+
+    GoalNavigation goalNavigation(
+        robot,
+        std::move(condition),
+        targetX,
+        targetY,
+        TARGET_SPEED,
+        rotationPid,
+        rightPid,
+        leftPid,
+        straightAnglePid);
 
     goalNavigation.run();
 
-    /*
-     * この地点まで実際に走行できたので、
-     * 現在の格子座標と向きを更新する。
-     */
-    currentGridX = targetState.x;
+    // -------------------------------------------------------
+    // 現在の格子位置を更新
+    // -------------------------------------------------------
 
-    currentGridY = targetState.y;
+    currentGridX
+        = targetState.x;
 
-    currentDirection = targetState.direction;
+    currentGridY
+        = targetState.y;
 
-    Logger::printfLog(Logger::INFO, "Reached grid=(%d,%d)", currentGridX, currentGridY);
+    currentDirection
+        = targetState.direction;
+
+    Logger::printfLog(
+        Logger::INFO,
+        "Reached: grid=(%d,%d), direction=%s",
+        currentGridX,
+        currentGridY,
+        directionToString(
+            currentDirection));
   }
 
   // =========================================================
-  // 9. ゲート通過後の確認
+  // 11. 終了
   // =========================================================
 
-  Logger::printfLog(Logger::INFO, "Gate passed: exit=(%d,%d), direction=%s", routeResult.exit.x,
-                    routeResult.exit.y, directionToString(routeResult.exitDirection));
+  Logger::printfLog(
+      Logger::INFO,
+      "Gate passed: exit=(%d,%d), direction=%s",
+      routeResult.exit.x,
+      routeResult.exit.y,
+      directionToString(
+          routeResult.exitDirection));
 
-  Logger::info("Map navigation test finished");
+  Logger::info(
+      "Map navigation test finished");
 }
-```

@@ -260,10 +260,10 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
 
       auto distanceCondition = std::make_unique<DistanceCondition>(robot, targetDistance);
 
-      auto UltraSonicCondition = std::make_unique<SensorColorCondition>(robot, targetSonicDistance);
+      auto ultraSonicCondition = std::make_unique<UltraSonicCondition>(robot, targetSonicDistance);
 
       return std::make_unique<CompoundCondition>(robot, std::move(distanceCondition),
-                                                 std::move(UltraSonicCondition),
+                                                 std::move(ultraSonicCondition),
                                                  CompoundCondition::LogicalOperator::OR);
     }
     case CONDITION_COMMAND::ULTRA_SONIC: {
@@ -288,19 +288,13 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
   switch(command) {
     case MOTION_COMMAND::STRAIGHT: {
       // Straight: motionParams[2]=speed(double)
-      //           motionParams[3..5]=rightPid(kp,ki,kd)
-      //           motionParams[6..8]=leftPid(kp,ki,kd)
       //           motionParams[9..11]=anglePid(kp,ki,kd)
       //           motionParams[12]=useIMU(string: "true"/"false")
       return new Straight(
           robot, std::move(condition), fromString<double>(motionParams[2]),
           Pid::PidGain{ fromString<double>(motionParams[3]), fromString<double>(motionParams[4]),
                         fromString<double>(motionParams[5]) },
-          Pid::PidGain{ fromString<double>(motionParams[6]), fromString<double>(motionParams[7]),
-                        fromString<double>(motionParams[8]) },
-          Pid::PidGain{ fromString<double>(motionParams[9]), fromString<double>(motionParams[10]),
-                        fromString<double>(motionParams[11]) },
-          motionParams[12] == "true");
+          motionParams[6] == "true");
     }
     case MOTION_COMMAND::LINETRACE: {
       // LineTrace: motionParams[2]=speed(double)
@@ -318,6 +312,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       request.hsvRangeCount = 1;
       request.hsvRanges[0].lower = { 0, 0, 0 };
       request.hsvRanges[0].upper = { 179, 255, 30 };
+
       request.roi = { fromString<int>(motionParams[8]), fromString<int>(motionParams[9]),
                       fromString<int>(motionParams[10]), fromString<int>(motionParams[11]) };
 

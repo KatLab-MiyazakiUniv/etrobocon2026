@@ -11,7 +11,12 @@
 /**
  * @brief ロボットの向き
  */
-enum class Direction { NORTH = 0, EAST, SOUTH, WEST };
+enum class Direction {
+  NORTH = 0,
+  EAST,
+  SOUTH,
+  WEST
+};
 
 /**
  * @brief マップ上の座標
@@ -24,11 +29,13 @@ struct Point {
 /**
  * @brief 通行を遮るゲート
  *
- * 水平ゲート:
- *   (1,3) ～ (3,3)
+ * startからendまでの線分をゲートとして扱う。
  *
- * 垂直ゲート:
- *   (3,1) ～ (3,3)
+ * 水平ゲート例:
+ * (2,6) ～ (6,6)
+ *
+ * 垂直ゲート例:
+ * (6,2) ～ (6,6)
  */
 struct Gate {
   Point start;
@@ -38,7 +45,8 @@ struct Gate {
 /**
  * @brief 経路探索中の状態
  *
- * 同じ座標でも向きが異なれば別状態として扱う
+ * 同じ座標でもロボットの向きが違えば
+ * 別の状態として扱う。
  */
 struct RouteState {
   int x;
@@ -47,15 +55,27 @@ struct RouteState {
 };
 
 /**
- * @brief 経路探索結果
+ * @brief ダイクストラ法による経路探索結果
  */
 struct RouteResult {
+  /**
+   * @brief 経路が見つかったか
+   */
   bool found = false;
 
-  Point goal = { 0, 0 };
+  /**
+   * @brief 到達したゴール
+   */
+  Point goal = {0, 0};
 
+  /**
+   * @brief 経路の合計コスト
+   */
   int cost = 0;
 
+  /**
+   * @brief 開始地点からゴールまでの経路
+   */
   std::vector<RouteState> route;
 };
 
@@ -63,16 +83,17 @@ struct RouteResult {
  * @brief ダイクストラ法による経路探索クラス
  */
 class DijkstraRoutePlanner {
- public:
+public:
   /**
    * @brief コンストラクタ
    *
-   * @param gates 通行を遮るゲート一覧
+   * @param _gates 通行を遮るゲート一覧
    */
-  explicit DijkstraRoutePlanner(const std::vector<Gate>& gates);
+  explicit DijkstraRoutePlanner(
+      const std::vector<Gate>& _gates);
 
   /**
-   * @brief 2つのゴールのうち最小コストで到達できる方を探索する
+   * @brief 2つのゴール候補から最小コストの経路を探索する
    *
    * @param startX 開始X座標
    * @param startY 開始Y座標
@@ -82,46 +103,96 @@ class DijkstraRoutePlanner {
    *
    * @return 経路探索結果
    */
-  RouteResult search(int startX, int startY, Direction startDirection, const Point& goal1,
-                     const Point& goal2);
+  RouteResult search(
+      int startX,
+      int startY,
+      Direction startDirection,
+      const Point& goal1,
+      const Point& goal2);
 
- private:
+private:
+  /**
+   * @brief マップ上の最小座標
+   */
   static constexpr int MAP_MIN = 0;
+
+  /**
+   * @brief マップ上の最大座標
+   */
   static constexpr int MAP_MAX = 10;
 
+  /**
+   * @brief ノード間の座標間隔
+   *
+   * 使用する座標:
+   *
+   * 0, 2, 4, 6, 8, 10
+   */
   static constexpr int MOVE_STEP = 2;
 
+  /**
+   * @brief X/Y方向のノード数
+   *
+   * 0～10を2刻みなので6個
+   */
   static constexpr int GRID_SIZE = 6;
+
+  /**
+   * @brief 方向の数
+   */
   static constexpr int DIRECTION_COUNT = 4;
 
+  /**
+   * @brief 直進コスト
+   */
   static constexpr int STRAIGHT_COST = 1;
+
+  /**
+   * @brief 90度回頭コスト
+   */
   static constexpr int TURN_90_COST = 3;
+
+  /**
+   * @brief 180度回頭コスト
+   */
   static constexpr int TURN_180_COST = 10;
 
+  /**
+   * @brief ゲート一覧
+   */
   std::vector<Gate> gates;
 
   /**
-   * @brief 現在の向きから次の向きへの移動コストを計算
+   * @brief 回頭＋直進に必要なコストを計算する
    */
-  int calculateMoveCost(Direction currentDirection, Direction nextDirection) const;
+  int calculateMoveCost(
+      Direction currentDirection,
+      Direction nextDirection) const;
 
   /**
-   * @brief 座標が走行可能なノードか判定
+   * @brief 指定座標が有効か判定する
    */
   bool isValid(int x, int y) const;
 
   /**
-   * @brief 現在地点から次地点への移動がゲートで遮られているか判定
+   * @brief 移動先との間にゲートが存在するか判定する
    */
-  bool isBlockedMove(int currentX, int currentY, int nextX, int nextY) const;
+  bool isBlockedMove(
+      int currentX,
+      int currentY,
+      int nextX,
+      int nextY) const;
 
   /**
-   * @brief 状態を配列用インデックスへ変換
+   * @brief 状態を配列用インデックスに変換する
    */
-  int stateToIndex(int x, int y, Direction direction) const;
+  int stateToIndex(
+      int x,
+      int y,
+      Direction direction) const;
 
   /**
-   * @brief 配列用インデックスを状態へ変換
+   * @brief 配列用インデックスを状態に戻す
    */
   RouteState indexToState(int index) const;
 };

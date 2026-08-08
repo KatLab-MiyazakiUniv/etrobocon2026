@@ -423,6 +423,7 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
           { "RepeatCount", CONDITION_COMMAND::REPEAT_COUNT },
           { "DistanceAndColor", CONDITION_COMMAND::DISTANCE_AND_COLOR },
           { "DistanceOrColor", CONDITION_COMMAND::DISTANCE_OR_COLOR },
+          { "DistanceOrUltraSonic", CONDITION_COMMAND::DISTANCE_OR_ULTRA_SONIC },
           { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC } };
 
   // 条件コマンド文字列に対応するCONDITION_COMMAND値をマップから取得。なければCONDITION_COMMAND::NONEを返す

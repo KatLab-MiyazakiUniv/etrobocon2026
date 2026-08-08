@@ -165,16 +165,7 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
       double targetDistance = fromString<double>(params[2]);
       return make_unique<DistanceCondition>(robot, targetDistance);
     }
-    case CONDITION_COMMAND::ABSOLUTE_ANGLE: {
-      double targetAngle = fromString<double>(params[2]);
-      double tolerance = fromString<double>(params[3]);
-      return make_unique<AbsoluteAngleCondition>(robot, targetAngle, tolerance);
-    }
-    case CONDITION_COMMAND::RELATIVE_ANGLE: {
-      double targetAngle = fromString<double>(params[2]);
-      double tolerance = fromString<double>(params[3]);
-      return make_unique<RelativeAngleCondition>(robot, targetAngle, tolerance);
-    }
+
     // ↓ 他の条件コマンドはここに追加していく
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Condition %s は未実装です",
@@ -199,24 +190,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
     //                                     fromString<double>(motionParams[5]) },
     //                       motionParams[6] == "true");
     // }
-    case MOTION_COMMAND::ABSOLUTE_ROTATION: {
-      // AbsoluteRotation: motionParams[2]=targetAngle(double)
-      //                   motionParams[3..5]=anglePid(kp,ki,kd)
-      return new AbsoluteRotation(robot, std::move(condition),
-                                  Pid::PidGain{ fromString<double>(motionParams[3]),
-                                                fromString<double>(motionParams[4]),
-                                                fromString<double>(motionParams[5]) },
-                                  fromString<double>(motionParams[2]));
-    }
-    case MOTION_COMMAND::RELATIVE_ROTATION: {
-      // AbsoluteRotation: motionParams[2]=targetAngle(double)
-      //                   motionParams[3..5]=anglePid(kp,ki,kd)
-      return new RelativeRotation(robot, std::move(condition),
-                                  Pid::PidGain{ fromString<double>(motionParams[3]),
-                                                fromString<double>(motionParams[4]),
-                                                fromString<double>(motionParams[5]) },
-                                  fromString<double>(motionParams[2]));
-    }
+
     // ↓ 他のコマンドはここに追加していく
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
@@ -230,8 +204,6 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
   // コマンド文字列(string)と、それに対応する列挙型MOTION_COMMANDのマッピングを定義
   static const unordered_map<string, MOTION_COMMAND> commandMap = {
     { "Straight", MOTION_COMMAND::STRAIGHT },
-    { "AbsoluteRotation", MOTION_COMMAND::ABSOLUTE_ROTATION },
-    { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
   };
 
   // コマンド文字列に対応するMOTION_COMMAND値をマップから取得。なければMOTION_COMMAND::NONEを返す
@@ -248,8 +220,6 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
   // 条件コマンド文字列と、それに対応する列挙型CONDITION_COMMANDのマッピングを定義
   static const unordered_map<string, CONDITION_COMMAND> conditionMap = {
     { "Distance", CONDITION_COMMAND::DISTANCE },
-    { "AbsoluteAngle", CONDITION_COMMAND::ABSOLUTE_ANGLE },
-    { "RelativeAngle", CONDITION_COMMAND::RELATIVE_ANGLE },
   };
 
   // 条件コマンド文字列に対応するCONDITION_COMMAND値をマップから取得。なければCONDITION_COMMAND::NONEを返す

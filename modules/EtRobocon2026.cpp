@@ -18,29 +18,49 @@
 #include <vector>
 
 #include <chrono>
-#include <vector>
 
-#include "DijkstraRoutePlanner.h"
+#include "GateRoutePlanner.h"
+#include "MapData.h"
+#include "RouteTypes.h"
 
 namespace {
 
   /**
-   * @brief Directionを文字列へ変換する
+   * @brief Directionを文字列に変換する
    */
   const char* directionToString(Direction direction)
   {
     switch(direction) {
-      case Direction::NORTH:
-        return "NORTH";
+      case Direction::UP:
+        return "UP";
 
-      case Direction::EAST:
-        return "EAST";
+      case Direction::RIGHT:
+        return "RIGHT";
 
-      case Direction::SOUTH:
-        return "SOUTH";
+      case Direction::DOWN:
+        return "DOWN";
 
-      case Direction::WEST:
-        return "WEST";
+      case Direction::LEFT:
+        return "LEFT";
+    }
+
+    return "UNKNOWN";
+  }
+
+  /**
+   * @brief GoalColorを文字列に変換する
+   */
+  const char* colorToString(GoalColor color)
+  {
+    switch(color) {
+      case GoalColor::RED:
+        return "RED";
+
+      case GoalColor::BLUE:
+        return "BLUE";
+
+      case GoalColor::YELLOW:
+        return "YELLOW";
     }
 
     return "UNKNOWN";
@@ -50,94 +70,67 @@ namespace {
 
 void EtRobocon2026::start()
 {
-  Logger::info("DijkstraRoutePlanner test start");
+  Logger::info("GateRoutePlanner sequential test start");
 
-  // =========================
-  // ゲート
-  // =========================
+  MapData mapData;
 
-  std::vector<Gate> gates = {
+  GateRoutePlanner routePlanner(mapData);
 
-    // (2,2) ↔ (2,4) を遮断
-    { { 1, 5 }, { 1, 7 } },
+  int currentX = 0;
+  int currentY = 0;
 
-    // (6,4) ↔ (8,4) を遮断
-    { { 5, 9 }, { 7, 9 } },
+  Direction currentDirection = Direction::LEFT;
 
-    // (4,6) ↔ (4,8) を遮断
-    { { 7, 3 }, { 9, 3 } }
-  };
+  constexpr GoalColor TARGETS[] = { GoalColor::RED, GoalColor::BLUE, GoalColor::YELLOW };
 
-  // =========================
-  // スタート地点
-  // =========================
+  for(const GoalColor targetColor : TARGETS) {
+    Logger::printfLog(Logger::INFO, "--------------------------------");
 
-  constexpr int START_X = 0;
-  constexpr int START_Y = 0;
+    Logger::printfLog(Logger::INFO, "Current: (%d, %d), direction=%s", currentX, currentY,
+                      directionToString(currentDirection));
 
-  constexpr Direction START_DIRECTION = Direction::WEST;
+    Logger::printfLog(Logger::INFO, "Next gate: %s", colorToString(targetColor));
 
-  // =========================
-  // ゴール候補
-  // =========================
+    auto startTime = std::chrono::high_resolution_clock::now();
 
-  const Point goal1 = { 6, 8 };
+    GateRouteResult result = routePlanner.search(currentX, currentY, currentDirection, targetColor);
 
-  const Point goal2 = { 6, 10 };
+    auto endTime = std::chrono::high_resolution_clock::now();
 
-  // =========================
-  // 経路探索クラス生成
-  // =========================
+    auto elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
 
-  DijkstraRoutePlanner planner(gates);
+    Logger::printfLog(Logger::INFO, "Search time: %lld us",
+                      static_cast<long long>(elapsedTime.count()));
 
-  // =========================
-  // 時間計測開始
-  // =========================
+    if(!result.found) {
+      Logger::printfLog(Logger::ERROR, "Route to %s not found", colorToString(targetColor));
 
-  auto startTime = std::chrono::high_resolution_clock::now();
+      return;
+    }
 
-  RouteResult result = planner.search(START_X, START_Y, START_DIRECTION, goal1, goal2);
+    Logger::printfLog(Logger::INFO, "Cost: %d", result.cost);
 
-  // =========================
-  // 時間計測終了
-  // =========================
+    Logger::printfLog(Logger::INFO, "Entrance: (%d, %d)", result.entrance.x, result.entrance.y);
 
-  auto endTime = std::chrono::high_resolution_clock::now();
+    Logger::printfLog(Logger::INFO, "Exit: (%d, %d)", result.exit.x, result.exit.y);
 
-  auto elapsedTime = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
+    for(size_t i = 0; i < result.route.size(); ++i) {
+      const RouteState& state = result.route[i];
 
-  Logger::printfLog(Logger::INFO, "Search time: %lld us",
-                    static_cast<long long>(elapsedTime.count()));
+      Logger::printfLog(Logger::INFO, "Route[%d]: (%d, %d), direction=%s", static_cast<int>(i),
+                        state.x, state.y, directionToString(state.direction));
+    }
 
-  // =========================
-  // 経路が見つからない
-  // =========================
+    /*
+     * ゲートをくぐり切ったものとして、
+     * 次回探索の開始状態を更新する。
+     */
+    currentX = result.exit.x;
 
-  if(!result.found) {
-    Logger::info("Route not found");
+    currentY = result.exit.y;
 
-    return;
+    currentDirection = result.exitDirection;
   }
 
-  // =========================
-  // 探索結果
-  // =========================
-
-  Logger::printfLog(Logger::INFO, "Selected goal: (%d, %d)", result.goal.x, result.goal.y);
-
-  Logger::printfLog(Logger::INFO, "Total cost: %d", result.cost);
-
-  Logger::printfLog(Logger::INFO, "Route size: %d", static_cast<int>(result.route.size()));
-
-  // =========================
-  // 経路表示
-  // =========================
-
-  for(const RouteState& state : result.route) {
-    Logger::printfLog(Logger::INFO, "(%d, %d) direction=%s", state.x, state.y,
-                      directionToString(state.direction));
-  }
-
-  Logger::info("DijkstraRoutePlanner test end");
+  Logger::info("GateRoutePlanner sequential test end");
 }

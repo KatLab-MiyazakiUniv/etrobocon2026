@@ -16,7 +16,7 @@ class EtRallyMap {
    */
   struct Node {
     int gridX;
-    int gridY;  // -1～9
+    int gridY;  // -1～10
 
     double x;
     double y;
@@ -56,9 +56,8 @@ class EtRallyMap {
   double gridSize = SystemInfo::GRID_SIZE;                   // X方向の通常の区間(mm)
   double gridSizeY = SystemInfo::GRID_SIZE_Y;                // Y方向の区間(mm)
   static constexpr int X_GRID_NUM = SystemInfo::X_GRID_NUM;  // X方向の区間数
-  static constexpr int Y_GRID_NUM = SystemInfo::Y_GRID_NUM;  // Y方向の区間数（-1～9を使用）
+  static constexpr int Y_GRID_NUM = SystemInfo::Y_GRID_NUM;  // Y方向の区間数（-1～10を使用）
 
-  // gridY=-1～9なので+2
   Node nodes[X_GRID_NUM + 1][Y_GRID_NUM + 2];  // 交点情報
 };
 

@@ -1,10 +1,12 @@
 /**
  * @file   GateRoutePlanner.h
- * @brief  指定された色のゲートまでの経路を探索するクラス
+ * @brief  最新のマップ情報から指定ゲートへの経路を探索するクラス
  */
 
 #ifndef GATE_ROUTE_PLANNER_H
 #define GATE_ROUTE_PLANNER_H
+
+#include <vector>
 
 #include "DijkstraRoutePlanner.h"
 #include "MapData.h"
@@ -16,6 +18,8 @@ class GateRoutePlanner {
 
   /**
    * @brief 指定色のゲートを通過する最小コスト経路を探索する
+   *
+   * 探索を行うたびにMapDataから最新のゲート情報を取得する。
    */
   GateRouteResult search(int currentX, int currentY, Direction currentDirection,
                          GoalColor goalColor);
@@ -25,24 +29,8 @@ class GateRoutePlanner {
 
   const MapData& mapData;
 
-  DijkstraRoutePlanner planner;
-
   /**
-   * @brief 同じ方向へ進む連続区間をまとめる
-   *
-   * 例:
-   *
-   * (0,0) LEFT
-   * (2,0) LEFT
-   * (4,0) LEFT
-   * (4,2) DOWN
-   * (4,4) DOWN
-   *
-   * ↓
-   *
-   * (0,0) LEFT
-   * (4,0) LEFT
-   * (4,4) DOWN
+   * @brief 同じ方向への連続した直進区間をまとめる
    */
   std::vector<RouteState> compressRoute(const std::vector<RouteState>& route) const;
 };

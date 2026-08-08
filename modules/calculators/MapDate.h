@@ -1,6 +1,6 @@
 /**
  * @file   MapData.h
- * @brief  固定マップ情報を保持するクラス
+ * @brief  走行中に取得したマップ情報を保持するクラス
  */
 
 #ifndef MAP_DATA_H
@@ -11,27 +11,51 @@
 #include "RouteTypes.h"
 
 /**
- * @brief マップ情報を管理するクラス
+ * @brief 走行中に取得したゲート情報を管理するクラス
  */
 class MapData {
  public:
   MapData();
 
   /**
-   * @brief 全ゲートを取得する
+   * @brief ゲート情報を登録・更新する
+   *
+   * 同じ色のゲートがすでに存在する場合は更新する。
+   *
+   * @param color ゲートの色
+   * @param start ゲートの始点
+   * @param end ゲートの終点
+   */
+  void setGate(GoalColor color, const Point& start, const Point& end);
+
+  /**
+   * @brief 指定した色のゲート情報が存在するか確認する
+   *
+   * @param color ゲートの色
+   * @return 存在する場合true
+   */
+  bool hasGate(GoalColor color) const;
+
+  /**
+   * @brief 指定した色のゲートを取得する
+   *
+   * @param color ゲートの色
+   * @return ゲートへのポインタ
+   *
+   * 存在しない場合はnullptrを返す。
+   */
+  const Gate* getGate(GoalColor color) const;
+
+  /**
+   * @brief 現在登録されている全ゲートを取得する
    */
   const std::vector<Gate>& getGates() const;
 
   /**
-   * @brief 指定色のゲートを取得する
-   */
-  const Gate& getGate(GoalColor color) const;
-
-  /**
-   * @brief 指定色のゲートの通過候補を取得する
+   * @brief 指定したゲートを通過する2つの候補を取得する
    *
-   * 返される2つは、
-   * 両方向からゲートをくぐる場合の情報。
+   * @param color ゲートの色
+   * @return ゲート通過候補
    */
   std::vector<GatePass> getGatePasses(GoalColor color) const;
 

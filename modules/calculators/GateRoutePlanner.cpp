@@ -1,32 +1,58 @@
 /**
  * @file   GateRoutePlanner.cpp
- * @brief  指定された色のゲートまでの経路を探索するクラス
+ * @brief  最新のマップ情報から指定ゲートへの経路を探索するクラス
  */
 
 #include "GateRoutePlanner.h"
 
 #include <climits>
 
-GateRoutePlanner::GateRoutePlanner(const MapData& mapData)
-  : mapData(mapData), planner(mapData.getGates())
-{
-}
+GateRoutePlanner::GateRoutePlanner(const MapData& mapData) : mapData(mapData) {}
 
 GateRouteResult GateRoutePlanner::search(int currentX, int currentY, Direction currentDirection,
                                          GoalColor goalColor)
 {
   GateRouteResult result;
 
+  // ==========================================
+  // 指定されたゲート情報が存在するか確認
+  // ==========================================
+
+  if(!mapData.hasGate(goalColor)) {
+    return result;
+  }
+
+  // ==========================================
+  // 最新のマップ情報でダイクストラ法を生成
+  // ==========================================
+
+  DijkstraRoutePlanner planner(mapData.getGates());
+
+  // ==========================================
+  // ゲートの2つの通過候補を取得
+  // ==========================================
+
   std::vector<GatePass> passes = mapData.getGatePasses(goalColor);
+
+  if(passes.empty()) {
+    return result;
+  }
 
   int bestCost = INT_MAX;
 
+  // ==========================================
+  // ゲートの両側を比較
+  // ==========================================
+
   for(const GatePass& pass : passes) {
     /*
-     * 全ゲートを壁として扱い、
-     * 目的ゲートの入口まで探索する。
+     * ダイクストラ法ではすべてのゲートを壁として扱う。
      *
-     * 入口ではゲート通過方向を向く。
+     * 目的ゲートについても入口までは通常の壁として扱い、
+     * 入口に到達してから最後にゲートを通過する。
+     *
+     * goalDirectionには、
+     * ゲートをくぐる方向を指定する。
      */
     RouteResult candidate
         = planner.search(currentX, currentY, currentDirection, pass.entrance, pass.direction);
@@ -36,39 +62,41 @@ GateRouteResult GateRoutePlanner::search(int currentX, int currentY, Direction c
     }
 
     /*
-     * ゲート通過1区間分。
+     * candidateの最後では、
+     * ゲートを通過する方向を向いている。
      *
-     * candidateの最後では
-     * pass.directionを向いているので
-     * 直進コストだけ加算する。
+     * あとは1区間直進して出口へ行くだけなので、
+     * STRAIGHT_COSTを追加する。
      */
     int totalCost = candidate.cost + STRAIGHT_COST;
 
+    // すでにもっと良い経路がある
     if(totalCost >= bestCost) {
       continue;
     }
 
     bestCost = totalCost;
 
-    // =========================
-    // ゲート出口まで追加
-    // =========================
+    // ==========================================
+    // ゲート出口まで含めた経路を作成
+    // ==========================================
 
     std::vector<RouteState> fullRoute = candidate.route;
 
     fullRoute.push_back({ pass.exit.x, pass.exit.y, pass.direction });
 
-    // =========================
-    // 直進区間をまとめる
-    // =========================
+    // ==========================================
+    // 連続した直進をまとめる
+    // ==========================================
 
     std::vector<RouteState> compressedRoute = compressRoute(fullRoute);
 
-    // =========================
-    // 結果
-    // =========================
+    // ==========================================
+    // 結果保存
+    // ==========================================
 
     result.found = true;
+
     result.color = goalColor;
 
     result.entrance = pass.entrance;
@@ -93,48 +121,49 @@ std::vector<RouteState> GateRoutePlanner::compressRoute(const std::vector<RouteS
     return compressed;
   }
 
-  /*
-   * スタート地点は必ず残す
-   */
+  // スタート位置
   compressed.push_back(route.front());
 
   /*
-   * currentの次で方向が変わる場合、
-   * currentが直進区間の終点になる。
+   * 3点を比較する。
+   *
+   * previous → current → next
+   *
+   * currentまでと、
+   * currentから先で移動方向が変わるなら
+   * currentが曲がり地点。
    */
   for(size_t i = 1; i + 1 < route.size(); ++i) {
+    const RouteState& previous = route[i - 1];
+
     const RouteState& current = route[i];
 
     const RouteState& next = route[i + 1];
 
-    bool positionChanged = current.x != next.x || current.y != next.y;
+    // ==========================================
+    // currentでその場回頭している
+    // ==========================================
 
-    bool directionChanged = current.direction != next.direction;
+    bool samePositionAsPrevious = previous.x == current.x && previous.y == current.y;
 
-    /*
-     * 次の状態で方向が変化する場合
-     *
-     * currentを曲がり地点として残す。
-     */
-    if(positionChanged && directionChanged) {
+    if(samePositionAsPrevious && previous.direction != current.direction) {
       compressed.push_back(current);
+
+      continue;
     }
 
-    /*
-     * 同じ座標で向きだけ変わる場合も残す。
-     *
-     * 例:
-     * (4,4) DOWN
-     * (4,4) RIGHT
-     */
-    if(!positionChanged && directionChanged) {
+    // ==========================================
+    // currentの次で進行方向が変化する
+    // ==========================================
+
+    bool directionChangesNext = current.direction != next.direction;
+
+    if(directionChangesNext) {
       compressed.push_back(current);
     }
   }
 
-  /*
-   * 最終地点は必ず残す
-   */
+  // 最終地点
   if(route.size() >= 2) {
     compressed.push_back(route.back());
   }

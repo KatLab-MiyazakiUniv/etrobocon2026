@@ -1,21 +1,42 @@
 /**
  * @file   MapData.cpp
- * @brief  固定マップ情報を保持するクラス
+ * @brief  走行中に取得したマップ情報を保持するクラス
  */
 
 #include "MapData.h"
 
-MapData::MapData()
-  : gates{ // 赤ゲート
-           { GoalColor::RED, { 1, 3 }, { 3, 3 } },
+MapData::MapData() : gates() {}
 
-           // 青ゲート
-           { GoalColor::BLUE, { 7, 3 }, { 7, 5 } },
-
-           // 黄ゲート
-           { GoalColor::YELLOW, { 3, 7 }, { 5, 7 } }
-    }
+void MapData::setGate(GoalColor color, const Point& start, const Point& end)
 {
+  // 同じ色のゲートがすでに存在する場合は更新
+  for(Gate& gate : gates) {
+    if(gate.color == color) {
+      gate.start = start;
+      gate.end = end;
+
+      return;
+    }
+  }
+
+  // 存在しない場合は新しく追加
+  gates.push_back({ color, start, end });
+}
+
+bool MapData::hasGate(GoalColor color) const
+{
+  return getGate(color) != nullptr;
+}
+
+const Gate* MapData::getGate(GoalColor color) const
+{
+  for(const Gate& gate : gates) {
+    if(gate.color == color) {
+      return &gate;
+    }
+  }
+
+  return nullptr;
 }
 
 const std::vector<Gate>& MapData::getGates() const
@@ -23,43 +44,40 @@ const std::vector<Gate>& MapData::getGates() const
   return gates;
 }
 
-const Gate& MapData::getGate(GoalColor color) const
-{
-  for(const Gate& gate : gates) {
-    if(gate.color == color) {
-      return gate;
-    }
-  }
-
-  // RED / BLUE / YELLOWの3種類しか来ない前提
-  return gates[0];
-}
-
 std::vector<GatePass> MapData::getGatePasses(GoalColor color) const
 {
-  const Gate& gate = getGate(color);
-
   std::vector<GatePass> passes;
+
+  const Gate* gate = getGate(color);
+
+  // 指定色のゲート情報がまだない
+  if(gate == nullptr) {
+    return passes;
+  }
 
   // ==========================================
   // 横向きゲート
   //
   // 例:
   //
-  // (1,3) -------- (3,3)
-  //
   //        (2,2)
+  //          ↓
+  //
+  // (1,3) ====== (3,3)
+  //
   //          ↓
   //        (2,4)
   // ==========================================
 
-  if(gate.start.y == gate.end.y) {
-    int centerX = (gate.start.x + gate.end.x) / 2;
+  if(gate->start.y == gate->end.y) {
+    int centerX = (gate->start.x + gate->end.x) / 2;
 
-    int gateY = gate.start.y;
+    int gateY = gate->start.y;
 
+    // 上側 → 下側
     passes.push_back({ { centerX, gateY - 1 }, { centerX, gateY + 1 }, Direction::DOWN });
 
+    // 下側 → 上側
     passes.push_back({ { centerX, gateY + 1 }, { centerX, gateY - 1 }, Direction::UP });
 
     return passes;
@@ -68,26 +86,30 @@ std::vector<GatePass> MapData::getGatePasses(GoalColor color) const
   // ==========================================
   // 縦向きゲート
   //
-  //        |
-  //        |
+  // RIGHT : Xが減る
+  // LEFT  : Xが増える
   //
-  // (8,4) → ← (6,4)
+  //     (X小)     (X大)
+  //        ← RIGHT
   //
-  // RIGHTはX減少
-  // LEFTはX増加
+  //        | GATE |
+  //
+  //        LEFT →
   // ==========================================
 
-  int centerY = (gate.start.y + gate.end.y) / 2;
+  if(gate->start.x == gate->end.x) {
+    int centerY = (gate->start.y + gate->end.y) / 2;
 
-  int gateX = gate.start.x;
+    int gateX = gate->start.x;
 
-  // Xが大きい側 → Xが小さい側
-  // RIGHT
-  passes.push_back({ { gateX + 1, centerY }, { gateX - 1, centerY }, Direction::RIGHT });
+    // Xが大きい側 → Xが小さい側
+    // RIGHT
+    passes.push_back({ { gateX + 1, centerY }, { gateX - 1, centerY }, Direction::RIGHT });
 
-  // Xが小さい側 → Xが大きい側
-  // LEFT
-  passes.push_back({ { gateX - 1, centerY }, { gateX + 1, centerY }, Direction::LEFT });
+    // Xが小さい側 → Xが大きい側
+    // LEFT
+    passes.push_back({ { gateX - 1, centerY }, { gateX + 1, centerY }, Direction::LEFT });
+  }
 
   return passes;
 }

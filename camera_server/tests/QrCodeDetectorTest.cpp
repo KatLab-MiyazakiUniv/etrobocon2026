@@ -78,7 +78,7 @@ namespace etrobocon2026_test {
     cv::Mat frame = cv::imread("camera_server/test_data/Hint1.png");
     ASSERT_FALSE(frame.empty());
 
-    QrCodeDetector detector(cv::Rect(1000, 1000, 100, 100));
+    QrCodeDetector detector(cv::Rect(CAM_MAX_WIDTH + 1, CAM_MAX_HEIGHT + 1, 100, 100));
 
     auto result = detector.detect(frame);
 

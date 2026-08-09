@@ -31,8 +31,12 @@ void QrCodeDetector::validateParameters()
 {
   if(roi.x < 0) roi.x = 0;
   if(roi.y < 0) roi.y = 0;
-  if(roi.x + roi.width > CAM_MAX_WIDTH) roi.width = CAM_MAX_WIDTH - roi.x;
-  if(roi.y + roi.height > CAM_MAX_HEIGHT) roi.height = CAM_MAX_HEIGHT - roi.y;
+  if(roi.x > CAM_MAX_WIDTH) roi.x = CAM_MAX_WIDTH;
+  if(roi.y > CAM_MAX_HEIGHT) roi.y = CAM_MAX_HEIGHT;
+  if(roi.width < 0) roi.width = 0;
+  if(roi.height < 0) roi.height = 0;
+  if(roi.width > CAM_MAX_WIDTH - roi.x) roi.width = CAM_MAX_WIDTH - roi.x;
+  if(roi.height > CAM_MAX_HEIGHT - roi.y) roi.height = CAM_MAX_HEIGHT - roi.y;
 }
 
 QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)

@@ -49,8 +49,3 @@ const CameraCapture& QrCodeDetectionActionHandler::getCamera() const
 {
   return camera;
 }
-
-const QrCodeDetector& QrCodeDetectionActionHandler::getDetector() const
-{
-  return detector;
-}

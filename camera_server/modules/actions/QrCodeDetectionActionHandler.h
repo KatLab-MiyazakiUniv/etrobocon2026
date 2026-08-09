@@ -40,12 +40,6 @@ class QrCodeDetectionActionHandler {
    */
   const CameraCapture& getCamera() const;
 
-  /**
-   * @brief QRコード検出器を取得する
-   * @return const QrCodeDetector& QRコード検出器への参照
-   */
-  const QrCodeDetector& getDetector() const;
-
  private:
   CameraCapture& camera;    // カメラキャプチャのインスタンスへの参照
   QrCodeDetector detector;  // QRコード検出器

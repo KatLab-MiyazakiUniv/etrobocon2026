@@ -30,12 +30,12 @@ class CameraTracking : public BaseMotion {
    * @param _targetSpeed 目標速度
    * @param _targetXCoordinate 目標x座標
    * @param _pidGain カメラ制御用PIDゲイン
-   * @param _detectionRequest 色領域検出リクエスト
+   * @param _colorDetectionRequest 色領域検出リクエスト
    * @param _isStopMotorPower モーターを停止するかどうか
    */
   CameraTracking(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                  double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
-                 const CameraServer::ColorRegionDetectorRequest& _detectionRequest,
+                 const CameraServer::ColorRegionDetectorRequest& _colorDetectionRequest,
                  bool _isStopMotorPower = true);
 
   /**
@@ -75,7 +75,7 @@ class CameraTracking : public BaseMotion {
    * @brief 色領域検出リクエストを取得する
    * @return const CameraServer::ColorRegionDetectorRequest& 検出リクエストへの参照
    */
-  const CameraServer::ColorRegionDetectorRequest& getDetectionRequest() const;
+  const CameraServer::ColorRegionDetectorRequest& getColorDetectionRequest() const;
 
   /**
    * @brief QRコード検出リクエストを取得する
@@ -123,14 +123,14 @@ class CameraTracking : public BaseMotion {
   void finish() override;
 
  private:
-  double targetSpeed;                                         // 目標速度
-  int targetXCoordinate;                                      // 目標X座標
-  DetectionMode detectionMode;                                // 検出方式
-  CameraServer::ColorRegionDetectorRequest detectionRequest;  // 色領域検出リクエスト
-  CameraServer::QrCodeDetectorRequest qrDetectionRequest;     // QRコード検出リクエスト
-  bool isStopMotorPower;                                      // モーターを停止するかどうか
-  SpeedCalculator speedCalculator;                            // 目標速度に対するモータパワー計算
-  Pid cameraPid;                                              // カメラ画像x座標に対するPID制御
+  double targetSpeed;                                              // 目標速度
+  int targetXCoordinate;                                           // 目標X座標
+  DetectionMode detectionMode;                                     // 検出方式
+  CameraServer::ColorRegionDetectorRequest colorDetectionRequest;  // 色領域検出リクエスト
+  CameraServer::QrCodeDetectorRequest qrDetectionRequest;          // QRコード検出リクエスト
+  bool isStopMotorPower;                                           // モーターを停止するかどうか
+  SpeedCalculator speedCalculator;  // 目標速度に対するモータパワー計算
+  Pid cameraPid;                    // カメラ画像x座標に対するPID制御
 };
 
 #endif

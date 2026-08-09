@@ -6,17 +6,15 @@
 
 #include "CameraTracking.h"
 
-CameraTracking::CameraTracking(Robot& _robot,
-                               std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                               double _targetSpeed, int _targetXCoordinate,
-                               const Pid::PidGain& _pidGain,
-                               const CameraServer::ColorRegionDetectorRequest& _detectionRequest,
-                               bool _isStopMotorPower)
+CameraTracking::CameraTracking(
+    Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+    double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
+    const CameraServer::ColorRegionDetectorRequest& _colorDetectionRequest, bool _isStopMotorPower)
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
     targetXCoordinate(_targetXCoordinate),
     detectionMode(DetectionMode::COLOR_REGION),
-    detectionRequest(_detectionRequest),
+    colorDetectionRequest(_colorDetectionRequest),
     qrDetectionRequest(),
     isStopMotorPower(_isStopMotorPower),
     speedCalculator(_robot, _targetSpeed),
@@ -35,7 +33,7 @@ CameraTracking::CameraTracking(Robot& _robot,
     targetSpeed(_targetSpeed),
     targetXCoordinate(_targetXCoordinate),
     detectionMode(DetectionMode::QR_CODE),
-    detectionRequest(),
+    colorDetectionRequest(),
     qrDetectionRequest(_qrDetectionRequest),
     isStopMotorPower(_isStopMotorPower),
     speedCalculator(_robot, _targetSpeed),
@@ -78,7 +76,7 @@ void CameraTracking::executeStep()
   if(detectionMode == DetectionMode::COLOR_REGION) {
     CameraServer::ColorRegionDetectorResponse response;
     // run()の中でColorRegionDetectorインスタンスが繰り返し生死。インスタンスの生死のlogが重い処理
-    success = client.executeColorRegionDetection(detectionRequest, response);
+    success = client.executeColorRegionDetection(colorDetectionRequest, response);
     wasDetected = response.result.wasDetected;
     if(success && wasDetected) {
       // バウンディングボックスの中心X座標を計算
@@ -139,9 +137,9 @@ int CameraTracking::getTargetXCoordinate() const
   return targetXCoordinate;
 }
 
-const CameraServer::ColorRegionDetectorRequest& CameraTracking::getDetectionRequest() const
+const CameraServer::ColorRegionDetectorRequest& CameraTracking::getColorDetectionRequest() const
 {
-  return detectionRequest;
+  return colorDetectionRequest;
 }
 
 const CameraServer::QrCodeDetectorRequest& CameraTracking::getQrDetectionRequest() const

@@ -86,7 +86,7 @@ namespace etrobocon2026_test {
     EXPECT_DOUBLE_EQ(tracking.getTargetSpeed(), speed);
     EXPECT_EQ(tracking.getTargetXCoordinate(), targetX);
 
-    const auto& retReq = tracking.getDetectionRequest();
+    const auto& retReq = tracking.getColorDetectionRequest();
     EXPECT_EQ(retReq.hsvRangeCount, req.hsvRangeCount);
     EXPECT_EQ(retReq.roi.x, req.roi.x);
     EXPECT_EQ(retReq.roi.y, req.roi.y);

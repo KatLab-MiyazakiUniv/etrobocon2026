@@ -110,7 +110,7 @@ class SocketServer {
 
  private:
   INetworkSystem& netSys;                                          // 注入される具象クラスのポインタ
-  int listenSocket;                                                // Severのファイルディスクリプタ
+  int listenSocket;                                                // Serverのファイルディスクリプタ
   bool isRunning;                                                  // Serverが稼働中ならtrue
   int port;                                                        // サーバーのポート番号
   static constexpr int DEFAULT_BUFLEN = 512;                       // デフォルトのバッファサイズ

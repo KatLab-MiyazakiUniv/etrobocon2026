@@ -18,7 +18,6 @@ CameraTracking::CameraTracking(Robot& _robot,
     detectionRequest(_detectionRequest),
     isStopMotorPower(_isStopMotorPower),
     speedCalculator(_robot, _targetSpeed),
-    pidGain(_pidGain),
     cameraPid(_pidGain.kp, _pidGain.ki, _pidGain.kd, _targetXCoordinate)
 {
   LOG_CREATE("CameraTracking");
@@ -75,19 +74,6 @@ void CameraTracking::executeStep()
 
   robot.getWheelMotorControllerInstance().setRightPower(rightPower);
   robot.getWheelMotorControllerInstance().setLeftPower(leftPower);
-
-  LogData logData;
-  logData.time = ClockUtil::now();
-  logData.target = targetXCoordinate;
-  logData.currentVal = currentX;
-  logData.rightPower = robot.getWheelMotorControllerInstance().getRightPower();
-  logData.leftPower = robot.getWheelMotorControllerInstance().getLeftPower();
-  logData.rightSpeed = robot.getWheelMotorControllerInstance().getRightSpeed();
-  logData.leftSpeed = robot.getWheelMotorControllerInstance().getLeftSpeed();
-  logData.kp = pidGain.kp;
-  logData.ki = pidGain.ki;
-  logData.kd = pidGain.kd;
-  CsvLogger::add(logData);
 }
 
 void CameraTracking::wait()

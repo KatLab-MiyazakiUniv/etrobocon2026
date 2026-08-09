@@ -8,7 +8,8 @@
 
 LineTrace::LineTrace(Robot& _robot,
                      std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                     double _targetSpeed, int _targetBrightness, const Pid::PidGain& _brightnessPidGain)
+                     double _targetSpeed, int _targetBrightness,
+                     const Pid::PidGain& _brightnessPidGain)
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
     targetBrightness(_targetBrightness),
@@ -50,16 +51,6 @@ void LineTrace::executeStep()
 
   robot.getWheelMotorControllerInstance().setRightPower(rightPower);
   robot.getWheelMotorControllerInstance().setLeftPower(leftPower);
-
-  LogData logData;
-  logData.time = ClockUtil::now();
-  logData.target = targetBrightness;
-  logData.currentVal = robot.getColorSensorControllerInstance().getReflectance();
-  logData.rightPower = robot.getWheelMotorControllerInstance().getRightPower();
-  logData.leftPower = robot.getWheelMotorControllerInstance().getLeftPower();
-  logData.rightSpeed = robot.getWheelMotorControllerInstance().getRightPower();
-  logData.leftSpeed = robot.getWheelMotorControllerInstance().getLeftPower();
-  CsvLogger::add(logData);
 }
 
 void LineTrace::finish()

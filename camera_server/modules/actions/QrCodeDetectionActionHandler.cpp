@@ -20,6 +20,8 @@ QrCodeDetectionActionHandler::~QrCodeDetectionActionHandler()
 void QrCodeDetectionActionHandler::execute(const CameraServer::QrCodeDetectorRequest& request,
                                            CameraServer::QrCodeDetectorResponse& response)
 {
+  response = {};
+
   cv::Mat frame;
   if(!camera.getFrame(frame)) {
     Logger::error("QrCodeDetectionActionHandler:フレームの取得に失敗しました");
@@ -34,6 +36,7 @@ void QrCodeDetectionActionHandler::execute(const CameraServer::QrCodeDetectorReq
 
   response.wasDetected = result.wasDetected;
   if(result.wasDetected) {
+    std::strncpy(response.content, result.content.c_str(), sizeof(response.content) - 1);
     for(uint32_t i = 0; i < CameraServer::QR_CODE_CORNER_COUNT; i++) {
       response.corners[i].x = static_cast<int32_t>(std::lround(result.corners[i].x));
       response.corners[i].y = static_cast<int32_t>(std::lround(result.corners[i].y));

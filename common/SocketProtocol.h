@@ -113,7 +113,8 @@ namespace CameraServer {
     int32_t largestColorIndex = -1;     // 最も面積が大きい色のインデックス
   };
 
-  static constexpr uint32_t QR_CODE_CORNER_COUNT = 4;  // QRコードの頂点数
+  static constexpr uint32_t QR_CODE_CORNER_COUNT = 4;   // QRコードの頂点数
+  static constexpr uint32_t QR_CODE_CONTENT_SIZE = 64;  // QRコードから取得した文字列の最大バイト数
 
   /**
    * @brief カメラサーバーにQRコード検出を要求する際のリクエスト構造体
@@ -128,6 +129,7 @@ namespace CameraServer {
    */
   struct QrCodeDetectorResponse {
     bool wasDetected = false;                      // 検出できたかどうか
+    char content[QR_CODE_CONTENT_SIZE] = {};       // QRコードから取得した文字列
     PointData corners[QR_CODE_CORNER_COUNT] = {};  // QRコードの各頂点の座標(左上から時計回りの順)
   };
 }  // namespace CameraServer

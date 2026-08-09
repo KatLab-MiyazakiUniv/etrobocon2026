@@ -75,6 +75,7 @@ namespace etrobocon2026_test {
     handler.execute(request, response);
 
     EXPECT_TRUE(response.wasDetected);
+    EXPECT_STREQ("25,35", response.content);
 
     Logger::outputToFile();
     std::ifstream file(fullPath);

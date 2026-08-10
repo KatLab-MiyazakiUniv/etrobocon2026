@@ -6,8 +6,6 @@
 
 #include "BaseMotion.h"
 
-#include <utility>
-
 BaseMotion::BaseMotion(Robot& _robot,
                        std::unique_ptr<BaseContinuationCondition> _continuationCondition)
   : robot(_robot), continuationCondition(std::move(_continuationCondition))
@@ -16,37 +14,29 @@ BaseMotion::BaseMotion(Robot& _robot,
 
 void BaseMotion::run()
 {
-  // 動作を開始可能か確認する
+  // 実行時の状態を確認する。
+  // 基本はtrueで、IMUやカメラサーバーなどの状態確認が必要な動作だけcanStart関数をoverrideする。
   if(!canStart()) {
     return;
   }
 
-  // 動作開始時点までの移動量をPositionへ反映する
-  updateOdometry();
-
-  // 派生クラス固有の準備を行う
+  // メンバ変数の初期化など、動作固有の事前準備を行う。
   prepare();
 
-  // 継続条件の初期値を設定する
+  // 初期値のセットなど、継続条件の事前準備を行う。
   continuationCondition->prepare();
 
-  // 継続条件を満たしている間、1周期ずつ動作を実行する
+  // 継続条件を満たしている間、1周期ずつ動作を実行する。
   while(continuationCondition->shouldContinue()) {
-    // モーター出力など、派生クラス固有の処理を行う
+    // 派生クラス固有の1周期分の動作を実行する。
     executeStep();
 
-    // モーターが動作する時間を確保する
+    // 制御を安定させるために待機する。
     wait();
-
-    // この制御周期で移動した分をPositionへ反映する
-    updateOdometry();
   }
 
-  // モーター停止など、動作終了後の処理を行う
+  // モーター停止など、動作終了後の処理を行う。
   finish();
-
-  // 継続条件の判定から停止までに移動した分を反映する
-  updateOdometry();
 }
 
 bool BaseMotion::canStart()
@@ -62,16 +52,3 @@ void BaseMotion::wait()
 }
 
 void BaseMotion::finish() {}
-
-void BaseMotion::updateOdometry()
-{
-  WheelMotorController& wheelMotorController = robot.getWheelMotorControllerInstance();
-
-  const int32_t leftCount = wheelMotorController.getLeftCount();
-
-  const int32_t rightCount = wheelMotorController.getRightCount();
-
-  const double heading = robot.getIMUControllerInstance().getAzimuth();
-
-  robot.getOdometryInstance().update(leftCount, rightCount, heading);
-}

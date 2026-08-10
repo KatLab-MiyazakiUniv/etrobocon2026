@@ -65,11 +65,6 @@ class Pid {
    */
   double calculatePid(double currentValue);
 
-  /**
-   * @brief PIDの内部状態をリセットする
-   */
-  void reset();
-
  private:
   PidGain pidGain;
   double prevTime = -1.0;               // 前回の時間

@@ -10,7 +10,6 @@
 #include "Position.h"
 #include "AngleNormalizer.h"
 #include "SystemInfo.h"
-
 #include <cmath>
 
 class Navigator {

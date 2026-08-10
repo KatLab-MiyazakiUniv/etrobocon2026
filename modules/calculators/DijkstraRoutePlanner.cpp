@@ -1,25 +1,23 @@
 /**
  * @file   DijkstraRoutePlanner.cpp
  * @brief  ゲートを考慮したダイクストラ法による経路探索
+ * @author okuyama0528 yutaro-1214
  */
 
 #include "DijkstraRoutePlanner.h"
 
-#include <algorithm>
-#include <climits>
-#include <cmath>
-#include <functional>
-#include <queue>
-
+/**
+ * @brief ダイクストラ法の優先度付きキューで使用するノード
+ */
 namespace {
-
   struct QueueNode {
-    int cost;
-    int index;
-
-    bool operator>(const QueueNode& other) const { return cost > other.cost; }
+    int cost;   // 開始地点からの累積コスト
+    int index;  // 現在の状態を表すインデックス
+    bool operator>(const QueueNode& other) const
+    {
+      return cost > other.cost;
+    }  // コストの小さいノードを優先するための比較
   };
-
 }  // namespace
 
 DijkstraRoutePlanner::DijkstraRoutePlanner(const std::vector<Gate>& gates) : gates(gates) {}
@@ -100,10 +98,7 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
       }
     }
   }
-
-  // ==========================================
   // ゴールへの4方向の到着方法を比較
-  // ==========================================
 
   int bestIndex = -1;
   int bestCost = INT_MAX;
@@ -128,10 +123,7 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
   if(bestIndex == -1) {
     return result;
   }
-
-  // ==========================================
   // 経路復元
-  // ==========================================
 
   std::vector<RouteState> route;
 

@@ -1,6 +1,7 @@
 /**
  * @file   MapData.cpp
  * @brief  走行中に取得したマップ情報を保持するクラス
+ * @author okuyama0528 yutaro-1214
  */
 
 #include "MapData.h"
@@ -55,59 +56,31 @@ std::vector<GatePass> MapData::getGatePasses(GoalColor color) const
     return passes;
   }
 
-  // ==========================================
   // 横向きゲート
-  //
-  // 例:
-  //
-  //        (2,2)
-  //          ↓
-  //
-  // (1,3) ====== (3,3)
-  //
-  //          ↓
-  //        (2,4)
-  // ==========================================
-
   if(gate->start.y == gate->end.y) {
     int centerX = (gate->start.x + gate->end.x) / 2;
 
     int gateY = gate->start.y;
 
-    // 上側 → 下側
+    // upからdown
     passes.push_back({ { centerX, gateY - 1 }, { centerX, gateY + 1 }, Direction::DOWN });
 
-    // 下側 → 上側
+    // downからup
     passes.push_back({ { centerX, gateY + 1 }, { centerX, gateY - 1 }, Direction::UP });
 
     return passes;
   }
 
-  // ==========================================
   // 縦向きゲート
-  //
-  // RIGHT : Xが減る
-  // LEFT  : Xが増える
-  //
-  //     (X小)     (X大)
-  //        ← RIGHT
-  //
-  //        | GATE |
-  //
-  //        LEFT →
-  // ==========================================
-
   if(gate->start.x == gate->end.x) {
     int centerY = (gate->start.y + gate->end.y) / 2;
 
     int gateX = gate->start.x;
 
-    // Xが大きい側 → Xが小さい側
-    // RIGHT
+    // leftからright
     passes.push_back({ { gateX + 1, centerY }, { gateX - 1, centerY }, Direction::RIGHT });
 
-    // Xが小さい側 → Xが大きい側
-    // LEFT
+    // rightからleft
     passes.push_back({ { gateX - 1, centerY }, { gateX + 1, centerY }, Direction::LEFT });
   }
 

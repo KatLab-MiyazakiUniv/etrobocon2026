@@ -46,7 +46,7 @@ void GoalNavigation::prepare()
                     targetX, targetY, targetDistance, targetHeading);
 
   // 現在位置から目標地点までの方位角を計算する
-targetHeading = navigator.calculateHeading( targetX, targetY);
+  targetHeading = navigator.calculateHeading(targetX, targetY);
 }
 
 void GoalNavigation::executeStep()

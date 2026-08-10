@@ -85,7 +85,7 @@ namespace etrobocon2026_test {
     EXPECT_FALSE(result.wasDetected);
   }
 
-  // setRoiでROIを更新すると、更新後のROIを用いて検出できることを確認するテスト
+  // setValidatedRoiでROIを更新すると、更新後のROIを用いて検出できることを確認するテスト
   TEST(QrCodeDetectorTest, DetectQrCodeAfterSetRoi)
   {
     cv::Mat frame = cv::imread("camera_server/test_data/Hint1.png");
@@ -96,7 +96,7 @@ namespace etrobocon2026_test {
     ASSERT_FALSE(detector.detect(frame).wasDetected);
 
     // フレーム全体を対象とするROIに更新
-    detector.setRoi(FULL_FRAME_ROI);
+    detector.setValidatedRoi(FULL_FRAME_ROI);
 
     auto result = detector.detect(frame);
     EXPECT_TRUE(result.wasDetected);

@@ -21,7 +21,7 @@ QrCodeDetector::~QrCodeDetector()
   LOG_DESTROY("QrCodeDetector");
 }
 
-void QrCodeDetector::setRoi(const cv::Rect& _roi)
+void QrCodeDetector::setValidatedRoi(const cv::Rect& _roi)
 {
   roi = _roi;
   validateParameters();

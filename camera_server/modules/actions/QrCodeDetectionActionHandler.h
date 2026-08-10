@@ -35,12 +35,6 @@ class QrCodeDetectionActionHandler {
   void execute(const CameraServer::QrCodeDetectorRequest& request,
                CameraServer::QrCodeDetectorResponse& response);
 
-  /**
-   * @brief カメラキャプチャのインスタンスを取得する
-   * @return CameraCapture& カメラキャプチャのインスタンスへの参照
-   */
-  const CameraCapture& getCamera() const;
-
  private:
   CameraCapture& camera;    // カメラキャプチャのインスタンスへの参照
   QrCodeDetector detector;  // QRコード検出器

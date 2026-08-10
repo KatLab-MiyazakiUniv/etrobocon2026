@@ -36,10 +36,10 @@ class QrCodeDetector : public CodeDetector<QrCodeDetectionResult> {
   QrCodeDetectionResult detect(const cv::Mat& frame) override;
 
   /**
-   * @brief ROIを設定する
+   * @brief ROIを検証したうえで設定する
    * @param _roi 設定するROI
    */
-  void setRoi(const cv::Rect& _roi);
+  void setValidatedRoi(const cv::Rect& _roi);
 
  private:
   ZXing::ReaderOptions options;  // ZXingのデコードオプション

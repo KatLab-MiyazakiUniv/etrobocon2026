@@ -30,13 +30,16 @@ void QrCodeDetectionActionHandler::execute(const CameraServer::QrCodeDetectorReq
   }
 
   cv::Rect localRoi(request.roi.x, request.roi.y, request.roi.width, request.roi.height);
-  detector.setRoi(localRoi);
+  detector.setValidatedRoi(localRoi);
 
   QrCodeDetectionResult result = detector.detect(frame);
 
   response.wasDetected = result.wasDetected;
   if(result.wasDetected) {
+    // 検出したQRコードの文字列をレスポンスに格納する
     std::strncpy(response.content, result.content.c_str(), sizeof(response.content) - 1);
+
+    // 検出したQRコードの4頂点の座標をレスポンスに格納する
     for(uint32_t i = 0; i < CameraServer::QR_CODE_CORNER_COUNT; i++) {
       response.corners[i].x = static_cast<int32_t>(std::lround(result.corners[i].x));
       response.corners[i].y = static_cast<int32_t>(std::lround(result.corners[i].y));
@@ -46,9 +49,4 @@ void QrCodeDetectionActionHandler::execute(const CameraServer::QrCodeDetectorReq
   } else {
     Logger::error("QrCodeDetectionActionHandler:QRコードが検出されませんでした");
   }
-}
-
-const CameraCapture& QrCodeDetectionActionHandler::getCamera() const
-{
-  return camera;
 }

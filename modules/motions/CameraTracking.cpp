@@ -82,7 +82,7 @@ void CameraTracking::executeStep()
       // バウンディングボックスの中心X座標を計算
       currentX = (response.result.topLeft.x + response.result.bottomRight.x) / 2.0;
     }
-  } else {
+  } else if(detectionMode == DetectionMode::QR_CODE) {
     CameraServer::QrCodeDetectorResponse response;
     success = client.executeQrCodeDetection(qrDetectionRequest, response);
     wasDetected = response.wasDetected;
@@ -94,11 +94,17 @@ void CameraTracking::executeStep()
       }
       currentX = sumX / CameraServer::QR_CODE_CORNER_COUNT;
     }
+  } else {
+    Logger::error("CameraTracking:検出方式が不正です");
   }
 
-  // 通信失敗、または検出できなかった場合は、出力を更新せずに終了する
-  if(!success || !wasDetected) {
-    Logger::warning("CameraTracking:検出対象が検出されませんでした");
+  if(!success) {
+    Logger::warning("CameraTracking:通信に失敗しました");
+    return;
+  }
+
+  if(!wasDetected) {
+    Logger::warning("CameraTracking:検出対象が検出できませんでした");
     return;
   }
 

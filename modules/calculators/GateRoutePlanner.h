@@ -23,13 +23,13 @@ class GateRoutePlanner {
 
   /**
    * @brief MapDataから最新のゲート情報を取得
-   指定されたゲートを通過する最短経路を探索
-    * @param currentX 現在のX座標
-    * @param currentY 現在のY座標
-    * @param currentDirection 現在のロボットの向き
-    * @param goalColor 目標ゲートの色
-    * @return ゲートへの経路探索の結果
-    */
+   *        指定されたゲートを通過する最短経路を探索
+   * @param currentX 現在のX座標
+   * @param currentY 現在のY座標
+   * @param currentDirection 現在のロボットの向き
+   * @param goalColor 目標ゲートの色
+   * @return ゲートへの経路探索の結果
+   */
   GateRouteResult search(int currentX, int currentY, Direction currentDirection,
                          GoalColor goalColor);
 

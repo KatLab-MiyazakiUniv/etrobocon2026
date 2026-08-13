@@ -8,13 +8,15 @@
 
 LineTrace::LineTrace(Robot& _robot,
                      std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                     double _targetSpeed, int _targetBrightness, const Pid::PidGain& _brightnessPidGain)
+                     double _targetSpeed, int _targetBrightness,
+                     const Pid::PidGain& _brightnessPidGain)
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
     targetBrightness(_targetBrightness),
     speedCalculator(_robot, _targetSpeed),
     brightnessPidGain(_brightnessPidGain),
-    brightnessPid(_brightnessPidGain.kp, _brightnessPidGain.ki, _brightnessPidGain.kd, _targetBrightness)
+    brightnessPid(_brightnessPidGain.kp, _brightnessPidGain.ki, _brightnessPidGain.kd,
+                  _targetBrightness)
 {
   LOG_CREATE("LineTrace");
 }

@@ -290,11 +290,11 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       // Straight: motionParams[2]=speed(double)
       //           motionParams[9..11]=anglePid(kp,ki,kd)
       //           motionParams[12]=useIMU(string: "true"/"false")
-      return new Straight(
-          robot, std::move(condition), fromString<double>(motionParams[2]),
-          Pid::PidGain{ fromString<double>(motionParams[3]), fromString<double>(motionParams[4]),
-                        fromString<double>(motionParams[5]) },
-          motionParams[6] == "true");
+      return new Straight(robot, std::move(condition), fromString<double>(motionParams[2]),
+                          Pid::PidGain{ fromString<double>(motionParams[3]),
+                                        fromString<double>(motionParams[4]),
+                                        fromString<double>(motionParams[5]) },
+                          motionParams[6] == "true");
     }
     case MOTION_COMMAND::LINETRACE: {
       // LineTrace: motionParams[2]=speed(double)

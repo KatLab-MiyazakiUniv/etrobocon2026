@@ -207,9 +207,9 @@ bool checkType(const std::string& commandFilePath, const std::string& label)
       continue;
     }
 
-    std::stringstream ss(line);          // 行をカンマで分割するための文字列ストリーム
+    std::stringstream ss(line);  // 行をカンマで分割するための文字列ストリーム
     std::vector<std::string> runParams;  // 分割したパラメータを格納するベクター
-    std::string token;                   // 分割したトークンを一時的に格納するバッファ
+    std::string token;  // 分割したトークンを一時的に格納するバッファ
     while(std::getline(ss, token, SEPARATOR)) {
       trim(token);
       runParams.push_back(token);

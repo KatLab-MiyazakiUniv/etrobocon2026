@@ -100,12 +100,12 @@ class SocketServer {
   void handleConnection(int clientSocket);
 
  private:
-  INetworkSystem& netSys;                                          // 注入される具象クラスのポインタ
-  int listenSocket;                                                // Severのファイルディスクリプタ
-  bool isRunning;                                                  // Serverが稼働中ならtrue
-  int port;                                                        // サーバーのポート番号
-  static constexpr int DEFAULT_BUFLEN = 512;                       // デフォルトのバッファサイズ
-  SnapshotActionHandler& snapshotHandler;                          // スナップショットのハンドラ
+  INetworkSystem& netSys;                     // 注入される具象クラスのポインタ
+  int listenSocket;                           // Severのファイルディスクリプタ
+  bool isRunning;                             // Serverが稼働中ならtrue
+  int port;                                   // サーバーのポート番号
+  static constexpr int DEFAULT_BUFLEN = 512;  // デフォルトのバッファサイズ
+  SnapshotActionHandler& snapshotHandler;     // スナップショットのハンドラ
   ColorRegionDetectionActionHandler& colorRegionDetectionHandler;  // 色領域検出のハンドラ
 };
 #endif  // SOCKET_SERVER_H

@@ -98,7 +98,7 @@ namespace CameraServer {
    */
   struct ColorRegionDetectorRequest {
     Command command = Command::COLOR_REGION_DETECTION;  // 色領域検出コマンド
-    bool requireLargestColorIndex = false;   // 最も大きい色領域のインデックスを返すかどうか
+    bool requireLargestColorIndex = false;  // 最も大きい色領域のインデックスを返すかどうか
     uint8_t hsvRangeCount = 0;               // hsvRangesの有効な要素数
     HSVRangeData hsvRanges[MAX_HSV_RANGES];  // HSVの範囲の配列
     RectData roi;                            // 検出対象の領域

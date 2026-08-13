@@ -91,9 +91,9 @@ class CameraTracking : public BaseMotion {
   double targetSpeed;                                         // 目標速度
   int targetXCoordinate;                                      // 目標X座標
   CameraServer::ColorRegionDetectorRequest detectionRequest;  // 検出リクエスト
-  bool isStopMotorPower;            // モーターを停止するかどうか
-  SpeedCalculator speedCalculator;  // 目標速度に対するモータパワー計算
-  Pid cameraPid;                    // カメラ画像x座標に対するPID制御
+  bool isStopMotorPower;                                      // モーターを停止するかどうか
+  SpeedCalculator speedCalculator;                            // 目標速度に対するモータパワー計算
+  Pid cameraPid;                                              // カメラ画像x座標に対するPID制御
   Pid::PidGain pidGain;
 };
 

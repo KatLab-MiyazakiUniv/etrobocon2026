@@ -7,7 +7,7 @@
 #ifndef ULTRA_SONIC_CONTROLLER_H
 #define ULTRA_SONIC_CONTROLLER_H
 
-#include "UltraSonicSensor.h"
+#include "UltrasonicSensor.h"
 
 class UltraSonicController {
  public:

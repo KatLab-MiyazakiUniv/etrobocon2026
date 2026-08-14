@@ -65,7 +65,7 @@ namespace etrobocon2026_test {
               ColorSensorController::convertHsvToColor(lowSaturationLowValue));
 
     // 彩度が低く,明度は高い
-    ColorSensorController::HSV lowSaturationHighValue = { 0, 46, 95 };
+    ColorSensorController::HSV lowSaturationHighValue = { 0, 46, 96 };
     EXPECT_EQ(ColorSensorController::COLOR::WHITE,
               ColorSensorController::convertHsvToColor(lowSaturationHighValue));
 

@@ -82,20 +82,6 @@ void CameraTracking::executeStep()
 
   robot.getWheelMotorControllerInstance().setRightPower(rightPower);
   robot.getWheelMotorControllerInstance().setLeftPower(leftPower);
-
-  LogData logData;
-  logData.time = ClockUtil::now();
-  logData.target = targetXCoordinate;
-  logData.currentVal = currentX;
-  logData.rightPower = robot.getWheelMotorControllerInstance().getRightPower();
-  logData.leftPower = robot.getWheelMotorControllerInstance().getLeftPower();
-  logData.rightSpeed = robot.getWheelMotorControllerInstance().getRightSpeed();
-  logData.leftSpeed = robot.getWheelMotorControllerInstance().getLeftSpeed();
-  logData.kp = cameraPid.getPidGain().kp;
-  logData.ki = cameraPid.getPidGain().ki;
-  logData.kd = cameraPid.getPidGain().kd;
-
-  CsvLogger::add(logData);
 }
 
 void CameraTracking::wait() {}

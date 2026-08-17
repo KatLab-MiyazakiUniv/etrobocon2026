@@ -126,7 +126,7 @@ bool ColorRegionDetector::detectBoundingBox(const cv::Mat& frame,
   for(const auto& contour : contours) {
     double area = cv::contourArea(contour);
     // 最小面積未満ならスキップ
-    if(area <= MIN_CONTOUR_AREA) {
+    if(area < MIN_CONTOUR_AREA) {
       continue;
     }
 

@@ -211,7 +211,7 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
                         targetCount);
       return make_unique<RepeatCountCondition>(robot, targetCount);
     }
-    case CONDITION_COMMAND::DISTANCE_AND_SCOLOR: {
+    case CONDITION_COMMAND::DISTANCE_AND_COLOR: {
       double targetDistance = fromString<double>(params[2]);
       std::string targetColorName = params[3];
 
@@ -274,10 +274,13 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       request.requireLargestColorIndex = fromString<bool>(motionParams[12]);
       request.hsvRangeCount = 3;
       // request.hsvRanges = ImageProcessingColor::BottleColors;
-      request.hsvRanges[0] = ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::RED);
-      request.hsvRanges[1] = ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::BLUE);
-      request.hsvRanges[2]
-          = ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::YELLOW);
+      int count = 0;
+      for(int i = 0; i < ImageProcessingColor::BottleColors.size(); i++) {
+        if(fromString<bool>(motionParams[13 + i])) {
+          request.hsvRanges[count] = ImageProcessingColor::BottleColors[i];
+          count++;
+        }
+      }
       // request.hsvRanges[3]
       //     = ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::BLACK);
 
@@ -351,7 +354,6 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "LineTrace", MOTION_COMMAND::LINETRACE },
           { "AbsoluteRotation", MOTION_COMMAND::ABSOLUTE_ROTATION },
           { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
-          { "EdgeChange", MOTION_COMMAND::EDGECHANGE },
           { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING } };
 
   // コマンド文字列に対応するMOTION_COMMAND値をマップから取得。なければMOTION_COMMAND::NONEを返す
@@ -374,7 +376,7 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
     { "RunningTime", CONDITION_COMMAND::RUNNING_TIME },
     { "MotionTime", CONDITION_COMMAND::MOTION_TIME },
     { "RepeatCount", CONDITION_COMMAND::REPEAT_COUNT },
-    { "DistanceAndColor", CONDITION_COMMAND::DISTANCE_AND_SCOLOR },
+    { "DistanceAndColor", CONDITION_COMMAND::DISTANCE_AND_COLOR },
   };
 
   // 条件コマンド文字列に対応するCONDITION_COMMAND値をマップから取得。なければCONDITION_COMMAND::NONEを返す

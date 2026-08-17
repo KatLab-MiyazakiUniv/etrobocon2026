@@ -40,9 +40,8 @@ class MotionParser {
     STRAIGHT,
     LINETRACE,
     CAMERA_TRACKING,
-    RELATIVE_ROTATION,
     ABSOLUTE_ROTATION,
-    EDGECHANGE,
+    RELATIVE_ROTATION,
     NONE
   };
   // 条件コマンド名を持つ列挙型クラス
@@ -53,8 +52,8 @@ class MotionParser {
     SENSOR_COLOR,
     RUNNING_TIME,
     MOTION_TIME,
-    DISTANCE_AND_SCOLOR,
     REPEAT_COUNT,
+    DISTANCE_AND_COLOR,
     NONE
   };
 

@@ -11,6 +11,7 @@
 #include "Pid.h"
 #include "SpeedCalculator.h"
 #include "SocketProtocol.h"
+#include "CsvLogger.h"
 
 class CameraTracking : public BaseMotion {
  public:

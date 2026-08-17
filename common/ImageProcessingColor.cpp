@@ -1,7 +1,7 @@
 /**
  * @file ImageProcessingColor.cpp
  * @brief 画像処理で使用する色定義とHSV変換処理
- * @author takuchi17
+ * @author takuchi17 sadomiya-sousi
  */
 
 #include "ImageProcessingColor.h"
@@ -20,6 +20,10 @@ const CameraServer::HSVRangeData ImageProcessingColor::GRAY_HSV
     = { { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 } };
 const CameraServer::HSVRangeData ImageProcessingColor::WHITE_HSV
     = { { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 } };
+
+const std::vector<CameraServer::HSVRangeData> ImageProcessingColor::BottleColors
+    = { ImageProcessingColor::RED_HSV, ImageProcessingColor::BLUE_HSV,
+        ImageProcessingColor::YELLOW_HSV, ImageProcessingColor::BLACK_HSV };
 
 const CameraServer::HSVRangeData& ImageProcessingColor::getHSVRangeFromColor(Color color)
 {

@@ -16,16 +16,46 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include <sstream>
 #include <memory>
 #include <unordered_map>
-#include "BaseMotion.h"
 #include "Logger.h"
 #include "DistanceCondition.h"
+#include "SensorColorCondition.h"
+#include "RunningTimeCondition.h"
+#include "MotionTimeCondition.h"
+#include "CompoundCondition.h"
+#include "RelativeAngleCondition.h"
+#include "AbsoluteAngleCondition.h"
+#include "RepeatCountCondition.h"
+#include "LineTrace.h"
+#include "Straight.h"
+#include "AbsoluteRotation.h"
+#include "RelativeRotation.h"
+#include "CameraTracking.h"
+#include "./../common/ImageProcessingColor.h"
 
 class MotionParser {
  public:
   // 動作コマンド名を持つ列挙型クラス
-  enum class MOTION_COMMAND { STRAIGHT, NONE };
+  enum class MOTION_COMMAND {
+    EXAMPLE,
+    STRAIGHT,
+    LINETRACE,
+    CAMERA_TRACKING,
+    ABSOLUTE_ROTATION,
+    RELATIVE_ROTATION,
+    NONE
+  };
   // 条件コマンド名を持つ列挙型クラス
-  enum class CONDITION_COMMAND { DISTANCE, NONE };
+  enum class CONDITION_COMMAND {
+    DISTANCE,
+    ABSOLUTE_ANGLE,
+    RELATIVE_ANGLE,
+    SENSOR_COLOR,
+    RUNNING_TIME,
+    MOTION_TIME,
+    REPEAT_COUNT,
+    DISTANCE_AND_COLOR,
+    NONE
+  };
 
   /**
    * @brief Area CSVファイルを解析して動作インスタンスのリストを生成する

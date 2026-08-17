@@ -13,6 +13,7 @@
 #include "ColorSensorController.h"
 #include "UltraSonicController.h"
 #include "SocketClient.h"
+
 #include "Course.h"
 #include "Button.h"
 #include "ForceSensor.h"
@@ -139,6 +140,18 @@ class Robot {
    */
   int getTargetBrightness() const;
 
+  /**
+   * @brief ボトルキャリーで取得した色範囲のインデックス設定する
+   * @param _indexOfLabel ボトルキャリーで取得した色範囲のインデックス
+   */
+  void setIndexOfLabel(int _indexOfLabel);
+
+  /**
+   * @brief ボトルキャリーで取得した色領域のインデックスを取得する
+   * @return indexOfLabel ボトルキャリーで取得した色範囲のインデックス
+   */
+  int getIndexOfLabel();
+
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
   ArmMotorController armMotorController;        // ArmMotorController インスタンス
@@ -154,5 +167,6 @@ class Robot {
   spikeapi::Display display;                    // Displayインスタンス
   char decryptionKey[5] = { 0 };                // 復号キー
   int targetBrightness = 50;                    // 目標輝度
+  int indexOfLabel = 0;                         // ボトルキャリーで取得した色範囲のインデックス
 };
 #endif

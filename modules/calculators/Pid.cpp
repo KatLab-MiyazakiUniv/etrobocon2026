@@ -45,6 +45,11 @@ void Pid::setPidGain(double _kp, double _ki, double _kd)
   pidGain.kd = (_kd < 0) ? 0.0 : _kd;
 }
 
+const Pid::PidGain& Pid::getPidGain() const
+{
+  return pidGain;
+}
+
 void Pid::prepare()
 {
   prevTime = ClockUtil::now();

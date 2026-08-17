@@ -147,7 +147,7 @@ class Robot {
   void setIndexOfLabel(int _indexOfLabel);
 
   /**
-   * @brief ボトルキャリーで取得した色範囲のインデックス設定する
+   * @brief ボトルキャリーで取得した色領域のインデックスを取得する
    * @return indexOfLabel ボトルキャリーで取得した色範囲のインデックス
    */
   int getIndexOfLabel();

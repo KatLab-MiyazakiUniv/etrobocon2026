@@ -21,6 +21,10 @@ const CameraServer::HSVRangeData ImageProcessingColor::GRAY_HSV
 const CameraServer::HSVRangeData ImageProcessingColor::WHITE_HSV
     = { { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 } };
 
+const std::vector<CameraServer::HSVRangeData> ImageProcessingColor::BottleColors
+    = { ImageProcessingColor::RED_HSV, ImageProcessingColor::BLUE_HSV,
+        ImageProcessingColor::YELLOW_HSV, ImageProcessingColor::BLACK_HSV };
+
 const CameraServer::HSVRangeData& ImageProcessingColor::getHSVRangeFromColor(Color color)
 {
   switch(color) {

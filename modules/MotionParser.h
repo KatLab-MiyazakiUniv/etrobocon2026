@@ -23,7 +23,7 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 class MotionParser {
  public:
   // 動作コマンド名を持つ列挙型クラス
-  enum class MOTION_COMMAND { STRAIGHT, NONE };
+  enum class MOTION_COMMAND { STRAIGHT, QR_TRACKING, NONE };
   // 条件コマンド名を持つ列挙型クラス
   enum class CONDITION_COMMAND { DISTANCE, NONE };
 

@@ -47,10 +47,10 @@ class ColorRegionDetector : public BoundingBoxDetector {
   void setHsvRanges(const std::vector<ColorRegionDetector::HSVRange>& _hsvRanges);
 
   /**
-   * @brief ROIを設定する
+   * @brief ROIを検証したうえで設定する
    * @param _roi 設定するROI
    */
-  void setRoi(const cv::Rect& _roi);
+  void setValidatedRoi(const cv::Rect& _roi);
 
   /**
    * @brief フレームから色領域を検出

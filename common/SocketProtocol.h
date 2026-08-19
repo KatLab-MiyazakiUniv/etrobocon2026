@@ -20,6 +20,7 @@ namespace CameraServer {
   enum class Command : uint8_t {
     COLOR_REGION_DETECTION = 0,  // 色領域検出
     SNAPSHOT = 1,                // スナップショット
+    QR_CODE_DETECTION = 2,       // QRコード検出
     DISCONNECT = 254,            // サーバーから切断
     SHUTDOWN = 255               // サーバーをシャットダウン
   };
@@ -110,6 +111,26 @@ namespace CameraServer {
   struct ColorRegionDetectorResponse {
     BoundingBoxDetectionResult result;  // 色領域の検出結果
     int32_t largestColorIndex = -1;     // 最も面積が大きい色のインデックス
+  };
+
+  static constexpr uint32_t QR_CODE_CORNER_COUNT = 4;   // QRコードの頂点数
+  static constexpr uint32_t QR_CODE_CONTENT_SIZE = 64;  // QRコードから取得した文字列の最大バイト数
+
+  /**
+   * @brief カメラサーバーにQRコード検出を要求する際のリクエスト構造体
+   */
+  struct QrCodeDetectorRequest {
+    Command command = Command::QR_CODE_DETECTION;  // QRコード検出コマンド
+    RectData roi;                                  // 検出対象の領域
+  };
+
+  /**
+   * @brief QRコード検出のレスポンス構造体
+   */
+  struct QrCodeDetectorResponse {
+    bool wasDetected = false;                      // 検出できたかどうか
+    char content[QR_CODE_CONTENT_SIZE] = {};       // QRコードから取得した文字列
+    PointData corners[QR_CODE_CORNER_COUNT] = {};  // QRコードの各頂点の座標(左上から時計回りの順)
   };
 }  // namespace CameraServer
 #endif  // SOCKET_PROTOCOL_H

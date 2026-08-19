@@ -7,6 +7,7 @@
 #define RELATIVE_ANGLE_CONDITION_H
 
 #include "AngleCondition.h"
+#include "AngleNormalizer.h"
 #include "Logger.h"
 
 class RelativeAngleCondition : public AngleCondition {

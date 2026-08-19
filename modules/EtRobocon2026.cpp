@@ -29,7 +29,7 @@ namespace {
   const char* directionToString(Direction direction)
   {
     switch(direction) {
-      case Direction::up:
+      case Direction::UP:
         return "UP";
 
       case Direction::RIGHT:
@@ -56,7 +56,7 @@ namespace {
       case Direction::RIGHT:
         return 0.0;
 
-      case Direction::up:
+      case Direction::UP:
         return 90.0;
 
       case Direction::LEFT:

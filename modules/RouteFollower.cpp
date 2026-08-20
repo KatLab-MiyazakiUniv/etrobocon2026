@@ -11,18 +11,22 @@
 
 #include "DistanceCondition.h"
 #include "Logger.h"
-#include "RelativeAngleCondition.h"
+#include "RelativeAngleContinuationCondition.h"
 #include "RelativeRotation.h"
 #include "Straight.h"
 
 RouteFollower::RouteFollower(Robot& _robot, EtRallyMap& _map, double _targetSpeed,
-                             const Pid::PidGain& _rotationPid,
-                             const Pid::PidGain& _straightAnglePid)
+                             const Pid::PidGain& _rotationPid, const Pid::PidGain& _rightPid,
+                             const Pid::PidGain& _leftPid, const Pid::PidGain& _straightAnglePid,
+                             bool _useCompass)
   : robot(_robot),
     map(_map),
     targetSpeed(_targetSpeed),
     rotationPid(_rotationPid),
-    straightAnglePid(_straightAnglePid)
+    rightPid(_rightPid),
+    leftPid(_leftPid),
+    straightAnglePid(_straightAnglePid),
+    useCompass(_useCompass)
 {
   LOG_CREATE("RouteFollower");
 }
@@ -49,16 +53,10 @@ void RouteFollower::run(const std::vector<GridPoint>& route, Direction startDire
     Logger::printfLog(Logger::INFO, "RouteFollower: (%d,%d) -> (%d,%d), angle=%.2f, distance=%.2f",
                       from.x, from.y, to.x, to.y, rotationAngle, distance);
 
-    /*
-     * 必要な場合だけ回頭
-     */
     if(std::abs(rotationAngle) > 0.001) {
       rotate(rotationAngle);
     }
 
-    /*
-     * その区間を直進
-     */
     if(distance > 0.0) {
       straight(distance);
     }
@@ -70,13 +68,6 @@ void RouteFollower::run(const std::vector<GridPoint>& route, Direction startDire
 RouteFollower::Direction RouteFollower::calculateDirection(const GridPoint& from,
                                                            const GridPoint& to) const
 {
-  /*
-   * EtRallyMapでは
-   *
-   * gridX増加 → X方向
-   * gridY増加 → 下方向
-   */
-
   if(to.x > from.x) {
     return Direction::RIGHT;
   }
@@ -100,9 +91,6 @@ double RouteFollower::calculateRotationAngle(Direction currentDirection,
 
   int diff = target - current;
 
-  /*
-   * 180度を超える場合は逆方向に回した方が短い
-   */
   if(diff > 2) {
     diff -= 4;
   } else if(diff < -2) {
@@ -118,24 +106,16 @@ double RouteFollower::calculateDistance(const GridPoint& from, const GridPoint& 
 
   EtRallyMap::Node toNode = map.getNode(to.x, to.y);
 
-  /*
-   * X方向への移動
-   */
+  // X方向
   if(from.y == to.y) {
     return std::abs(toNode.x - fromNode.x);
   }
 
-  /*
-   * Y方向への移動
-   */
+  // Y方向
   if(from.x == to.x) {
     return std::abs(toNode.y - fromNode.y);
   }
 
-  /*
-   * 経路圧縮後の経路は縦か横だけを想定しているため、
-   * 斜め移動は不正
-   */
   Logger::printfLog(Logger::ERROR, "RouteFollower: diagonal route (%d,%d) -> (%d,%d)", from.x,
                     from.y, to.x, to.y);
 
@@ -144,9 +124,7 @@ double RouteFollower::calculateDistance(const GridPoint& from, const GridPoint& 
 
 void RouteFollower::rotate(double angle)
 {
-  constexpr double ROTATION_TOLERANCE = 2.0;
-
-  auto condition = std::make_unique<RelativeAngleCondition>(robot, angle, ROTATION_TOLERANCE);
+  auto condition = std::make_unique<RelativeAngleContinuationCondition>(robot, angle);
 
   RelativeRotation rotation(robot, std::move(condition), rotationPid, angle);
 
@@ -157,7 +135,8 @@ void RouteFollower::straight(double distance)
 {
   auto condition = std::make_unique<DistanceCondition>(robot, distance);
 
-  Straight straightMotion(robot, std::move(condition), targetSpeed, straightAnglePid, true);
+  Straight straightMotion(robot, std::move(condition), targetSpeed, rightPid, leftPid,
+                          straightAnglePid, useCompass);
 
   straightMotion.run();
 }

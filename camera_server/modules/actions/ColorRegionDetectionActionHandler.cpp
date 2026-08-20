@@ -44,7 +44,7 @@ void ColorRegionDetectionActionHandler::execute(
   cv::Rect localRoi(request.roi.x, request.roi.y, request.roi.width, request.roi.height);
 
   detector.setHsvRanges(localHsvRanges);
-  detector.setRoi(localRoi);
+  detector.setValidatedRoi(localRoi);
   BoundingBoxDetectionResult localResult;
 
   if(request.requireLargestColorIndex) {
@@ -69,14 +69,4 @@ void ColorRegionDetectionActionHandler::execute(
   } else {
     Logger::error("ColorRegionDetectionActionHandler:色領域が検出されませんでした");
   }
-}
-
-const CameraCapture& ColorRegionDetectionActionHandler::getCamera() const
-{
-  return camera;
-}
-
-const ColorRegionDetector& ColorRegionDetectionActionHandler::getDetector() const
-{
-  return detector;
 }

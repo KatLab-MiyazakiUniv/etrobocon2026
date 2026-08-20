@@ -5,6 +5,8 @@
  */
 
 #include "MotionParser.h"
+#include "CameraTracking.h"
+#include "SocketProtocol.h"
 
 using namespace std;
 
@@ -339,6 +341,25 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
 
       return new RelativeRotation(robot, std::move(condition), anglePidGain, relativeTargetAngle);
     }
+    case MOTION_COMMAND::QR_TRACKING: {
+      // QRTracking: motionParams[2]=speed(double)
+      //                 motionParams[3]=targetXCoordinate(int)
+      //                 motionParams[4..6]=cameraPid(kp,ki,kd)
+      //                 motionParams[7]=isStopMotorPower(string: "true"/"false")
+      //                 motionParams[8..11]=roi(x,y,width,height)
+      CameraServer::QrCodeDetectorRequest qrRequest;
+      qrRequest.roi.x = fromString<int32_t>(motionParams[8]);
+      qrRequest.roi.y = fromString<int32_t>(motionParams[9]);
+      qrRequest.roi.width = fromString<int32_t>(motionParams[10]);
+      qrRequest.roi.height = fromString<int32_t>(motionParams[11]);
+      return new CameraTracking(robot, std::move(condition), fromString<double>(motionParams[2]),
+                                fromString<int>(motionParams[3]),
+                                Pid::PidGain{ fromString<double>(motionParams[4]),
+                                              fromString<double>(motionParams[5]),
+                                              fromString<double>(motionParams[6]) },
+                                qrRequest, motionParams[7] == "true");
+    }
+    // ↓ 他のコマンドはここに追加していく
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
                         motionParams[0].c_str());
@@ -354,6 +375,7 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "LineTrace", MOTION_COMMAND::LINETRACE },
           { "AbsoluteRotation", MOTION_COMMAND::ABSOLUTE_ROTATION },
           { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
+          { "QRTracking", MOTION_COMMAND::QR_TRACKING },
           { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING } };
 
   // コマンド文字列に対応するMOTION_COMMAND値をマップから取得。なければMOTION_COMMAND::NONEを返す

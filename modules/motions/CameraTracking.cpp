@@ -1,21 +1,40 @@
 /**
  * @file   CameraTracking.cpp
  * @brief  カメラを使ったPID走行クラス
- * @author sadomiya-sousi
+ * @author sadomiya-sousi HaruArima08
  */
 
 #include "CameraTracking.h"
+
+CameraTracking::CameraTracking(
+    Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+    double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
+    const CameraServer::ColorRegionDetectorRequest& _colorDetectionRequest, bool _isStopMotorPower)
+  : BaseMotion(_robot, std::move(_continuationCondition)),
+    targetSpeed(_targetSpeed),
+    targetXCoordinate(_targetXCoordinate),
+    detectionMode(DetectionMode::COLOR_REGION),
+    colorDetectionRequest(_colorDetectionRequest),
+    qrDetectionRequest(),
+    isStopMotorPower(_isStopMotorPower),
+    speedCalculator(_robot, _targetSpeed),
+    cameraPid(_pidGain.kp, _pidGain.ki, _pidGain.kd, _targetXCoordinate)
+{
+  LOG_CREATE("CameraTracking");
+}
 
 CameraTracking::CameraTracking(Robot& _robot,
                                std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                                double _targetSpeed, int _targetXCoordinate,
                                const Pid::PidGain& _pidGain,
-                               const CameraServer::ColorRegionDetectorRequest& _detectionRequest,
+                               const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
                                bool _isStopMotorPower)
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
     targetXCoordinate(_targetXCoordinate),
-    detectionRequest(_detectionRequest),
+    detectionMode(DetectionMode::QR_CODE),
+    colorDetectionRequest(),
+    qrDetectionRequest(_qrDetectionRequest),
     isStopMotorPower(_isStopMotorPower),
     speedCalculator(_robot, _targetSpeed),
     cameraPid(_pidGain.kp, _pidGain.ki, _pidGain.kd, _targetXCoordinate)
@@ -48,28 +67,56 @@ void CameraTracking::executeStep()
   double baseRightPower = speedCalculator.calculateRightMotorPower();
   double baseLeftPower = speedCalculator.calculateLeftMotorPower();
 
-  // 色領域検出処理の呼び出し。
+  // 検出処理の呼び出し
   SocketClient& client = robot.getCameraSocketClientInstance();
-  CameraServer::ColorRegionDetectorResponse response;
-  // run()の中でColorRegionDetectorインスタンスが繰り返し生死。インスタンスの生死のlogが重い処理
-  bool success = client.executeColorRegionDetection(detectionRequest, response);
+  bool success = false;
+  bool wasDetected = false;
+  double currentX = 0.0;
 
-  // 通信失敗、または検出できなかった場合は、出力を更新せずに終了する
-  if(!success || !response.result.wasDetected) {
-    Logger::printfLog(
-        Logger::WARNING,
-        "CameraTracking:色領域が検出されませんでした。success:%d  response.result.wasDetected:%d",
-        success, response.result.wasDetected);
+  if(detectionMode == DetectionMode::COLOR_REGION) {
+    CameraServer::ColorRegionDetectorResponse response;
+    success = client.executeColorRegionDetection(colorDetectionRequest, response);
+    wasDetected = response.result.wasDetected;
+
+    if(!success || !wasDetected) {
+      Logger::printfLog(Logger::WARNING,
+                        "CameraTracking:色領域が検出されませんでした。success:%d wasDetected:%d",
+                        success, wasDetected);
+      return;
+    }
+
+    // 黒を除く最大面積の色範囲取得
+    if(colorDetectionRequest.requireLargestColorIndex || response.largestColorIndex != 3) {
+      robot.setIndexOfLabel(response.largestColorIndex);
+    }
+
+    // バウンディングボックスの中心X座標を計算
+    currentX = (response.result.topLeft.x + response.result.bottomRight.x) / 2.0;
+  } else if(detectionMode == DetectionMode::QR_CODE) {
+    CameraServer::QrCodeDetectorResponse response;
+    success = client.executeQrCodeDetection(qrDetectionRequest, response);
+    wasDetected = response.wasDetected;
+    if(success && wasDetected) {
+      // QRコードの4頂点の中心X座標を計算
+      double sumX = 0.0;
+      for(const auto& corner : response.corners) {
+        sumX += corner.x;
+      }
+      currentX = sumX / CameraServer::QR_CODE_CORNER_COUNT;
+    }
+  } else {
+    Logger::error("CameraTracking:検出方式が不正です");
+  }
+
+  if(!success) {
+    Logger::warning("CameraTracking:通信に失敗しました");
     return;
   }
 
-  // 黒を除く最大面積の色範囲取得
-  if(detectionRequest.requireLargestColorIndex || response.largestColorIndex != 3) {
-    robot.setIndexOfLabel(response.largestColorIndex);
+  if(!wasDetected) {
+    Logger::warning("CameraTracking:検出対象が検出できませんでした");
+    return;
   }
-
-  // バウンディングボックスの中心X座標を計算
-  double currentX = (response.result.topLeft.x + response.result.bottomRight.x) / 2.0;
 
   // 旋回値の計算
   double turningPower = cameraPid.calculatePid(currentX) * -1;
@@ -103,9 +150,19 @@ int CameraTracking::getTargetXCoordinate() const
   return targetXCoordinate;
 }
 
-const CameraServer::ColorRegionDetectorRequest& CameraTracking::getDetectionRequest() const
+const CameraServer::ColorRegionDetectorRequest& CameraTracking::getColorDetectionRequest() const
 {
-  return detectionRequest;
+  return colorDetectionRequest;
+}
+
+const CameraServer::QrCodeDetectorRequest& CameraTracking::getQrDetectionRequest() const
+{
+  return qrDetectionRequest;
+}
+
+CameraTracking::DetectionMode CameraTracking::getDetectionMode() const
+{
+  return detectionMode;
 }
 
 bool CameraTracking::getIsStopMotorPower() const

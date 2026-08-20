@@ -42,6 +42,7 @@ class MotionParser {
     CAMERA_TRACKING,
     ABSOLUTE_ROTATION,
     RELATIVE_ROTATION,
+    QR_TRACKING,
     NONE
   };
   // 条件コマンド名を持つ列挙型クラス

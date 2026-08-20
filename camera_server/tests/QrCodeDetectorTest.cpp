@@ -11,6 +11,9 @@
 
 namespace etrobocon2026_test {
 
+  // Hint1.pngの実解像度(135x135)を包含する、フレーム全体を対象とするROI
+  static const cv::Rect FULL_FRAME_ROI(0, 0, 1920, 1080);
+
   // QRコードを含む画像を入力したときに、QRコードを検出し、
   // 内容「25,35」を正しく取得できることを確認するテスト
   TEST(QrCodeDetectorTest, DetectQrCode)
@@ -19,7 +22,7 @@ namespace etrobocon2026_test {
 
     ASSERT_FALSE(frame.empty());
 
-    QrCodeDetector detector;
+    QrCodeDetector detector(FULL_FRAME_ROI);
 
     auto result = detector.detect(frame);
 
@@ -31,7 +34,7 @@ namespace etrobocon2026_test {
   // wasDetectedがfalse、contentが空文字列になることを確認するテスト
   TEST(QrCodeDetectorTest, EmptyFrame)
   {
-    QrCodeDetector detector;
+    QrCodeDetector detector(FULL_FRAME_ROI);
 
     cv::Mat frame;
 
@@ -45,7 +48,7 @@ namespace etrobocon2026_test {
   // wasDetectedがfalse、contentが空文字列になることを確認するテスト
   TEST(QrCodeDetectorTest, NoQrCode)
   {
-    QrCodeDetector detector;
+    QrCodeDetector detector(FULL_FRAME_ROI);
 
     cv::Mat frame = cv::Mat::zeros(300, 300, CV_8UC3);
 
@@ -53,5 +56,50 @@ namespace etrobocon2026_test {
 
     EXPECT_FALSE(result.wasDetected);
     EXPECT_TRUE(result.content.empty());
+  }
+
+  // ROIがQRコードを含まない領域に限定されているとき、QRコード未検出となることを確認するテスト
+  TEST(QrCodeDetectorTest, NotDetectedWhenRoiExcludesQrCode)
+  {
+    cv::Mat frame = cv::imread("camera_server/test_data/Hint1.png");
+    ASSERT_FALSE(frame.empty());
+
+    // フレーム左上の小さな領域にはQRコードが含まれない
+    QrCodeDetector detector(cv::Rect(0, 0, 10, 10));
+
+    auto result = detector.detect(frame);
+
+    EXPECT_FALSE(result.wasDetected);
+  }
+
+  // ROIがフレーム範囲外を指定しているとき、QRコード未検出となることを確認するテスト
+  TEST(QrCodeDetectorTest, NotDetectedWhenRoiOutsideFrame)
+  {
+    cv::Mat frame = cv::imread("camera_server/test_data/Hint1.png");
+    ASSERT_FALSE(frame.empty());
+
+    QrCodeDetector detector(cv::Rect(CAM_MAX_WIDTH + 1, CAM_MAX_HEIGHT + 1, 100, 100));
+
+    auto result = detector.detect(frame);
+
+    EXPECT_FALSE(result.wasDetected);
+  }
+
+  // setValidatedRoiでROIを更新すると、更新後のROIを用いて検出できることを確認するテスト
+  TEST(QrCodeDetectorTest, DetectQrCodeAfterSetRoi)
+  {
+    cv::Mat frame = cv::imread("camera_server/test_data/Hint1.png");
+    ASSERT_FALSE(frame.empty());
+
+    // 最初はQRコードを含まない領域を指定
+    QrCodeDetector detector(cv::Rect(0, 0, 10, 10));
+    ASSERT_FALSE(detector.detect(frame).wasDetected);
+
+    // フレーム全体を対象とするROIに更新
+    detector.setValidatedRoi(FULL_FRAME_ROI);
+
+    auto result = detector.detect(frame);
+    EXPECT_TRUE(result.wasDetected);
+    EXPECT_EQ("25,35", result.content);
   }
 }  // namespace etrobocon2026_test

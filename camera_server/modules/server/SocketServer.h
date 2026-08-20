@@ -1,7 +1,7 @@
 /**
  * @file SocketServer.h
  * @brief 接続を待ち、クライアントからのリクエストを処理するクラス
- * @author sadomiya-sousi takuchi17
+ * @author sadomiya-sousi takuchi17 HaruArima08
  */
 
 #ifndef SOCKET_SERVER_H
@@ -12,6 +12,7 @@
 #include "RealNetworkSystem.h"
 #include "SnapshotActionHandler.h"
 #include "ColorRegionDetectionActionHandler.h"
+#include "QrCodeDetectionActionHandler.h"
 #include "Logger.h"
 #include "CameraCapture.h"
 #include <cstring>
@@ -22,11 +23,13 @@ class SocketServer {
    * @brief SocketServerのコンストラクタ
    * @param _snapshotHandler スナップショット撮影アクションハンドラ
    * @param _colorRegionDetectionHandler 色領域検出アクションハンドラ
+   * @param _qrCodeDetectionHandler QRコード検出アクションハンドラ
    * @param _netSys 注入する具象クラス
    * @param _port デフォルトは27015
    */
   explicit SocketServer(SnapshotActionHandler& _snapshotHandler,
                         ColorRegionDetectionActionHandler& _colorRegionDetectionHandler,
+                        QrCodeDetectionActionHandler& _qrCodeDetectionHandler,
                         INetworkSystem& _netSys, int _port = CameraServer::DEFAULT_PORT);
 
   /**
@@ -89,6 +92,12 @@ class SocketServer {
   const ColorRegionDetectionActionHandler& getColorRegionDetectionHandler() const;
 
   /**
+   * @brief QRコード検出のハンドラを取得する
+   * @return QrCodeDetectionActionHandler& QRコード検出のハンドラへの参照
+   */
+  const QrCodeDetectionActionHandler& getQrCodeDetectionHandler() const;
+
+  /**
    * @brief サーバーをシャットダウンする
    */
   void shutdown();
@@ -101,11 +110,12 @@ class SocketServer {
 
  private:
   INetworkSystem& netSys;                                          // 注入される具象クラスのポインタ
-  int listenSocket;                                                // Severのファイルディスクリプタ
+  int listenSocket;                                                // Serverのファイルディスクリプタ
   bool isRunning;                                                  // Serverが稼働中ならtrue
   int port;                                                        // サーバーのポート番号
   static constexpr int DEFAULT_BUFLEN = 512;                       // デフォルトのバッファサイズ
   SnapshotActionHandler& snapshotHandler;                          // スナップショットのハンドラ
   ColorRegionDetectionActionHandler& colorRegionDetectionHandler;  // 色領域検出のハンドラ
+  QrCodeDetectionActionHandler& qrCodeDetectionHandler;            // QRコード検出のハンドラ
 };
 #endif  // SOCKET_SERVER_H

@@ -56,7 +56,7 @@ class EtRallyMap {
   void updateNodes();
 
   double firstXGridSize = SystemInfo::FIRST_X_GRID_SIZE;  // X方向の最初の区間
-  double gridSize = SystemInfo::GRID_SIZE_X;                // X方向の通常区間
+  double gridSize = SystemInfo::GRID_SIZE_X;              // X方向の通常区間
   double gridSizeY = SystemInfo::GRID_SIZE_Y;             // Y方向の通常区間
 
   // X方向の区間数
@@ -70,7 +70,7 @@ class EtRallyMap {
    * gridXが増えるほど左へ
    * gridYが増えるほど下へ
    */
-  Node nodes[X_GRID_NUM][Y_GRID_NUM];
+  Node nodes[X_GRID_NUM + 1][Y_GRID_NUM + 1];
 };
 
 #endif  // ET_RALLY_MAP_H

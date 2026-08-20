@@ -23,9 +23,16 @@ void AreaMaster::run()
   vector<BaseMotion*> motionList;
 
   // コマンドファイルパスを作成する
-  string commandFilePath = basePath + areaCommandNames[static_cast<int>(area)]
-                           + (robot.getCourse() == Course::Left ? "Left" : "Right") + ".csv";
-
+  if(area == Area::BottleDelivery) {
+    commandFilePath = basePath + areaCommandNames[static_cast<int>(area) + robot.getIndexOfLabel()]
+                      + (robot.getCourse() == Course::Left ? "Left" : "Right") + ".csv";
+  } else {
+    commandFilePath = basePath + areaCommandNames[static_cast<int>(area)]
+                      + (robot.getCourse() == Course::Left ? "Left" : "Right") + ".csv";
+  }
+  Logger::printfLog(Logger::INFO, "%s を開きました", commandFilePath.c_str());
+  // 動作インスタンスのリストを生成する
+  motionList = MotionParser::createMotionList(robot, commandFilePath);
   // 動作インスタンスのリストを生成する
   motionList = MotionParser::createMotionList(robot, commandFilePath);
 

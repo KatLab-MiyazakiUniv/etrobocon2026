@@ -5,14 +5,11 @@
  */
 #include "RelativeAngleCondition.h"
 
-RelativeAngleCondition::RelativeAngleCondition(
-Robot& robot,
-double _relativeAngle,
-double _tolerance)
-: AngleCondition(robot, 0.0, _tolerance),
-relativeAngle(_relativeAngle)
+RelativeAngleCondition::RelativeAngleCondition(Robot& robot, double _relativeAngle,
+                                               double _tolerance)
+  : AngleCondition(robot, _tolerance), relativeAngle(_relativeAngle)
 {
-LOG_CREATE("RelativeAngleCondition");
+  LOG_CREATE("RelativeAngleCondition");
 }
 
 RelativeAngleCondition::~RelativeAngleCondition()
@@ -22,9 +19,8 @@ RelativeAngleCondition::~RelativeAngleCondition()
 
 void RelativeAngleCondition::prepare()
 {
-double initialAngle
-= robot.getIMUControllerInstance().getAzimuth();
+  double initialAngle
+      = robot.getIMUControllerInstance().getAzimuth();  // IMUから現在の方位角（絶対角度）を取得
 
-targetAngle = AngleNormalizer::normalizeAngle(
-initialAngle + relativeAngle);
+  targetAngle = initialAngle + relativeAngle;
 }

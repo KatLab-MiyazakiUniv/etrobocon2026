@@ -70,7 +70,7 @@ class EtRallyMap {
    * gridXが増えるほど左へ
    * gridYが増えるほど下へ
    */
-  Node nodes[X_GRID_NUM+1][Y_GRID_NUM+1];
+  Node nodes[X_GRID_NUM][Y_GRID_NUM];
 };
 
 #endif  // ET_RALLY_MAP_H

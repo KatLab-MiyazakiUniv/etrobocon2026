@@ -7,11 +7,10 @@
 #ifndef BASE_MOTION_H
 #define BASE_MOTION_H
 
-#include <memory>
-
 #include "Robot.h"
 #include "BaseContinuationCondition.h"
 #include "ClockUtil.h"
+#include <memory>
 
 class BaseMotion {
  public:
@@ -35,17 +34,16 @@ class BaseMotion {
   void run();
 
  protected:
-  Robot& robot;  // Robotインスタンスの参照
+  Robot& robot;  // Robot インスタンスの参照
 
   /**
-   * @brief 動作を開始できるかを判定する
-   * @return true 動作を開始できる
-   * @return false 動作を開始できない
+   * @brief 動作を開始できるかを判定する (デフォルトは true を返す)
+   * @return true/動作を開始できる、false/動作を開始できない
    */
   virtual bool canStart();
 
   /**
-   * @brief 動作実行前の準備を行う
+   * @brief 動作実行前の準備を行う (デフォルトは何もしない)
    */
   virtual void prepare();
 
@@ -55,25 +53,17 @@ class BaseMotion {
   virtual void executeStep() = 0;
 
   /**
-   * @brief 1周期分の待機を行う
+   * @brief 1周期分の待機を行う (デフォルトは10ミリ秒待機)
    */
   virtual void wait();
 
   /**
-   * @brief 動作終了後の処理を行う
+   * @brief 動作終了後の処理を行う (デフォルトは何もしない)
    */
   virtual void finish();
 
  private:
-  /**
-   * @brief 現在のエンコーダ値とIMU角度から自己位置を更新する
-   */
-  void updateOdometry();
-
-  /**
-   * 継続条件クラスのインスタンス
-   */
-  std::unique_ptr<BaseContinuationCondition> continuationCondition;
+  std::unique_ptr<BaseContinuationCondition> continuationCondition;  // 継続条件クラスのインスタンス
 };
 
-#endif  // BASE_MOTION_H
+#endif

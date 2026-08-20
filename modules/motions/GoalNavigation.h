@@ -9,8 +9,8 @@
 
 #include "BaseMotion.h"
 #include "Navigator.h"
-#include "RelativeRotation.h"
-#include "RelativeAngleCondition.h"
+#include "AbsoluteRotation.h"
+#include "AbsoluteAngleCondition.h"
 #include "Straight.h"
 #include "DistanceCondition.h"
 #include "Pid.h"

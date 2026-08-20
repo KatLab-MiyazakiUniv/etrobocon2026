@@ -40,13 +40,13 @@ void GoalNavigation::prepare()
   // 現在位置から目標地点までの距離を計算する
   targetDistance = navigator.calculateDistance(targetX, targetY);
 
-    // 現在位置から目標地点までの方位角を計算する
-  targetHeading = navigator.calculateHeading(targetX, targetY);
-
   Logger::printfLog(Logger::INFO,
                     "GoalNavigation: target=(%.2f, %.2f), "
                     "distance=%.2f, heading=%.2f",
                     targetX, targetY, targetDistance, targetHeading);
+
+  // 現在位置から目標地点までの方位角を計算する
+  targetHeading = navigator.calculateHeading(targetX, targetY);
 }
 
 void GoalNavigation::executeStep()
@@ -56,22 +56,22 @@ void GoalNavigation::executeStep()
     return;
   }
 
-  
-const double currentHeading= robot.getIMUControllerInstance().getAzimuth();
+  const double currentHeading = robot.getIMUControllerInstance().getAzimuth();
 
-const double angleDifference= AngleNormalizer::normalizeAngle(targetHeading - currentHeading);
+  const double angleDifference = AngleNormalizer::normalizeAngle(targetHeading - currentHeading);
+
   // 目標方向との角度差が許容誤差より大きい場合だけ回頭する。
   if(std::abs(angleDifference) > ROTATION_TOLERANCE) {
     auto rotationCondition
-        = std::make_unique<RelativeAngleCondition>(robot,angleDifference , ROTATION_TOLERANCE);
+        = std::make_unique<AbsoluteAngleCondition>(robot, targetHeading, ROTATION_TOLERANCE);
 
-    RelativeRotation rotation(robot, std::move(rotationCondition), rotationPid, angleDifference);
+    AbsoluteRotation rotation(robot, std::move(rotationCondition), rotationPid, targetHeading);
 
     rotation.run();
   }
 
   // 回頭後の位置からの距離を計算する
-  targetDistance = navigator.calculateDistance(targetX, targetY);
+  targetHeading = navigator.calculateHeading(targetX, targetY);
 
   // 計算した距離だけ直進する。
   auto distanceCondition = std::make_unique<DistanceCondition>(robot, targetDistance);

@@ -97,8 +97,8 @@ void EtRobocon2026::start()
   // 4. 開始位置
   // =========================================================
 
-  int currentGridX = 0;
-  int currentGridY = 0;
+  int currentGridX = 2;
+  int currentGridY = 2;
 
   /*
    * 格子座標系

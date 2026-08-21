@@ -1,4 +1,4 @@
-動作コマンド名,動作ID,条件コマンド名,条件ID
+#動作コマンド名,動作ID,条件コマンド名,条件ID
 # カメラ走行
 #CameraTracking,LTS001,Distance,035
 #CameraTracking,LTR001,Distance,035

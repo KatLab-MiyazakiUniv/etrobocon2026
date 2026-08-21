@@ -281,7 +281,6 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
     case MOTION_COMMAND::CAMERA_TRACKING: {
       CameraServer::ColorRegionDetectorRequest request;
       request.requireLargestColorIndex = fromString<bool>(motionParams[12]);
-      request.hsvRangeCount = 3;
       // request.hsvRanges = ImageProcessingColor::BottleColors;
       int count = 0;
       for(int i = 0; i < ImageProcessingColor::BottleColors.size(); i++) {
@@ -290,6 +289,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
           count++;
         }
       }
+      request.hsvRangeCount = count;
       // request.hsvRanges[3]
       //     = ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::BLACK);
 
@@ -413,6 +413,7 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
     { "SensorColor", CONDITION_COMMAND::SENSOR_COLOR },
     { "RunningTime", CONDITION_COMMAND::RUNNING_TIME },
     { "MotionTime", CONDITION_COMMAND::MOTION_TIME },
+    { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC },
     { "RepeatCount", CONDITION_COMMAND::REPEAT_COUNT },
     { "DistanceAndColor", CONDITION_COMMAND::DISTANCE_AND_COLOR },
   };

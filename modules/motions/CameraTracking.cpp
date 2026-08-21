@@ -86,9 +86,9 @@ void CameraTracking::executeStep()
     }
 
     // 黒を除く最大面積の色範囲取得
-    if(colorDetectionRequest.requireLargestColorIndex || response.largestColorIndex != 3) {
-      robot.setIndexOfLabel(response.largestColorIndex);
-    }
+    // if(colorDetectionRequest.requireLargestColorIndex || response.largestColorIndex != 3) {
+    //   robot.setIndexOfLabel(response.largestColorIndex);
+    // }
 
     // バウンディングボックスの中心X座標を計算
     currentX = (response.result.topLeft.x + response.result.bottomRight.x) / 2.0;

@@ -21,14 +21,14 @@ void EtRobocon2026::start()
   // robot.setEdge(Edge::LeftEdge);
   robot.setEdge(Edge::RightEdge);
   // // LineTrace走行
-  // Area lineTraceArea = Area::LineTrace;
-  // AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
-  // lineTraceAreaMaster.run();
+  Area lineTraceArea = Area::LineTrace;
+  AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
+  lineTraceAreaMaster.run();
 
 //カメラトラッキング走行
-  Area CameraTracking = Area::CameraTracking;
-  AreaMaster CameraTrackingAreaMaster(robot, CameraTracking);
-  CameraTrackingAreaMaster.run();
+  // Area CameraTracking = Area::CameraTracking;
+  // AreaMaster CameraTrackingAreaMaster(robot, CameraTracking);
+  // CameraTrackingAreaMaster.run();
 
   // // // BotlleDelivery走行
   // Area bottleDeliveryArea = Area::BottleDelivery;

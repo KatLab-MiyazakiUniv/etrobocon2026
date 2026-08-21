@@ -7,19 +7,19 @@
 #CameraTracking,LTS001,Distance,032
 #CameraTracking,LTL001,Distance,030
 #CameraTracking,LTL002,Distance,075
-#CameraTracking,LTS001,Distance,050
+CameraTracking,LTS001,Distance,050
 
 #CameraTracking,000,Distance,000
 
 #カラー走行
-LineTrace,002,Distance,052
-LineTrace,003,Distance,043
-LineTrace,002,Distance,035
-LineTrace,003,Distance,040
-LineTrace,002,Distance,025
-LineTrace,008,Distance,070
-LineTrace,005,Distance,070
-LineTrace,007,Distance,080
-LineTrace,003,Distance,040
+#LineTrace,002,Distance,052
+#LineTrace,003,Distance,043
+#LineTrace,002,Distance,035
+#LineTrace,003,Distance,040
+#LineTrace,002,Distance,025
+#LineTrace,008,Distance,070
+#LineTrace,005,Distance,070
+#LineTrace,007,Distance,080
+#LineTrace,003,Distance,040
 
 #Calibrator,001,RepeatCount,001

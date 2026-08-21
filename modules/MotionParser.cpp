@@ -239,6 +239,26 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
           "[MotionParser] UltraSonic: targetDistance=%.1f", targetDistance);
       return std::make_unique<UltraSonicCondition>(robot,targetDistance);
     }
+    case CONDITION_COMMAND::COLOR_OR_COLOR: {
+      std::string targetColorName1 = params[2];
+      std::string targetColorName2 = params[3];
+
+      auto targetColor1 = ColorSensorController::convertStringToColor(targetColorName1);
+      auto targetColor2 = ColorSensorController::convertStringToColor(targetColorName2);
+
+      Logger::printfLog(
+          Logger::DEBUG,
+          "[MotionParser] ColorAndColor: targetColor1=%s, targetColor2=%s を生成しました",
+          targetColorName1.c_str(), targetColorName2.c_str());
+
+
+      auto colorCondition1 = std::make_unique<SensorColorCondition>(robot, targetColor1);
+      auto colorCondition2 = std::make_unique<SensorColorCondition>(robot, targetColor2);
+
+      return std::make_unique<CompoundCondition>(robot, std::move(colorCondition1),
+                                                 std::move(colorCondition2),
+                                                 CompoundCondition::LogicalOperator::OR);
+    }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Condition %s は未実装です",
                         params[0].c_str());
@@ -258,6 +278,10 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       //           motionParams[6..8]=leftPid(kp,ki,kd)
       //           motionParams[9..11]=anglePid(kp,ki,kd)
       //           motionParams[12]=useIMU(string: "true"/"false")
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] Straight: targetdistance=%.d を生成しました",
+                        fromString<double>(motionParams[2]));
+
       return new Straight(
           robot, std::move(condition), fromString<double>(motionParams[2]),
           Pid::PidGain{ fromString<double>(motionParams[3]), fromString<double>(motionParams[4]),
@@ -422,6 +446,8 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
     { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC },
     { "RepeatCount", CONDITION_COMMAND::REPEAT_COUNT },
     { "DistanceAndColor", CONDITION_COMMAND::DISTANCE_AND_COLOR },
+    { "ColorOrColor", CONDITION_COMMAND::COLOR_OR_COLOR },
+
   };
 
   // 条件コマンド文字列に対応するCONDITION_COMMAND値をマップから取得。なければCONDITION_COMMAND::NONEを返す

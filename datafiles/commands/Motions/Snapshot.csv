@@ -1,3 +1,12 @@
 コマンド名,ID,filename
 コマンド名,ID,String
-Snapshot,001,QR1
+Snapshot,011,QR1_1
+Snapshot,012,QR1_2
+Snapshot,013,QR1_3
+Snapshot,014,QR1_4
+Snapshot,015,QR1_5
+Snapshot,021,QR2_1
+Snapshot,022,QR2_2
+Snapshot,023,QR2_3
+Snapshot,024,QR2_4
+Snapshot,025,QR2_5

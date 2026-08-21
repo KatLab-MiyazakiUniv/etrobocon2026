@@ -40,5 +40,6 @@ void EtRobocon2026::start()
   // AreaMaster QRTrackingAreaMaster(robot, QRTrackingArea);
   // QRTrackingAreaMaster.run();
 
+
   CsvLogger::outputToFile();
 }

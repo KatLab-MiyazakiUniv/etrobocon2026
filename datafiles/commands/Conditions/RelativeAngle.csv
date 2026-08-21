@@ -2,3 +2,4 @@
 RelativeAngle,ID,double
 RelativeAngle,001,90
 RelativeAngle,002,-90
+RelativeAngle,003,87

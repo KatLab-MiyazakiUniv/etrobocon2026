@@ -16,7 +16,55 @@
 #CameraTracking,001,Distance,080
 #CameraTracking,000,Distance,000
 
+Straight,002,Distance,075
 Snapshot,1,RepeatCount,001
+Snapshot,1,RepeatCount,001
+RelativeRotation,001,RelativeAngle,001
+Snapshot,1,RepeatCount,001
+Snapshot,1,RepeatCount,001
+Straight,002,Distance,075
+Snapshot,1,RepeatCount,001
+Snapshot,1,RepeatCount,001
+RelativeRotation,001,RelativeAngle,001
+Snapshot,1,RepeatCount,001
+Snapshot,1,RepeatCount,001
+Straight,002,Distance,075
+Snapshot,1,RepeatCount,001
+Snapshot,1,RepeatCount,001
+RelativeRotation,001,RelativeAngle,001
+Snapshot,1,RepeatCount,001
+Snapshot,1,RepeatCount,001
+Straight,002,Distance,075
+Snapshot,1,RepeatCount,001
+Snapshot,1,RepeatCount,001
+RelativeRotation,001,RelativeAngle,003
+Snapshot,1,RepeatCount,001
+Snapshot,1,RepeatCount,001
+Straight,002,Distance,075
+Snapshot,1,RepeatCount,001
+Snapshot,1,RepeatCount,001
+RelativeRotation,001,RelativeAngle,001
+Snapshot,1,RepeatCount,001
+Snapshot,1,RepeatCount,001
+Straight,002,Distance,075
+Snapshot,1,RepeatCount,001
+Snapshot,1,RepeatCount,001
+RelativeRotation,001,RelativeAngle,001
+Snapshot,1,RepeatCount,001
+Snapshot,1,RepeatCount,001
+Straight,002,Distance,075
+Snapshot,1,RepeatCount,001
+Snapshot,1,RepeatCount,001
+RelativeRotation,001,RelativeAngle,001
+Snapshot,1,RepeatCount,001
+Snapshot,1,RepeatCount,001
+Straight,002,Distance,075
+Snapshot,1,RepeatCount,001
+Snapshot,1,RepeatCount,001
+RelativeRotation,001,RelativeAngle,003
+Snapshot,1,RepeatCount,001
+Snapshot,1,RepeatCount,001
+
 
 
 
@@ -35,9 +83,9 @@ Snapshot,1,RepeatCount,001
 #CameraTracking,000,Distance,000
 
 #相撲
-CameraTracking,014,DistanceOrUltraSonic,001
-Straight,002,DistanceOrColor,004
-Straight,003,Distance,015
+#CameraTracking,014,DistanceOrUltraSonic,001
+#Straight,002,DistanceOrColor,004
+#Straight,003,Distance,015
 
 
 

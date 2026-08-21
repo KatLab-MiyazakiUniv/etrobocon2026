@@ -17,7 +17,7 @@ class RelativeAngleCondition : public AngleCondition {
    * @param _relativeAngle 回頭する相対角度(°)
    * @param _tolerance 許容誤差(°)
    */
-  RelativeAngleCondition(Robot& robot, double _relativeAngle, double _tolerance = 2.0);
+  RelativeAngleCondition(Robot& robot, double _relativeAngle, double _tolerance = 0.0);
 
   /**
    * デストラクタ

@@ -16,6 +16,8 @@
 #CameraTracking,001,Distance,080
 #CameraTracking,000,Distance,000
 
+Snapshot,1,RepeatCount,001
+
 
 
 # CameraTracking,001,Distance,008

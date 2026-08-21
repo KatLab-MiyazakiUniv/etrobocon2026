@@ -1,0 +1,5 @@
+Command,ID,FileName
+説明,ID,保存ファイル名
+Snapshot,1,gate_red
+Snapshot,2,gate_blue
+Snapshot,3,gate_yellow

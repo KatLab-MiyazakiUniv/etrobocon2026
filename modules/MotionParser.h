@@ -9,29 +9,31 @@
 
 constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字として、カンマを定義
 
-#include <vector>
-#include <string>
-#include <iostream>
 #include <fstream>
-#include <sstream>
+#include <iostream>
 #include <memory>
+#include <sstream>
+#include <string>
 #include <unordered_map>
-#include "Logger.h"
-#include "DistanceCondition.h"
-#include "SensorColorCondition.h"
-#include "RunningTimeCondition.h"
-#include "MotionTimeCondition.h"
-#include "CompoundCondition.h"
-#include "RelativeAngleCondition.h"
+#include <vector>
+
 #include "AbsoluteAngleCondition.h"
-#include "RepeatCountCondition.h"
-#include "LineTrace.h"
-#include "Straight.h"
 #include "AbsoluteRotation.h"
-#include "RelativeRotation.h"
-#include "ChangeEdge.h"
-#include "CameraTracking.h"
 #include "Calibrator.h"
+#include "CameraTracking.h"
+#include "ChangeEdge.h"
+#include "CompoundCondition.h"
+#include "DistanceCondition.h"
+#include "LineTrace.h"
+#include "Logger.h"
+#include "MotionTimeCondition.h"
+#include "RelativeAngleCondition.h"
+#include "RelativeRotation.h"
+#include "RepeatCountCondition.h"
+#include "RunningTimeCondition.h"
+#include "SensorColorCondition.h"
+#include "Snapshot.h"
+#include "Straight.h"
 #include "UltraSonicCondition.h"
 #include "./../common/ImageProcessingColor.h"
 
@@ -47,8 +49,10 @@ class MotionParser {
     ABSOLUTE_ROTATION,
     EDGECHANGE,
     CALIBRATOR,
+    SNAPSHOT,
     NONE
   };
+
   // 条件コマンド名を持つ列挙型クラス
   enum class CONDITION_COMMAND {
     DISTANCE,
@@ -125,14 +129,16 @@ class MotionParser {
   //  * @param stringParameter 文字列のパラメータ
   //  * @return bool値
   //  */
-  // static bool convertBool(const std::string& command, const std::string& stringParameter);
+  // static bool convertBool(const std::string& command,
+  //                         const std::string& stringParameter);
 
   // /**
-  //  * @brief 回頭方法の文字列をbool型に変換する（convertBoolは方向判定で使用済みのため専用関数化）
+  //  * @brief 回頭方法の文字列をbool型に変換する
   //  * @param stringParameter 文字列のパラメータ ("relative" or "absolute")
   //  * @return false: 相対角度回頭, true: 絶対角度回頭
   //  */
-  // static bool convertRotationModeToBool(const std::string& stringParameter);
+  // static bool convertRotationModeToBool(
+  //     const std::string& stringParameter);
 };
 
-#endif
+#endif  // MOTION_PARSER_H

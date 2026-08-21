@@ -9,7 +9,9 @@
 #CameraTracking,LTL002,Distance,075
 #CameraTracking,LTS001,Distance,050
 
-CameraTracking,LTS003,UltraSonic,001
+
+CameraTracking,LTS003,Distance,060
+CameraTracking,LTS004,Distance,040
 
 #CameraTracking,000,Distance,000
 

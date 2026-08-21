@@ -1,22 +1,28 @@
 コマンド名,ID,speed,targetX,camera_kp,camera_ki,camera_kd,isStop,roi.x,roi.y,width,height,colrIndex,red,blue,yellow,black
-#CameraTracking,ID,double,int,double,double,double,bool,int,int,int,int,bool,bool,bool,bool,bool
+CameraTracking,ID,double,int,double,double,double,bool,int,int,int,int,bool,bool,bool,bool,bool
 # Tracking Area
-#CameraTracking,ID,double,int,double,double,double,bool,int,int,int,int
+CameraTracking,ID,double,int,double,double,double,bool,int,int,int,int
 # 直線
-#CameraTracking,LTS001,550,960,0.008,0.0000,0.001,0,480,540,960,1080,0,0,0,0,1
-#CameraTracking,LTS002,600,960,0.01,0.0000,0.0005,0,480,540,960,1080,0,0,0,0,1
+CameraTracking,LTS001,550,960,0.008,0.0000,0.001,0,480,540,960,1080,0,0,0,0,1
+CameraTracking,LTS002,600,960,0.01,0.0000,0.0005,0,480,540,960,1080,0,0,0,0,1
 
 # 右カーブ
-#CameraTracking,LTR001,550,960,0.01,0.0000,0.003,0,760,540,1920,1080,0,0,0,0,1
-#CameraTracking,LTR002,600,960,0.01,0.0000,0.0005,0,480,540,960,1080,0,0,0,0,1
+CameraTracking,LTR001,550,960,0.01,0.0000,0.003,0,760,540,1920,1080,0,0,0,0,1
+CameraTracking,LTR002,600,960,0.01,0.0000,0.0005,0,480,540,960,1080,0,0,0,0,1
 
 # 左カーブ
-#CameraTracking,LTL001,550,960,0.01,0.000,0.003,0,0,540,1160,1080,0,0,0,0,1
-#CameraTracking,LTL002,550,960,0.008,0.000,0.001,0,0,540,1160,1080,0,0,0,0,1
-#CameraTracking,LTL003,600,960,0.01,0.0000,0.0005,0,480,540,960,1080,0,0,0,0,1
+CameraTracking,LTL001,550,960,0.01,0.000,0.003,0,0,540,1160,1080,0,0,0,0,1
+CameraTracking,LTL002,550,960,0.008,0.000,0.001,0,0,540,1160,1080,0,0,0,0,1
+CameraTracking,LTL003,600,960,0.01,0.0000,0.0005,0,480,540,960,1080,0,0,0,0,1
+
+CameraTracking,LBL001,550,960,0.01,0.000,0.003,0,0,540,860,1080,0,0,0,0,1
+CameraTracking,LBS001,550,960,0.01,0.000,0.003,0,480,0,960,540,0,0,1,0,1
+CameraTracking,LBR001,550,960,0.01,0.000,0.003,0,0,540,1160,1080,0,0,0,0,1
+
 
 # ストップ
-#CameraTracking,000,550,960,0.008,0.000,0.0012,1,660,540,1260,740,0,0,0,0,1
+CameraTracking,000,550,960,0.008,0.000,0.0012,1,660,540,1260,740,0,0,0,0,1
 
 # ボトルキャリーのラベル取得のための4色走行
-CameraTracking,LTS003,350,960,0.008,0.0000,0.001,1,480,540,960,1080,1,1,1,1,1
+CameraTracking,LTS003,550,960,0.01,0.0000,0.002,1,480,540,960,1080,1,1,1,1,1
+CameraTracking,LTS004,350,960,0.002,0.0000,0.0005,1,0,270,1920,1080,1,1,1,1,1

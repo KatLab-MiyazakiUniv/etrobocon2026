@@ -46,6 +46,7 @@ class MotionParser {
     RELATIVE_ROTATION,
     QR_TRACKING,
     CALIBRATOR,
+    SNAPSHOT,
     NONE
   };
   // 条件コマンド名を持つ列挙型クラス

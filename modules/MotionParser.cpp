@@ -262,11 +262,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
           robot, std::move(condition), fromString<double>(motionParams[2]),
           Pid::PidGain{ fromString<double>(motionParams[3]), fromString<double>(motionParams[4]),
                         fromString<double>(motionParams[5]) },
-          Pid::PidGain{ fromString<double>(motionParams[6]), fromString<double>(motionParams[7]),
-                        fromString<double>(motionParams[8]) },
-          Pid::PidGain{ fromString<double>(motionParams[9]), fromString<double>(motionParams[10]),
-                        fromString<double>(motionParams[11]) },
-          motionParams[12] == "true");
+          fromString<bool>(motionParams[6]));
     }
     case MOTION_COMMAND::LINETRACE: {
       // LineTrace: motionParams[2]=speed(double)
@@ -373,6 +369,13 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
 
       return new Calibrator(robot, std::move(condition));
     }
+    case MOTION_COMMAND::SNAPSHOT: {
+
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] Snapshotを生成しました");
+
+      return new Snapshot(robot,motionParams[2], std::move(condition));
+    }
     // ↓ 他のコマンドはここに追加していく
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
@@ -391,7 +394,10 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
           { "QRTracking", MOTION_COMMAND::QR_TRACKING },
           { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING },
-          { "Calibrator", MOTION_COMMAND::CALIBRATOR }
+          { "Calibrator", MOTION_COMMAND::CALIBRATOR },
+          { "Snapshot", MOTION_COMMAND::SNAPSHOT }
+
+
          };
 
   // コマンド文字列に対応するMOTION_COMMAND値をマップから取得。なければMOTION_COMMAND::NONEを返す

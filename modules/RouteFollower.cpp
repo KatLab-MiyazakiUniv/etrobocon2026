@@ -113,7 +113,7 @@ double RouteFollower::calculateRotationAngle(Direction from, Direction to) const
 
   const double targetHeading = directionToHeading(to);
 
-  return AngleNormalizer::normalizeAngle(targetHeading - currentHeading);
+  return AngleNormalizer::normalizeAngle(currentHeading-targetHeading);
 }
 
 double RouteFollower::calculateDistance(const RouteState& from, const RouteState& to) const

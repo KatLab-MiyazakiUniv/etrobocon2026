@@ -58,6 +58,7 @@ class EtRallyMap {
   double firstXGridSize = SystemInfo::FIRST_X_GRID_SIZE;  // X方向の最初の区間
   double gridSize = SystemInfo::GRID_SIZE_X;              // X方向の通常区間
   double gridSizeY = SystemInfo::GRID_SIZE_Y;             // Y方向の通常区間
+  double lastYGridSize = SystemInfo::LAST_Y_GRID_SIZE;     // Y方向の最後の区間
 
   // X方向の区間数
   static constexpr int X_GRID_NUM = SystemInfo::X_GRID_NUM;

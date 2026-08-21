@@ -77,10 +77,10 @@ void EtRobocon2026::start()
   MapData mapData;
 
   // 赤ゲート
-  mapData.setGate(GoalColor::RED, { 5, 9 }, { 7, 9 });
+  mapData.setGate(GoalColor::RED, { 7, 9 }, { 9, 9 });
 
   // 青ゲート
-  mapData.setGate(GoalColor::BLUE, { 1, 5 }, { 1, 7 });
+  mapData.setGate(GoalColor::BLUE, { 3, 5 }, { 3, 7 });
 
   // 黄ゲート
   mapData.setGate(GoalColor::YELLOW, { 7, 3 }, { 9, 3 });

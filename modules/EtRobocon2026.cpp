@@ -1,11 +1,12 @@
 /**
  * @file   EtRobocon2026.cpp
- * @brief  3色のゲートを順番に経路探索してRouteFollowerで走行するテスト
+ * @brief  L/Rコース対応で3色のゲートをRouteFollowerで3周走行するテスト
  * @author HaruArima08
  */
 
 #include "EtRobocon2026.h"
 
+#include "CourseMirror.h"
 #include "EtRallyMap.h"
 #include "GateRoutePlanner.h"
 #include "Logger.h"
@@ -18,6 +19,46 @@
 #include "SocketClient.h"
 
 namespace {
+
+  /**
+   * @brief コースの種類
+   */
+  enum class CourseSide { L_COURSE, R_COURSE };
+
+  /**
+   * @brief 使用するコース
+   *
+   * Lコース:
+   * CourseSide::L_COURSE
+   *
+   * Rコース:
+   * CourseSide::R_COURSE
+   */
+  constexpr CourseSide COURSE_SIDE = CourseSide::L_COURSE;
+
+  /**
+   * @brief Lコースの座標を、使用するコース用の座標へ変換する
+   */
+  Point convertPoint(const Point& point)
+  {
+    if(COURSE_SIDE == CourseSide::R_COURSE) {
+      return CourseMirror::mirrorPoint(point);
+    }
+
+    return point;
+  }
+
+  /**
+   * @brief Lコースの方向を、使用するコース用の方向へ変換する
+   */
+  Direction convertDirection(Direction direction)
+  {
+    if(COURSE_SIDE == CourseSide::R_COURSE) {
+      return CourseMirror::mirrorDirection(direction);
+    }
+
+    return direction;
+  }
 
   /**
    * @brief Directionを文字列へ変換する
@@ -64,7 +105,7 @@ namespace {
 
 void EtRobocon2026::start()
 {
-  Logger::info("Three gate RouteFollower test start");
+  Logger::info("L/R Three gate RouteFollower test start");
 
   // =========================================================
   // 1. Robot生成
@@ -78,23 +119,58 @@ void EtRobocon2026::start()
 
   // =========================================================
   // 2. ゲート情報登録
+  //
+  // ここにはLコース側の座標を書く
+  //
+  // L:
+  // 10 9 8 7 6 5 4 3 2 1 0
+  //
+  // Rの場合はCourseMirrorで
+  // 0 1 2 3 4 5 6 7 8 9 10
+  // へ自動変換する
   // =========================================================
 
   MapData mapData;
 
+  // ---------------------------------------------------------
   // 赤ゲート
-  // (5,9) ----- (7,9)
-  mapData.setGate(GoalColor::RED, { 5, 5 }, { 7, 5 });
+  // Lコース
+  // (5,5) ----- (7,5)
+  // ---------------------------------------------------------
 
+  Point redGate1 = convertPoint({ 5, 5 });
+
+  Point redGate2 = convertPoint({ 7, 5 });
+
+  mapData.setGate(GoalColor::RED, redGate1, redGate2);
+
+  // ---------------------------------------------------------
   // 青ゲート
-  // (1,5)
+  //
+  // Lコース
+  //
+  // (9,5)
   //   |
-  // (1,7)
-  mapData.setGate(GoalColor::BLUE, { 9, 5 }, { 9, 7 });
+  // (9,7)
+  // ---------------------------------------------------------
 
+  Point blueGate1 = convertPoint({ 9, 5 });
+
+  Point blueGate2 = convertPoint({ 9, 7 });
+
+  mapData.setGate(GoalColor::BLUE, blueGate1, blueGate2);
+
+  // ---------------------------------------------------------
   // 黄ゲート
-  // (7,3) ----- (9,3)
-  mapData.setGate(GoalColor::YELLOW, { 1, 3 }, { 3, 3 });
+  // Lコース
+  // (1,3) ----- (3,3)
+  // ---------------------------------------------------------
+
+  Point yellowGate1 = convertPoint({ 1, 3 });
+
+  Point yellowGate2 = convertPoint({ 3, 3 });
+
+  mapData.setGate(GoalColor::YELLOW, yellowGate1, yellowGate2);
 
   // =========================================================
   // 3. 経路探索・距離変換
@@ -106,20 +182,20 @@ void EtRobocon2026::start()
 
   // =========================================================
   // 4. 開始位置
+  //
+  // Lコース側の開始位置を書く
   // =========================================================
 
-  int currentGridX = 2;
-  int currentGridY = 2;
+  Point startPoint = convertPoint({ 2, 2 });
 
-  /*
-   * 格子座標系
-   *
-   * UP    : Yが減る
-   * RIGHT : Xが減る
-   * DOWN  : Yが増える
-   * LEFT  : Xが増える
-   */
-  Direction currentDirection = Direction::LEFT;
+  int currentGridX = startPoint.x;
+
+  int currentGridY = startPoint.y;
+
+  Direction currentDirection = convertDirection(Direction::LEFT);
+
+  Logger::printfLog(Logger::INFO, "Start grid: (%d,%d), direction=%s", currentGridX, currentGridY,
+                    directionToString(currentDirection));
 
   // =========================================================
   // 5. 通過するゲートの順番
@@ -169,7 +245,6 @@ void EtRobocon2026::start()
 
     Logger::printfLog(Logger::INFO, "Lap %d / %d start", lap, LAP_COUNT);
 
-    // RED → BLUE → YELLOW
     for(const GoalColor targetColor : TARGET_COLORS) {
       Logger::info("==============================");
 
@@ -180,7 +255,7 @@ void EtRobocon2026::start()
                         currentGridY, directionToString(currentDirection));
 
       // -------------------------------------------------------
-      // 現在位置から指定された色のゲートまで経路探索
+      // 経路探索
       // -------------------------------------------------------
 
       GateRouteResult routeResult
@@ -195,7 +270,7 @@ void EtRobocon2026::start()
       }
 
       // -------------------------------------------------------
-      // 経路探索結果を表示
+      // 探索結果表示
       // -------------------------------------------------------
 
       Logger::printfLog(Logger::INFO, "Route cost: %d", routeResult.cost);
@@ -213,7 +288,7 @@ void EtRobocon2026::start()
                         static_cast<int>(routeResult.route.size()));
 
       // -------------------------------------------------------
-      // 経路の内容を表示
+      // 経路表示
       // -------------------------------------------------------
 
       for(std::size_t i = 0; i < routeResult.route.size(); ++i) {
@@ -236,11 +311,13 @@ void EtRobocon2026::start()
       routeFollower.run(routeResult.route);
 
       // -------------------------------------------------------
-      // 次の探索開始位置を更新
+      // 次回探索位置を更新
       // -------------------------------------------------------
 
       currentGridX = routeResult.exit.x;
+
       currentGridY = routeResult.exit.y;
+
       currentDirection = routeResult.exitDirection;
 
       Logger::printfLog(Logger::INFO, "%s gate passed: exit=(%d,%d), direction=%s",
@@ -257,8 +334,8 @@ void EtRobocon2026::start()
 
   robot.getWheelMotorControllerInstance().stopBoth();
 
-  Logger::printfLog(Logger::INFO, "Final grid: (%d, %d), direction=%s", currentGridX, currentGridY,
+  Logger::printfLog(Logger::INFO, "Final grid: (%d,%d), direction=%s", currentGridX, currentGridY,
                     directionToString(currentDirection));
 
-  Logger::info("Three laps RouteFollower test finished");
+  Logger::info("L/R Three laps RouteFollower test finished");
 }

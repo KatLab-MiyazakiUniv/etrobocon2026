@@ -28,8 +28,7 @@ class Straight : public BaseMotion {
    */
 
   Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-           double _targetSpeed,
-           const Pid::PidGain& _anglePidGain, bool _shouldUseIMU);
+           double _targetSpeed,const Pid::PidGain& _anglePidGain, bool _shouldUseIMU);
   /**
    * デストラクタ
    */

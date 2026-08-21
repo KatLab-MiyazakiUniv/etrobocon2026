@@ -84,17 +84,17 @@ void EtRobocon2026::start()
 
   // 赤ゲート
   // (5,9) ----- (7,9)
-  mapData.setGate(GoalColor::RED, { 7, 9 }, { 9, 9 });
+  mapData.setGate(GoalColor::RED, { 5, 5 }, { 7, 5 });
 
   // 青ゲート
   // (1,5)
   //   |
   // (1,7)
-  mapData.setGate(GoalColor::BLUE, { 3, 5 }, { 3, 7 });
+  mapData.setGate(GoalColor::BLUE, { 9, 5 }, { 9, 7 });
 
   // 黄ゲート
   // (7,3) ----- (9,3)
-  mapData.setGate(GoalColor::YELLOW, { 7, 3 }, { 9, 3 });
+  mapData.setGate(GoalColor::YELLOW, { 1, 3 }, { 3, 3 });
 
   // =========================================================
   // 3. 経路探索・距離変換

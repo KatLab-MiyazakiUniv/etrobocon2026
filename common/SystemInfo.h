@@ -23,10 +23,11 @@ static constexpr int CAM_MAX_HEIGHT = 1080;  // カメラ撮影解像度の高�
 class SystemInfo {
  public:
   // ETラリーMapの定義
-  static constexpr double FIRST_X_GRID_SIZE = 185.0;  // 175から１８０へX方向の最初の区間(mm)
+  static constexpr double FIRST_X_GRID_SIZE = 220.0;  // 175から１８０へX方向の最初の区間(mm)
+  static constexpr double FIRST_Y_GRID_SIZE = 230.5;  // 175から１８０へX方向の最初の区間(mm)
   static constexpr double GRID_SIZE_X = 122.5;          // X方向の通常の区間(mm)
   static constexpr double GRID_SIZE_Y = 122.5;        // Y方向の区間(mm)
-  static constexpr double LAST_Y_GRID_SIZE = 180.5;
+  static constexpr double LAST_Y_GRID_SIZE = 230.5;
   static constexpr int X_GRID_NUM = 10;               // X方向の区間数
   static constexpr int Y_GRID_NUM = 10;               // Y方向の区間数
 };

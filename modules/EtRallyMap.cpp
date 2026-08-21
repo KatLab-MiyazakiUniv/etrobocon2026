@@ -19,52 +19,33 @@ void EtRallyMap::updateNodes()
       nodes[gridX][gridY].gridX = gridX;
       nodes[gridX][gridY].gridY = gridY;
 
-      // =====================================================
       // X方向の実座標
-      // =====================================================
-      //
-      // gridX=0 → 1 の区間のみ firstXGridSize
-      //
-      // それ以降は gridSizeX
-      //
-      // 例:
-      //
-      // 0 ---- firstXGridSize ---- 1 ---- gridSizeX ---- 2
-      //                               ---- gridSizeX ---- 3
-      //
-      // =====================================================
-
+      // 0→1のみfirstXGridSize、それ以降はgridSizeX
       if(gridX == 0) {
         nodes[gridX][gridY].x = 0.0;
-
       } else if(gridX == 1) {
         nodes[gridX][gridY].x = firstXGridSize;
-
       } else {
-        nodes[gridX][gridY].x = firstXGridSize + (gridX - 1) * gridSizeX;
+        nodes[gridX][gridY].x =
+            firstXGridSize + (gridX - 1) * gridSizeX;
       }
 
-      // =====================================================
       // Y方向の実座標
-      // =====================================================
-      //
-      // 通常区間は gridSizeY
-      //
-      // 最後の区間
-      //
-      // Y_GRID_NUM - 1 → Y_GRID_NUM
-      //
-      // のみ lastYGridSize
-      //
-      // Y方向はgridYが増えるほど負方向へ進む。
-      //
-      // =====================================================
-
-      if(gridY == Y_GRID_NUM) {
-        nodes[gridX][gridY].y = -((Y_GRID_NUM - 1) * gridSizeY + lastYGridSize);
-
+      // 0→1はfirstYGridSize
+      // 1→Y_GRID_NUM-1はgridSizeY
+      // Y_GRID_NUM-1→Y_GRID_NUMはlastYGridSize
+      if(gridY == 0) {
+        nodes[gridX][gridY].y = 0.0;
+      } else if(gridY == 1) {
+        nodes[gridX][gridY].y = -firstYGridSize;
+      } else if(gridY == Y_GRID_NUM) {
+        nodes[gridX][gridY].y =
+            -(firstYGridSize
+              + (Y_GRID_NUM - 2) * gridSizeY
+              + lastYGridSize);
       } else {
-        nodes[gridX][gridY].y = -gridY * gridSizeY;
+        nodes[gridX][gridY].y =
+            -(firstYGridSize + (gridY - 1) * gridSizeY);
       }
     }
   }
@@ -85,6 +66,13 @@ void EtRallyMap::setFirstXGridSize(double value)
 void EtRallyMap::setGridSizeX(double value)
 {
   gridSizeX = value;
+
+  updateNodes();
+}
+
+void EtRallyMap::setFirstYGridSize(double value)
+{
+  firstYGridSize = value;
 
   updateNodes();
 }

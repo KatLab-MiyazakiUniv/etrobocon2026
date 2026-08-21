@@ -47,6 +47,12 @@ class EtRallyMap {
   void setGridSizeX(double value);
 
   /**
+   * @brief Y方向の最初の区間を設定する
+   * @param value Y方向の最初の区間[mm]
+   */
+  void setFirstYGridSize(double value);
+
+  /**
    * @brief Y方向の通常区間を設定する
    * @param value Y方向の通常区間[mm]
    */
@@ -69,6 +75,9 @@ class EtRallyMap {
 
   // X方向の通常区間
   double gridSizeX = SystemInfo::GRID_SIZE_X;
+
+  // Y方向の最初の区間
+  double firstYGridSize = SystemInfo::FIRST_Y_GRID_SIZE;
 
   // Y方向の通常区間
   double gridSizeY = SystemInfo::GRID_SIZE_Y;

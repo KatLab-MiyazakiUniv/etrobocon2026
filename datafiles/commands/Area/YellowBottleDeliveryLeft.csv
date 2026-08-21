@@ -1,2 +1,4 @@
 動作コマンド名,動作ID,条件コマンド名,条件ID
-CameraTracking,003,Distance,030
+CameraTracking,LTS003,UltraSonic,001
+
+

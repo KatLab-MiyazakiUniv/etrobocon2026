@@ -338,4 +338,33 @@ void EtRobocon2026::start()
                     directionToString(currentDirection));
 
   Logger::info("L/R Three laps RouteFollower test finished");
+
+
+    // =========================================================
+  // 10. 最終位置 (10,0) へ移動
+  // =========================================================
+
+  Point finalGoal = convertPoint({10, 0});
+  Direction finalDirection = convertDirection(Direction::LEFT);
+
+  DijkstraRoutePlanner planner(mapData.getGates());
+
+  RouteResult finalRoute = planner.search(
+      currentGridX,
+      currentGridY,
+      currentDirection,
+      finalGoal,
+      finalDirection);
+
+  if(!finalRoute.found) {
+    Logger::error("Final route not found");
+    robot.getWheelMotorControllerInstance().stopBoth();
+    return;
+  }
+
+  routeFollower.run(finalRoute.route);
+
+  currentGridX = finalGoal.x;
+  currentGridY = finalGoal.y;
+  currentDirection = finalDirection;
 }

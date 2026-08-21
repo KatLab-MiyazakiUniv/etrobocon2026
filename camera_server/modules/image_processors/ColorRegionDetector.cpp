@@ -126,17 +126,11 @@ bool ColorRegionDetector::detectBoundingBox(const cv::Mat& frame,
   // 小さいノイズを除外して、一番大きい領域だけ選ぶ
   double maxArea = 0;
   std::vector<cv::Point> largestContour;
-
   for(const auto& contour : contours) {
     double area = cv::contourArea(contour);
-    // 最小面積未満ならスキップ
-    if(area < MIN_CONTOUR_AREA) {
-      continue;
-    }
-
-    // maxAreaより「大きい」場合のみ更新（同面積なら更新しない）
-    if(area > maxArea) {
+    if(area > MIN_CONTOUR_AREA && area > maxArea) {
       maxArea = area;
+      // 最大輪郭が同面積の場合は更新しない
       largestContour = contour;
     }
   }

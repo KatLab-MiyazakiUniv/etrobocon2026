@@ -232,6 +232,13 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
                                                  std::move(colorCondition),
                                                  CompoundCondition::LogicalOperator::AND);
     }
+    case CONDITION_COMMAND::ULTRA_SONIC: {
+      double targetDistance = fromString<double>(params[2]);
+      Logger::printfLog(
+          Logger::DEBUG,
+          "[MotionParser] UltraSonic: targetDistance=%.1f", targetDistance);
+      return std::make_unique<UltraSonicCondition>(robot,targetDistance);
+    }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Condition %s は未実装です",
                         params[0].c_str());
@@ -359,6 +366,13 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                                               fromString<double>(motionParams[6]) },
                                 qrRequest, motionParams[7] == "true");
     }
+    case MOTION_COMMAND::CALIBRATOR: {
+
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] Calibratorを生成しました");
+
+      return new Calibrator(robot, std::move(condition));
+    }
     // ↓ 他のコマンドはここに追加していく
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
@@ -376,7 +390,9 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "AbsoluteRotation", MOTION_COMMAND::ABSOLUTE_ROTATION },
           { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
           { "QRTracking", MOTION_COMMAND::QR_TRACKING },
-          { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING } };
+          { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING },
+          { "Calibrator", MOTION_COMMAND::CALIBRATOR }
+         };
 
   // コマンド文字列に対応するMOTION_COMMAND値をマップから取得。なければMOTION_COMMAND::NONEを返す
   auto it = commandMap.find(str);

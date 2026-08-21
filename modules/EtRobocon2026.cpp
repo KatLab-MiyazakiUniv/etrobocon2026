@@ -159,87 +159,100 @@ void EtRobocon2026::start()
   odometry.initialize(wheelMotorController.getLeftCount(), wheelMotorController.getRightCount());
 
   // =========================================================
-  // 9. RED → BLUE → YELLOW の順番で走行
+  // 9. RED → BLUE → YELLOW を3周走行
   // =========================================================
 
-  for(const GoalColor targetColor : TARGET_COLORS) {
-    Logger::info("==============================");
+  constexpr int LAP_COUNT = 3;
 
-    Logger::printfLog(Logger::INFO, "Target gate: %s", colorToString(targetColor));
+  for(int lap = 1; lap <= LAP_COUNT; ++lap) {
+    Logger::info("========================================");
 
-    Logger::printfLog(Logger::INFO, "Current grid: (%d, %d), direction=%s", currentGridX,
-                      currentGridY, directionToString(currentDirection));
+    Logger::printfLog(Logger::INFO, "Lap %d / %d start", lap, LAP_COUNT);
 
-    // -------------------------------------------------------
-    // 現在位置から指定された色のゲートまで経路探索
-    // -------------------------------------------------------
+    // RED → BLUE → YELLOW
+    for(const GoalColor targetColor : TARGET_COLORS) {
+      Logger::info("==============================");
 
-    GateRouteResult routeResult
-        = routePlanner.search(currentGridX, currentGridY, currentDirection, targetColor);
+      Logger::printfLog(Logger::INFO, "Lap %d / %d, Target gate: %s", lap, LAP_COUNT,
+                        colorToString(targetColor));
 
-    if(!routeResult.found) {
-      Logger::printfLog(Logger::ERROR, "Route to %s not found", colorToString(targetColor));
+      Logger::printfLog(Logger::INFO, "Current grid: (%d, %d), direction=%s", currentGridX,
+                        currentGridY, directionToString(currentDirection));
 
-      robot.getWheelMotorControllerInstance().stopBoth();
+      // -------------------------------------------------------
+      // 現在位置から指定された色のゲートまで経路探索
+      // -------------------------------------------------------
 
-      return;
+      GateRouteResult routeResult
+          = routePlanner.search(currentGridX, currentGridY, currentDirection, targetColor);
+
+      if(!routeResult.found) {
+        Logger::printfLog(Logger::ERROR, "Route to %s not found", colorToString(targetColor));
+
+        robot.getWheelMotorControllerInstance().stopBoth();
+
+        return;
+      }
+
+      // -------------------------------------------------------
+      // 経路探索結果を表示
+      // -------------------------------------------------------
+
+      Logger::printfLog(Logger::INFO, "Route cost: %d", routeResult.cost);
+
+      Logger::printfLog(Logger::INFO, "Gate entrance: (%d, %d)", routeResult.entrance.x,
+                        routeResult.entrance.y);
+
+      Logger::printfLog(Logger::INFO, "Gate exit: (%d, %d)", routeResult.exit.x,
+                        routeResult.exit.y);
+
+      Logger::printfLog(Logger::INFO, "Exit direction: %s",
+                        directionToString(routeResult.exitDirection));
+
+      Logger::printfLog(Logger::INFO, "Compressed route size: %d",
+                        static_cast<int>(routeResult.route.size()));
+
+      // -------------------------------------------------------
+      // 経路の内容を表示
+      // -------------------------------------------------------
+
+      for(std::size_t i = 0; i < routeResult.route.size(); ++i) {
+        const RouteState& state = routeResult.route[i];
+
+        const EtRallyMap::Node node = etRallyMap.getNode(state.x, state.y);
+
+        Logger::printfLog(Logger::INFO,
+                          "Route[%d]: grid=(%d,%d), "
+                          "position=(%.2f, %.2f), "
+                          "direction=%s",
+                          static_cast<int>(i), state.x, state.y, node.x, node.y,
+                          directionToString(state.direction));
+      }
+
+      // -------------------------------------------------------
+      // RouteFollowerで走行
+      // -------------------------------------------------------
+
+      routeFollower.run(routeResult.route);
+
+      // -------------------------------------------------------
+      // 次の探索開始位置を更新
+      // -------------------------------------------------------
+
+      currentGridX = routeResult.exit.x;
+      currentGridY = routeResult.exit.y;
+      currentDirection = routeResult.exitDirection;
+
+      Logger::printfLog(Logger::INFO, "%s gate passed: exit=(%d,%d), direction=%s",
+                        colorToString(targetColor), currentGridX, currentGridY,
+                        directionToString(currentDirection));
     }
 
-    // -------------------------------------------------------
-    // 経路探索結果を表示
-    // -------------------------------------------------------
-
-    Logger::printfLog(Logger::INFO, "Route cost: %d", routeResult.cost);
-
-    Logger::printfLog(Logger::INFO, "Gate entrance: (%d, %d)", routeResult.entrance.x,
-                      routeResult.entrance.y);
-
-    Logger::printfLog(Logger::INFO, "Gate exit: (%d, %d)", routeResult.exit.x, routeResult.exit.y);
-
-    Logger::printfLog(Logger::INFO, "Exit direction: %s",
-                      directionToString(routeResult.exitDirection));
-
-    Logger::printfLog(Logger::INFO, "Compressed route size: %d",
-                      static_cast<int>(routeResult.route.size()));
-
-    // -------------------------------------------------------
-    // 経路の内容を表示
-    // -------------------------------------------------------
-
-    for(std::size_t i = 0; i < routeResult.route.size(); ++i) {
-      const RouteState& state = routeResult.route[i];
-
-      const EtRallyMap::Node node = etRallyMap.getNode(state.x, state.y);
-
-      Logger::printfLog(Logger::INFO,
-                        "Route[%d]: grid=(%d,%d), "
-                        "position=(%.2f, %.2f), "
-                        "direction=%s",
-                        static_cast<int>(i), state.x, state.y, node.x, node.y,
-                        directionToString(state.direction));
-    }
-
-    // -------------------------------------------------------
-    // RouteFollowerで走行
-    // -------------------------------------------------------
-
-    routeFollower.run(routeResult.route);
-
-    // -------------------------------------------------------
-    // 次の経路探索の開始位置・方向を更新
-    // -------------------------------------------------------
-
-    currentGridX = routeResult.exit.x;
-    currentGridY = routeResult.exit.y;
-    currentDirection = routeResult.exitDirection;
-
-    Logger::printfLog(Logger::INFO, "%s gate passed: exit=(%d,%d), direction=%s",
-                      colorToString(targetColor), currentGridX, currentGridY,
-                      directionToString(currentDirection));
+    Logger::printfLog(Logger::INFO, "Lap %d / %d finished", lap, LAP_COUNT);
   }
 
   // =========================================================
-  // 10. 全ゲート通過完了
+  // 10. 3周完了
   // =========================================================
 
   robot.getWheelMotorControllerInstance().stopBoth();
@@ -247,5 +260,5 @@ void EtRobocon2026::start()
   Logger::printfLog(Logger::INFO, "Final grid: (%d, %d), direction=%s", currentGridX, currentGridY,
                     directionToString(currentDirection));
 
-  Logger::info("Three gate RouteFollower test finished");
+  Logger::info("Three laps RouteFollower test finished");
 }

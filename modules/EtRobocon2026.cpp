@@ -7,6 +7,7 @@
 #include "EtRobocon2026.h"
 
 #include "CourseMirror.h"
+#include "DijkstraRoutePlanner.h"
 #include "EtRallyMap.h"
 #include "GateRoutePlanner.h"
 #include "Logger.h"
@@ -37,7 +38,9 @@ namespace {
   constexpr CourseSide COURSE_SIDE = CourseSide::L_COURSE;
 
   /**
-   * @brief Lコースの座標を、使用するコース用の座標へ変換する
+   * @brief Lコースの座標を使用するコース用の座標へ変換する
+   * @param point Lコース基準の座標
+   * @return 使用するコース用の座標
    */
   Point convertPoint(const Point& point)
   {
@@ -49,7 +52,9 @@ namespace {
   }
 
   /**
-   * @brief Lコースの方向を、使用するコース用の方向へ変換する
+   * @brief Lコースの方向を使用するコース用の方向へ変換する
+   * @param direction Lコース基準の方向
+   * @return 使用するコース用の方向
    */
   Direction convertDirection(Direction direction)
   {
@@ -134,12 +139,12 @@ void EtRobocon2026::start()
 
   // ---------------------------------------------------------
   // 赤ゲート
+  //
   // Lコース
   // (5,5) ----- (7,5)
   // ---------------------------------------------------------
 
   Point redGate1 = convertPoint({ 5, 5 });
-
   Point redGate2 = convertPoint({ 7, 5 });
 
   mapData.setGate(GoalColor::RED, redGate1, redGate2);
@@ -155,19 +160,18 @@ void EtRobocon2026::start()
   // ---------------------------------------------------------
 
   Point blueGate1 = convertPoint({ 9, 5 });
-
   Point blueGate2 = convertPoint({ 9, 7 });
 
   mapData.setGate(GoalColor::BLUE, blueGate1, blueGate2);
 
   // ---------------------------------------------------------
   // 黄ゲート
+  //
   // Lコース
   // (1,3) ----- (3,3)
   // ---------------------------------------------------------
 
   Point yellowGate1 = convertPoint({ 1, 3 });
-
   Point yellowGate2 = convertPoint({ 3, 3 });
 
   mapData.setGate(GoalColor::YELLOW, yellowGate1, yellowGate2);
@@ -183,13 +187,12 @@ void EtRobocon2026::start()
   // =========================================================
   // 4. 開始位置
   //
-  // Lコース側の開始位置を書く
+  // Lコース基準
   // =========================================================
 
   Point startPoint = convertPoint({ 2, 2 });
 
   int currentGridX = startPoint.x;
-
   int currentGridY = startPoint.y;
 
   Direction currentDirection = convertDirection(Direction::LEFT);
@@ -245,6 +248,10 @@ void EtRobocon2026::start()
 
     Logger::printfLog(Logger::INFO, "Lap %d / %d start", lap, LAP_COUNT);
 
+    // ---------------------------------------------------------
+    // RED → BLUE → YELLOW
+    // ---------------------------------------------------------
+
     for(const GoalColor targetColor : TARGET_COLORS) {
       Logger::info("==============================");
 
@@ -255,7 +262,7 @@ void EtRobocon2026::start()
                         currentGridY, directionToString(currentDirection));
 
       // -------------------------------------------------------
-      // 経路探索
+      // 現在位置から指定されたゲートまで経路探索
       // -------------------------------------------------------
 
       GateRouteResult routeResult
@@ -311,7 +318,7 @@ void EtRobocon2026::start()
       routeFollower.run(routeResult.route);
 
       // -------------------------------------------------------
-      // 次回探索位置を更新
+      // 次の経路探索の開始位置を更新
       // -------------------------------------------------------
 
       currentGridX = routeResult.exit.x;
@@ -329,7 +336,85 @@ void EtRobocon2026::start()
   }
 
   // =========================================================
-  // 10. 3周完了
+  // 10. 3周終了後に最終地点へ移動
+  //
+  // Lコース基準:
+  //   座標 : (8,0)
+  //   方向 : LEFT
+  //
+  // Rコース:
+  //   座標 : (2,0)
+  //   方向 : RIGHT
+  // =========================================================
+
+  Logger::info("========================================");
+  Logger::info("Move to final position");
+
+  Point finalPoint = convertPoint({ 8, 0 });
+
+  Direction finalDirection = convertDirection(Direction::LEFT);
+
+  Logger::printfLog(Logger::INFO, "Final target: (%d,%d), direction=%s", finalPoint.x, finalPoint.y,
+                    directionToString(finalDirection));
+
+  // =========================================================
+  // 11. 最終地点への経路探索
+  // =========================================================
+
+  DijkstraRoutePlanner finalRoutePlanner(mapData.getGates());
+
+  RouteResult finalRoute = finalRoutePlanner.search(currentGridX, currentGridY, currentDirection,
+                                                    finalPoint, finalDirection);
+
+  if(!finalRoute.found) {
+    Logger::printfLog(Logger::ERROR, "Route to final position (%d,%d) not found", finalPoint.x,
+                      finalPoint.y);
+
+    robot.getWheelMotorControllerInstance().stopBoth();
+
+    return;
+  }
+
+  Logger::printfLog(Logger::INFO, "Final route cost: %d", finalRoute.cost);
+
+  Logger::printfLog(Logger::INFO, "Final route size: %d",
+                    static_cast<int>(finalRoute.route.size()));
+
+  // =========================================================
+  // 12. 最終経路表示
+  // =========================================================
+
+  for(std::size_t i = 0; i < finalRoute.route.size(); ++i) {
+    const RouteState& state = finalRoute.route[i];
+
+    const EtRallyMap::Node node = etRallyMap.getNode(state.x, state.y);
+
+    Logger::printfLog(Logger::INFO,
+                      "FinalRoute[%d]: grid=(%d,%d), "
+                      "position=(%.2f, %.2f), "
+                      "direction=%s",
+                      static_cast<int>(i), state.x, state.y, node.x, node.y,
+                      directionToString(state.direction));
+  }
+
+  // =========================================================
+  // 13. 最終地点まで走行
+  // =========================================================
+
+  routeFollower.run(finalRoute.route);
+
+  // =========================================================
+  // 14. 最終状態更新
+  // =========================================================
+
+  currentGridX = finalPoint.x;
+
+  currentGridY = finalPoint.y;
+
+  currentDirection = finalDirection;
+
+  // =========================================================
+  // 15. 終了
   // =========================================================
 
   robot.getWheelMotorControllerInstance().stopBoth();

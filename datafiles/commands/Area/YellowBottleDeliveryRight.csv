@@ -1,37 +1,34 @@
 動作コマンド名,動作ID,条件コマンド名,条件ID
 
 
-CameraTracking,LBL003,Distance,030
+CameraTracking,LBR003,Distance,030
 CameraTracking,LBS002,Distance,040
-CameraTracking,LBL001,Distance,003
+CameraTracking,LBR002,Distance,003
 Snapshot,011,RepeatCount,001
-CameraTracking,LBL001,Distance,003
+CameraTracking,LBR002,Distance,003
 Snapshot,012,RepeatCount,001
-CameraTracking,LBL001,Distance,003
+CameraTracking,LBR002,Distance,003
 Snapshot,013,RepeatCount,001
-CameraTracking,LBL001,Distance,003
+CameraTracking,LBR002,Distance,003
 Snapshot,014,RepeatCount,001
-CameraTracking,LBL001,Distance,003
+CameraTracking,LBR002,Distance,003
 CameraTracking,LBS001,Distance,110
 Snapshot,021,RepeatCount,001
-CameraTracking,LBL001,Distance,003
+CameraTracking,LBR002,Distance,003
 Snapshot,022,RepeatCount,001
-CameraTracking,LBL001,Distance,003
+CameraTracking,LBR002,Distance,003
 Snapshot,023,RepeatCount,001
-CameraTracking,LBL001,Distance,003
+CameraTracking,LBR002,Distance,003
 Snapshot,023,RepeatCount,001
-CameraTracking,LBL001,Distance,003
+CameraTracking,LBR002,Distance,003
 Snapshot,024,RepeatCount,001
-CameraTracking,LBL001,Distance,003
+CameraTracking,LBR002,Distance,003
 Snapshot,025,RepeatCount,001
 
 CameraTracking,000,Distance,000
 
-CameraTracking,LBS001,Distance,060
 CameraTracking,LBY,Distance,035
+Straight,
 
 
 CameraTracking,000,Distance,000
-
-RelativeRotation,004,RelativeAngle,004
-

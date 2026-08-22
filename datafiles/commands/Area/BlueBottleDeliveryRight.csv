@@ -27,8 +27,8 @@ Snapshot,025,RepeatCount,001
 
 CameraTracking,000,Distance,000
 
-CameraTracking,LBS001,Distance,030
-CameraTracking,LBB,Distance,035
+CameraTracking,LBS001,Distance,015
+CameraTracking,LBB,Distance,020
 
 
 CameraTracking,000,Distance,000

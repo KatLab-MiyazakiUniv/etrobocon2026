@@ -1,6 +1,6 @@
 動作コマンド名,動作ID,条件コマンド名,条件ID
 
-CameraTracking,LBL003,Distance,030
+CameraTracking,LBL002,Distance,030
 CameraTracking,LBS002,Distance,040
 CameraTracking,LBL001,Distance,003
 Snapshot,011,RepeatCount,001

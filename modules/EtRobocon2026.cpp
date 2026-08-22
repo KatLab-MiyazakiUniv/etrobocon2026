@@ -17,9 +17,9 @@ void EtRobocon2026::start()
   int voltage = BatteryController::getVoltage();
   Logger::printfLog(Logger::INFO, "バッテリー電圧: %d mV", voltage);
   robot.getCameraSocketClientInstance().connectToServer();
-  robot.setCourse(Course::Left);
+  robot.setCourse(Course::Right);
   // robot.setEdge(Edge::LeftEdge);
-  robot.setEdge(Edge::RightEdge);
+  robot.setEdge(Edge::LeftEdge);
   // // LineTrace走行
   Area lineTraceArea = Area::LineTrace;
   AreaMaster lineTraceAreaMaster(robot, lineTraceArea);

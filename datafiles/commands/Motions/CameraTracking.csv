@@ -3,7 +3,10 @@ CameraTracking,ID,double,int,double,double,double,bool,int,int,int,int,bool,bool
 # Tracking Area
 CameraTracking,ID,double,int,double,double,double,bool,int,int,int,int
 # 直線
-CameraTracking,LTS001,550,960,0.008,0.0000,0.001,0,480,540,960,1080,0,0,0,0,1
+
+CameraTracking,LTS001,600,960,0.01,0.0000,0.003,1,480,540,960,1080,0,0,0,0,1
+
+
 CameraTracking,LTS002,600,960,0.01,0.0000,0.0005,0,480,540,960,1080,0,0,0,0,1
 
 # 右カーブ

@@ -17,15 +17,6 @@ UltraSonicCondition::~UltraSonicCondition()
   LOG_DESTROY("UltraSonicCondition");
 }
 
-void UltraSonicCondition::prepare()
-{
-  // 初期値を代入
-  initDistance = Mileage::calculateMileage(robot.getWheelMotorControllerInstance().getRightCount(),
-                                           robot.getWheelMotorControllerInstance().getLeftCount());
-
-  // 超音波カウントを初期化
-  detectCount = 0;
-}
 bool UltraSonicCondition::shouldContinue()
 {
   // 超音波センサーの距離を取得

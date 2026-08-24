@@ -28,11 +28,6 @@ class UltraSonicCondition : public BaseContinuationCondition {
   ~UltraSonicCondition();
 
   /**
-   * @brief 継続条件の事前準備を行う (デフォルトは何もしない)
-   */
-  void prepare() override;
-
-  /**
    * @brief 動作を継続するかを判定する
    * @return true/動作を継続する、false/動作を継続しない
    */

@@ -85,8 +85,9 @@ void CameraTracking::executeStep()
       return;
     }
 
-    // 黒を除く最大面積の色範囲取得
-    if(colorDetectionRequest.requireLargestColorIndex || response.largestColorIndex != 3) {
+    // 黒を除く最大面積の色範囲取得>
+    if(colorDetectionRequest.requireLargestColorIndex != -1 || response.largestColorIndex != 3) {
+      Logger::printfLog(Logger::DEBUG, "CameraTracking:検知した最大色の添字は[%d]", response.largestColorIndex);
       robot.setIndexOfLabel(response.largestColorIndex);
     }
 

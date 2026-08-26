@@ -31,12 +31,7 @@ void EtRobocon2026::start()
   AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
   lineTraceAreaMaster.run();
 
-//カメラトラッキング走行
-  // Area CameraTracking = Area::CameraTracking;
-  // AreaMaster CameraTrackingAreaMaster(robot, CameraTracking);
-  // CameraTrackingAreaMaster.run();
-
-  // // BotlleDelivery走行
+  // BotlleDelivery走行
   Area bottleDeliveryArea = Area::BottleDelivery;
   AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
   bottleDeliveryAreaMaster.run();

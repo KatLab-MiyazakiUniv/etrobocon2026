@@ -1,8 +1,8 @@
 動作コマンド名,動作ID,条件コマンド名,条件ID
 
-CameraTracking,LBL002,Distance,030
-CameraTracking,LBS002,Distance,040
-CameraTracking,LBL001,Distance,003
+CameraTracking,LBL002,Distance,035
+CameraTracking,LBS002,Distance,035
+#CameraTracking,LBL001,Distance,003
 Snapshot,011,RepeatCount,001
 CameraTracking,LBL001,Distance,003
 Snapshot,012,RepeatCount,001
@@ -13,20 +13,21 @@ Snapshot,014,RepeatCount,001
 CameraTracking,LBL001,Distance,003
 CameraTracking,LBS001,Distance,110
 Snapshot,021,RepeatCount,001
-CameraTracking,LBL001,Distance,003
+CameraTracking,LBS001,Distance,003
 Snapshot,022,RepeatCount,001
-CameraTracking,LBL001,Distance,003
+CameraTracking,LBS001,Distance,003
 Snapshot,023,RepeatCount,001
-CameraTracking,LBL001,Distance,003
+
+CameraTracking,LBS001,Distance,003
 Snapshot,023,RepeatCount,001
-CameraTracking,LBL001,Distance,003
+CameraTracking,LBS001,Distance,003
 Snapshot,024,RepeatCount,001
-CameraTracking,LBL001,Distance,003
+CameraTracking,LBS001,Distance,003
 Snapshot,025,RepeatCount,001
 
 CameraTracking,000,Distance,000
 
-CameraTracking,LBY,Distance,035
+CameraTracking,LBY,Distance,025
 
 
 CameraTracking,000,Distance,000

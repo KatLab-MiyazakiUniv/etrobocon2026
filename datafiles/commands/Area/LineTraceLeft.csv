@@ -1,10 +1,5 @@
 #動作コマンド名,動作ID,条件コマンド名,条件ID
 # カメラ走行
-CameraTracking,LTS001,Distance,035
-CameraTracking,LTR001,Distance,035
-CameraTracking,LTS001,Distance,030
-CameraTracking,LTR001,Distance,040
-CameraTracking,LTS001,Distance,032
-CameraTracking,LTL001,Distance,030
-CameraTracking,LTL002,Distance,075
-CameraTracking,LTS001,Distance,050
+
+CameraTracking,LTS001,Distance,060
+CameraTracking,LTS004,Distance,035

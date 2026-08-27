@@ -1,41 +1,29 @@
 動作コマンド名,動作ID,条件コマンド名,条件ID
 
-#ボトルキャッチ後に左カーブ
-#CameraTracking,LBL002,Distance,035
-#青に向かって直進
-#CameraTracking,LBS002,Distance,035
-#Straightを使用する場合
-RelativeRotation,004,RelativeAngle,004
-Straight,001,Distance,070
-CameraTracking,000,Distance,000
+
+#QR1検出位置まで直進
+RelativeRotation,005,RelativeAngle,005
+Straight,001,Distance,065
+CameraTracking,001,RepeatCount,002
+
+# QR1検出
+CameraTracking,001,RepeatCount,002
 Snapshot,011,RepeatCount,001
-# QRコード検出1
-#Snapshot,011,RepeatCount,001
-#CameraTracking,LBL001,Distance,003
-#Snapshot,012,RepeatCount,001
-#CameraTracking,LBL001,Distance,003
-#Snapshot,013,RepeatCount,001
-#CameraTracking,LBL001,Distance,003
-#Snapshot,014,RepeatCount,001
-#CameraTracking,LBL001,Distance,003
-#第1QR取得後の直線
-#CameraTracking,LBS001,Distance,110
-#Snapshot,021,RepeatCount,001
-#CameraTracking,LBL001,Distance,003
-#Snapshot,022,RepeatCount,001
-#CameraTracking,LBL001,Distance,003
-#Snapshot,023,RepeatCount,001
-#CameraTracking,LBL001,Distance,003
-#Snapshot,023,RepeatCount,001
-#CameraTracking,LBL001,Distance,003
-#Snapshot,024,RepeatCount,001
-#CameraTracking,LBL001,Distance,003
-#Snapshot,025,RepeatCount,001
 
-#CameraTracking,000,Distance,000
+#QR1取得後の直線
+RelativeRotation,005,RelativeAngle,005
+CameraTracking,LBS001,Distance,147
 
-#CameraTracking,LBY,Distance,035
-#Straight,004,Distance,025
+# QR2検出
+CameraTracking,000,Distance,000
+Snapshot,021,RepeatCount,001
+
+#黄色まで移動
+RelativeRotation,004,RelativeAngle,004
+CameraTracking,LBY,Distance,040
+CameraTracking,000,Distance,000
+
+Straight,004,Distance,005
 
 
 #CameraTracking,000,Distance,000

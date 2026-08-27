@@ -1,5 +1,9 @@
 #動作コマンド名,動作ID,条件コマンド名,条件ID
 # カメラ走行
+CameraTracking,001,RepeatCount,002
+CameraTracking,LTS001,Distance,075
+CameraTracking,LTS004,Distance,037
 
-CameraTracking,LTS001,Distance,060
-CameraTracking,LTS004,Distance,035
+
+# キャリブレーション
+#Calibrator,001,RepeatCount,001

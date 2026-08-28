@@ -1,0 +1,4 @@
+コマンド名,ID,targetAngle
+AbsoluteAngle,ID,double
+AbsoluteAngle,001,90
+AbsoluteAngle,002,180

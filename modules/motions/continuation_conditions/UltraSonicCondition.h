@@ -8,7 +8,6 @@
 #define ULTRA_SONIC_CONDITION_H
 
 #include "BaseContinuationCondition.h"
-#include "Mileage.h"
 #include "Logger.h"
 
 class UltraSonicCondition : public BaseContinuationCondition {
@@ -36,7 +35,7 @@ class UltraSonicCondition : public BaseContinuationCondition {
  protected:
   double targetDistance = 0.0;           // 目標超音波距離
   int detectCount = 0;                   // 取得回数
-  static constexpr int JUDGE_COUNT = 2;  // 継続条件を修了するために必要な連続取得回数
+  static constexpr int JUDGE_COUNT = 2;  // 継続条件を終了するために必要な連続取得回数
 };
 
 #endif

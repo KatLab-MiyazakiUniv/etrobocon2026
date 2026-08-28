@@ -132,10 +132,10 @@ void EtRobocon2026::start()
 
   // 赤ゲート
   Point redGate1 =
-      convertPoint({7, 9});
+      convertPoint({1, 9});
 
   Point redGate2 =
-      convertPoint({9, 9});
+      convertPoint({3, 9});
 
   mapData.setGate(
       GoalColor::RED,
@@ -144,10 +144,10 @@ void EtRobocon2026::start()
 
   // 青ゲート
   Point blueGate1 =
-      convertPoint({7, 5});
+      convertPoint({3, 5});
 
   Point blueGate2 =
-      convertPoint({7, 7});
+      convertPoint({3, 7});
 
   mapData.setGate(
       GoalColor::BLUE,
@@ -156,10 +156,10 @@ void EtRobocon2026::start()
 
   // 黄ゲート
   Point yellowGate1 =
-      convertPoint({1, 5});
+      convertPoint({7, 5});
 
   Point yellowGate2 =
-      convertPoint({3, 5});
+      convertPoint({9, 5});
 
   mapData.setGate(
       GoalColor::YELLOW,
@@ -181,7 +181,7 @@ void EtRobocon2026::start()
   // =========================================================
 
   Point startPoint =
-      convertPoint({2, 8});
+      convertPoint({0, 4});
 
   int currentGridX =
       startPoint.x;

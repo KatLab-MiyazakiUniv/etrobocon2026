@@ -154,8 +154,5 @@ class Robot {
   spikeapi::Display display;                    // Displayインスタンス
   char decryptionKey[5] = { 0 };                // 復号キー
   int targetBrightness = 50;                    // 目標輝度
-  Position position;                            // Position インスタンス
-  Odometry odometry;                            // Odometry インスタンス
-  Navigator navigator;                          // Navigator インスタンス
 };
 #endif

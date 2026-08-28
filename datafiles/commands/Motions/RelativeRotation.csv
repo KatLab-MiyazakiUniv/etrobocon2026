@@ -1,7 +1,7 @@
 コマンド名,ID,a_kp,a_ki,a_kd,relativeTargetAngle
 RelativeRotation,ID,double,double,double,double
-RelativeRotation,001,0.8, 1.1, 0.0,90
-RelativeRotation,002,0.8,1.1,0.0,-90
-RelativeRotation,003,1.5, 2.5, 0.0,35
-RelativeRotation,004,1.5,3.0,0.0,-35
-RelativeRotation,005,1.5,2.5,0.0,-40
+RelativeRotation,001,0.8, 1.1, 0.0,90.0
+RelativeRotation,002,0.8,1.1,0.0,-90.0
+RelativeRotation,003,1.5, 2.5, 0.0,35.0
+RelativeRotation,004,1.5,3.0,0.0,-35.0
+RelativeRotation,005,1.5,2.5,0.0,-37.0

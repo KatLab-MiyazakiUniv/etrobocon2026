@@ -86,10 +86,17 @@ void CameraTracking::executeStep()
     }
 
     // 黒を除く最大面積の色範囲取得>
-    if(colorDetectionRequest.requireLargestColorIndex != -1 && response.largestColorIndex != 3) {
+
+    if(response.largestColorIndex != -1) {
+      Logger::printfLog(Logger::DEBUG, "CameraTracking:最大色の検知失敗");
+    }
+
+    if(colorDetectionRequest.requireLargestColorIndex != -1 && response.largestColorIndex != 3  && response.largestColorIndex != -1) {
       Logger::printfLog(Logger::DEBUG, "CameraTracking:検知した最大色の添字は[%d]", response.largestColorIndex);
       robot.setIndexOfLabel(response.largestColorIndex);
     }
+
+
 
     // バウンディングボックスの中心X座標を計算
     currentX = (response.result.topLeft.x + response.result.bottomRight.x) / 2.0;

@@ -1,6 +1,6 @@
 /**
  * @file   EtRobocon2026.cpp
- * @brief  L/Rコース対応で3色のゲートをRouteFollowerで3周走行するテスト
+ * @brief  L/Rコース対応で3色のゲートをRouteFollowerで走行するテスト
  * @author HaruArima08
  */
 
@@ -103,8 +103,7 @@ namespace {
 
 void EtRobocon2026::start()
 {
-  Logger::info(
-      "L/R Three gate RouteFollower test start");
+  Logger::info("RouteFollower QR gate test start");
 
   // =========================================================
   // 1. Robot生成
@@ -116,21 +115,24 @@ void EtRobocon2026::start()
 
   Robot robot(cameraSocketClient);
 
+  /*
+   * QRコード検出を使用するため、
+   * カメラサーバーへ接続する。
+   */
+  robot
+      .getCameraSocketClientInstance()
+      .connectToServer();
+
   // =========================================================
   // 2. ゲート情報登録
-  //
-  // Lコース基準
-  //
-  // L:
-  // 10 9 8 7 6 5 4 3 2 1 0
-  //
-  // R:
-  // 0 1 2 3 4 5 6 7 8 9 10
   // =========================================================
 
   MapData mapData;
 
+  // ---------------------------------------------------------
   // 赤ゲート
+  // ---------------------------------------------------------
+
   Point redGate1 =
       convertPoint({1, 9});
 
@@ -142,7 +144,10 @@ void EtRobocon2026::start()
       redGate1,
       redGate2);
 
+  // ---------------------------------------------------------
   // 青ゲート
+  // ---------------------------------------------------------
+
   Point blueGate1 =
       convertPoint({3, 5});
 
@@ -154,7 +159,10 @@ void EtRobocon2026::start()
       blueGate1,
       blueGate2);
 
+  // ---------------------------------------------------------
   // 黄ゲート
+  // ---------------------------------------------------------
+
   Point yellowGate1 =
       convertPoint({7, 5});
 
@@ -167,7 +175,7 @@ void EtRobocon2026::start()
       yellowGate2);
 
   // =========================================================
-  // 3. 経路探索・距離変換
+  // 3. 経路探索クラス・実座標マップ
   // =========================================================
 
   GateRoutePlanner routePlanner(mapData);
@@ -176,8 +184,6 @@ void EtRobocon2026::start()
 
   // =========================================================
   // 4. 開始位置
-  //
-  // Lコース基準
   // =========================================================
 
   Point startPoint =
@@ -200,7 +206,7 @@ void EtRobocon2026::start()
       directionToString(currentDirection));
 
   // =========================================================
-  // 5. 通過するゲートの順番
+  // 5. 通過するゲート
   // =========================================================
 
   constexpr GoalColor TARGET_COLORS[] = {
@@ -213,53 +219,95 @@ void EtRobocon2026::start()
   // 6. PID設定
   // =========================================================
 
+  /*
+   * 回頭PID
+   */
   const Pid::PidGain rotationPid = {
       1.3,
       1.0,
       0.0
   };
 
+  /*
+   * 右車輪速度PID
+   */
   const Pid::PidGain rightPid = {
       0.016,
       0.005,
       0.0015
   };
 
+  /*
+   * 左車輪速度PID
+   */
   const Pid::PidGain leftPid = {
       0.016,
       0.0045,
       0.0015
   };
 
+  /*
+   * 通常Straight用角度補正PID
+   */
   const Pid::PidGain straightAnglePid = {
       0.033,
       0.003,
       0.03
   };
 
+  /*
+   * QRコード追従用PID
+   *
+   * QRTracking設定:
+   *
+   * speed   = 350.0
+   * targetX = 960
+   * kp      = 0.000161
+   * ki      = 0.00001
+   * kd      = 0.0001019
+   */
+  const Pid::PidGain qrTrackingPid = {
+      0.000161,
+      0.00001,
+      0.0001019
+  };
+
+  /*
+   * 通常走行速度
+   */
   constexpr double TARGET_SPEED = 400.0;
+
+  /*
+   * QR追従時の速度
+   */
+  constexpr double QR_TRACKING_SPEED = 350.0;
+
+  /*
+   * QRコードを画像の中央へ合わせるための目標X座標。
+   *
+   * 1920px幅の画像なので中央は960。
+   */
+  constexpr int QR_TARGET_X = 960;
 
   // =========================================================
   // 7. RouteFollower生成
-  //
-  // QR検知成功
-  //     → CameraTracking
-  //
-  // QR検知失敗
-  //     → Straight
   // =========================================================
 
   RouteFollower routeFollower(
       robot,
       etRallyMap,
+      mapData,
       TARGET_SPEED,
+      QR_TRACKING_SPEED,
+      QR_TARGET_X,
       rotationPid,
       rightPid,
       leftPid,
-      straightAnglePid);
+      straightAnglePid,
+      qrTrackingPid);
 
   // =========================================================
-  // 8. RED → BLUE → YELLOW を3周走行
+  // 8. RED → BLUE → YELLOW を3周
   // =========================================================
 
   constexpr int LAP_COUNT = 3;
@@ -291,14 +339,14 @@ void EtRobocon2026::start()
 
       Logger::printfLog(
           Logger::INFO,
-          "Current grid: (%d, %d), direction=%s",
+          "Current grid: (%d,%d), direction=%s",
           currentGridX,
           currentGridY,
           directionToString(currentDirection));
 
-      // -------------------------------------------------------
+      // =====================================================
       // 経路探索
-      // -------------------------------------------------------
+      // =====================================================
 
       GateRouteResult routeResult =
           routePlanner.search(
@@ -308,7 +356,6 @@ void EtRobocon2026::start()
               targetColor);
 
       if(!routeResult.found) {
-
         Logger::printfLog(
             Logger::ERROR,
             "Route to %s not found",
@@ -321,9 +368,9 @@ void EtRobocon2026::start()
         return;
       }
 
-      // -------------------------------------------------------
+      // =====================================================
       // 探索結果表示
-      // -------------------------------------------------------
+      // =====================================================
 
       Logger::printfLog(
           Logger::INFO,
@@ -332,13 +379,13 @@ void EtRobocon2026::start()
 
       Logger::printfLog(
           Logger::INFO,
-          "Gate entrance: (%d, %d)",
+          "Gate entrance: (%d,%d)",
           routeResult.entrance.x,
           routeResult.entrance.y);
 
       Logger::printfLog(
           Logger::INFO,
-          "Gate exit: (%d, %d)",
+          "Gate exit: (%d,%d)",
           routeResult.exit.x,
           routeResult.exit.y);
 
@@ -348,15 +395,9 @@ void EtRobocon2026::start()
           directionToString(
               routeResult.exitDirection));
 
-      Logger::printfLog(
-          Logger::INFO,
-          "Compressed route size: %d",
-          static_cast<int>(
-              routeResult.route.size()));
-
-      // -------------------------------------------------------
+      // =====================================================
       // 経路表示
-      // -------------------------------------------------------
+      // =====================================================
 
       for(std::size_t i = 0;
           i < routeResult.route.size();
@@ -384,22 +425,40 @@ void EtRobocon2026::start()
                 state.direction));
       }
 
-      // -------------------------------------------------------
-      // RouteFollowerで走行
+      // =====================================================
+      // RouteFollowerでゲートまで走行
       //
-      // QR検知成功
-      //     → CameraTracking
+      // true:
+      // QR補正を使用する。
       //
-      // QR検知失敗
-      //     → Straight
-      // -------------------------------------------------------
+      // 内側ゲート:
+      //   ゲート125mm手前までStraight
+      //   ↓
+      //   QRコード確認
+      //   ↓
+      //   成功:
+      //     QRTracking
+      //     speed   = 350
+      //     targetX = 960
+      //     PID     = QR専用PID
+      //     distance = 250mm
+      //
+      //   失敗:
+      //     Straight 250mm
+      //   ↓
+      //   残りStraight
+      //
+      // 外周ゲート:
+      //   通常Straight
+      // =====================================================
 
       routeFollower.run(
-          routeResult.route);
+          routeResult.route,
+          true);
 
-      // -------------------------------------------------------
-      // 次回探索開始位置を更新
-      // -------------------------------------------------------
+      // =====================================================
+      // 次回探索開始位置更新
+      // =====================================================
 
       currentGridX =
           routeResult.exit.x;
@@ -427,13 +486,7 @@ void EtRobocon2026::start()
   }
 
   // =========================================================
-  // 9. 3周終了後に最終地点へ移動
-  //
-  // Lコース基準:
-  //   (8,0) LEFT
-  //
-  // Rコース:
-  //   (2,0) RIGHT
+  // 9. 最終地点
   // =========================================================
 
   Logger::info(
@@ -447,13 +500,6 @@ void EtRobocon2026::start()
 
   Direction finalDirection =
       convertDirection(Direction::LEFT);
-
-  Logger::printfLog(
-      Logger::INFO,
-      "Final target: (%d,%d), direction=%s",
-      finalPoint.x,
-      finalPoint.y,
-      directionToString(finalDirection));
 
   // =========================================================
   // 10. 最終地点への経路探索
@@ -471,7 +517,6 @@ void EtRobocon2026::start()
           finalDirection);
 
   if(!finalRoute.found) {
-
     Logger::printfLog(
         Logger::ERROR,
         "Route to final position (%d,%d) not found",
@@ -485,75 +530,17 @@ void EtRobocon2026::start()
     return;
   }
 
-  Logger::printfLog(
-      Logger::INFO,
-      "Final route cost: %d",
-      finalRoute.cost);
-
-  Logger::printfLog(
-      Logger::INFO,
-      "Final route size: %d",
-      static_cast<int>(
-          finalRoute.route.size()));
-
   // =========================================================
-  // 11. 最終経路表示
-  // =========================================================
-
-  for(std::size_t i = 0;
-      i < finalRoute.route.size();
-      ++i) {
-
-    const RouteState& state =
-        finalRoute.route[i];
-
-    const EtRallyMap::Node node =
-        etRallyMap.getNode(
-            state.x,
-            state.y);
-
-    Logger::printfLog(
-        Logger::INFO,
-        "FinalRoute[%d]: grid=(%d,%d), "
-        "position=(%.2f, %.2f), "
-        "direction=%s",
-        static_cast<int>(i),
-        state.x,
-        state.y,
-        node.x,
-        node.y,
-        directionToString(
-            state.direction));
-  }
-
-  // =========================================================
-  // 12. 最終地点まで走行
+  // 11. 最終地点まで通常走行
   //
-  // QR検知成功
-  //     → CameraTracking
-  //
-  // QR検知失敗
-  //     → Straight
+  // QR補正は使用しない。
   // =========================================================
 
   routeFollower.run(
       finalRoute.route);
 
   // =========================================================
-  // 13. 最終状態更新
-  // =========================================================
-
-  currentGridX =
-      finalPoint.x;
-
-  currentGridY =
-      finalPoint.y;
-
-  currentDirection =
-      finalDirection;
-
-  // =========================================================
-  // 14. 停止
+  // 12. 停止
   // =========================================================
 
   robot
@@ -563,10 +550,11 @@ void EtRobocon2026::start()
   Logger::printfLog(
       Logger::INFO,
       "Final grid: (%d,%d), direction=%s",
-      currentGridX,
-      currentGridY,
-      directionToString(currentDirection));
+      finalPoint.x,
+      finalPoint.y,
+      directionToString(finalDirection));
 
   Logger::info(
-      "L/R Three laps RouteFollower test finished");
+      "RouteFollower QR gate test finished");
 }
+

@@ -367,11 +367,6 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
 
       return new RelativeRotation(robot, std::move(condition), anglePidGain, relativeTargetAngle);
     }
-    case MOTION_COMMAND::EDGECHANGE: {
-      std::string edge = motionParams[2];
-      Logger::printfLog(Logger::DEBUG, "[MotionParser] ChangeEdge: edge = %s を生成しました", edge);
-      return new ChangeEdge(robot, std::move(condition), edge);
-    }
     case MOTION_COMMAND::CALIBRATOR: {
       return new Calibrator(robot, std::move(condition));
     }
@@ -390,7 +385,6 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "LineTrace", MOTION_COMMAND::LINETRACE },
           { "AbsoluteRotation", MOTION_COMMAND::ABSOLUTE_ROTATION },
           { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
-          { "EdgeChange", MOTION_COMMAND::EDGECHANGE },
           { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING },
           { "Calibrator", MOTION_COMMAND::CALIBRATOR }
 

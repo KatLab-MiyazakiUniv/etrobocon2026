@@ -29,7 +29,6 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "Straight.h"
 #include "AbsoluteRotation.h"
 #include "RelativeRotation.h"
-#include "ChangeEdge.h"
 #include "CameraTracking.h"
 #include "Calibrator.h"
 #include "UltraSonicCondition.h"
@@ -45,7 +44,6 @@ class MotionParser {
     CAMERA_TRACKING,
     RELATIVE_ROTATION,
     ABSOLUTE_ROTATION,
-    EDGECHANGE,
     CALIBRATOR,
     NONE
   };

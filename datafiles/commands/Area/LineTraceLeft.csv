@@ -2,9 +2,12 @@
 # カメラ走行
 #フレームを7回捨てる
 CameraTracking,001,RepeatCount,002
+#ボトルキャッチ前
 CameraTracking,LTS001,Distance,060
+#ボトルキャッチ中
 CameraTracking,LTS002,Distance,015
-CameraTracking,LTS004,Distance,042
+#ボトルキャッチ後
+CameraTracking,LTS004,Distance,032
 # キャリブレーション
 #Calibrator,001,RepeatCount,001
 

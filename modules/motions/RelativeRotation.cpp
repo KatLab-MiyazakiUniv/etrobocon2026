@@ -22,7 +22,9 @@ RelativeRotation::~RelativeRotation()
 void RelativeRotation::prepare()
 {
   double initialAngle = getCurrentAngle();  // 現在の走行体角度を取得する
+  Logger::printfLog(Logger::INFO, "RelativeAngle:prepare:取得した走行体の角度は%lf", initialAngle);
 
   // 現在角度にrelativeAngleを加算し、-180～180度に正規化して目標角度を算出する
   targetAngle = AngleNormalizer::normalizeAngle(initialAngle + relativeTargetAngle);
+  Logger::printfLog(Logger::INFO, "RelativeAngle:prepare:目標角度は%lf", targetAngle);
 }

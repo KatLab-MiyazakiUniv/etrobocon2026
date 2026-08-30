@@ -114,3 +114,12 @@ int Robot::getTargetBrightness() const
 {
   return targetBrightness;
 }
+
+GatePosition& Robot::getGatePosition()
+{
+  return gatePosition;
+}
+const GatePosition& Robot::getGatePosition() const
+{
+  return gatePosition;
+}

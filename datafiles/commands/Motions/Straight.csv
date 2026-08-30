@@ -1,6 +1,7 @@
 コマンド名,ID,speed,a_kp,a_ki,a_kd,useIMU
 Straight,ID,double,double,double,double,bool
 Straight,001,600,0.001,0.001,0.001,0
-Straight,002,300,0.03,0.003,0.003,0
+Straight,002,300,0.01,0.003,0.003,0
 Straight,003,150,0.03,0.003,0.003,0
 Straight,004,-150,0.03,0.003,0.003,0
+Straight,005,300,

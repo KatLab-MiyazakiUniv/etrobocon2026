@@ -3,7 +3,7 @@
 
 #QR1検出位置まで直進
 RelativeRotation,005,RelativeAngle,-040
-Straight,001,Distance,063
+Straight,001,Distance,068
 CameraTracking,001,RepeatCount,002
 
 # QR1検出

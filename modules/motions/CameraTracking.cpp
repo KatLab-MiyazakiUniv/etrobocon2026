@@ -21,6 +21,7 @@ CameraTracking::CameraTracking(
     cameraPid(_pidGain.kp, _pidGain.ki, _pidGain.kd, _targetXCoordinate)
 {
   LOG_CREATE("CameraTracking");
+  Logger::printfLog(Logger::DEBUG, "カメラトラッキング作成");
 }
 
 CameraTracking::CameraTracking(Robot& _robot,
@@ -135,8 +136,11 @@ void CameraTracking::executeStep()
   double leftPower = baseLeftPower > 0.0 ? std::max(baseLeftPower + turningPower, 0.0)
                                          : std::min(baseLeftPower - turningPower, 0.0);
 
+  Logger::printfLog(Logger::DEBUG, "カメラトラッキングのpower値をセットする直前");
   robot.getWheelMotorControllerInstance().setRightPower(rightPower);
+  Logger::printfLog(Logger::DEBUG, "カメラトラッキングの右のpower値をセットしました");
   robot.getWheelMotorControllerInstance().setLeftPower(leftPower);
+  Logger::printfLog(Logger::DEBUG, "カメラトラッキングの左のpower値をセットしました");
 }
 
 void CameraTracking::wait() {}

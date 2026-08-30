@@ -124,3 +124,13 @@ int Robot::getIndexOfLabel()
 {
   return indexOfLabel;
 }
+
+GatePosition& Robot::getGatePosition()
+{
+  return gatePosition;
+}
+
+const GatePosition& Robot::getGatePosition() const
+{
+  return gatePosition;
+}

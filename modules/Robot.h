@@ -19,6 +19,7 @@
 #include "ForceSensor.h"
 #include "Display.h"
 #include <cstring>
+#include "GatePosition.h"
 
 class Robot {
  public:
@@ -100,6 +101,17 @@ class Robot {
   spikeapi::Display& getDisplayInstance();
 
   /**
+   * @brief ゲート位置情報を取得する
+   * @return ゲート位置情報
+   */
+  GatePosition& getGatePosition();
+
+  /**
+   * @brief ゲート位置情報を取得する
+   * @return ゲート位置情報
+   */
+  const GatePosition& getGatePosition() const;
+  /**
    * @brief エッジの左右判定を設定する
    * @param edge エッジの左右判定
    */
@@ -168,5 +180,6 @@ class Robot {
   char decryptionKey[5] = { 0 };                // 復号キー
   int targetBrightness = 50;                    // 目標輝度
   int indexOfLabel = 0;                         // ボトルキャリーで取得した色範囲のインデックス
+  GatePosition gatePosition;                    // ゲート位置情報
 };
 #endif

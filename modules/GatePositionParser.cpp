@@ -5,7 +5,7 @@
  * @author migaku2645
  */
 
-#include "GatePositonParser.h"
+#include "GatePositionParser.h"
 
 GatePositionParser::GatePositionParser(const std::string& _plaintext, Robot& _robot)
   : plaintext(_plaintext), robot(_robot)

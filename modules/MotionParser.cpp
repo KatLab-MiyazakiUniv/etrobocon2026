@@ -234,10 +234,9 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
     }
     case CONDITION_COMMAND::ULTRA_SONIC: {
       double targetDistance = fromString<double>(params[2]);
-      Logger::printfLog(
-          Logger::DEBUG,
-          "[MotionParser] UltraSonic: targetDistance=%.1f", targetDistance);
-      return std::make_unique<UltraSonicCondition>(robot,targetDistance);
+      Logger::printfLog(Logger::DEBUG, "[MotionParser] UltraSonic: targetDistance=%.1f",
+                        targetDistance);
+      return std::make_unique<UltraSonicCondition>(robot, targetDistance);
     }
     case CONDITION_COMMAND::COLOR_OR_COLOR: {
       std::string targetColorName1 = params[2];
@@ -250,7 +249,6 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
           Logger::DEBUG,
           "[MotionParser] ColorAndColor: targetColor1=%s, targetColor2=%s を生成しました",
           targetColorName1.c_str(), targetColorName2.c_str());
-
 
       auto colorCondition1 = std::make_unique<SensorColorCondition>(robot, targetColor1);
       auto colorCondition2 = std::make_unique<SensorColorCondition>(robot, targetColor2);
@@ -278,15 +276,14 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       //           motionParams[6..8]=leftPid(kp,ki,kd)
       //           motionParams[9..11]=anglePid(kp,ki,kd)
       //           motionParams[12]=useIMU(string: "true"/"false")
-      Logger::printfLog(Logger::DEBUG,
-                        "[MotionParser] Straight: targetdistance=%.d を生成しました",
+      Logger::printfLog(Logger::DEBUG, "[MotionParser] Straight: targetdistance=%.d を生成しました",
                         fromString<double>(motionParams[2]));
 
-      return new Straight(
-          robot, std::move(condition), fromString<double>(motionParams[2]),
-          Pid::PidGain{ fromString<double>(motionParams[3]), fromString<double>(motionParams[4]),
-                        fromString<double>(motionParams[5]) },
-          fromString<bool>(motionParams[6]));
+      return new Straight(robot, std::move(condition), fromString<double>(motionParams[2]),
+                          Pid::PidGain{ fromString<double>(motionParams[3]),
+                                        fromString<double>(motionParams[4]),
+                                        fromString<double>(motionParams[5]) },
+                          fromString<bool>(motionParams[6]));
     }
     case MOTION_COMMAND::LINETRACE: {
       // LineTrace: motionParams[2]=speed(double)
@@ -387,18 +384,14 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                                 qrRequest, motionParams[7] == "true");
     }
     case MOTION_COMMAND::CALIBRATOR: {
-
-      Logger::printfLog(Logger::DEBUG,
-                        "[MotionParser] Calibratorを生成しました");
+      Logger::printfLog(Logger::DEBUG, "[MotionParser] Calibratorを生成しました");
 
       return new Calibrator(robot, std::move(condition));
     }
     case MOTION_COMMAND::SNAPSHOT: {
+      Logger::printfLog(Logger::DEBUG, "[MotionParser] Snapshotを生成しました");
 
-      Logger::printfLog(Logger::DEBUG,
-                        "[MotionParser] Snapshotを生成しました");
-
-      return new Snapshot(robot,motionParams[2], std::move(condition));
+      return new Snapshot(robot, motionParams[2], std::move(condition));
     }
     // ↓ 他のコマンドはここに追加していく
     default:
@@ -421,8 +414,7 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "Calibrator", MOTION_COMMAND::CALIBRATOR },
           { "Snapshot", MOTION_COMMAND::SNAPSHOT }
 
-
-         };
+        };
 
   // コマンド文字列に対応するMOTION_COMMAND値をマップから取得。なければMOTION_COMMAND::NONEを返す
   auto it = commandMap.find(str);

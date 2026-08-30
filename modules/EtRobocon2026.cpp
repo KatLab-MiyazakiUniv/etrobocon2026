@@ -25,10 +25,10 @@ void EtRobocon2026::start()
   AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
   lineTraceAreaMaster.run();
 
-//カメラトラッキング走行
-  // Area CameraTracking = Area::CameraTracking;
-  // AreaMaster CameraTrackingAreaMaster(robot, CameraTracking);
-  // CameraTrackingAreaMaster.run();
+  // カメラトラッキング走行
+  //  Area CameraTracking = Area::CameraTracking;
+  //  AreaMaster CameraTrackingAreaMaster(robot, CameraTracking);
+  //  CameraTrackingAreaMaster.run();
 
   // // // BotlleDelivery走行
   Area bottleDeliveryArea = Area::BottleDelivery;
@@ -39,7 +39,6 @@ void EtRobocon2026::start()
   // Area QRTrackingArea = Area::QRTracking;
   // AreaMaster QRTrackingAreaMaster(robot, QRTrackingArea);
   // QRTrackingAreaMaster.run();
-
 
   CsvLogger::outputToFile();
 }

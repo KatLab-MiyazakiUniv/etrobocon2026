@@ -7,8 +7,7 @@
 #include "Straight.h"
 
 Straight::Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                   double _targetSpeed,
-                   const Pid::PidGain& _anglePidGain, bool _shouldUseIMU)
+                   double _targetSpeed, const Pid::PidGain& _anglePidGain, bool _shouldUseIMU)
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
     speedCalculator(_robot, _targetSpeed),

@@ -148,6 +148,7 @@ void CameraTracking::wait() {}
 void CameraTracking::finish()
 {
   if(isStopMotorPower) {
+    Logger::printfLog(Logger::DEBUG, "モーターに0をセット");
     robot.getWheelMotorControllerInstance().stopBoth();
   }
 }

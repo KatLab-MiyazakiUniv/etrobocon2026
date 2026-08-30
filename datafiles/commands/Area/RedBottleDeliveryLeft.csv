@@ -1,6 +1,0 @@
-動作コマンド名,動作ID,条件コマンド名,条件ID
-#QR1検出位置まで直進
-RelativeRotation,-037,RelativeAngle,-037
-RelativeRotation,-037,RelativeAngle,-037
-#黄色まで移動
-RelativeRotation,-035,RelativeAngle,-35

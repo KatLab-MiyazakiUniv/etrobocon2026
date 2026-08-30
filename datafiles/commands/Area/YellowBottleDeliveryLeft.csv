@@ -2,8 +2,8 @@
 
 
 #QR1検出位置まで直進
-RelativeRotation,005,RelativeAngle,-037
-Straight,001,Distance,065
+RelativeRotation,005,RelativeAngle,-040
+Straight,001,Distance,063
 CameraTracking,001,RepeatCount,002
 
 # QR1検出
@@ -11,7 +11,7 @@ CameraTracking,001,RepeatCount,002
 Snapshot,011,RepeatCount,001
 
 #QR1取得後の直線
-RelativeRotation,005,RelativeAngle,-040
+RelativeRotation,005,RelativeAngle,-037
 CameraTracking,LBS003,Distance,132
 CameraTracking,LBS004,Distance,005
 

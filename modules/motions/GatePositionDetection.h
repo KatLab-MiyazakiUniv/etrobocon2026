@@ -8,10 +8,7 @@
 #define GATE_POSITION_DETECTION_H
 
 #include "BaseMotion.h"
-#include "QrCodeDetector.h"
-
-#include <memory>
-#include <opencv2/opencv.hpp>
+#include "SocketProtocol.h"
 #include <string>
 #include "AesDecryptor.h"
 #include "GatePositionParser.h"
@@ -29,8 +26,8 @@ class GatePositionDetection : public BaseMotion {
    * @param _roi QRコード検出範囲
    * @param continuationCondition 継続条件
    */
-  GatePositionDetection(Robot& _robot, const std::string& _fileName, const std::string& _key,
-                        const cv::Rect& _roi,
+  GatePositionDetection(Robot& _robot, const std::string& _fileName,
+                        const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
                         std::unique_ptr<BaseContinuationCondition> continuationCondition);
 
   /**
@@ -46,9 +43,8 @@ class GatePositionDetection : public BaseMotion {
 
  private:
   std::string fileName;
-  std::string key;
+  CameraServer::QrCodeDetectorRequest qrDetectionRequest;          // QRコード検出リクエスト
 
-  QrCodeDetector qrCodeDetector;
 };
 
 #endif

@@ -7,12 +7,11 @@
 #include "GatePositionDetection.h"
 
 GatePositionDetection::GatePositionDetection(
-    Robot& _robot, const std::string& _fileName, const std::string& _key, const cv::Rect& _roi,
+    Robot& _robot, const std::string& _fileName, const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
     std::unique_ptr<BaseContinuationCondition> continuationCondition)
   : BaseMotion(_robot, std::move(continuationCondition)),
     fileName(_fileName),
-    key(_key),
-    qrCodeDetector(_roi)
+    qrDetectionRequest(_qrDetectionRequest)
 {
   LOG_CREATE("GatePositionDetection");
 }
@@ -32,33 +31,30 @@ void GatePositionDetection::executeStep()
 
   snapshot.run();
 
-  // -----------------------------
-  // 2. 撮影画像を読み込む
-  // -----------------------------
 
-  cv::Mat frame = cv::imread(fileName);
-
-  if(frame.empty()) {
-    Logger::error("GatePositionDetection: 撮影画像の読み込みに失敗しました。");
-    return;
-  }
 
   // -----------------------------
-  // 3. QRコードを検出
+  // 2. QRコードを検出
   // -----------------------------
 
-  QrCodeDetectionResult qrResult = qrCodeDetector.detect(frame);
+  SocketClient& client = robot.getCameraSocketClientInstance();
+  bool success = false;
+  bool wasDetected = false;
 
-  if(!qrResult.wasDetected) {
+  CameraServer::QrCodeDetectorResponse qrResponse;
+  success = client.executeQrCodeDetection(qrDetectionRequest, qrResponse);
+  wasDetected = qrResponse.wasDetected;
+
+  if(!wasDetected || !success) {
     Logger::error("GatePositionDetection: QRコードの検出に失敗しました。");
     return;
   }
 
   // -----------------------------
-  // 4. QRコードの暗号文を復号
+  // 3. QRコードの暗号文を復号
   // -----------------------------
 
-  AesDecryptor decryptor(key, qrResult.content);
+  AesDecryptor decryptor(std::string(robot.getDecryptionKey()), qrResponse.content);
 
   std::string plaintext = decryptor.decrypt();
 
@@ -68,7 +64,7 @@ void GatePositionDetection::executeStep()
   }
 
   // -----------------------------
-  // 5. 平文を解析して
+  // 4. 平文を解析して
   //    ゲート位置情報をRobotに設定
   // -----------------------------
 

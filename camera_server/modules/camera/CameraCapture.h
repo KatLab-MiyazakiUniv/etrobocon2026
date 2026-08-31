@@ -55,7 +55,7 @@ class CameraCapture {
   bool openCamera();
 
   /**
-   * @brief カメラフレームの高さと幅を設定する
+   * @brief カメラフレームの高さと幅とフレームのバッファ数を設定する
    * @param width 設定するフレームの幅 (px)
    * @param height 設定するフレームの高さ (px)
    */
@@ -70,9 +70,9 @@ class CameraCapture {
 
   /**
    * @brief カメラの内部バッファに溜まっている古いフレームを読み捨てる
-   * @param dropCount 読み捨てるフレーム数 (デフォルト: 7)
+   * @param dropCount 読み捨てるフレーム数 (デフォルト: 1)
    */
-  virtual void clearBuffer(int dropCount = 7);
+  virtual void clearBuffer(int dropCount = 1);
 
   /**
    * @brief 指定した枚数だけ、指定したミリ秒間隔でカメラフレームを取得し、配列に保存する

@@ -1,8 +1,15 @@
 #動作コマンド名,動作ID,条件コマンド名,条件ID
 # カメラ走行
 #フレームを7回捨てる
-#CameraTracking,001,RepeatCount,002
-CameraTracking,001,RepeatCount,004
+
+#RelativeRotation,005,RelativeAngle,-040
+CameraTracking,001,RepeatCount,002
+RelativeRotation,005,RelativeAngle,-040
+CameraTracking,001,RepeatCount,002
+#RelativeRotation,005,RelativeAngle,-040
+
+
+#CameraTracking,001,RepeatCount,004
 #ボトルキャッチ前
 #CameraTracking,LTS001,Distance,065
 #ボトルキャッチ中

@@ -103,6 +103,8 @@ void CameraCapture::setCapProps(double width, double height)
 {
   cap.set(cv::CAP_PROP_FRAME_WIDTH, width);
   cap.set(cv::CAP_PROP_FRAME_HEIGHT, height);
+  // バッファサイズを1に指定（※LinuxのV4L2など、対応しているバックエンドでのみ有効）>試し中
+ // cap.set(cv::CAP_PROP_BUFFERSIZE, 1);
 }
 
 bool CameraCapture::getFrame(cv::Mat& outFrame)
@@ -113,6 +115,7 @@ bool CameraCapture::getFrame(cv::Mat& outFrame)
   }
 
   for(int i = 0; i < 5; i++) {
+    Logger::printfLog(Logger::DEBUG, "CameraCaptureフレーム取得にかかったカウントは%d", i );
     cap >> outFrame;
     if(!outFrame.empty()) {
       return true;

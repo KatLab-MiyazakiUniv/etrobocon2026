@@ -48,7 +48,7 @@ void BaseMotion::prepare() {}
 
 void BaseMotion::wait()
 {
-  ClockUtil::sleep();  // 10ミリ秒待機
+  ClockUtil::sleep(10);  // 10ミリ秒待機
 }
 
 void BaseMotion::finish() {}

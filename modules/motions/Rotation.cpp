@@ -28,12 +28,12 @@ void Rotation::prepare()
 void Rotation::executeStep()
 {
   double currentAngle = getCurrentAngle();  // 現在の方位角を取得
-  Logger::printfLog(Logger::INFO, "Rotation:現在の方位角は%lf", currentAngle);
+  // Logger::printfLog(Logger::INFO, "Rotation:現在の方位角は%lf", currentAngle);
   // 目標角度との差を計算し、-180～180度に正規化
   double error = AngleNormalizer::normalizeAngle(targetAngle - currentAngle);
-  Logger::printfLog(Logger::INFO, "Rotation:目標角度との差は%lf", error);
+  // Logger::printfLog(Logger::INFO, "Rotation:目標角度との差は%lf", error);
   double turn = anglePid.calculatePid(error);  // 旋回量を計算
-  Logger::printfLog(Logger::INFO, "Rotation:モーター出力は%lf", turn);
+  // Logger::printfLog(Logger::INFO, "Rotation:モーター出力は%lf", turn);
 
   // PID制御で回頭方向を決定し、左右モータの出力を算出する
   double requiredRightPower = turn;

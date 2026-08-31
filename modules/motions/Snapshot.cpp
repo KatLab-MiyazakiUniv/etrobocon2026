@@ -19,6 +19,7 @@ Snapshot::~Snapshot()
 
 void Snapshot::executeStep()
 {
+  int startExecuteStep = ClockUtil::now();
   Logger::printfLog(Logger::INFO, "Requesting snapshot: %s", fileName.c_str());
 
   CameraServer::SnapshotActionRequest request;
@@ -36,4 +37,9 @@ void Snapshot::executeStep()
   } else {
     Logger::error("Snapshot:撮影失敗");
   }
+  int endExecuteStep = ClockUtil::now();
+
+  Logger::printfLog(Logger::DEBUG, "SnapShotの1ステップにかかった時間は%d",endExecuteStep - startExecuteStep);
+
+
 }

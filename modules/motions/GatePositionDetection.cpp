@@ -7,7 +7,8 @@
 #include "GatePositionDetection.h"
 
 GatePositionDetection::GatePositionDetection(
-    Robot& _robot, const std::string& _fileName, const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
+    Robot& _robot, const std::string& _fileName,
+    const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
     std::unique_ptr<BaseContinuationCondition> continuationCondition)
   : BaseMotion(_robot, std::move(continuationCondition)),
     fileName(_fileName),
@@ -30,8 +31,6 @@ void GatePositionDetection::executeStep()
   Snapshot snapshot(robot, fileName, std::make_unique<RepeatCountCondition>(robot, 1));
 
   snapshot.run();
-
-
 
   // -----------------------------
   // 2. QRコードを検出

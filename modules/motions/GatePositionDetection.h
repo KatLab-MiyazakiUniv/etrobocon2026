@@ -43,8 +43,7 @@ class GatePositionDetection : public BaseMotion {
 
  private:
   std::string fileName;
-  CameraServer::QrCodeDetectorRequest qrDetectionRequest;          // QRコード検出リクエスト
-
+  CameraServer::QrCodeDetectorRequest qrDetectionRequest;  // QRコード検出リクエスト
 };
 
 #endif

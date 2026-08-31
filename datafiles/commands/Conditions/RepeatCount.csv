@@ -1,4 +1,7 @@
 コマンド名,ID,targetCount
 RepeatCount,ID,int
 RepeatCount,001,1
-RepeatCount,002,20
+RepeatCount,002,7
+
+RepeatCount,003,3
+RepeatCount,004,400

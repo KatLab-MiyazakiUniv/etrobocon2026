@@ -21,6 +21,7 @@ CameraTracking::CameraTracking(
     cameraPid(_pidGain.kp, _pidGain.ki, _pidGain.kd, _targetXCoordinate)
 {
   LOG_CREATE("CameraTracking");
+  Logger::printfLog(Logger::DEBUG, "カメラトラッキング作成");
 }
 
 CameraTracking::CameraTracking(Robot& _robot,
@@ -86,10 +87,17 @@ void CameraTracking::executeStep()
     }
 
     // 黒を除く最大面積の色範囲取得>
-    if(colorDetectionRequest.requireLargestColorIndex != -1 || response.largestColorIndex != 3) {
+
+    if(response.largestColorIndex != -1) {
+      Logger::printfLog(Logger::DEBUG, "CameraTracking:最大色の検知失敗");
+    }
+
+    if(colorDetectionRequest.requireLargestColorIndex != -1 && response.largestColorIndex != 3  && response.largestColorIndex != -1) {
       Logger::printfLog(Logger::DEBUG, "CameraTracking:検知した最大色の添字は[%d]", response.largestColorIndex);
       robot.setIndexOfLabel(response.largestColorIndex);
     }
+
+
 
     // バウンディングボックスの中心X座標を計算
     currentX = (response.result.topLeft.x + response.result.bottomRight.x) / 2.0;
@@ -128,8 +136,11 @@ void CameraTracking::executeStep()
   double leftPower = baseLeftPower > 0.0 ? std::max(baseLeftPower + turningPower, 0.0)
                                          : std::min(baseLeftPower - turningPower, 0.0);
 
+  Logger::printfLog(Logger::DEBUG, "カメラトラッキングのpower値をセットする直前");
   robot.getWheelMotorControllerInstance().setRightPower(rightPower);
+  Logger::printfLog(Logger::DEBUG, "カメラトラッキングの右のpower値をセットしました");
   robot.getWheelMotorControllerInstance().setLeftPower(leftPower);
+  Logger::printfLog(Logger::DEBUG, "カメラトラッキングの左のpower値をセットしました");
 }
 
 void CameraTracking::wait() {}
@@ -137,6 +148,7 @@ void CameraTracking::wait() {}
 void CameraTracking::finish()
 {
   if(isStopMotorPower) {
+    Logger::printfLog(Logger::DEBUG, "モーターに0をセット");
     robot.getWheelMotorControllerInstance().stopBoth();
   }
 }

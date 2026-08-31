@@ -25,9 +25,9 @@ def parse_args():
                       help="入力JPEG画像のディレクトリのパス")
   parser.add_argument("-o", "--output", default="line_trace.mp4",
                       help="出力動画のファイルパス")
-  parser.add_argument("-r", "--fps", type=int, default= 5,
+  parser.add_argument("-r", "--fps", type=int, default= 15,
                       help="出力動画のFPS")
-  parser.add_argument("-s", "--scale", type=float, default=0.3,
+  parser.add_argument("-s", "--scale", type=float, default=0.1,
                       help="画像の縮小比率 (0.1 〜 1.0)")
   parser.add_argument("-g", "--gpu", action="store_true", default=False,
                       help="NVIDIA GPUエンコーダー (h264_nvenc) を使用するかどうか")

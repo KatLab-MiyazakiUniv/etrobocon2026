@@ -69,6 +69,12 @@ class CameraCapture {
   virtual bool getFrame(cv::Mat& outFrame);
 
   /**
+   * @brief カメラの内部バッファに溜まっている古いフレームを読み捨てる
+   * @param dropCount 読み捨てるフレーム数 (デフォルト: 7)
+   */
+  virtual void clearBuffer(int dropCount = 7);
+
+  /**
    * @brief 指定した枚数だけ、指定したミリ秒間隔でカメラフレームを取得し、配列に保存する
    * @param frames 取得したフレームを格納するstd::vector<cv::Mat>型の参照
    * @param numFrames 取得するフレームの枚数

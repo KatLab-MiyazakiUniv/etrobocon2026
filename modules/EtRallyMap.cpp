@@ -15,12 +15,6 @@ void EtRallyMap::updateNodes()
 {
   for(int gridX = 0; gridX <= X_GRID_NUM; ++gridX) {
     for(int gridY = 0; gridY <= Y_GRID_NUM; ++gridY) {
-<<<<<<< HEAD
-      nodes[gridX][gridY].gridX = gridX;
-
-      nodes[gridX][gridY].gridY = gridY;
-
-=======
       // 格子座標を設定
       nodes[gridX][gridY].gridX = gridX;
       nodes[gridX][gridY].gridY = gridY;
@@ -33,20 +27,12 @@ void EtRallyMap::updateNodes()
       // X_GRID_NUM - 1 → 最後 : lastXGridSize
       // =====================================================
 
->>>>>>> work-KL26-149-kodama-3
       if(gridX == 0) {
         nodes[gridX][gridY].x = 0.0;
 
       } else if(gridX == 1) {
         nodes[gridX][gridY].x = firstXGridSize;
 
-<<<<<<< HEAD
-      } else {
-        nodes[gridX][gridY].x = firstXGridSize + (gridX - 1) * gridSize;
-      }
-
-      nodes[gridX][gridY].y = -gridY * gridSizeY;
-=======
       } else if(gridX == X_GRID_NUM) {
         nodes[gridX][gridY].x = firstXGridSize + (X_GRID_NUM - 2) * gridSizeX + lastXGridSize;
 
@@ -76,7 +62,6 @@ void EtRallyMap::updateNodes()
       } else {
         nodes[gridX][gridY].y = -(firstYGridSize + (gridY - 1) * gridSizeY);
       }
->>>>>>> work-KL26-149-kodama-3
     }
   }
 }
@@ -95,9 +80,6 @@ void EtRallyMap::setFirstXGridSize(double value)
 
 void EtRallyMap::setGridSizeX(double value)
 {
-<<<<<<< HEAD
-  gridSize = value;
-=======
   gridSizeX = value;
 
   updateNodes();
@@ -113,7 +95,6 @@ void EtRallyMap::setLastXGridSize(double value)
 void EtRallyMap::setFirstYGridSize(double value)
 {
   firstYGridSize = value;
->>>>>>> work-KL26-149-kodama-3
 
   updateNodes();
 }
@@ -123,8 +104,6 @@ void EtRallyMap::setGridSizeY(double value)
   gridSizeY = value;
 
   updateNodes();
-<<<<<<< HEAD
-=======
 }
 
 void EtRallyMap::setLastYGridSize(double value)
@@ -132,5 +111,4 @@ void EtRallyMap::setLastYGridSize(double value)
   lastYGridSize = value;
 
   updateNodes();
->>>>>>> work-KL26-149-kodama-3
 }

@@ -6,8 +6,6 @@
 
 #include "GateRoutePlanner.h"
 
-<<<<<<< HEAD
-=======
 namespace {
 
   /**
@@ -73,7 +71,6 @@ namespace {
 
 }  // namespace
 
->>>>>>> work-KL26-149-kodama-3
 GateRoutePlanner::GateRoutePlanner(const MapData& mapData) : mapData(mapData) {}
 
 GateRouteResult GateRoutePlanner::search(int currentX, int currentY, Direction currentDirection,
@@ -99,10 +96,7 @@ GateRouteResult GateRoutePlanner::search(int currentX, int currentY, Direction c
   int bestCost = INT_MAX;
 
   for(const GatePass& pass : passes) {
-<<<<<<< HEAD
-=======
     // 現在地点からゲート入口までの経路を探索
->>>>>>> work-KL26-149-kodama-3
     RouteResult candidate
         = planner.search(currentX, currentY, currentDirection, pass.entrance, pass.direction);
 
@@ -110,10 +104,7 @@ GateRouteResult GateRoutePlanner::search(int currentX, int currentY, Direction c
       continue;
     }
 
-<<<<<<< HEAD
-=======
     // ゲート通過分の直進コストを追加
->>>>>>> work-KL26-149-kodama-3
     int totalCost = candidate.cost + STRAIGHT_COST;
 
     if(totalCost >= bestCost) {
@@ -122,22 +113,6 @@ GateRouteResult GateRoutePlanner::search(int currentX, int currentY, Direction c
 
     bestCost = totalCost;
 
-<<<<<<< HEAD
-    std::vector<RouteState> fullRoute = candidate.route;
-
-    fullRoute.push_back({ pass.exit.x, pass.exit.y, pass.direction });
-
-    std::vector<RouteState> compressedRoute = compressRoute(fullRoute);
-
-    result.found = true;
-    result.color = goalColor;
-    result.entrance = pass.entrance;
-    result.exit = pass.exit;
-    result.exitDirection = pass.direction;
-    result.cost = totalCost;
-    result.route = compressedRoute;
-  }
-=======
     // =====================================================
     // ゲート入口までの経路
     // =====================================================
@@ -211,7 +186,6 @@ GateRouteResult GateRoutePlanner::search(int currentX, int currentY, Direction c
     bestCost = totalCost;
   }
 
->>>>>>> work-KL26-149-kodama-3
   return result;
 }
 
@@ -229,33 +203,21 @@ std::vector<RouteState> GateRoutePlanner::compressRoute(const std::vector<RouteS
   // robotの向きが変わる地点を追加する
   for(size_t i = 1; i + 1 < route.size(); ++i) {
     const RouteState& previous = route[i - 1];
-<<<<<<< HEAD
-    const RouteState& current = route[i];
-    const RouteState& next = route[i + 1];
-
-=======
 
     const RouteState& current = route[i];
 
     const RouteState& next = route[i + 1];
 
     // 同じ位置で向きだけ変わった場合
->>>>>>> work-KL26-149-kodama-3
     bool samePositionAsPrevious = previous.x == current.x && previous.y == current.y;
 
     if(samePositionAsPrevious && previous.direction != current.direction) {
       compressed.push_back(current);
-<<<<<<< HEAD
-      continue;
-    }
-
-=======
 
       continue;
     }
 
     // 次の地点で進行方向が変わる場合
->>>>>>> work-KL26-149-kodama-3
     bool directionChangesNext = current.direction != next.direction;
 
     if(directionChangesNext) {
@@ -263,11 +225,7 @@ std::vector<RouteState> GateRoutePlanner::compressRoute(const std::vector<RouteS
     }
   }
 
-<<<<<<< HEAD
-  // 最終地点
-=======
   // 最終地点を追加
->>>>>>> work-KL26-149-kodama-3
   if(route.size() >= 2) {
     compressed.push_back(route.back());
   }

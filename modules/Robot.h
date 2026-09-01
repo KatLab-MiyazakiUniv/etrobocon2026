@@ -18,9 +18,6 @@
 #include "ForceSensor.h"
 #include "Display.h"
 #include <cstring>
-#include "Position.h"
-#include "Odometry.h"
-#include "Navigator.h"
 
 class Robot {
  public:
@@ -71,24 +68,6 @@ class Robot {
    * @return メンバ変数 course(Course のインスタンス) の参照
    */
   Course& getCourse();
-
-  /**
-   * @brief Positionのインスタンスの参照を返す
-   * @return メンバ変数 Position(Position のインスタンス) の参照
-   */
-  Position& getPositionInstance();
-
-  /**
-   * @brief Odometryのインスタンスの参照を返す
-   * @return メンバ変数 Odometry(Odometry のインスタンス) の参照
-   */
-  Odometry& getOdometryInstance();
-
-  /**
-   * @brief Navigatorのインスタンスの参照を返す
-   * @return メンバ変数 Navigator(Navigator のインスタンス) の参照
-   */
-  Navigator& getNavigatorInstance();
 
   /**
    * @brief コースを設定する
@@ -175,8 +154,5 @@ class Robot {
   spikeapi::Display display;                    // Displayインスタンス
   char decryptionKey[5] = { 0 };                // 復号キー
   int targetBrightness = 50;                    // 目標輝度
-  Position position;                            // Position インスタンス
-  Odometry odometry;                            // Odometry インスタンス
-  Navigator navigator;                          // Navigator インスタンス
 };
 #endif

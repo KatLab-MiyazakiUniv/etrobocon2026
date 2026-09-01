@@ -11,19 +11,10 @@
  */
 namespace {
   struct QueueNode {
-<<<<<<< HEAD
-    int cost;   // 開始地点からの累積コスト
-    int index;  // 現在の状態を表すインデックス
-    bool operator>(const QueueNode& other) const
-    {
-      return cost > other.cost;
-    }  // コストの小さいノードを優先するための比較
-=======
     int cost;
     int index;
 
     bool operator>(const QueueNode& other) const { return cost > other.cost; }
->>>>>>> work-KL26-149-kodama-3
   };
 }  // namespace
 
@@ -45,10 +36,6 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
   constexpr int STATE_COUNT = GRID_SIZE * GRID_SIZE * DIRECTION_COUNT;
 
   std::vector<int> distance(STATE_COUNT, INT_MAX);
-<<<<<<< HEAD
-
-=======
->>>>>>> work-KL26-149-kodama-3
   std::vector<int> previous(STATE_COUNT, -1);
 
   std::priority_queue<QueueNode, std::vector<QueueNode>, std::greater<QueueNode>> queue;
@@ -60,11 +47,8 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
   queue.push({ 0, startIndex });
 
   /*
-<<<<<<< HEAD
-=======
    * 座標系
    *
->>>>>>> work-KL26-149-kodama-3
    * UP    : Y - 2
    * RIGHT : X - 2
    * DOWN  : Y + 2
@@ -76,10 +60,6 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
 
   while(!queue.empty()) {
     QueueNode currentNode = queue.top();
-<<<<<<< HEAD
-
-=======
->>>>>>> work-KL26-149-kodama-3
     queue.pop();
 
     if(currentNode.cost != distance[currentNode.index]) {
@@ -92,10 +72,6 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
       Direction nextDirection = static_cast<Direction>(directionValue);
 
       int nextX = current.x + DX[directionValue];
-<<<<<<< HEAD
-
-=======
->>>>>>> work-KL26-149-kodama-3
       int nextY = current.y + DY[directionValue];
 
       if(!isValid(nextX, nextY)) {
@@ -106,35 +82,22 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
         continue;
       }
 
-<<<<<<< HEAD
-      int nextCost = currentNode.cost + calculateMoveCost(current.direction, nextDirection);
-=======
       int moveCost = calculateMoveCost(current.x, current.y, current.direction, nextDirection);
 
       int nextCost = currentNode.cost + moveCost;
->>>>>>> work-KL26-149-kodama-3
 
       int nextIndex = stateToIndex(nextX, nextY, nextDirection);
 
       if(nextCost < distance[nextIndex]) {
         distance[nextIndex] = nextCost;
-<<<<<<< HEAD
-
-=======
->>>>>>> work-KL26-149-kodama-3
         previous[nextIndex] = currentNode.index;
 
         queue.push({ nextCost, nextIndex });
       }
     }
   }
-<<<<<<< HEAD
-  // ゴールへの4方向の到着方法を比較
-
-=======
 
   // ゴールへの4方向の到着方法を比較
->>>>>>> work-KL26-149-kodama-3
   int bestIndex = -1;
   int bestCost = INT_MAX;
 
@@ -147,9 +110,6 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
       continue;
     }
 
-<<<<<<< HEAD
-    int finalCost = distance[index] + calculateTurnCost(arrivalDirection, goalDirection);
-=======
     int finalTurnCost = calculateTurnCost(arrivalDirection, goalDirection);
 
     /*
@@ -164,7 +124,6 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
     }
 
     int finalCost = distance[index] + finalTurnCost;
->>>>>>> work-KL26-149-kodama-3
 
     if(finalCost < bestCost) {
       bestCost = finalCost;
@@ -175,13 +134,8 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
   if(bestIndex == -1) {
     return result;
   }
-<<<<<<< HEAD
-  // 経路復元
-
-=======
 
   // 経路復元
->>>>>>> work-KL26-149-kodama-3
   std::vector<RouteState> route;
 
   for(int index = bestIndex; index != -1; index = previous[index]) {
@@ -206,10 +160,6 @@ int DijkstraRoutePlanner::calculateTurnCost(Direction currentDirection,
                                             Direction nextDirection) const
 {
   int current = static_cast<int>(currentDirection);
-<<<<<<< HEAD
-
-=======
->>>>>>> work-KL26-149-kodama-3
   int next = static_cast<int>(nextDirection);
 
   int difference = std::abs(current - next);
@@ -227,12 +177,6 @@ int DijkstraRoutePlanner::calculateTurnCost(Direction currentDirection,
   return TURN_180_COST;
 }
 
-<<<<<<< HEAD
-int DijkstraRoutePlanner::calculateMoveCost(Direction currentDirection,
-                                            Direction nextDirection) const
-{
-  return calculateTurnCost(currentDirection, nextDirection) + STRAIGHT_COST;
-=======
 int DijkstraRoutePlanner::calculateMoveCost(int currentX, int currentY, Direction currentDirection,
                                             Direction nextDirection) const
 {
@@ -339,7 +283,6 @@ bool DijkstraRoutePlanner::isOuterArea(int x, int y) const
    * ゲート足が後方にあっても通常コストを使用する。
    */
   return x == MAP_MIN || x == MAP_MAX || y == MAP_MIN || y == MAP_MAX;
->>>>>>> work-KL26-149-kodama-3
 }
 
 bool DijkstraRoutePlanner::isValid(int x, int y) const
@@ -397,10 +340,6 @@ bool DijkstraRoutePlanner::isBlockedMove(int currentX, int currentY, int nextX, 
 int DijkstraRoutePlanner::stateToIndex(int x, int y, Direction direction) const
 {
   int gridX = x / MOVE_STEP;
-<<<<<<< HEAD
-
-=======
->>>>>>> work-KL26-149-kodama-3
   int gridY = y / MOVE_STEP;
 
   return ((gridY * GRID_SIZE + gridX) * DIRECTION_COUNT) + static_cast<int>(direction);
@@ -413,10 +352,6 @@ RouteState DijkstraRoutePlanner::indexToState(int index) const
   index /= DIRECTION_COUNT;
 
   int gridX = index % GRID_SIZE;
-<<<<<<< HEAD
-
-=======
->>>>>>> work-KL26-149-kodama-3
   int gridY = index / GRID_SIZE;
 
   return { gridX * MOVE_STEP, gridY * MOVE_STEP, static_cast<Direction>(directionValue) };

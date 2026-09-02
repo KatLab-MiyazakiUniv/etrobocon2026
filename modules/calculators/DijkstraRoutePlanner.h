@@ -36,17 +36,17 @@ class DijkstraRoutePlanner {
                      Direction goalDirection);
 
  private:
-  static constexpr int MAP_MIN = 0;    // ETRallyMapの最小座標値
-  static constexpr int MAP_MAX = 10;   // ETRallyMapの最大座標値
-  static constexpr int MOVE_STEP = 2;  // 1回の移動量
-  static constexpr int GRID_SIZE = 6; // マップのグリッド数
-  static constexpr int DIRECTION_COUNT = 4;// ロボットの向きの種類数
+  static constexpr int MAP_MIN = 0;                // ETRallyMapの最小座標値
+  static constexpr int MAP_MAX = 10;               // ETRallyMapの最大座標値
+  static constexpr int MOVE_STEP = 2;              // 1回の移動量
+  static constexpr int GRID_SIZE = 6;              // マップのグリッド数
+  static constexpr int DIRECTION_COUNT = 4;        // ロボットの向きの種類数
   static constexpr int STRAIGHT_COST = 1;          // 直進コスト
   static constexpr int TURN_90_COST = 3;           // 90度回頭コスト
   static constexpr int TURN_180_COST = 6;          // 180度回頭コスト
   static constexpr int NEAR_GATE_TURN_COST = 100;  // 危険な回頭のコスト
 
-  std::vector<Gate> gates; // ゲートの情報
+  std::vector<Gate> gates;  // ゲートの情報
 
   /**
    * @brief 方向転換に必要なコストを計算する

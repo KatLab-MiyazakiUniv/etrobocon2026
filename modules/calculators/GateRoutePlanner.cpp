@@ -105,9 +105,9 @@ GateRouteResult GateRoutePlanner::search(int currentX, int currentY, Direction c
 
     std::vector<RouteState> fullRoute = candidate.route;
 
-   fullRoute.push_back({ pass.exit.x, pass.exit.y, pass.direction });
+    fullRoute.push_back({ pass.exit.x, pass.exit.y, pass.direction });
 
-Point finalPosition = pass.exit;
+    Point finalPosition = pass.exit;
 
     if(!isOuterGrid(pass.exit)) {
       finalPosition = getNextEvenPoint(pass.exit, pass.direction);
@@ -126,7 +126,7 @@ Point finalPosition = pass.exit;
     result.exitDirection = pass.direction;
     result.cost = totalCost;
     result.route = compressedRoute;
-    
+
     bestCost = totalCost;
   }
 
@@ -166,7 +166,6 @@ std::vector<RouteState> GateRoutePlanner::compressRoute(const std::vector<RouteS
       compressed.push_back(current);
     }
   }
-
 
   if(route.size() >= 2) {
     compressed.push_back(route.back());

@@ -146,7 +146,6 @@ int DijkstraRoutePlanner::calculateTurnCost(Direction currentDirection,
 {
   int current = static_cast<int>(currentDirection);
   int next = static_cast<int>(nextDirection);
-
   int difference = std::abs(current - next);
 
   // 回頭角度の差を最小化する

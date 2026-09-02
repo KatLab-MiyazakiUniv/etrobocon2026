@@ -31,6 +31,6 @@ Direction CourseMirror::mirrorDirection(Direction direction)
     case Direction::DOWN:
       return Direction::DOWN;
   }
-Logger::warning("CourseMirror:Invalid direction");
+  Logger::warning("CourseMirror:Invalid direction");
   return direction;
 }

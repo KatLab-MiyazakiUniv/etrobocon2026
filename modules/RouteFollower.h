@@ -69,13 +69,13 @@ class RouteFollower {
    */
   void straight(double distance);
 
-  Robot& robot; //robotインスタンスの参照
-  const EtRallyMap& map; //ETラリーマップの参照
-  double targetSpeed;   // 目標速度(mm/秒)
-  Pid::PidGain rotationPid; // 回頭PIDゲイン
-  Pid::PidGain rightPid; // 右車輪PIDゲイン
-  Pid::PidGain leftPid;// 左車輪PIDゲイン
-  Pid::PidGain straightAnglePid;// 直進角度補正PIDゲイン
+  Robot& robot;                   // robotインスタンスの参照
+  const EtRallyMap& map;          // ETラリーマップの参照
+  double targetSpeed;             // 目標速度(mm/秒)
+  Pid::PidGain rotationPid;       // 回頭PIDゲイン
+  Pid::PidGain rightPid;          // 右車輪PIDゲイン
+  Pid::PidGain leftPid;           // 左車輪PIDゲイン
+  Pid::PidGain straightAnglePid;  // 直進角度補正PIDゲイン
 };
 
 #endif  // ROUTE_FOLLOWER_H

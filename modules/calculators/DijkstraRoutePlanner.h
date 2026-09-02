@@ -7,6 +7,7 @@
 #ifndef DIJKSTRA_ROUTE_PLANNER_H
 #define DIJKSTRA_ROUTE_PLANNER_H
 
+#include "RouteTypes.h"
 #include <algorithm>
 #include <climits>
 #include <cmath>
@@ -14,15 +15,13 @@
 #include <queue>
 #include <vector>
 
-#include "RouteTypes.h"
-
 class DijkstraRoutePlanner {
  public:
   /**
    * @brief コンストラクタ
-   * @param gates ゲートの情報
+   * @param _gates ゲートの情報
    */
-  explicit DijkstraRoutePlanner(const std::vector<Gate>& gates);
+  explicit DijkstraRoutePlanner(const std::vector<Gate>& _gates);
 
   /**
    * @brief 指定された1地点まで経路探索する
@@ -40,17 +39,14 @@ class DijkstraRoutePlanner {
   static constexpr int MAP_MIN = 0;    // ETRallyMapの最小座標値
   static constexpr int MAP_MAX = 10;   // ETRallyMapの最大座標値
   static constexpr int MOVE_STEP = 2;  // 1回の移動量
-
-  static constexpr int GRID_SIZE = 6;
-
-  static constexpr int DIRECTION_COUNT = 4;
-
+  static constexpr int GRID_SIZE = 6; // マップのグリッド数
+  static constexpr int DIRECTION_COUNT = 4;// ロボットの向きの種類数
   static constexpr int STRAIGHT_COST = 1;          // 直進コスト
   static constexpr int TURN_90_COST = 3;           // 90度回頭コスト
   static constexpr int TURN_180_COST = 6;          // 180度回頭コスト
   static constexpr int NEAR_GATE_TURN_COST = 100;  // 危険な回頭のコスト
 
-  std::vector<Gate> gates;
+  std::vector<Gate> gates; // ゲートの情報
 
   /**
    * @brief 方向転換に必要なコストを計算する

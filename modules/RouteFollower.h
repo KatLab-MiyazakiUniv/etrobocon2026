@@ -1,14 +1,21 @@
 /**
  * @file   RouteFollower.h
  * @brief  経路探索結果に従って自己位置を使用せず走行するクラス
- * @author yutaro-1214
+ * @author okuyama0528 yutaro-1214
  */
 
 #ifndef ROUTE_FOLLOWER_H
 #define ROUTE_FOLLOWER_H
 
+#include <cmath>
+#include <memory>
 #include <vector>
-
+#include "AngleNormalizer.h"
+#include "DistanceCondition.h"
+#include "Logger.h"
+#include "RelativeAngleCondition.h"
+#include "RelativeRotation.h"
+#include "Straight.h"
 #include "EtRallyMap.h"
 #include "Pid.h"
 #include "Robot.h"
@@ -62,15 +69,13 @@ class RouteFollower {
    */
   void straight(double distance);
 
-  Robot& robot;
-  const EtRallyMap& map;
-
-  double targetSpeed;
-
-  Pid::PidGain rotationPid;
-  Pid::PidGain rightPid;
-  Pid::PidGain leftPid;
-  Pid::PidGain straightAnglePid;
+  Robot& robot; //robotインスタンスの参照
+  const EtRallyMap& map; //ETラリーマップの参照
+  double targetSpeed;   // 目標速度(mm/秒)
+  Pid::PidGain rotationPid; // 回頭PIDゲイン
+  Pid::PidGain rightPid; // 右車輪PIDゲイン
+  Pid::PidGain leftPid;// 左車輪PIDゲイン
+  Pid::PidGain straightAnglePid;// 直進角度補正PIDゲイン
 };
 
 #endif  // ROUTE_FOLLOWER_H

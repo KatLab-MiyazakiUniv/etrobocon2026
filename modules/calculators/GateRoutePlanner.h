@@ -19,7 +19,7 @@ class GateRoutePlanner {
    * @brief コンストラクタ
    * @param mapData 最新のマップ情報
    */
-  explicit GateRoutePlanner(const MapData& mapData);
+  explicit GateRoutePlanner(const MapData& _mapData);
 
   /**
    * @brief MapDataから最新のゲート情報を取得

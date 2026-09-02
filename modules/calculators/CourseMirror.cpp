@@ -1,30 +1,13 @@
 /**
  * @file   CourseMirror.cpp
  * @brief  Lコースの座標・方向をRコースへ左右反転するクラス
- * @author yutaro-1214
+ * @author yutaro-1214 okuyama0528
  */
 
 #include "CourseMirror.h"
 
 int CourseMirror::mirrorX(int x)
 {
-  /*
-   * X_GRID_NUM = 10 の場合
-   *
-   * L  -> R
-   *
-   * 10 -> 0
-   *  9 -> 1
-   *  8 -> 2
-   *  7 -> 3
-   *  6 -> 4
-   *  5 -> 5
-   *  4 -> 6
-   *  3 -> 7
-   *  2 -> 8
-   *  1 -> 9
-   *  0 -> 10
-   */
   return SystemInfo::X_GRID_NUM - x;
 }
 
@@ -48,6 +31,6 @@ Direction CourseMirror::mirrorDirection(Direction direction)
     case Direction::DOWN:
       return Direction::DOWN;
   }
-
+Logger::warning("CourseMirror:Invalid direction");
   return direction;
 }

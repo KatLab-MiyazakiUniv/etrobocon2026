@@ -12,8 +12,8 @@
 /**
  * @brief ロボットの向き
  * @param up    : Yが減る方向
- * @param right : Xが増える方向
  * @param down  : Yが増える方向
+ * @param right : Xが増える方向
  * @param left  : Xが減る方向
  */
 enum class Direction { UP = 0, RIGHT, DOWN, LEFT };
@@ -32,10 +32,10 @@ struct Point {
 enum class GoalColor { RED, BLUE, YELLOW };
 
 /**
- * @brief ゲート
+ * @brief ゲートの情報
  */
 struct Gate {
-  GoalColor color;
+  GoalColor color; // ゲートの色
   Point start;  // ゲートの始点
   Point end;    // ゲートの終点
 };
@@ -55,7 +55,7 @@ struct RouteState {
 struct RouteResult {
   bool found = false;             // 経路が見つかったかどうか
   int cost = 0;                   // 経路のコスト
-  std::vector<RouteState> route;  // 経路の状態
+  std::vector<RouteState> route;  // 経路上のロボットの状態
 };
 
 /**
@@ -72,16 +72,12 @@ struct GatePass {
  */
 struct GateRouteResult {
   bool found = false;  // ゲートへの経路が見つかったかどうか
-  GoalColor color = GoalColor::RED;
-
-  Point entrance = { 0, 0 };
-  Point exit = { 0, 0 };
-
-  Direction exitDirection = Direction::UP;
-
-  int cost = 0;
-
-  std::vector<RouteState> route;
+  GoalColor color = GoalColor::RED; // ゲートの色
+  Point entrance = { 0, 0 }; // ゲートの入り口座標
+  Point exit = { 0, 0 }; // ゲートの出口座標
+  Direction exitDirection = Direction::UP; // ゲート通過後のロボットの向き
+  int cost = 0; // 経路のコスト
+  std::vector<RouteState> route; // 経路上のロボットの状態
 };
 
 #endif  // ROUTE_TYPES_H

@@ -25,4 +25,5 @@ void RelativeRotation::prepare()
 
   // 現在角度にrelativeAngleを加算し、-180～180度に正規化して目標角度を算出する
   targetAngle = AngleNormalizer::normalizeAngle(initialAngle + relativeTargetAngle);
+  Rotation::prepare();
 }

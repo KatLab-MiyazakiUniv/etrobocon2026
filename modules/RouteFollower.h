@@ -31,18 +31,10 @@ class RouteFollower {
    * @param straightAnglePid 通常直進角度補正PID
    * @param qrTrackingPid QR追従PID
    */
-  RouteFollower(
-      Robot& robot,
-      const EtRallyMap& map,
-      const MapData& mapData,
-      double targetSpeed,
-      double qrTrackingSpeed,
-      int qrTargetX,
-      const Pid::PidGain& rotationPid,
-      const Pid::PidGain& rightPid,
-      const Pid::PidGain& leftPid,
-      const Pid::PidGain& straightAnglePid,
-      const Pid::PidGain& qrTrackingPid);
+  RouteFollower(Robot& robot, const EtRallyMap& map, const MapData& mapData, double targetSpeed,
+                double qrTrackingSpeed, int qrTargetX, const Pid::PidGain& rotationPid,
+                const Pid::PidGain& rightPid, const Pid::PidGain& leftPid,
+                const Pid::PidGain& straightAnglePid, const Pid::PidGain& qrTrackingPid);
 
   /**
    * @brief QR補正を使用せず圧縮済み経路を走行する
@@ -67,30 +59,23 @@ class RouteFollower {
    * @param route 経路探索結果
    * @param useQrCorrection QR補正を使用するか
    */
-  void run(
-      const std::vector<RouteState>& route,
-      bool useQrCorrection);
+  void run(const std::vector<RouteState>& route, bool useQrCorrection);
 
  private:
   /**
    * @brief Directionを方位角へ変換する
    */
-  double directionToHeading(
-      Direction direction) const;
+  double directionToHeading(Direction direction) const;
 
   /**
    * @brief 現在方向から目標方向への相対回頭角を求める
    */
-  double calculateRotationAngle(
-      Direction from,
-      Direction to) const;
+  double calculateRotationAngle(Direction from, Direction to) const;
 
   /**
    * @brief 2地点間の実距離を求める
    */
-  double calculateDistance(
-      const RouteState& from,
-      const RouteState& to) const;
+  double calculateDistance(const RouteState& from, const RouteState& to) const;
 
   /**
    * @brief 指定角度だけ回頭する
@@ -126,9 +111,7 @@ class RouteFollower {
    * @return Gateへのポインタ
    * @return nullptr 対応するゲートがない場合
    */
-  const Gate* findGate(
-      const RouteState& from,
-      const RouteState& to) const;
+  const Gate* findGate(const RouteState& from, const RouteState& to) const;
 
   /**
    * @brief ゲートが外周にあるか判定する
@@ -138,9 +121,7 @@ class RouteFollower {
   /**
    * @brief 区間開始地点からゲート中心までの距離を求める
    */
-  double calculateDistanceToGate(
-      const RouteState& from,
-      const Gate& gate) const;
+  double calculateDistanceToGate(const RouteState& from, const Gate& gate) const;
 
   /**
    * @brief ゲート通過区間を走行する
@@ -154,10 +135,7 @@ class RouteFollower {
    *   3. 250mm CameraTrackingまたはStraight
    *   4. 残りをStraight
    */
-  void runGateSegment(
-      const RouteState& from,
-      const RouteState& to,
-      double distance);
+  void runGateSegment(const RouteState& from, const RouteState& to, double distance);
 
   Robot& robot;
 

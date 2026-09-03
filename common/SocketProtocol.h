@@ -21,6 +21,7 @@ namespace CameraServer {
     COLOR_REGION_DETECTION = 0,  // 色領域検出
     SNAPSHOT = 1,                // スナップショット
     QR_CODE_DETECTION = 2,       // QRコード検出
+    SQUARE_DETECTION = 3,        // 正方形検出
     DISCONNECT = 254,            // サーバーから切断
     SHUTDOWN = 255               // サーバーをシャットダウン
   };
@@ -115,22 +116,41 @@ namespace CameraServer {
 
   static constexpr uint32_t QR_CODE_CORNER_COUNT = 4;   // QRコードの頂点数
   static constexpr uint32_t QR_CODE_CONTENT_SIZE = 64;  // QRコードから取得した文字列の最大バイト数
+static constexpr uint32_t SQUARE_CORNER_COUNT = 4;  // 正方形の頂点数
 
   /**
    * @brief カメラサーバーにQRコード検出を要求する際のリクエスト構造体
    */
   struct QrCodeDetectorRequest {
-    Command command = Command::QR_CODE_DETECTION;  // QRコード検出コマンド
-    RectData roi;                                  // 検出対象の領域
+    Command command = Command::QR_CODE_DETECTION;
+    RectData roi;
   };
 
   /**
    * @brief QRコード検出のレスポンス構造体
    */
   struct QrCodeDetectorResponse {
-    bool wasDetected = false;                      // 検出できたかどうか
-    char content[QR_CODE_CONTENT_SIZE] = {};       // QRコードから取得した文字列
-    PointData corners[QR_CODE_CORNER_COUNT] = {};  // QRコードの各頂点の座標(左上から時計回りの順)
+    bool wasDetected = false;
+    char content[QR_CODE_CONTENT_SIZE] = {};
+    PointData corners[QR_CODE_CORNER_COUNT] = {};
   };
+
+  /**
+   * @brief カメラサーバーに正方形検出を要求する際のリクエスト構造体
+   */
+  struct SquareDetectorRequest {
+    Command command = Command::SQUARE_DETECTION;
+    RectData roi;
+  };
+
+  /**
+   * @brief 正方形検出のレスポンス構造体
+   */
+  struct SquareDetectorResponse {
+    bool wasDetected = false;
+    PointData corners[SQUARE_CORNER_COUNT] = {};
+  };
+
 }  // namespace CameraServer
+
 #endif  // SOCKET_PROTOCOL_H

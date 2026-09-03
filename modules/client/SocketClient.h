@@ -77,6 +77,16 @@ class SocketClient {
                                       CameraServer::QrCodeDetectorResponse& response);
 
   /**
+   * @brief 正方形検出アクションを実行する
+   * @param request リクエスト 
+   * @param response レスポンス
+   * @return true アクションの実行に成功した場合
+   * @return false アクションの実行に失敗した場合
+   */
+  virtual bool executeSquareDetection(const CameraServer::SquareDetectorRequest& request,
+                                      CameraServer::SquareDetectorResponse& response);
+
+  /**
    * @brief サーバーにリクエストを送信し、レスポンスを受信するtemplate関数
    * @tparam Req リクエストの型
    * @tparam Res レスポンスの型

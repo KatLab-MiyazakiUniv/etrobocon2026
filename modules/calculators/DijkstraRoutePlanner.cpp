@@ -14,10 +14,7 @@ namespace {
     int cost;   // 開始地点からの累積コスト
     int index;  // 現在の状態を表すインデックス
 
-    bool operator>(const QueueNode& other) const
-    {
-      return cost > other.cost;
-    }
+    bool operator>(const QueueNode& other) const { return cost > other.cost; }
   };
 }  // namespace
 
@@ -55,19 +52,9 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
    * DOWN  : Y + 2
    * LEFT  : X + 2
    */
-  constexpr int DX[DIRECTION_COUNT] = {
-      0,
-      -MOVE_STEP,
-      0,
-      MOVE_STEP
-  };
+  constexpr int DX[DIRECTION_COUNT] = { 0, -MOVE_STEP, 0, MOVE_STEP };
 
-  constexpr int DY[DIRECTION_COUNT] = {
-      -MOVE_STEP,
-      0,
-      MOVE_STEP,
-      0
-  };
+  constexpr int DY[DIRECTION_COUNT] = { -MOVE_STEP, 0, MOVE_STEP, 0 };
 
   while(!queue.empty()) {
     QueueNode currentNode = queue.top();
@@ -94,11 +81,7 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
         continue;
       }
 
-      int moveCost = calculateMoveCost(
-          current.x,
-          current.y,
-          current.direction,
-          nextDirection);
+      int moveCost = calculateMoveCost(current.x, current.y, current.direction, nextDirection);
 
       int nextCost = currentNode.cost + moveCost;
 
@@ -135,8 +118,7 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
      *
      * ただし外周は回頭スペースが広いため通常コスト。
      */
-    if(arrivalDirection != goalDirection
-       && isNearGatePost(goal.x, goal.y)
+    if(arrivalDirection != goalDirection && isNearGatePost(goal.x, goal.y)
        && !isOuterArea(goal.x, goal.y)) {
       finalTurnCost = NEAR_GATE_TURN_COST;
     }
@@ -164,11 +146,7 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
 
   // ゴール地点で最終回頭
   if(route.back().direction != goalDirection) {
-    route.push_back({
-        goal.x,
-        goal.y,
-        goalDirection
-    });
+    route.push_back({ goal.x, goal.y, goalDirection });
   }
 
   result.found = true;
@@ -186,9 +164,7 @@ int DijkstraRoutePlanner::calculateTurnCost(Direction currentDirection,
 
   int difference = std::abs(current - next);
 
-  difference = std::min(
-      difference,
-      DIRECTION_COUNT - difference);
+  difference = std::min(difference, DIRECTION_COUNT - difference);
 
   // 同じ方向
   if(difference == 0) {
@@ -204,13 +180,10 @@ int DijkstraRoutePlanner::calculateTurnCost(Direction currentDirection,
   return TURN_180_COST;
 }
 
-int DijkstraRoutePlanner::calculateMoveCost(int currentX, int currentY,
-                                            Direction currentDirection,
+int DijkstraRoutePlanner::calculateMoveCost(int currentX, int currentY, Direction currentDirection,
                                             Direction nextDirection) const
 {
-  int turnCost = calculateTurnCost(
-      currentDirection,
-      nextDirection);
+  int turnCost = calculateTurnCost(currentDirection, nextDirection);
 
   // 方向転換しない場合は直進コストのみ
   if(turnCost == 0) {
@@ -223,8 +196,7 @@ int DijkstraRoutePlanner::calculateMoveCost(int currentX, int currentY,
    *
    * ただし外周では通常の回頭コストを使用する。
    */
-  if(isNearGatePost(currentX, currentY)
-     && !isOuterArea(currentX, currentY)) {
+  if(isNearGatePost(currentX, currentY) && !isOuterArea(currentX, currentY)) {
     turnCost = NEAR_GATE_TURN_COST;
   }
 
@@ -234,10 +206,7 @@ int DijkstraRoutePlanner::calculateMoveCost(int currentX, int currentY,
 bool DijkstraRoutePlanner::isNearGatePost(int x, int y) const
 {
   for(const Gate& gate : gates) {
-    const Point posts[] = {
-        gate.start,
-        gate.end
-    };
+    const Point posts[] = { gate.start, gate.end };
 
     for(const Point& post : posts) {
       int dx = std::abs(x - post.x);
@@ -274,29 +243,23 @@ bool DijkstraRoutePlanner::isOuterArea(int x, int y) const
    * 外周は十分な回頭スペースがあるため、
    * ゲートの足付近でも通常の回頭コストを使用する。
    */
-  return x == MAP_MIN
-         || x == MAP_MAX
-         || y == MAP_MIN
-         || y == MAP_MAX;
+  return x == MAP_MIN || x == MAP_MAX || y == MAP_MIN || y == MAP_MAX;
 }
 
 bool DijkstraRoutePlanner::isValid(int x, int y) const
 {
-  if(x < MAP_MIN || x > MAP_MAX
-     || y < MAP_MIN || y > MAP_MAX) {
+  if(x < MAP_MIN || x > MAP_MAX || y < MAP_MIN || y > MAP_MAX) {
     return false;
   }
 
-  if(x % MOVE_STEP != 0
-     || y % MOVE_STEP != 0) {
+  if(x % MOVE_STEP != 0 || y % MOVE_STEP != 0) {
     return false;
   }
 
   return true;
 }
 
-bool DijkstraRoutePlanner::isBlockedMove(int currentX, int currentY,
-                                         int nextX, int nextY) const
+bool DijkstraRoutePlanner::isBlockedMove(int currentX, int currentY, int nextX, int nextY) const
 {
   for(const Gate& gate : gates) {
     // 上下移動
@@ -305,17 +268,11 @@ bool DijkstraRoutePlanner::isBlockedMove(int currentX, int currentY,
 
       // 横向きゲート
       if(gate.start.y == gate.end.y) {
-        int minX = std::min(
-            gate.start.x,
-            gate.end.x);
+        int minX = std::min(gate.start.x, gate.end.x);
 
-        int maxX = std::max(
-            gate.start.x,
-            gate.end.x);
+        int maxX = std::max(gate.start.x, gate.end.x);
 
-        if(middleY == gate.start.y
-           && currentX >= minX
-           && currentX <= maxX) {
+        if(middleY == gate.start.y && currentX >= minX && currentX <= maxX) {
           return true;
         }
       }
@@ -327,17 +284,11 @@ bool DijkstraRoutePlanner::isBlockedMove(int currentX, int currentY,
 
       // 縦向きゲート
       if(gate.start.x == gate.end.x) {
-        int minY = std::min(
-            gate.start.y,
-            gate.end.y);
+        int minY = std::min(gate.start.y, gate.end.y);
 
-        int maxY = std::max(
-            gate.start.y,
-            gate.end.y);
+        int maxY = std::max(gate.start.y, gate.end.y);
 
-        if(middleX == gate.start.x
-           && currentY >= minY
-           && currentY <= maxY) {
+        if(middleX == gate.start.x && currentY >= minY && currentY <= maxY) {
           return true;
         }
       }
@@ -347,14 +298,12 @@ bool DijkstraRoutePlanner::isBlockedMove(int currentX, int currentY,
   return false;
 }
 
-int DijkstraRoutePlanner::stateToIndex(int x, int y,
-                                       Direction direction) const
+int DijkstraRoutePlanner::stateToIndex(int x, int y, Direction direction) const
 {
   int gridX = x / MOVE_STEP;
   int gridY = y / MOVE_STEP;
 
-  return ((gridY * GRID_SIZE + gridX) * DIRECTION_COUNT)
-         + static_cast<int>(direction);
+  return ((gridY * GRID_SIZE + gridX) * DIRECTION_COUNT) + static_cast<int>(direction);
 }
 
 RouteState DijkstraRoutePlanner::indexToState(int index) const
@@ -366,9 +315,5 @@ RouteState DijkstraRoutePlanner::indexToState(int index) const
   int gridX = index % GRID_SIZE;
   int gridY = index / GRID_SIZE;
 
-  return {
-      gridX * MOVE_STEP,
-      gridY * MOVE_STEP,
-      static_cast<Direction>(directionValue)
-  };
+  return { gridX * MOVE_STEP, gridY * MOVE_STEP, static_cast<Direction>(directionValue) };
 }

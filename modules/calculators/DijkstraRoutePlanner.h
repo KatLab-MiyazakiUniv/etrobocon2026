@@ -46,9 +46,9 @@ class DijkstraRoutePlanner {
 
   static constexpr int DIRECTION_COUNT = 4;  // ロボットの向きの種類
 
-  static constexpr int STRAIGHT_COST = 1;        // 直進コスト
-  static constexpr int TURN_90_COST = 3;         // 90度回頭コスト
-  static constexpr int TURN_180_COST = 6;        // 180度回頭コスト
+  static constexpr int STRAIGHT_COST = 1;          // 直進コスト
+  static constexpr int TURN_90_COST = 3;           // 90度回頭コスト
+  static constexpr int TURN_180_COST = 6;          // 180度回頭コスト
   static constexpr int NEAR_GATE_TURN_COST = 100;  // ゲート足付近の回頭コスト
 
   std::vector<Gate> gates;  // ゲートの情報

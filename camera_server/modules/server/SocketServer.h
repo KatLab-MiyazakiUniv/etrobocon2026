@@ -13,6 +13,7 @@
 #include "SnapshotActionHandler.h"
 #include "ColorRegionDetectionActionHandler.h"
 #include "QrCodeDetectionActionHandler.h"
+#include "SquareDetectionActionHandler.h"
 #include "Logger.h"
 #include "CameraCapture.h"
 #include <cstring>
@@ -30,6 +31,7 @@ class SocketServer {
   explicit SocketServer(SnapshotActionHandler& _snapshotHandler,
                         ColorRegionDetectionActionHandler& _colorRegionDetectionHandler,
                         QrCodeDetectionActionHandler& _qrCodeDetectionHandler,
+                        SquareDetectionActionHandler& _squareDetectionHandler,
                         INetworkSystem& _netSys, int _port = CameraServer::DEFAULT_PORT);
 
   /**
@@ -97,6 +99,12 @@ class SocketServer {
    */
   const QrCodeDetectionActionHandler& getQrCodeDetectionHandler() const;
 
+  /*
+  * @brief 正方形検出のハンドラを取得する
+  * @return SquareDetectionActionHandler& 正方形検出のハンドラへの参照
+  */
+  const SquareDetectionActionHandler& getSquareDetectionHandler() const;
+
   /**
    * @brief サーバーをシャットダウンする
    */
@@ -117,5 +125,6 @@ class SocketServer {
   SnapshotActionHandler& snapshotHandler;                          // スナップショットのハンドラ
   ColorRegionDetectionActionHandler& colorRegionDetectionHandler;  // 色領域検出のハンドラ
   QrCodeDetectionActionHandler& qrCodeDetectionHandler;            // QRコード検出のハンドラ
+  SquareDetectionActionHandler& squareDetectionHandler;            // 正方形検出のハンドラ
 };
 #endif  // SOCKET_SERVER_H

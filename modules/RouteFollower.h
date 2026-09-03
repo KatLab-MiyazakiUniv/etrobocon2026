@@ -10,7 +10,6 @@
 #include <vector>
 
 #include "EtRallyMap.h"
-#include "MapData.h"
 #include "Pid.h"
 #include "Robot.h"
 #include "RouteTypes.h"
@@ -19,74 +18,73 @@ class RouteFollower {
  public:
   /**
    * @brief コンストラクタ
-   * @param robot ロボット
-   * @param map ETラリーの実座標マップ
-   * @param mapData ゲート情報
-   * @param targetSpeed 通常直進速度
-   * @param qrTrackingSpeed QR追従走行速度
-   * @param qrTargetX QR追従時の目標X座標
-   * @param rotationPid 回頭PID
-   * @param rightPid 右車輪PID
-   * @param leftPid 左車輪PID
-   * @param straightAnglePid 通常直進角度補正PID
-   * @param qrTrackingPid QR追従PID
+   * @param _robot ロボットインスタンス
+   * @param _map ETラリーマップ
+   * @param _targetSpeed 通常走行速度
+   * @param _qrTrackingSpeed QR追従走行速度
+   * @param _qrTargetX QRコードの目標X座標
+   * @param _rotationPid 回頭用PIDゲイン
+   * @param _rightPid 右車輪用PIDゲイン
+   * @param _leftPid 左車輪用PIDゲイン
+   * @param _straightAnglePid 直進角度補正用PIDゲイン
+   * @param _qrTrackingPid QR追従用PIDゲイン
    */
   RouteFollower(
-      Robot& robot,
-      const EtRallyMap& map,
-      const MapData& mapData,
-      double targetSpeed,
-      double qrTrackingSpeed,
-      int qrTargetX,
-      const Pid::PidGain& rotationPid,
-      const Pid::PidGain& rightPid,
-      const Pid::PidGain& leftPid,
-      const Pid::PidGain& straightAnglePid,
-      const Pid::PidGain& qrTrackingPid);
+      Robot& _robot,
+      const EtRallyMap& _map,
+      double _targetSpeed,
+      double _qrTrackingSpeed,
+      int _qrTargetX,
+      const Pid::PidGain& _rotationPid,
+      const Pid::PidGain& _rightPid,
+      const Pid::PidGain& _leftPid,
+      const Pid::PidGain& _straightAnglePid,
+      const Pid::PidGain& _qrTrackingPid);
 
   /**
-   * @brief QR補正を使用せず圧縮済み経路を走行する
+   * @brief QR補正を使用せず経路を走行する
    * @param route 経路探索結果
    */
-  void run(const std::vector<RouteState>& route);
+  void run(
+      const std::vector<RouteState>& route);
 
   /**
-   * @brief 圧縮済み経路を走行する
+   * @brief 指定したゲートへの経路を走行する
    *
-   * useQrCorrectionがtrueの場合、
-   * 最後の区間をゲート通過区間として処理する。
-   *
-   * 内側ゲートの場合はゲート125mm手前でQRコードを確認し、
-   * 検出できた場合は250mmをQR追従走行する。
-   *
-   * QRコードを検出できなかった場合は250mm通常直進する。
-   *
-   * 外周ゲートの場合はQR補正を使用せず、
-   * 区間全体を通常直進する。
+   * 最後の走行区間でゲート通過処理を行う。
+   * 内側ゲートの場合はQR補正を行う。
    *
    * @param route 経路探索結果
-   * @param useQrCorrection QR補正を使用するか
+   * @param targetGate 通過対象ゲート
    */
   void run(
       const std::vector<RouteState>& route,
-      bool useQrCorrection);
+      const Gate& targetGate);
 
  private:
   /**
-   * @brief Directionを方位角へ変換する
+   * @brief Directionを角度へ変換する
+   * @param direction 方向
+   * @return 方位角[deg]
    */
   double directionToHeading(
       Direction direction) const;
 
   /**
-   * @brief 現在方向から目標方向への相対回頭角を求める
+   * @brief 回頭角度を計算する
+   * @param from 現在方向
+   * @param to 目標方向
+   * @return 回頭角度[deg]
    */
   double calculateRotationAngle(
       Direction from,
       Direction to) const;
 
   /**
-   * @brief 2地点間の実距離を求める
+   * @brief 2地点間の走行距離を計算する
+   * @param from 開始地点
+   * @param to 終了地点
+   * @return 走行距離[mm]
    */
   double calculateDistance(
       const RouteState& from,
@@ -94,91 +92,97 @@ class RouteFollower {
 
   /**
    * @brief 指定角度だけ回頭する
+   * @param angle 回頭角度[deg]
    */
-  void rotate(double angle);
+  void rotate(
+      double angle);
 
   /**
-   * @brief 指定距離だけ通常直進する
+   * @brief 指定距離を通常直進する
+   * @param distance 走行距離[mm]
    */
-  void straight(double distance);
+  void straight(
+      double distance);
 
   /**
-   * @brief 指定距離だけQR追従走行する
+   * @brief QRコードを使用して指定距離を追従走行する
+   * @param distance 走行距離[mm]
    */
-  void straightWithQrCorrection(double distance);
+  void straightWithQrCorrection(
+      double distance);
 
   /**
    * @brief QRコードを1回検出する
-   *
-   * CameraTrackingを開始するかどうかの判定に使用する。
-   *
    * @return true QRコードを検出した
    * @return false QRコードを検出できなかった
    */
   bool detectQrCode();
 
   /**
-   * @brief 指定区間を通過するゲートを取得する
-   *
-   * MapDataのGatePassと、
-   * from -> to の区間を比較して対象ゲートを取得する。
-   *
-   * @return Gateへのポインタ
-   * @return nullptr 対応するゲートがない場合
+   * @brief ゲートが外周ゲートか判定する
+   * @param gate 判定対象ゲート
+   * @return true 外周ゲート
+   * @return false 内側ゲート
    */
-  const Gate* findGate(
-      const RouteState& from,
-      const RouteState& to) const;
+  bool isOuterGate(
+      const Gate& gate) const;
 
   /**
-   * @brief ゲートが外周にあるか判定する
-   */
-  bool isOuterGate(const Gate& gate) const;
-
-  /**
-   * @brief 区間開始地点からゲート中心までの距離を求める
+   * @brief 区間開始地点からゲートまでの距離を計算する
+   * @param from 区間開始地点
+   * @param gate 通過対象ゲート
+   * @return ゲートまでの距離[mm]
    */
   double calculateDistanceToGate(
       const RouteState& from,
       const Gate& gate) const;
 
   /**
-   * @brief ゲート通過区間を走行する
+   * @brief ゲートを含む最後の区間を走行する
    *
-   * 外周ゲート:
-   *   全区間Straight
+   * 内側ゲートの場合、
+   * ゲート125mm手前まで走行し、一時停止後にQRを検出する。
+   * 検出成功時はQR追従、失敗時は通常直進する。
    *
-   * 内側ゲート:
-   *   1. ゲート125mm手前までStraight
-   *   2. QRコード検出
-   *   3. 250mm CameraTrackingまたはStraight
-   *   4. 残りをStraight
+   * @param from 区間開始地点
+   * @param to 区間終了地点
+   * @param distance 区間全体の距離[mm]
+   * @param gate 通過対象ゲート
    */
   void runGateSegment(
       const RouteState& from,
       const RouteState& to,
-      double distance);
+      double distance,
+      const Gate& gate);
 
+  /** ロボット */
   Robot& robot;
 
+  /** ETラリーマップ */
   const EtRallyMap& map;
 
-  const MapData& mapData;
-
+  /** 通常走行速度 */
   double targetSpeed;
 
+  /** QR追従走行速度 */
   double qrTrackingSpeed;
 
+  /** QRコードの目標X座標 */
   int qrTargetX;
 
+  /** 回頭用PIDゲイン */
   Pid::PidGain rotationPid;
 
+  /** 右車輪用PIDゲイン */
   Pid::PidGain rightPid;
 
+  /** 左車輪用PIDゲイン */
   Pid::PidGain leftPid;
 
+  /** Straight角度補正用PIDゲイン */
   Pid::PidGain straightAnglePid;
 
+  /** QR追従用PIDゲイン */
   Pid::PidGain qrTrackingPid;
 };
 

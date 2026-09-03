@@ -2,3 +2,5 @@
 AbsoluteRotation,ID,double,double,double,double
 AbsoluteRotation,001,0.001,0.001,0.001,90
 AbsoluteRotation,002,0.002,0.002,0.002,180
+AbsoluteRotation,003,0.005,0.001,0.0,0
+AbsoluteRotation,004,0.005,0.001,0.0,-80

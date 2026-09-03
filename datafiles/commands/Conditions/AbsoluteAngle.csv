@@ -2,3 +2,6 @@
 AbsoluteAngle,ID,double
 AbsoluteAngle,001,90
 AbsoluteAngle,002,180
+AbsoluteAngle,003,0
+AbsoluteAngle,004,-80
+AbsoluteAngle,005,-90

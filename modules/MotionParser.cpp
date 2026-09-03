@@ -370,6 +370,9 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
     case MOTION_COMMAND::CALIBRATOR: {
       return new Calibrator(robot, std::move(condition));
     }
+    case MOTION_COMMAND::RESET_AZIMUTH: {
+      return new ResetAzimuth(robot, std::move(condition));
+    }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
                         motionParams[0].c_str());
@@ -386,7 +389,8 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "AbsoluteRotation", MOTION_COMMAND::ABSOLUTE_ROTATION },
           { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
           { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING },
-          { "Calibrator", MOTION_COMMAND::CALIBRATOR }
+          { "Calibrator", MOTION_COMMAND::CALIBRATOR },
+          { "ResetAzimuth", MOTION_COMMAND::RESET_AZIMUTH }
 
         };
 

@@ -6,6 +6,7 @@
 
 #include "MotionParser.h"
 #include "CameraTracking.h"
+#include "LineTrace.h"
 #include "SocketProtocol.h"
 
 using namespace std;
@@ -219,6 +220,19 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                                               fromString<double>(motionParams[6]) },
                                 qrRequest, motionParams[7] == "true");
     }
+    case MOTION_COMMAND::LINETRACE: {
+      // LineTrace: motionParams[2]=speed(double)
+      //           motionParams[3]=brightness(int)
+      //           motionParams[4..6]=brightnessPid(kp,ki,kd)
+      //           motionParams[7]=deadbandRate(double)
+      //           motionParams[8]=maxoutRate(double)
+      return new LineTrace(
+          robot, std::move(condition), fromString<double>(motionParams[2]),
+          fromString<int>(motionParams[3]),
+          Pid::PidGain{ fromString<double>(motionParams[4]), fromString<double>(motionParams[5]),
+                        fromString<double>(motionParams[6]) },
+          fromString<double>(motionParams[7]), fromString<double>(motionParams[8]));
+    }
     // ↓ 他のコマンドはここに追加していく
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
@@ -233,6 +247,7 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
   static const unordered_map<string, MOTION_COMMAND> commandMap = {
     { "Straight", MOTION_COMMAND::STRAIGHT },
     { "QRTracking", MOTION_COMMAND::QR_TRACKING },
+    { "LineTrace", MOTION_COMMAND::LINETRACE },
   };
 
   // コマンド文字列に対応するMOTION_COMMAND値をマップから取得。なければMOTION_COMMAND::NONEを返す

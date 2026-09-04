@@ -241,7 +241,7 @@ void EtRobocon2026::start()
 
   Direction currentDirection =
       convertDirection(
-          Direction::LEFT);
+          Direction::DOWN);
 
   Logger::printfLog(
       Logger::INFO,
@@ -308,9 +308,9 @@ void EtRobocon2026::start()
    * 画像中央へ来るように補正する。
    */
   const Pid::PidGain squareTrackingPid = {
-      0.000161,
-      0.00001,
-      0.0001019
+      0.0010,
+      0.000,
+      0.0005
   };
 
   // =========================================================
@@ -327,7 +327,7 @@ void EtRobocon2026::start()
    * @brief 正方形追従時の速度[mm/s]
    */
   constexpr double SQUARE_TRACKING_SPEED =
-      350.0;
+      200.0;
 
   /**
    * @brief 正方形を合わせる画像上のX座標

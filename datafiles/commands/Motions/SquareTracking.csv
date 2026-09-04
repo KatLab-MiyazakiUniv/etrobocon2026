@@ -1,0 +1,5 @@
+command,id,speed,targetX,kp,ki,kd,isStopMotorPower,roiX,roiY,roiWidth,roiHeight
+,,,,,,,,,,,
+SquareTracking,001,200.0,960,0.000161,0.00001,0.0001019,true,300,350,1320,730
+SquareTracking,002,200.0,960,0.0010,0.0000,0.0005,true,00,350,1860,730
+SquareTracking,003,200.0,960,0.00075,0.000005,0.0005,true,00,350,1860,730

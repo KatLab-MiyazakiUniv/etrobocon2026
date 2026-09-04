@@ -7,94 +7,153 @@
 #ifndef MOTION_PARSER_H
 #define MOTION_PARSER_H
 
-constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字として、カンマを定義
-
-#include <vector>
-#include <string>
-#include <iostream>
 #include <fstream>
-#include <sstream>
 #include <memory>
+#include <sstream>
+#include <stdexcept>
+#include <string>
 #include <unordered_map>
+#include <vector>
+
+#include "BaseContinuationCondition.h"
 #include "BaseMotion.h"
-#include "Logger.h"
 #include "DistanceCondition.h"
+#include "Logger.h"
+#include "Robot.h"
 
 class MotionParser {
  public:
-  // 動作コマンド名を持つ列挙型クラス
-  enum class MOTION_COMMAND { STRAIGHT, QR_TRACKING, NONE };
-  // 条件コマンド名を持つ列挙型クラス
-  enum class CONDITION_COMMAND { DISTANCE, NONE };
+  /**
+   * @brief 動作コマンドの種類
+   */
+  enum class MOTION_COMMAND {
+    NONE,
+
+    /**
+     * @brief 通常直進
+     */
+    STRAIGHT,
+
+    /**
+     * @brief QRコード追従
+     */
+    QR_TRACKING,
+
+    /**
+     * @brief 正方形追従
+     */
+    SQUARE_TRACKING
+  };
 
   /**
-   * @brief Area CSVファイルを解析して動作インスタンスのリストを生成する
-   * @param robot ロボット本体の参照
-   * @param commandFilePath Area CSVファイルパス
-   * @return 動作インスタンスリスト
+   * @brief 継続条件コマンドの種類
    */
-  static std::vector<BaseMotion*> createMotionList(Robot& robot, std::string& commandFilePath);
+  enum class CONDITION_COMMAND {
+    NONE,
+
+    /**
+     * @brief 距離条件
+     */
+    DISTANCE
+  };
+
+  /**
+   * @brief AreaコマンドCSVから動作リストを生成する
+   *
+   * AreaコマンドCSVに記述された
+   *
+   * motionName,
+   * motionId,
+   * conditionName,
+   * conditionId
+   *
+   * を読み込み、対応する動作インスタンスを生成する。
+   *
+   * @param robot ロボット
+   * @param commandFilePath AreaコマンドCSVのパス
+   * @return 生成した動作リスト
+   */
+  static std::vector<BaseMotion*> createMotionList(
+      Robot& robot,
+      std::string& commandFilePath);
 
  private:
-  MotionParser();  // インスタンス化を禁止する
+  /**
+   * @brief CSVの区切り文字
+   */
+  static constexpr char SEPARATOR = ',';
 
   /**
-   * @brief CSVファイルからIDに一致する行のパラメータを取得する
-   * @param filePath CSVファイルパス
+   * @brief 指定されたCSVからIDに対応する行を取得する
+   *
+   * CSVの2列目をIDとして検索する。
+   *
+   * @param filePath CSVファイルのパス
    * @param id 検索するID
-   * @return パラメータリスト（見つからない場合は空のvector）
+   * @return IDに対応するパラメータ一覧
    */
-  static std::vector<std::string> extractParamsFromID(const std::string& filePath,
-                                                      const std::string& id);
+  static std::vector<std::string> extractParamsFromID(
+      const std::string& filePath,
+      const std::string& id);
 
   /**
-   * @brief パラメータから条件インスタンスを生成する
-   * @param robot ロボット本体の参照
-   * @param params 条件CSVから取得したパラメータリスト
-   * @return 条件インスタンス（未定義の場合は nullptr）
+   * @brief 継続条件インスタンスを生成する
+   *
+   * @param robot ロボット
+   * @param params 条件CSVから取得したパラメータ
+   * @return 継続条件インスタンス
    */
-  static std::unique_ptr<BaseContinuationCondition> createConditionInstance(
-      Robot& robot, const std::vector<std::string>& params);
+  static std::unique_ptr<BaseContinuationCondition>
+      createConditionInstance(
+          Robot& robot,
+          const std::vector<std::string>& params);
 
   /**
-   * @brief パラメータから動作インスタンスを生成する
-   * @param robot ロボット本体の参照
-   * @param motionParams 動作CSVから取得したパラメータリスト
-   * @param condition 注入する条件インスタンス
-   * @return 動作インスタンス（未定義の場合は nullptr）
+   * @brief 動作インスタンスを生成する
+   *
+   * @param robot ロボット
+   * @param motionParams 動作CSVから取得したパラメータ
+   * @param condition 継続条件
+   * @return 動作インスタンス
    */
-  static BaseMotion* createMotionInstance(Robot& robot,
-                                          const std::vector<std::string>& motionParams,
-                                          std::unique_ptr<BaseContinuationCondition> condition);
+  static BaseMotion* createMotionInstance(
+      Robot& robot,
+      const std::vector<std::string>& motionParams,
+      std::unique_ptr<BaseContinuationCondition> condition);
 
   /**
-   * @brief 文字列を列挙型MOTION_COMMANDに変換する
-   * @param str 文字列のコマンド
-   * @return コマンド
+   * @brief 動作コマンド文字列を列挙型へ変換する
+   *
+   * 例:
+   *
+   * "Straight"
+   *     → MOTION_COMMAND::STRAIGHT
+   *
+   * "QRTracking"
+   *     → MOTION_COMMAND::QR_TRACKING
+   *
+   * "SquareTracking"
+   *     → MOTION_COMMAND::SQUARE_TRACKING
+   *
+   * @param str 動作コマンド名
+   * @return 動作コマンド
    */
-  static MOTION_COMMAND convertCommand(const std::string& str);
+  static MOTION_COMMAND convertCommand(
+      const std::string& str);
 
   /**
-   * @brief 文字列を列挙型CONDITION_COMMANDに変換する
-   * @param str 文字列の条件コマンド
+   * @brief 条件コマンド文字列を列挙型へ変換する
+   *
+   * 例:
+   *
+   * "Distance"
+   *     → CONDITION_COMMAND::DISTANCE
+   *
+   * @param str 条件コマンド名
    * @return 条件コマンド
    */
-  static CONDITION_COMMAND convertCondition(const std::string& str);
-
-  // /**
-  //  * @brief 文字列をbool型に変換する
-  //  * @param command 文字列のコマンド
-  //  * @param stringParameter 文字列のパラメータ
-  //  * @return bool値
-  //  */
-  // static bool convertBool(const std::string& command, const std::string& stringParameter);
-
-  // /**
-  //  * @brief 回頭方法の文字列をbool型に変換する（convertBoolは方向判定で使用済みのため専用関数化）
-  //  * @param stringParameter 文字列のパラメータ ("relative" or "absolute")
-  //  * @return false: 相対角度回頭, true: 絶対角度回頭
-  //  */
-  // static bool convertRotationModeToBool(const std::string& stringParameter);
+  static CONDITION_COMMAND convertCondition(
+      const std::string& str);
 };
 
 #endif

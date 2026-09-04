@@ -23,7 +23,7 @@ namespace {
   /**
    * @brief ゲートの何mm手前から正方形追従を開始するか
    */
-  constexpr double SQUARE_TRACKING_BEFORE_GATE = 125.0;
+  constexpr double SQUARE_TRACKING_BEFORE_GATE = 375.0;
 
   /**
    * @brief 正方形追従を行う最大距離[mm]
@@ -32,12 +32,12 @@ namespace {
    * 250mm走行することで
    * ゲートの125mm先まで走行する。
    */
-  constexpr double SQUARE_TRACKING_DISTANCE = 250.0;
+  constexpr double SQUARE_TRACKING_DISTANCE = 500.0;
 
   /**
    * @brief 回頭終了判定の許容誤差[deg]
    */
-  constexpr double ROTATION_TOLERANCE = 2.0;
+  constexpr double ROTATION_TOLERANCE = 1.0;
 
 }  // namespace
 

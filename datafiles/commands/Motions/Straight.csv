@@ -1,4 +1,5 @@
 コマンド名,ID,speed,r_kp,r_ki,r_kd,l_kp,l_ki,l_kd,a_kp,a_ki,a_kd,useIMU
-Straight,ID,double,double,double,double,double,double,double,double,double,double,string
-Straight,001,100,0.001,0.001,0.001,0.001,0.001,0.001,0.001,0.001,0.001,false
-Straight,002,150,0.002,0.002,0.002,0.002,0.002,0.002,0.001,0.001,0.001,false
+,,,,,,,,,,,,
+Straight,001,300.0,0.005,0.001,0.0,0.005,0.001,0.0,0.033,0.003,0.03,true
+Straight,002,300.0,0.033,0.003,0.0,0.005,0.001,0.0,0.033,0.003,0.03,false
+Straight,003,300,0.016,0.005,0.0015,0.016,0.0045,0.0015,0.033,0.003,0.03,true

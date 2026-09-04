@@ -19,61 +19,112 @@ class RouteFollower {
  public:
   /**
    * @brief コンストラクタ
-   * @param _robot ロボットインスタンス
-   * @param _map ETラリーの実座標マップ
+   * @param _robot ロボット
+   * @param _map ETラリーマップ
    * @param _mapData ゲート情報
-   * @param _targetSpeed 通常走行時の目標速度[mm/s]
-   * @param _squareTrackingSpeed 正方形補正走行時の目標速度[mm/s]
-   * @param _squareTargetX 正方形を合わせる画像上の目標X座標
-   * @param _rotationPid 回頭用PIDゲイン
-   * @param _rightPid 右車輪速度制御用PIDゲイン
-   * @param _leftPid 左車輪速度制御用PIDゲイン
-   * @param _straightAnglePid 通常直進時の角度補正用PIDゲイン
-   * @param _squareTrackingPid 正方形による角度補正用PIDゲイン
+   * @param _targetSpeed 通常Straightの速度
+   * @param _squareTrackingSpeed 正方形追従時の速度
+   * @param _squareTargetX 正方形の目標X座標
+   * @param _rotationPid 回頭PID
+   * @param _rightPid 右車輪速度PID
+   * @param _leftPid 左車輪速度PID
+   * @param _straightAnglePid Straight角度補正PID
+   * @param _squareTrackingPid 正方形追従PID
    */
-  RouteFollower(Robot& _robot, const EtRallyMap& _map, const MapData& _mapData,
-                double _targetSpeed, double _squareTrackingSpeed, int _squareTargetX,
-                const Pid::PidGain& _rotationPid, const Pid::PidGain& _rightPid,
-                const Pid::PidGain& _leftPid, const Pid::PidGain& _straightAnglePid,
-                const Pid::PidGain& _squareTrackingPid);
+  RouteFollower(
+      Robot& _robot,
+      const EtRallyMap& _map,
+      const MapData& _mapData,
+      double _targetSpeed,
+      double _squareTrackingSpeed,
+      int _squareTargetX,
+      const Pid::PidGain& _rotationPid,
+      const Pid::PidGain& _rightPid,
+      const Pid::PidGain& _leftPid,
+      const Pid::PidGain& _straightAnglePid,
+      const Pid::PidGain& _squareTrackingPid);
 
   /**
-   * @brief 経路に従って通常走行する
-   * @param route 走行する経路
+   * @brief 経路探索結果に従って走行する
+   *
+   * 通常区間:
+   *   Straight
+   *
+   * ゲート通過区間:
+   *   ゲート125mm手前までStraight
+   *   ↓
+   *   SquareTracking 250mm
+   *   ↓
+   *   残りStraight
+   *
+   * @param route 経路探索結果
    */
-  void run(const std::vector<RouteState>& route);
-
-  /**
-   * @brief 経路に従って走行する
-   * @param route 走行する経路
-   * @param useSquareCorrection ゲート通過時に正方形補正を使用するか
-   */
-  void run(const std::vector<RouteState>& route, bool useSquareCorrection);
+  void run(
+      const std::vector<RouteState>& route);
 
  private:
-  Robot& robot;            // ロボットインスタンス
-  const EtRallyMap& map;   // ETラリーの実座標マップ
-  const MapData& mapData;  // ゲート情報
-
-  double targetSpeed;  // 通常走行時の目標速度[mm/s]
-
-  double squareTrackingSpeed;  // 正方形補正走行時の目標速度[mm/s]
-
-  int squareTargetX;  // 正方形を合わせる画像上の目標X座標
-
-  Pid::PidGain rotationPid;       // 回頭用PID
-  Pid::PidGain rightPid;          // 右車輪速度制御用PID
-  Pid::PidGain leftPid;           // 左車輪速度制御用PID
-  Pid::PidGain straightAnglePid;  // 通常直進時の角度補正用PID
-
-  Pid::PidGain squareTrackingPid;  // 正方形による角度補正用PID
+  /**
+   * @brief ロボット
+   */
+  Robot& robot;
 
   /**
-   * @brief Directionをロボットの方位角へ変換する
+   * @brief ETラリーマップ
+   */
+  const EtRallyMap& map;
+
+  /**
+   * @brief ゲート情報
+   */
+  const MapData& mapData;
+
+  /**
+   * @brief 通常Straight速度
+   */
+  double targetSpeed;
+
+  /**
+   * @brief 正方形追従速度
+   */
+  double squareTrackingSpeed;
+
+  /**
+   * @brief 正方形を合わせる画像上のX座標
+   */
+  int squareTargetX;
+
+  /**
+   * @brief 回頭PID
+   */
+  Pid::PidGain rotationPid;
+
+  /**
+   * @brief 右車輪速度PID
+   */
+  Pid::PidGain rightPid;
+
+  /**
+   * @brief 左車輪速度PID
+   */
+  Pid::PidGain leftPid;
+
+  /**
+   * @brief Straight角度補正PID
+   */
+  Pid::PidGain straightAnglePid;
+
+  /**
+   * @brief 正方形追従PID
+   */
+  Pid::PidGain squareTrackingPid;
+
+  /**
+   * @brief Directionを方位角へ変換する
    * @param direction 方向
    * @return 方位角[deg]
    */
-  double directionToHeading(Direction direction) const;
+  double directionToHeading(
+      Direction direction) const;
 
   /**
    * @brief 回頭角度を計算する
@@ -81,70 +132,80 @@ class RouteFollower {
    * @param to 目標方向
    * @return 回頭角度[deg]
    */
-  double calculateRotationAngle(Direction from, Direction to) const;
+  double calculateRotationAngle(
+      Direction from,
+      Direction to) const;
 
   /**
-   * @brief 2地点間の走行距離を計算する
-   * @param from 開始地点
-   * @param to 終了地点
-   * @return 走行距離[mm]
+   * @brief 2つの経路状態間の距離を計算する
+   * @param from 開始状態
+   * @param to 終了状態
+   * @return 距離[mm]
    */
-  double calculateDistance(const RouteState& from, const RouteState& to) const;
+  double calculateDistance(
+      const RouteState& from,
+      const RouteState& to) const;
 
   /**
-   * @brief 指定角度だけ回頭する
+   * @brief 回頭する
    * @param angle 回頭角度[deg]
    */
-  void rotate(double angle);
+  void rotate(
+      double angle);
 
   /**
-   * @brief 指定距離を通常直進する
+   * @brief 通常Straight
    * @param distance 走行距離[mm]
    */
-  void straight(double distance);
+  void straight(
+      double distance);
 
   /**
-   * @brief 正方形を画像中央に合わせながら走行する
-   * @param distance 補正走行距離[mm]
+   * @brief 正方形を使用したCameraTracking
+   * @param distance 走行距離[mm]
    */
-  void straightWithSquareCorrection(double distance);
+  void straightWithSquareCorrection(
+      double distance);
 
   /**
-   * @brief 正方形を1回検出する
-   * @return 正方形を検出した場合true
+   * @brief 指定した直進区間内に存在するゲートを探す
+   *
+   * 経路圧縮後でも判定できるように、
+   * GatePassのentranceとexitがfrom-to区間内に
+   * 存在するか確認する。
+   *
+   * @param from 区間開始
+   * @param to 区間終了
+   * @return ゲート。存在しない場合nullptr
    */
-  bool detectSquare();
+  const Gate* findGate(
+      const RouteState& from,
+      const RouteState& to) const;
 
   /**
-   * @brief 指定区間に対応するゲートを取得する
-   * @param from 区間開始地点
-   * @param to 区間終了地点
-   * @return 対応するゲート。存在しない場合nullptr
-   */
-  const Gate* findGate(const RouteState& from, const RouteState& to) const;
-
-  /**
-   * @brief ゲートが外周ゲートか判定する
+   * @brief 開始地点からゲート中央までの距離を計算する
+   * @param from 区間開始
    * @param gate ゲート
-   * @return 外周ゲートの場合true
+   * @return 距離[mm]
    */
-  bool isOuterGate(const Gate& gate) const;
+  double calculateDistanceToGate(
+      const RouteState& from,
+      const Gate& gate) const;
 
   /**
-   * @brief 現在地点からゲートまでの距離を計算する
-   * @param from 現在地点
-   * @param gate ゲート
-   * @return ゲートまでの距離[mm]
+   * @brief ゲートを含む直進区間を走行する
+   *
+   * ゲート手前まで通常Straightし、
+   * ゲート付近のみ正方形CameraTrackingする。
+   *
+   * @param from 区間開始
+   * @param to 区間終了
+   * @param distance 区間全体の距離[mm]
    */
-  double calculateDistanceToGate(const RouteState& from, const Gate& gate) const;
-
-  /**
-   * @brief ゲート通過区間を走行する
-   * @param from 区間開始地点
-   * @param to 区間終了地点
-   * @param distance 区間全体の走行距離[mm]
-   */
-  void runGateSegment(const RouteState& from, const RouteState& to, double distance);
+  void runGateSegment(
+      const RouteState& from,
+      const RouteState& to,
+      double distance);
 };
 
-#endif  // ROUTE_FOLLOWER_H
+#endif

@@ -27,12 +27,13 @@ void EtRobocon2026::runLineTrace()
 
   // LineTraceLeft.csv と左エッジを使ってライントレース区間を走行する。
   robot.setCourse(Course::Left);
-  robot.setEdge(Edge::LeftEdge);
+  robot.setEdge(Edge::RightEdge);
 
   // Area CSVを解析する前に黒・白の輝度を測定する。
   // MotionParserは、この値にLineTrace.csvのオフセットを加えてPID目標値を作る。
   Calibrator calibrator(robot, std::make_unique<RepeatCountCondition>(robot, 1));
   calibrator.measureAndSetTargetBrightness();
+  calibrator.waitForStart();
 
   AreaMaster lineTraceArea(robot, Area::LineTrace);
   lineTraceArea.run();

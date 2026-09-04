@@ -1,2 +1,4 @@
 動作コマンド名,動作ID,条件コマンド名,条件ID
 LineTrace,001,Distance,001
+LineTrace,002,Distance,002
+LineTrace,001,Distance,001

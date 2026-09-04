@@ -16,8 +16,11 @@ std::string CsvLogger::fileName
 
 // CSVヘッダーの定義
 const std::vector<std::string> CsvLogger::HEADERS
-    = { "time",      "comand:id",  "brightness", "rightPower", "leftPower", "rightSpeed",
-        "leftSpeed", "currentVal", "target",     "kp",         "ki",        "kd" };
+    = { "time",          "comand:id",   "brightness",  "rightPower",
+        "leftPower",     "rightSpeed",  "leftSpeed",   "currentVal",
+        "target",        "kp",          "ki",          "kd",
+        "error",         "rawTurn",     "turn",        "basePower",
+        "deadbandPower", "maxoutPower", "maxoutActive" };
 
 // CSVログの初期化
 void CsvLogger::init()
@@ -102,7 +105,14 @@ void CsvLogger::add(const LogData& data)
   appendField(rowStr, localData.target, false);
   appendField(rowStr, localData.kp, false);
   appendField(rowStr, localData.ki, false);
-  appendField(rowStr, localData.kd, true);
+  appendField(rowStr, localData.kd, false);
+  appendField(rowStr, localData.error, false);
+  appendField(rowStr, localData.rawTurn, false);
+  appendField(rowStr, localData.turn, false);
+  appendField(rowStr, localData.basePower, false);
+  appendField(rowStr, localData.deadbandPower, false);
+  appendField(rowStr, localData.maxoutPower, false);
+  appendField(rowStr, localData.maxoutActive, true);
   rowStr += "\n";
 
   int written = snprintf(&logs[currentIndex], remainBuffer, "%s", rowStr.c_str());

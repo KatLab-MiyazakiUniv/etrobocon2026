@@ -234,7 +234,8 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
           robot, std::move(condition), fromString<double>(motionParams[2]), targetBrightness,
           Pid::PidGain{ fromString<double>(motionParams[4]), fromString<double>(motionParams[5]),
                         fromString<double>(motionParams[6]) },
-          fromString<double>(motionParams[7]), fromString<double>(motionParams[8]));
+          fromString<double>(motionParams[7]), fromString<double>(motionParams[8]),
+          motionParams[1]);
     }
     // ↓ 他のコマンドはここに追加していく
     default:

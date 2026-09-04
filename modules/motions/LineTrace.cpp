@@ -10,7 +10,7 @@ LineTrace::LineTrace(Robot& _robot,
                      std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                      double _targetSpeed, int _targetBrightness,
                      const Pid::PidGain& _brightnessPidGain, double _deadbandRate,
-                     double _maxoutRate)
+                     double _maxoutRate, const std::string& _commandId)
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
     targetBrightness(_targetBrightness),
@@ -18,7 +18,9 @@ LineTrace::LineTrace(Robot& _robot,
                   _targetBrightness),
     speedCalculator(_robot, _targetSpeed),
     deadbandRate(_deadbandRate),
-    maxoutRate(_maxoutRate)
+    maxoutRate(_maxoutRate),
+    brightnessPidGain(_brightnessPidGain),
+    commandId(_commandId)
 {
   LOG_CREATE("LineTrace");
 }
@@ -60,9 +62,9 @@ void LineTrace::executeStep()
   double basePower = (std::abs(baseRightPower) + std::abs(baseLeftPower)) / 2.0;
 
   // PIDで旋回値を計算
-  double turningPower
-      = brightnessPid.calculatePid(robot.getColorSensorControllerInstance().getReflectance())
-        * edgeSign;
+  int brightness = robot.getColorSensorControllerInstance().getReflectance();
+  double rawTurningPower = brightnessPid.calculatePid(brightness) * edgeSign;
+  double turningPower = rawTurningPower;
 
   // デッドバンドとマックスアウトを適用
   double deadbandPower = deadbandRate * basePower;
@@ -84,6 +86,27 @@ void LineTrace::executeStep()
 
   robot.getWheelMotorControllerInstance().setRightPower(rightPower);
   robot.getWheelMotorControllerInstance().setLeftPower(leftPower);
+
+  LogData logData;
+  logData.id = commandId.empty() ? "LineTrace" : "LineTrace:" + commandId;
+  logData.brightness = brightness;
+  logData.rightPower = static_cast<int>(rightPower);
+  logData.leftPower = static_cast<int>(leftPower);
+  logData.rightSpeed = robot.getWheelMotorControllerInstance().getRightSpeed();
+  logData.leftSpeed = robot.getWheelMotorControllerInstance().getLeftSpeed();
+  logData.currentVal = brightness;
+  logData.target = targetBrightness;
+  logData.kp = brightnessPidGain.kp;
+  logData.ki = brightnessPidGain.ki;
+  logData.kd = brightnessPidGain.kd;
+  logData.error = targetBrightness - brightness;
+  logData.rawTurn = rawTurningPower;
+  logData.turn = turningPower;
+  logData.basePower = basePower;
+  logData.deadbandPower = deadbandPower;
+  logData.maxoutPower = maxoutPower;
+  logData.maxoutActive = (maxoutPower > 0.0 && std::abs(rawTurningPower) >= maxoutPower) ? 1 : 0;
+  CsvLogger::add(logData);
 }
 
 void LineTrace::finish()

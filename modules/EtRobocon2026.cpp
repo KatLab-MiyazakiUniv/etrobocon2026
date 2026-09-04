@@ -11,6 +11,7 @@
 #include "RepeatCountCondition.h"
 #include "Robot.h"
 #include "SocketClient.h"
+#include "CsvLogger.h"
 
 void EtRobocon2026::start()
 {
@@ -19,6 +20,8 @@ void EtRobocon2026::start()
 
 void EtRobocon2026::runLineTrace()
 {
+  CsvLogger::init();
+  CsvLogger::writeHeader();
   // ライントレースではカメラ通信を行わないが、Robot が共有リソースとして
   // SocketClient を保持するため、ここで実機用の依存関係を構築する。
   RealNetworkSystem networkSystem;
@@ -37,4 +40,5 @@ void EtRobocon2026::runLineTrace()
 
   AreaMaster lineTraceArea(robot, Area::LineTrace);
   lineTraceArea.run();
+  CsvLogger::outputToFile();
 }

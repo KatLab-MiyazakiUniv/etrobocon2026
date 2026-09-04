@@ -60,6 +60,8 @@ help:
 	@echo " $$ make docker-run-user"
 	@echo venvを有効化して動画を作成する
 	@echo " $$ make create-video"
+	@echo ライントレースログの調整グラフを作成する
+	@echo " $$ make plot"
 
 ## 実行関連 ##
 .PHONY: build
@@ -213,3 +215,11 @@ create-video:
 	$(MAKEFILE_PATH)scripts/create_video/venv/bin/python \
     $(MAKEFILE_PATH)scripts/create_video/createVideo.py \
     -i $(MAKEFILE_PATH)camera_server/datafiles/line_trace/
+
+.PHONY: plot
+plot:
+	$(CXX) -std=c++17 -O2 $(MAKEFILE_PATH)scripts/plot_line_trace.cpp \
+	  -o /tmp/etrobocon_plot_line_trace
+	/tmp/etrobocon_plot_line_trace \
+	  $(MAKEFILE_PATH)datafiles/logfiles/runlog.csv \
+	  $(MAKEFILE_PATH)datafiles/logfiles/runlog_plot.svg

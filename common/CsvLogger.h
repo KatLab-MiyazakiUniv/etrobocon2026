@@ -26,18 +26,25 @@
  * @brief CsvLoggerで記録する走行データをまとめた構造体
  */
 struct LogData {
-  std::optional<int> time;           // 走行経過時間
-  std::optional<std::string> id;     // 実行しているコマンドのID(コマンド名:ID)
-  std::optional<int> brightness;     // 輝度値
-  std::optional<int> rightPower;     // 右Power値
-  std::optional<int> leftPower;      // 左Power値
-  std::optional<double> rightSpeed;  // 右Speed値
-  std::optional<double> leftSpeed;   // 左Speed値
-  std::optional<double> currentVal;  // 現在の値
-  std::optional<double> target;      // 目標値
-  std::optional<double> kp;          // Pゲイン
-  std::optional<double> ki;          // Iゲイン
-  std::optional<double> kd;          // Dゲイン
+  std::optional<int> time;              // 走行経過時間
+  std::optional<std::string> id;        // 実行しているコマンドのID(コマンド名:ID)
+  std::optional<int> brightness;        // 輝度値
+  std::optional<int> rightPower;        // 右Power値
+  std::optional<int> leftPower;         // 左Power値
+  std::optional<double> rightSpeed;     // 右Speed値
+  std::optional<double> leftSpeed;      // 左Speed値
+  std::optional<double> currentVal;     // 現在の値
+  std::optional<double> target;         // 目標値
+  std::optional<double> kp;             // Pゲイン
+  std::optional<double> ki;             // Iゲイン
+  std::optional<double> kd;             // Dゲイン
+  std::optional<double> error;          // 目標値と現在値の偏差
+  std::optional<double> rawTurn;        // 制限適用前の旋回Power値
+  std::optional<double> turn;           // デッドバンド・上限制限後の旋回Power値
+  std::optional<double> basePower;      // 左右の基準Power値の平均
+  std::optional<double> deadbandPower;  // デッドバンド閾値
+  std::optional<double> maxoutPower;    // 旋回Power上限
+  std::optional<int> maxoutActive;      // 上限に張り付いた場合は1
   // 今後新しいセンサー値（例: gyro）を追加したい場合は、ここに std::optional<int> gyro;
 };
 

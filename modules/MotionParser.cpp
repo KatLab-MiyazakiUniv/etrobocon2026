@@ -8,6 +8,7 @@
 #include "CameraTracking.h"
 #include "LineTrace.h"
 #include "SocketProtocol.h"
+#include <algorithm>
 
 using namespace std;
 
@@ -222,13 +223,15 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
     }
     case MOTION_COMMAND::LINETRACE: {
       // LineTrace: motionParams[2]=speed(double)
-      //           motionParams[3]=brightness(int)
+      //           motionParams[3]=targetBrightnessOffset(int)
       //           motionParams[4..6]=brightnessPid(kp,ki,kd)
       //           motionParams[7]=deadbandRate(double)
       //           motionParams[8]=maxoutRate(double)
+      int calibratedBrightness = robot.getTargetBrightness();
+      int targetBrightnessOffset = fromString<int>(motionParams[3]);
+      int targetBrightness = std::clamp(calibratedBrightness + targetBrightnessOffset, 0, 100);
       return new LineTrace(
-          robot, std::move(condition), fromString<double>(motionParams[2]),
-          fromString<int>(motionParams[3]),
+          robot, std::move(condition), fromString<double>(motionParams[2]), targetBrightness,
           Pid::PidGain{ fromString<double>(motionParams[4]), fromString<double>(motionParams[5]),
                         fromString<double>(motionParams[6]) },
           fromString<double>(motionParams[7]), fromString<double>(motionParams[8]));

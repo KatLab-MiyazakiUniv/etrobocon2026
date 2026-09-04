@@ -1,0 +1,3 @@
+コマンド名,ID,speed,targetBrightnessOffset,kp,ki,kd,deadbandRate,maxoutRate
+LineTrace,ID,double,int,double,double,double,double,double
+LineTrace,001,100.0,0,0.0055,0.0009,0.0001,0.05,0.90

@@ -1,33 +1,69 @@
-#include <iostream>
+/**
+ * @file main.cpp
+ * @brief カメラサーバーのエントリーポイント
+ */
+
+#include "CameraCapture.h"
+#include "ColorRegionDetectionActionHandler.h"
 #include "Logger.h"
-#include "SocketServer.h"
+#include "QrCodeDetectionActionHandler.h"
 #include "RealNetworkSystem.h"
+#include "SnapshotActionHandler.h"
+#include "SocketServer.h"
+#include "SquareDetectionActionHandler.h"
 
 int main()
 {
   Logger::info("Hello KATLAB");
+
+  // =====================================================
+  // ネットワーク
+  // =====================================================
+
   RealNetworkSystem real;
 
+  // =====================================================
+  // カメラ
+  // =====================================================
+
   CameraCapture camera;
-  int cameraId = camera.findAvailableCameraID();
-  if(cameraId < 0) {
-    Logger::error("利用可能なカメラを認識失敗");
-    return -1;
-  }
-  camera.setCameraID(cameraId);
-  if(!camera.openCamera()) {
-    Logger::error("カメラの起動に失敗");
-    return -1;
-  }
+
+  // =====================================================
+  // ActionHandler
+  // =====================================================
+
+  SnapshotActionHandler snapshotHandler(camera);
 
   ColorRegionDetectionActionHandler colorRegionDetectionHandler(camera);
+
   QrCodeDetectionActionHandler qrCodeDetectionHandler(camera);
-  SnapshotActionHandler snapshotHandler(camera);
-  SocketServer server(snapshotHandler, colorRegionDetectionHandler, qrCodeDetectionHandler, real);
+
+  /*
+   * 正方形検出用ハンドラ
+   */
+  SquareDetectionActionHandler squareDetectionHandler(camera);
+
+  // =====================================================
+  // SocketServer
+  // =====================================================
+
+  SocketServer server(
+      snapshotHandler,
+      colorRegionDetectionHandler,
+      qrCodeDetectionHandler,
+      squareDetectionHandler,
+      real);
+
+  // =====================================================
+  // サーバー起動
+  // =====================================================
+
   if(!server.init()) {
-    Logger::error("サーバーの初期化に失敗");
-    return -1;
+    Logger::error("CameraServer:初期化に失敗しました");
+    return 1;
   }
+
   server.run();
+
   return 0;
 }

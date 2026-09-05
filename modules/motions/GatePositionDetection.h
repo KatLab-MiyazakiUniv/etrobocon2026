@@ -22,11 +22,10 @@ class GatePositionDetection : public BaseMotion {
    * @brief コンストラクタ
    * @param _robot ロボットインスタンス
    * @param _fileName 撮影画像の保存ファイル名
-   * @param _key AES復号キー
-   * @param _roi QRコード検出範囲
+   * @param _decryptRequired 復号するか
    * @param continuationCondition 継続条件
    */
-  GatePositionDetection(Robot& _robot, const std::string& _fileName,
+  GatePositionDetection(Robot& _robot, const std::string& _fileName, bool _decryptRequired,
                         const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
                         std::unique_ptr<BaseContinuationCondition> continuationCondition);
 
@@ -44,6 +43,7 @@ class GatePositionDetection : public BaseMotion {
  private:
   std::string fileName;
   CameraServer::QrCodeDetectorRequest qrDetectionRequest;  // QRコード検出リクエスト
+  bool decryptRequired;
 };
 
 #endif

@@ -7,12 +7,13 @@
 #include "GatePositionDetection.h"
 
 GatePositionDetection::GatePositionDetection(
-    Robot& _robot, const std::string& _fileName,
+    Robot& _robot, const std::string& _fileName, bool _decryptRequired,
     const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
     std::unique_ptr<BaseContinuationCondition> continuationCondition)
   : BaseMotion(_robot, std::move(continuationCondition)),
     fileName(_fileName),
-    qrDetectionRequest(_qrDetectionRequest)
+    qrDetectionRequest(_qrDetectionRequest),
+    decryptRequired(_decryptRequired)
 {
   LOG_CREATE("GatePositionDetection");
 }
@@ -52,14 +53,21 @@ void GatePositionDetection::executeStep()
   // -----------------------------
   // 3. QRコードの暗号文を復号
   // -----------------------------
+  std::string gatePositionData;
 
-  AesDecryptor decryptor(std::string(robot.getDecryptionKey()), qrResponse.content);
+  if(decryptRequired) {
+    // 青・黄色：復号する
+    AesDecryptor decryptor(std::string(robot.getDecryptionKey()), qrResponse.content);
 
-  std::string plaintext = decryptor.decrypt();
+    gatePositionData = decryptor.decrypt();
 
-  if(plaintext.empty()) {
-    Logger::error("GatePositionDetection: QRコードの復号に失敗しました。");
-    return;
+    if(gatePositionData.empty()) {
+      Logger::error("GatePositionDetection: QRコードの復号に失敗しました。");
+      return;
+    }
+  } else {
+    // 赤：復号しない
+    gatePositionData = qrResponse.content;
   }
 
   // -----------------------------
@@ -67,7 +75,7 @@ void GatePositionDetection::executeStep()
   //    ゲート位置情報をRobotに設定
   // -----------------------------
 
-  GatePositionParser parser(plaintext, robot);
+  GatePositionParser parser(gatePositionData, robot);
 
   if(!parser.parse()) {
     Logger::error("GatePositionDetection: ゲート位置情報の解析に失敗しました。");

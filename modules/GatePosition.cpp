@@ -56,8 +56,8 @@ void GatePosition::getPosition(GateColor color, int position[2]) const
     default:
       Logger::error("GatePosition: 不正なゲート色が指定されました。");
 
-      position[0] = 0;
-      position[1] = 0;
+      position[0] = -1;
+      position[1] = -1;
       break;
   }
 }

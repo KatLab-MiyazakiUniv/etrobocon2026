@@ -1,4 +1,3 @@
-
 /**
  * @file   GatePositionParser.cpp
  * @brief  平文からゲート位置情報を解析するクラス

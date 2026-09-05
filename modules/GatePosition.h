@@ -39,9 +39,9 @@ class GatePosition {
   void getPosition(GateColor color, int position[2]) const;
 
  private:
-  int red[2];
-  int blue[2];
-  int yellow[2];
+  int red[2];     // 赤ゲート位置情報
+  int blue[2];    // 青ゲート位置情報
+  int yellow[2];  // 黄ゲート位置情報
 };
 
 #endif

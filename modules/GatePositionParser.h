@@ -9,11 +9,8 @@
 
 #include <string>
 #include <sstream>
-
 #include "Logger.h"
 #include "Robot.h"
-
-class Robot;
 
 class GatePositionParser {
  public:

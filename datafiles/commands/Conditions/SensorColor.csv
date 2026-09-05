@@ -1,0 +1,8 @@
+コマンド名,ID,targetColor
+SensorColor,ID,COLOR
+SensorColor,001,RED
+SensorColor,002,BLUE
+SensorColor,003,BLACK
+SensorColor,004,WHITE
+SensorColor,005,GREEN
+SensorColor,006,YELLOW

@@ -16,16 +16,52 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include <sstream>
 #include <memory>
 #include <unordered_map>
-#include "BaseMotion.h"
 #include "Logger.h"
 #include "DistanceCondition.h"
+#include "SensorColorCondition.h"
+#include "RunningTimeCondition.h"
+#include "MotionTimeCondition.h"
+#include "CompoundCondition.h"
+#include "RelativeAngleCondition.h"
+#include "AbsoluteAngleCondition.h"
+#include "RepeatCountCondition.h"
+#include "LineTrace.h"
+#include "Straight.h"
+#include "AbsoluteRotation.h"
+#include "RelativeRotation.h"
+#include "CameraTracking.h"
+#include "Calibrator.h"
+#include "UltraSonicCondition.h"
+#include "ImageProcessingColor.h"
 
 class MotionParser {
  public:
   // 動作コマンド名を持つ列挙型クラス
-  enum class MOTION_COMMAND { STRAIGHT, QR_TRACKING, NONE };
+  enum class MOTION_COMMAND {
+    EXAMPLE,
+    STRAIGHT,
+    LINETRACE,
+    CAMERA_TRACKING,
+    RELATIVE_ROTATION,
+    ABSOLUTE_ROTATION,
+    CALIBRATOR,
+    NONE
+  };
   // 条件コマンド名を持つ列挙型クラス
-  enum class CONDITION_COMMAND { DISTANCE, NONE };
+  enum class CONDITION_COMMAND {
+    DISTANCE,
+    ABSOLUTE_ANGLE,
+    RELATIVE_ANGLE,
+    SENSOR_COLOR,
+    RUNNING_TIME,
+    MOTION_TIME,
+    DISTANCE_AND_COLOR,
+    DISTANCE_OR_COLOR,
+    REPEAT_COUNT,
+    ULTRA_SONIC,
+    DISTANCE_OR_ULTRA_SONIC,
+    NONE
+  };
 
   /**
    * @brief Area CSVファイルを解析して動作インスタンスのリストを生成する

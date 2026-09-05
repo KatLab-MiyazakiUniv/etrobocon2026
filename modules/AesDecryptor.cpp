@@ -28,7 +28,7 @@ bool AesDecryptor::validateKey()
   }
 
   for(char c : key) {
-    if(c < '0' || c > '9') {
+    if(!std::isalnum(static_cast<unsigned char>(c))) {
       return false;
     }
   }
@@ -39,11 +39,9 @@ bool AesDecryptor::validateKey()
 void AesDecryptor::createKey(unsigned char aesKey[16])
 {
   for(int i = 0; i < 4; i++) {
-    // 各桁を数字に変換
-    int digit = key[i] - '0';
+    int value = static_cast<unsigned char>(key[i]);
 
-    // int型4バイトとして格納
-    std::memcpy(aesKey + i * 4, &digit, sizeof(int));
+    std::memcpy(aesKey + i * 4, &value, sizeof(int));
   }
 }
 

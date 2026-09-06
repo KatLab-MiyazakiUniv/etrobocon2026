@@ -750,6 +750,13 @@ void RouteFollower::runGateSegment(
       "===== SquareTracking START %.2f mm =====",
       squareDistance);
 
+
+    // 切り替え時に一旦停止
+robot.getWheelMotorControllerInstance().stopBoth();
+
+// 100～200ms待機
+ClockUtil::sleep(200);   // または使っているClockの待機関数
+
   straightWithSquareCorrection(
       squareDistance);
 

@@ -20,14 +20,14 @@ namespace {
   /**
    * @brief 最大旋回Power
    */
-  constexpr double MAX_TURNING_POWER = 30.0;
+  constexpr double MAX_TURNING_POWER = 40.0;
 
   /**
    * @brief 最低旋回Power
    *
    * 出力が小さすぎて車体が回らないことを防ぐ。
    */
-  constexpr double MIN_TURNING_POWER = 8.0;
+  constexpr double MIN_TURNING_POWER = 12.0;
 
   /**
    * @brief 最大補正回数
@@ -42,7 +42,7 @@ namespace {
    * 連続回転させず、
    * 短時間だけ回転させる。
    */
-  constexpr int ROTATION_PULSE_TIME = 50;
+  constexpr int ROTATION_PULSE_TIME = 80;
 
   /**
    * @brief 回転停止後の待機時間[ms]

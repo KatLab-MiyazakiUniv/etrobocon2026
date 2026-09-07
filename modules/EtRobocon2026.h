@@ -13,6 +13,10 @@
 class EtRobocon2026 {
  public:
   static void start();
+
+  /**
+   * @brief 輝度キャリブレーション後に左コースのライントレースを実行する
+   */
 };
 
 #endif

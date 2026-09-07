@@ -18,8 +18,10 @@
  * @class RouteFollower
  * @brief 経路探索結果に従って回頭と直進を行うクラス
  *
- * 90度回頭を行うたびに、
- * 正方形を利用して角度誤差を補正する。
+ * 回頭するたびに正方形による角度補正を試みる。
+ *
+ * 正方形を検出できなかった場合は、
+ * その回の補正だけスキップする。
  */
 class RouteFollower {
  public:
@@ -54,12 +56,12 @@ class RouteFollower {
   double directionToHeading(Direction direction) const;
 
   /**
-   * @brief 回頭角度を計算する
+   * @brief 必要な回頭角度を計算する
    */
   double calculateRotationAngle(Direction from, Direction to) const;
 
   /**
-   * @brief 2地点間の走行距離を計算する
+   * @brief 2地点間の距離を計算する
    */
   double calculateDistance(const RouteState& from, const RouteState& to) const;
 
@@ -69,8 +71,8 @@ class RouteFollower {
   void rotate(double angle);
 
   /**
-   * @brief 90度単位で回頭し、
-   *        90度回頭ごとに正方形角度補正を行う
+   * @brief 回頭を90度単位に分割し、
+   *        回頭するたびに正方形角度補正を行う
    */
   void rotateWithSquareCorrection(double angle);
 
@@ -80,10 +82,10 @@ class RouteFollower {
   void straight(double distance);
 
   /**
-   * @brief 正方形による角度補正
+   * @brief 正方形による角度補正を試みる
    *
    * @return true 補正成功
-   * @return false 正方形未検出等で補正スキップ
+   * @return false 正方形未検出等により補正スキップ
    */
   bool adjustAngleWithSquare();
 
@@ -98,7 +100,7 @@ class RouteFollower {
   const EtRallyMap& map;
 
   /**
-   * @brief Straight走行速度
+   * @brief Straight走行速度[mm/s]
    */
   double targetSpeed;
 

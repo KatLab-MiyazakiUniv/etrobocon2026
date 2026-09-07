@@ -22,38 +22,34 @@
 namespace {
 
   /**
-   * @brief RelativeRotation終了許容誤差[deg]
+   * @brief 回頭終了許容誤差[deg]
    */
   constexpr double ROTATION_TOLERANCE = 1.0;
 
   /**
    * @brief 正方形角度補正終了許容誤差[deg]
    */
-  constexpr double SQUARE_ANGLE_TOLERANCE = 0.5;
+  constexpr double SQUARE_ANGLE_TOLERANCE = 2.0;
 
   /**
-   * @brief 1回の回頭角度[deg]
+   * @brief 1回あたりの最大回頭角度[deg]
    */
   constexpr double RIGHT_ANGLE = 90.0;
 
   /**
-   * @brief 回頭を行う最低角度[deg]
+   * @brief 回頭を実行する最低角度[deg]
    */
   constexpr double MIN_ROTATION_ANGLE = 0.001;
 
   /**
    * @brief 制御変更前の停止時間[ms]
-   *
-   * Straight
-   * Rotation
-   * SquareAngleAdjustment
-   *
-   * などへ切り替わる前に停止する。
    */
   constexpr int MOTION_CHANGE_SLEEP_TIME = 200;
 
   /**
    * @brief 制御変更前に停止して待機する
+   *
+   * @param robot ロボット
    */
   void waitBeforeMotion(Robot& robot)
   {
@@ -90,8 +86,8 @@ void RouteFollower::run(const std::vector<RouteState>& route)
   }
 
   /*
-   * route[0]は現在位置。
-   * route[1]以降を走行する。
+   * route[0]は現在地点。
+   * route[1]以降を順番に処理する。
    */
   for(std::size_t i = 1; i < route.size(); ++i) {
     const RouteState& from = route[i - 1];
@@ -104,22 +100,31 @@ void RouteFollower::run(const std::vector<RouteState>& route)
                       static_cast<int>(i), from.x, from.y, to.x, to.y);
 
     // =====================================================
-    // 1. 必要な回頭角度
+    // 1. 必要な回頭角度を計算
     // =====================================================
 
     const double rotationAngle = calculateRotationAngle(from.direction, to.direction);
 
+    // =====================================================
+    // 2. 回頭が必要なら実行
+    //
+    // 回頭するたびに必ず
+    // SquareAngleAdjustmentを呼ぶ。
+    // =====================================================
+
     if(std::abs(rotationAngle) > MIN_ROTATION_ANGLE) {
       Logger::printfLog(Logger::INFO,
                         "RouteFollower: "
-                        "rotation=%.2f deg",
+                        "rotation required %.2f deg",
                         rotationAngle);
 
       rotateWithSquareCorrection(rotationAngle);
     }
 
     // =====================================================
-    // 2. 同じ座標なら方向変更のみ
+    // 3. 同じ座標の場合
+    //
+    // 方向変更だけなのでStraightしない。
     // =====================================================
 
     if(from.x == to.x && from.y == to.y) {
@@ -130,7 +135,7 @@ void RouteFollower::run(const std::vector<RouteState>& route)
     }
 
     // =====================================================
-    // 3. Straight距離
+    // 4. Straight距離計算
     // =====================================================
 
     const double distance = calculateDistance(from, to);
@@ -148,7 +153,7 @@ void RouteFollower::run(const std::vector<RouteState>& route)
     }
 
     // =====================================================
-    // 4. Straight
+    // 5. Straight
     // =====================================================
 
     straight(distance);
@@ -156,7 +161,8 @@ void RouteFollower::run(const std::vector<RouteState>& route)
 
   robot.getWheelMotorControllerInstance().stopBoth();
 
-  Logger::info("RouteFollower: route finished");
+  Logger::info("RouteFollower: "
+               "route finished");
 }
 
 double RouteFollower::directionToHeading(Direction direction) const
@@ -225,23 +231,19 @@ void RouteFollower::rotate(double angle)
   }
 
   // =====================================================
-  // 制御変更
-  //
-  // 前の制御
-  // ↓
-  // STOP
-  // ↓
-  // sleep
-  // ↓
-  // RelativeRotation
+  // 制御変更前停止
   // =====================================================
 
   Logger::printfLog(Logger::INFO,
                     "RouteFollower: "
-                    "wait before Rotation %.2f",
+                    "wait before Rotation %.2f deg",
                     angle);
 
   waitBeforeMotion(robot);
+
+  // =====================================================
+  // RelativeRotation
+  // =====================================================
 
   auto condition = std::make_unique<RelativeAngleCondition>(robot, angle, ROTATION_TOLERANCE);
 
@@ -249,14 +251,14 @@ void RouteFollower::rotate(double angle)
 
   Logger::printfLog(Logger::INFO,
                     "RouteFollower: "
-                    "Rotation START %.2f",
+                    "Rotation START %.2f deg",
                     angle);
 
   rotation.run();
 
   Logger::printfLog(Logger::INFO,
                     "RouteFollower: "
-                    "Rotation FINISHED %.2f",
+                    "Rotation FINISHED %.2f deg",
                     angle);
 }
 
@@ -264,29 +266,18 @@ void RouteFollower::rotateWithSquareCorrection(double angle)
 {
   double remainingAngle = angle;
 
-  /*
-   * 回頭を90度単位へ分割する。
-   *
-   * 例:
-   *
-   * 180°
-   *
-   * 90° Rotation
-   * ↓
-   * Square補正
-   * ↓
-   * 90° Rotation
-   * ↓
-   * Square補正
-   */
+  // =====================================================
+  // 90度単位で回頭
+  // =====================================================
+
   while(std::abs(remainingAngle) > MIN_ROTATION_ANGLE) {
     double stepAngle = remainingAngle;
 
-    // =====================================================
-    // 90度以上なら90度だけ回頭
-    // =====================================================
-
-    if(std::abs(remainingAngle) >= RIGHT_ANGLE) {
+    /*
+     * 180度などの場合は
+     * 90度ずつに分割する。
+     */
+    if(std::abs(remainingAngle) > RIGHT_ANGLE) {
       stepAngle = std::copysign(RIGHT_ANGLE, remainingAngle);
     }
 
@@ -303,27 +294,30 @@ void RouteFollower::rotateWithSquareCorrection(double angle)
     rotate(stepAngle);
 
     // =====================================================
-    // 90度回頭の場合のみ
-    // 正方形角度補正
+    // 回頭後は毎回必ず
+    // SquareAngleAdjustmentを呼ぶ
     // =====================================================
 
-    if(std::abs(std::abs(stepAngle) - RIGHT_ANGLE) <= ROTATION_TOLERANCE) {
-      Logger::info("RouteFollower: "
-                   "90deg rotation finished "
-                   "-> square correction");
+    Logger::info("RouteFollower: "
+                 "rotation finished "
+                 "-> try SquareAngleAdjustment");
 
-      const bool adjusted = adjustAngleWithSquare();
+    const bool adjusted = adjustAngleWithSquare();
 
-      if(!adjusted) {
-        /*
-         * 正方形が検出できなくても
-         * RouteFollowerは停止しない。
-         *
-         * 補正だけスキップする。
-         */
-        Logger::warning("RouteFollower: "
-                        "square correction skipped");
-      }
+    // =====================================================
+    // 正方形未検出
+    // =====================================================
+
+    if(!adjusted) {
+      /*
+       * 正方形が見えなかった場合は、
+       * この回の補正だけスキップする。
+       *
+       * RouteFollower全体は継続する。
+       */
+      Logger::warning("RouteFollower: "
+                      "SquareAngleAdjustment skipped "
+                      "-> continue route");
     }
 
     // =====================================================
@@ -341,15 +335,7 @@ void RouteFollower::straight(double distance)
   }
 
   // =====================================================
-  // 制御変更
-  //
-  // 前の制御
-  // ↓
-  // STOP
-  // ↓
-  // sleep
-  // ↓
-  // Straight
+  // 制御変更前停止
   // =====================================================
 
   Logger::printfLog(Logger::INFO,
@@ -358,6 +344,10 @@ void RouteFollower::straight(double distance)
                     distance);
 
   waitBeforeMotion(robot);
+
+  // =====================================================
+  // Straight
+  // =====================================================
 
   auto condition = std::make_unique<DistanceCondition>(robot, distance);
 
@@ -380,15 +370,7 @@ void RouteFollower::straight(double distance)
 bool RouteFollower::adjustAngleWithSquare()
 {
   // =====================================================
-  // 制御変更
-  //
-  // RelativeRotation
-  // ↓
-  // STOP
-  // ↓
-  // sleep
-  // ↓
-  // SquareAngleAdjustment
+  // 制御変更前停止
   // =====================================================
 
   Logger::info("RouteFollower: "
@@ -402,6 +384,9 @@ bool RouteFollower::adjustAngleWithSquare()
 
   CameraServer::SquareDetectorRequest squareRequest{};
 
+  /*
+   * 画像全体から正方形を検出する。
+   */
   squareRequest.roi.x = 0;
 
   squareRequest.roi.y = 0;
@@ -417,21 +402,19 @@ bool RouteFollower::adjustAngleWithSquare()
   SquareAngleAdjustment adjustment(robot, squareRequest, squareAnglePid, SQUARE_ANGLE_TOLERANCE);
 
   Logger::info("RouteFollower: "
-               "SquareAngleAdjustment START");
+               "========== SquareAngleAdjustment START ==========");
 
   const bool success = adjustment.run();
 
   if(!success) {
     Logger::warning("RouteFollower: "
-                    "square not detected "
-                    "or adjustment failed "
-                    "-> skip");
+                    "========== SquareAngleAdjustment SKIP ==========");
 
     return false;
   }
 
   Logger::info("RouteFollower: "
-               "SquareAngleAdjustment FINISHED");
+               "========== SquareAngleAdjustment SUCCESS ==========");
 
   return true;
 }

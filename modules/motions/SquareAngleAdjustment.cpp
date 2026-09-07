@@ -9,10 +9,11 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
-#include "SystemInfo.h"
+
 #include "ClockUtil.h"
 #include "Logger.h"
 #include "SocketClient.h"
+#include "SystemInfo.h"
 
 namespace {
 
@@ -38,7 +39,7 @@ namespace {
   /**
    * @brief 補正ループ待機時間[ms]
    */
-  constexpr int LOOP_SLEEP_TIME = 1;
+  constexpr int LOOP_SLEEP_TIME = 30;
 
 }  // namespace
 
@@ -65,25 +66,33 @@ bool SquareAngleAdjustment::run()
                     "start tolerance=%.2f",
                     angleTolerance);
 
+  // =====================================================
+  // PID初期化
+  // =====================================================
+
   /*
-   * PID目標値は0度。
+   * 目標角度は0度。
    */
   anglePid.prepare();
 
   SocketClient& client = robot.getCameraSocketClientInstance();
 
+  // =====================================================
+  // 角度補正ループ
+  // =====================================================
+
   for(int count = 0; count < MAX_ADJUSTMENT_COUNT; ++count) {
-    // =====================================================
+    // ===================================================
     // 正方形検出
-    // =====================================================
+    // ===================================================
 
     CameraServer::SquareDetectorResponse response{};
 
     const bool success = client.executeSquareDetection(squareDetectionRequest, response);
 
-    // =====================================================
+    // ===================================================
     // 通信失敗
-    // =====================================================
+    // ===================================================
 
     if(!success) {
       stop();
@@ -95,62 +104,72 @@ bool SquareAngleAdjustment::run()
       return false;
     }
 
-    // =====================================================
+    // ===================================================
     // 正方形未検出
     //
-    // 探し回ったりせず、その場で補正を中止する。
-    // =====================================================
+    // この回の補正だけスキップする。
+    // ===================================================
 
     if(!response.wasDetected) {
       stop();
 
       Logger::warning("SquareAngleAdjustment: "
                       "square not detected "
-                      "-> skip");
+                      "-> skip this correction");
 
       return false;
     }
 
-    // =====================================================
+    // ===================================================
     // 正方形角度計算
-    // =====================================================
+    // ===================================================
 
     const double currentAngle = calculateSquareAngle(response);
 
     Logger::printfLog(Logger::INFO,
                       "SquareAngleAdjustment: "
-                      "angle=%.2f deg",
-                      currentAngle);
+                      "detected=true "
+                      "angle=%.2f deg "
+                      "tolerance=%.2f deg",
+                      currentAngle, angleTolerance);
 
-    // =====================================================
-    // 補正完了
-    // =====================================================
+    // ===================================================
+    // 補正終了判定
+    // ===================================================
 
     if(std::abs(currentAngle) <= angleTolerance) {
       stop();
 
       Logger::printfLog(Logger::INFO,
                         "SquareAngleAdjustment: "
-                        "completed angle=%.2f deg",
+                        "completed "
+                        "angle=%.2f deg",
                         currentAngle);
 
       return true;
     }
 
-    // =====================================================
-    // PID
-    // =====================================================
+    // ===================================================
+    // PID計算
+    // ===================================================
 
     double turningPower = anglePid.calculatePid(currentAngle) * -1.0;
 
-    /*
-     * 最大Power制限
-     */
+    Logger::printfLog(Logger::INFO,
+                      "SquareAngleAdjustment: "
+                      "PID raw=%.2f",
+                      turningPower);
+
+    // ===================================================
+    // 最大Power制限
+    // ===================================================
+
     turningPower = std::max(-MAX_TURNING_POWER, std::min(turningPower, MAX_TURNING_POWER));
 
-    /*
-     * 最低Power保証
-     */
+    // ===================================================
+    // 最低Power保証
+    // ===================================================
+
     if(std::abs(turningPower) < MIN_TURNING_POWER) {
       if(turningPower >= 0.0) {
         turningPower = MIN_TURNING_POWER;
@@ -160,9 +179,9 @@ bool SquareAngleAdjustment::run()
       }
     }
 
-    // =====================================================
+    // ===================================================
     // その場回転
-    // =====================================================
+    // ===================================================
 
     const double rightPower = -turningPower;
 
@@ -180,17 +199,21 @@ bool SquareAngleAdjustment::run()
 
     robot.getWheelMotorControllerInstance().setLeftPower(leftPower);
 
+    // ===================================================
+    // 次の検出まで待機
+    // ===================================================
+
     ClockUtil::sleep(LOOP_SLEEP_TIME);
   }
 
   // =====================================================
-  // 最大回数到達
+  // 最大補正回数到達
   // =====================================================
 
   stop();
 
   Logger::warning("SquareAngleAdjustment: "
-                  "adjustment limit reached");
+                  "adjustment count limit reached");
 
   return false;
 }
@@ -199,10 +222,8 @@ double SquareAngleAdjustment::calculateSquareAngle(
     const CameraServer::SquareDetectorResponse& response) const
 {
   /*
-   * cornersの順番に依存しないようにする。
-   *
-   * Y座標が小さい2点を
-   * 正方形の上側2点として扱う。
+   * cornersの順番に依存しないように、
+   * Y座標が小さい2点を正方形上側の2点とする。
    */
 
   std::array<int, 4> indices = { 0, 1, 2, 3 };
@@ -215,8 +236,8 @@ double SquareAngleAdjustment::calculateSquareAngle(
   const auto& point2 = response.corners[indices[1]];
 
   /*
-   * Xが小さい方を左上、
-   * Xが大きい方を右上とする。
+   * X座標が小さい方を左上、
+   * X座標が大きい方を右上とする。
    */
   const auto& topLeft = point1.x < point2.x ? point1 : point2;
 
@@ -228,6 +249,9 @@ double SquareAngleAdjustment::calculateSquareAngle(
 
   const double angleRad = std::atan2(deltaY, deltaX);
 
+  /*
+   * rad → deg
+   */
   return angleRad * 180.0 / PI;
 }
 

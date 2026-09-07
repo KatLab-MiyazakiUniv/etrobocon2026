@@ -13,8 +13,7 @@
 
 /**
  * @class SquareAngleAdjustment
- * @brief カメラで検出した正方形の傾きを利用して
- *        ロボットの向きを補正するクラス
+ * @brief 正方形の傾きを利用してロボットの向きを補正するクラス
  */
 class SquareAngleAdjustment {
  public:
@@ -39,7 +38,7 @@ class SquareAngleAdjustment {
    * @brief 正方形を利用して角度補正する
    *
    * 正方形を検出できなかった場合は
-   * 補正を行わずfalseを返す。
+   * その回の補正を行わずfalseを返す。
    *
    * @return true 補正成功
    * @return false 正方形未検出または通信失敗
@@ -48,7 +47,7 @@ class SquareAngleAdjustment {
 
  private:
   /**
-   * @brief 正方形の傾きを計算する
+   * @brief 正方形の上辺の傾きを計算する
    *
    * @param response 正方形検出結果
    * @return 正方形の傾き[deg]
@@ -56,7 +55,7 @@ class SquareAngleAdjustment {
   double calculateSquareAngle(const CameraServer::SquareDetectorResponse& response) const;
 
   /**
-   * @brief モータを停止する
+   * @brief 左右モータを停止する
    */
   void stop();
 
@@ -71,12 +70,12 @@ class SquareAngleAdjustment {
   CameraServer::SquareDetectorRequest squareDetectionRequest;
 
   /**
-   * @brief 正方形角度補正PID
+   * @brief 角度補正PID
    */
   Pid anglePid;
 
   /**
-   * @brief 補正終了許容誤差[deg]
+   * @brief 角度補正終了許容誤差[deg]
    */
   double angleTolerance;
 };

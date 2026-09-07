@@ -27,7 +27,7 @@ namespace {
    *
    * 出力が小さすぎて車体が回らないことを防ぐ。
    */
-  constexpr double MIN_TURNING_POWER = 12.0;
+  constexpr double MIN_TURNING_POWER = 8.0;
 
   /**
    * @brief 最大補正回数
@@ -37,9 +37,20 @@ namespace {
   constexpr int MAX_ADJUSTMENT_COUNT = 300;
 
   /**
-   * @brief 補正ループ待機時間[ms]
+   * @brief 1回の補正でモータを回す時間[ms]
+   *
+   * 連続回転させず、
+   * 短時間だけ回転させる。
    */
-  constexpr int LOOP_SLEEP_TIME = 30;
+  constexpr int ROTATION_PULSE_TIME = 50;
+
+  /**
+   * @brief 回転停止後の待機時間[ms]
+   *
+   * 車体とカメラ画像が安定してから
+   * 次の正方形検出を行う。
+   */
+  constexpr int DETECTION_SETTLING_TIME = 200;
 
 }  // namespace
 
@@ -71,7 +82,7 @@ bool SquareAngleAdjustment::run()
   // =====================================================
 
   /*
-   * 目標角度は0度。
+   * PIDの目標角度は0度。
    */
   anglePid.prepare();
 
@@ -82,6 +93,17 @@ bool SquareAngleAdjustment::run()
   // =====================================================
 
   for(int count = 0; count < MAX_ADJUSTMENT_COUNT; ++count) {
+    // ===================================================
+    // 検出前に必ず停止
+    // ===================================================
+
+    /*
+     * 回転中の画像では正方形検出が
+     * 不安定になる可能性があるため、
+     * 正方形を検出するときは必ず停止状態にする。
+     */
+    stop();
+
     // ===================================================
     // 正方形検出
     // ===================================================
@@ -170,6 +192,10 @@ bool SquareAngleAdjustment::run()
     // 最低Power保証
     // ===================================================
 
+    /*
+     * PID出力が小さすぎると、
+     * 静止摩擦によって車体が回らない可能性がある。
+     */
     if(std::abs(turningPower) < MIN_TURNING_POWER) {
       if(turningPower >= 0.0) {
         turningPower = MIN_TURNING_POWER;
@@ -180,7 +206,7 @@ bool SquareAngleAdjustment::run()
     }
 
     // ===================================================
-    // その場回転
+    // その場回転用Power
     // ===================================================
 
     const double rightPower = -turningPower;
@@ -195,15 +221,46 @@ bool SquareAngleAdjustment::run()
                       "left=%.2f",
                       currentAngle, turningPower, rightPower, leftPower);
 
+    // ===================================================
+    // 短時間だけその場回転
+    // ===================================================
+
     robot.getWheelMotorControllerInstance().setRightPower(rightPower);
 
     robot.getWheelMotorControllerInstance().setLeftPower(leftPower);
 
+    /*
+     * 連続回転させず、
+     * ROTATION_PULSE_TIMEだけ回転する。
+     */
+    ClockUtil::sleep(ROTATION_PULSE_TIME);
+
     // ===================================================
-    // 次の検出まで待機
+    // 回転終了
     // ===================================================
 
-    ClockUtil::sleep(LOOP_SLEEP_TIME);
+    stop();
+
+    Logger::info("SquareAngleAdjustment: "
+                 "rotation pulse finished");
+
+    // ===================================================
+    // 車体・画像安定待ち
+    // ===================================================
+
+    /*
+     * モータ停止直後は車体の揺れや
+     * モーションブラーが残る可能性がある。
+     *
+     * 次の正方形検出は、
+     * DETECTION_SETTLING_TIME待ってから行う。
+     */
+    ClockUtil::sleep(DETECTION_SETTLING_TIME);
+
+    /*
+     * 次のforループへ進み、
+     * 停止した状態で再び正方形を検出する。
+     */
   }
 
   // =====================================================
@@ -213,7 +270,8 @@ bool SquareAngleAdjustment::run()
   stop();
 
   Logger::warning("SquareAngleAdjustment: "
-                  "adjustment count limit reached");
+                  "adjustment count limit reached "
+                  "-> skip");
 
   return false;
 }
@@ -222,8 +280,10 @@ double SquareAngleAdjustment::calculateSquareAngle(
     const CameraServer::SquareDetectorResponse& response) const
 {
   /*
-   * cornersの順番に依存しないように、
-   * Y座標が小さい2点を正方形上側の2点とする。
+   * cornersの順番に依存しないようにする。
+   *
+   * Y座標が小さい2点を
+   * 正方形の上側2点として扱う。
    */
 
   std::array<int, 4> indices = { 0, 1, 2, 3 };
@@ -231,6 +291,9 @@ double SquareAngleAdjustment::calculateSquareAngle(
   std::sort(indices.begin(), indices.end(),
             [&response](int a, int b) { return response.corners[a].y < response.corners[b].y; });
 
+  /*
+   * Y座標が小さい2点を取得する。
+   */
   const auto& point1 = response.corners[indices[0]];
 
   const auto& point2 = response.corners[indices[1]];
@@ -243,6 +306,10 @@ double SquareAngleAdjustment::calculateSquareAngle(
 
   const auto& topRight = point1.x < point2.x ? point2 : point1;
 
+  // =====================================================
+  // 正方形上辺の傾きを計算
+  // =====================================================
+
   const double deltaX = static_cast<double>(topRight.x - topLeft.x);
 
   const double deltaY = static_cast<double>(topRight.y - topLeft.y);
@@ -251,6 +318,8 @@ double SquareAngleAdjustment::calculateSquareAngle(
 
   /*
    * rad → deg
+   *
+   * PIはSystemInfo.hの定義を使用する。
    */
   return angleRad * 180.0 / PI;
 }

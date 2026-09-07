@@ -27,7 +27,7 @@ namespace {
    *
    * 出力が小さすぎて車体が回らないことを防ぐ。
    */
-  constexpr double MIN_TURNING_POWER = 8.0;
+  constexpr double MIN_TURNING_POWER = 12.0;
 
   /**
    * @brief 最大補正回数

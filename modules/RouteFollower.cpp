@@ -29,7 +29,7 @@ namespace {
   /**
    * @brief 正方形角度補正終了許容誤差[deg]
    */
-  constexpr double SQUARE_ANGLE_TOLERANCE = 2.0;
+  constexpr double SQUARE_ANGLE_TOLERANCE = 0.5;
 
   /**
    * @brief 1回あたりの最大回頭角度[deg]

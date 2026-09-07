@@ -219,7 +219,7 @@ void EtRobocon2026::start()
    *
    * 最初はP制御のみ。
    */
-  const Pid::PidGain squareAnglePid = { 1.0, 0.0, 0.0 };
+  const Pid::PidGain squareAnglePid = { 1.0, 0.0, 0.05 };
 
   // =========================================================
   // 7. 走行速度

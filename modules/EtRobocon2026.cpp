@@ -24,69 +24,43 @@ namespace {
   /**
    * @brief コースの種類
    */
-  enum class CourseSide {
-    L_COURSE,
-    R_COURSE
-  };
+  enum class CourseSide { L_COURSE, R_COURSE };
 
   /**
    * @brief 使用するコース
-   *
-   * Lコース:
-   *   CourseSide::L_COURSE
-   *
-   * Rコース:
-   *   CourseSide::R_COURSE
    */
-  constexpr CourseSide COURSE_SIDE =
-      CourseSide::L_COURSE;
+  constexpr CourseSide COURSE_SIDE = CourseSide::L_COURSE;
 
   /**
-   * @brief Lコース基準の座標を使用するコース用へ変換する
-   * @param point Lコース基準の座標
-   * @return 使用するコースの座標
+   * @brief Lコース座標を使用コース用へ変換する
    */
-  Point convertPoint(
-      const Point& point)
+  Point convertPoint(const Point& point)
   {
-    if(COURSE_SIDE
-       == CourseSide::R_COURSE) {
-
-      return CourseMirror::mirrorPoint(
-          point);
+    if(COURSE_SIDE == CourseSide::R_COURSE) {
+      return CourseMirror::mirrorPoint(point);
     }
 
     return point;
   }
 
   /**
-   * @brief Lコース基準の方向を使用するコース用へ変換する
-   * @param direction Lコース基準の方向
-   * @return 使用するコースの方向
+   * @brief Lコース方向を使用コース用へ変換する
    */
-  Direction convertDirection(
-      Direction direction)
+  Direction convertDirection(Direction direction)
   {
-    if(COURSE_SIDE
-       == CourseSide::R_COURSE) {
-
-      return CourseMirror::mirrorDirection(
-          direction);
+    if(COURSE_SIDE == CourseSide::R_COURSE) {
+      return CourseMirror::mirrorDirection(direction);
     }
 
     return direction;
   }
 
   /**
-   * @brief Directionを文字列へ変換する
-   * @param direction 方向
-   * @return 方向を表す文字列
+   * @brief Directionを文字列化する
    */
-  const char* directionToString(
-      Direction direction)
+  const char* directionToString(Direction direction)
   {
     switch(direction) {
-
       case Direction::UP:
         return "UP";
 
@@ -104,15 +78,11 @@ namespace {
   }
 
   /**
-   * @brief GoalColorを文字列へ変換する
-   * @param color ゲート色
-   * @return ゲート色を表す文字列
+   * @brief GoalColorを文字列化する
    */
-  const char* colorToString(
-      GoalColor color)
+  const char* colorToString(GoalColor color)
   {
     switch(color) {
-
       case GoalColor::RED:
         return "RED";
 
@@ -130,37 +100,31 @@ namespace {
 
 void EtRobocon2026::start()
 {
-  Logger::info(
-      "RouteFollower Square gate test start");
+  Logger::info("RouteFollower Square correction test start");
 
   // =========================================================
-  // 1. Robot生成
+  // 1. Robot
   // =========================================================
 
   RealNetworkSystem networkSystem;
 
-  SocketClient cameraSocketClient(
-      networkSystem);
+  SocketClient cameraSocketClient(networkSystem);
 
-  Robot robot(
-      cameraSocketClient);
-
-  /*
-   * ゲート通過時に正方形検出を使用するため、
-   * カメラサーバーへ接続する。
-   */
-  Logger::info(
-      "EtRobocon2026: connect to camera server");
-
-  robot
-      .getCameraSocketClientInstance()
-      .connectToServer();
+  Robot robot(cameraSocketClient);
 
   // =========================================================
-  // 2. ゲート情報登録
+  // カメラサーバー接続
   //
-  // 座標はLコース基準で定義し、
-  // Rコースの場合はCourseMirrorで変換する。
+  // 90度回頭後の正方形検出で使用する。
+  // =========================================================
+
+  Logger::info("EtRobocon2026: "
+               "connect to camera server");
+
+  robot.getCameraSocketClientInstance().connectToServer();
+
+  // =========================================================
+  // 2. ゲート情報
   // =========================================================
 
   MapData mapData;
@@ -169,59 +133,37 @@ void EtRobocon2026::start()
   // 赤ゲート
   // ---------------------------------------------------------
 
-  Point redGate1 =
-      convertPoint(
-          { 1, 5 });
+  Point redGate1 = convertPoint({ 1, 5 });
 
-  Point redGate2 =
-      convertPoint(
-          { 3, 5 });
+  Point redGate2 = convertPoint({ 3, 5 });
 
-  mapData.setGate(
-      GoalColor::RED,
-      redGate1,
-      redGate2);
+  mapData.setGate(GoalColor::RED, redGate1, redGate2);
 
   // ---------------------------------------------------------
   // 青ゲート
   // ---------------------------------------------------------
 
-  Point blueGate1 =
-      convertPoint(
-          { 5, 7 });
+  Point blueGate1 = convertPoint({ 5, 7 });
 
-  Point blueGate2 =
-      convertPoint(
-          { 5, 9 });
+  Point blueGate2 = convertPoint({ 5, 9 });
 
-  mapData.setGate(
-      GoalColor::BLUE,
-      blueGate1,
-      blueGate2);
+  mapData.setGate(GoalColor::BLUE, blueGate1, blueGate2);
 
   // ---------------------------------------------------------
   // 黄ゲート
   // ---------------------------------------------------------
 
-  Point yellowGate1 =
-      convertPoint(
-          { 7, 5 });
+  Point yellowGate1 = convertPoint({ 7, 5 });
 
-  Point yellowGate2 =
-      convertPoint(
-          { 9, 5 });
+  Point yellowGate2 = convertPoint({ 9, 5 });
 
-  mapData.setGate(
-      GoalColor::YELLOW,
-      yellowGate1,
-      yellowGate2);
+  mapData.setGate(GoalColor::YELLOW, yellowGate1, yellowGate2);
 
   // =========================================================
-  // 3. 経路探索クラス・実座標マップ
+  // 3. 経路探索
   // =========================================================
 
-  GateRoutePlanner routePlanner(
-      mapData);
+  GateRoutePlanner routePlanner(mapData);
 
   EtRallyMap etRallyMap;
 
@@ -229,447 +171,213 @@ void EtRobocon2026::start()
   // 4. 開始位置
   // =========================================================
 
-  Point startPoint =
-      convertPoint(
-          { 2, 2 });
+  Point startPoint = convertPoint({ 2, 2 });
 
-  int currentGridX =
-      startPoint.x;
+  int currentGridX = startPoint.x;
 
-  int currentGridY =
-      startPoint.y;
+  int currentGridY = startPoint.y;
 
-  Direction currentDirection =
-      convertDirection(
-          Direction::DOWN);
+  Direction currentDirection = convertDirection(Direction::DOWN);
 
-  Logger::printfLog(
-      Logger::INFO,
-      "Start grid: (%d,%d), direction=%s",
-      currentGridX,
-      currentGridY,
-      directionToString(
-          currentDirection));
+  Logger::printfLog(Logger::INFO, "Start grid: (%d,%d), direction=%s", currentGridX, currentGridY,
+                    directionToString(currentDirection));
 
   // =========================================================
-  // 5. 通過するゲート
+  // 5. 通過ゲート
   // =========================================================
 
-  constexpr GoalColor TARGET_COLORS[] = {
-      GoalColor::RED,
-      GoalColor::BLUE,
-      GoalColor::YELLOW
-  };
+  constexpr GoalColor TARGET_COLORS[] = { GoalColor::RED, GoalColor::BLUE, GoalColor::YELLOW };
 
   // =========================================================
-  // 6. PID設定
+  // 6. PID
   // =========================================================
 
   /**
-   * 回頭PID
+   * @brief 回頭PID
    */
-  const Pid::PidGain rotationPid = {
-      1.3,
-      1.0,
-      0.0
-  };
+  const Pid::PidGain rotationPid = { 1.3, 1.0, 0.0 };
 
   /**
-   * 右車輪速度PID
+   * @brief 右車輪速度PID
    */
-  const Pid::PidGain rightPid = {
-      0.016,
-      0.005,
-      0.0015
-  };
+  const Pid::PidGain rightPid = { 0.016, 0.005, 0.0015 };
 
   /**
-   * 左車輪速度PID
+   * @brief 左車輪速度PID
    */
-  const Pid::PidGain leftPid = {
-      0.016,
-      0.0045,
-      0.0015
-  };
+  const Pid::PidGain leftPid = { 0.016, 0.0045, 0.0015 };
 
   /**
-   * 通常Straight用角度補正PID
+   * @brief Straight角度PID
    */
-  const Pid::PidGain straightAnglePid = {
-      0.033,
-      0.003,
-      0.03
-  };
+  const Pid::PidGain straightAnglePid = { 0.033, 0.003, 0.03 };
 
   /**
-   * 正方形追従用PID
+   * @brief 正方形角度補正PID
    *
-   * 正方形の中心X座標が
-   * 画像中央へ来るように補正する。
-   */
-  const Pid::PidGain squareTrackingPid = {
-      0.0010,
-      0.000,
-      0.0005
-  };
-
-  // =========================================================
-  // 7. 走行設定
-  // =========================================================
-
-  /**
-   * @brief 通常Straight速度[mm/s]
-   */
-  constexpr double TARGET_SPEED =
-      200.0;
-
-  /**
-   * @brief 正方形追従時の速度[mm/s]
-   */
-  constexpr double SQUARE_TRACKING_SPEED =
-      200.0;
-
-  /**
-   * @brief 正方形を合わせる画像上のX座標
+   * 90度回頭後に使用する。
    *
-   * 1920px幅の画像中央。
+   * 最初はP制御のみ。
    */
-  constexpr int SQUARE_TARGET_X =
-      960;
+  const Pid::PidGain squareAnglePid = { 1.0, 0.0, 0.0 };
 
   // =========================================================
-  // 8. RouteFollower生成
+  // 7. 走行速度
   // =========================================================
 
-  RouteFollower routeFollower(
-      robot,
-      etRallyMap,
-      mapData,
-      TARGET_SPEED,
-      SQUARE_TRACKING_SPEED,
-      SQUARE_TARGET_X,
-      rotationPid,
-      rightPid,
-      leftPid,
-      straightAnglePid,
-      squareTrackingPid);
+  constexpr double TARGET_SPEED = 200.0;
 
   // =========================================================
-  // 9. RED → BLUE → YELLOW を3周
+  // 8. RouteFollower
+  // =========================================================
+
+  RouteFollower routeFollower(robot, etRallyMap, TARGET_SPEED, rotationPid, rightPid, leftPid,
+                              straightAnglePid, squareAnglePid);
+
+  // =========================================================
+  // 9. RED → BLUE → YELLOW × 3
   // =========================================================
 
   constexpr int LAP_COUNT = 3;
 
-  for(int lap = 1;
-      lap <= LAP_COUNT;
-      ++lap) {
+  for(int lap = 1; lap <= LAP_COUNT; ++lap) {
+    Logger::info("========================================");
 
-    Logger::info(
-        "========================================");
+    Logger::printfLog(Logger::INFO, "Lap %d / %d start", lap, LAP_COUNT);
 
-    Logger::printfLog(
-        Logger::INFO,
-        "Lap %d / %d start",
-        lap,
-        LAP_COUNT);
+    for(const GoalColor targetColor : TARGET_COLORS) {
+      Logger::info("==============================");
 
-    for(const GoalColor targetColor :
-        TARGET_COLORS) {
-
-      Logger::info(
-          "==============================");
-
-      Logger::printfLog(
-          Logger::INFO,
-          "Lap %d / %d, Target gate: %s",
-          lap,
-          LAP_COUNT,
-          colorToString(
-              targetColor));
-
-      Logger::printfLog(
-          Logger::INFO,
-          "Current grid: (%d,%d), direction=%s",
-          currentGridX,
-          currentGridY,
-          directionToString(
-              currentDirection));
+      Logger::printfLog(Logger::INFO,
+                        "Lap %d / %d "
+                        "Target=%s",
+                        lap, LAP_COUNT, colorToString(targetColor));
 
       // =====================================================
       // 経路探索
       // =====================================================
 
-      GateRouteResult routeResult =
-          routePlanner.search(
-              currentGridX,
-              currentGridY,
-              currentDirection,
-              targetColor);
+      GateRouteResult routeResult
+          = routePlanner.search(currentGridX, currentGridY, currentDirection, targetColor);
 
       if(!routeResult.found) {
+        Logger::printfLog(Logger::ERROR, "Route to %s not found", colorToString(targetColor));
 
-        Logger::printfLog(
-            Logger::ERROR,
-            "Route to %s not found",
-            colorToString(
-                targetColor));
-
-        robot
-            .getWheelMotorControllerInstance()
-            .stopBoth();
+        robot.getWheelMotorControllerInstance().stopBoth();
 
         return;
       }
 
       // =====================================================
-      // 探索結果表示
-      // =====================================================
-
-      Logger::printfLog(
-          Logger::INFO,
-          "Route cost: %d",
-          routeResult.cost);
-
-      Logger::printfLog(
-          Logger::INFO,
-          "Gate entrance: (%d,%d)",
-          routeResult.entrance.x,
-          routeResult.entrance.y);
-
-      Logger::printfLog(
-          Logger::INFO,
-          "Gate exit: (%d,%d)",
-          routeResult.exit.x,
-          routeResult.exit.y);
-
-      Logger::printfLog(
-          Logger::INFO,
-          "Exit direction: %s",
-          directionToString(
-              routeResult.exitDirection));
-
-      Logger::printfLog(
-          Logger::INFO,
-          "Route size: %d",
-          static_cast<int>(
-              routeResult.route.size()));
-
-      // =====================================================
       // 経路表示
       // =====================================================
 
-      for(std::size_t i = 0;
-          i < routeResult.route.size();
-          ++i) {
+      Logger::printfLog(Logger::INFO, "Route cost=%d", routeResult.cost);
 
-        const RouteState& state =
-            routeResult.route[i];
+      Logger::printfLog(Logger::INFO, "Route size=%d", static_cast<int>(routeResult.route.size()));
 
-        const EtRallyMap::Node node =
-            etRallyMap.getNode(
-                state.x,
-                state.y);
+      for(std::size_t i = 0; i < routeResult.route.size(); ++i) {
+        const RouteState& state = routeResult.route[i];
 
-        Logger::printfLog(
-            Logger::INFO,
-            "Route[%d]: grid=(%d,%d), "
-            "position=(%.2f, %.2f), "
-            "direction=%s",
-            static_cast<int>(i),
-            state.x,
-            state.y,
-            node.x,
-            node.y,
-            directionToString(
-                state.direction));
+        const EtRallyMap::Node node = etRallyMap.getNode(state.x, state.y);
+
+        Logger::printfLog(Logger::INFO,
+                          "Route[%d]: "
+                          "grid=(%d,%d) "
+                          "position=(%.2f,%.2f) "
+                          "direction=%s",
+                          static_cast<int>(i), state.x, state.y, node.x, node.y,
+                          directionToString(state.direction));
       }
 
       // =====================================================
-      // RouteFollowerで走行
+      // RouteFollower
       //
-      // RouteFollower側で各区間を自動判定する。
+      // Straight
       //
-      // 通常区間:
-      //   Straight
+      // または
       //
-      // ゲート通過区間:
+      // 90° Rotation
+      // ↓
+      // SquareAngleAdjustment
+      // ↓
+      // Straight
       //
-      //   Straight
-      //      ↓
-      //   ゲート125mm手前
-      //      ↓
-      //   SquareTracking 250mm
-      //      ↓
-      //   残りStraight
+      // 正方形なし:
       //
-      // true / falseの指定は不要。
+      // 90° Rotation
+      // ↓
+      // Square未検出
+      // ↓
+      // SKIP
+      // ↓
+      // Straight
+      //
+      // 各制御の切り替え前に
+      // stop + 200ms sleep
       // =====================================================
 
-      Logger::info(
-          "EtRobocon2026: RouteFollower start");
-
-      routeFollower.run(
-          routeResult.route);
-
-      Logger::info(
-          "EtRobocon2026: RouteFollower finished");
+      routeFollower.run(routeResult.route);
 
       // =====================================================
-      // 次回探索開始位置更新
+      // 現在状態更新
       // =====================================================
 
-      currentGridX =
-          routeResult.exit.x;
+      currentGridX = routeResult.exit.x;
 
-      currentGridY =
-          routeResult.exit.y;
+      currentGridY = routeResult.exit.y;
 
-      currentDirection =
-          routeResult.exitDirection;
+      currentDirection = routeResult.exitDirection;
 
-      Logger::printfLog(
-          Logger::INFO,
-          "%s gate passed: "
-          "exit=(%d,%d), direction=%s",
-          colorToString(
-              targetColor),
-          currentGridX,
-          currentGridY,
-          directionToString(
-              currentDirection));
+      Logger::printfLog(Logger::INFO,
+                        "%s gate passed: "
+                        "(%d,%d) %s",
+                        colorToString(targetColor), currentGridX, currentGridY,
+                        directionToString(currentDirection));
     }
 
-    Logger::printfLog(
-        Logger::INFO,
-        "Lap %d / %d finished",
-        lap,
-        LAP_COUNT);
+    Logger::printfLog(Logger::INFO, "Lap %d finished", lap);
   }
 
   // =========================================================
   // 10. 最終地点
   // =========================================================
 
-  Logger::info(
-      "========================================");
+  Point finalPoint = convertPoint({ 8, 0 });
 
-  Logger::info(
-      "Move to final position");
-
-  Point finalPoint =
-      convertPoint(
-          { 8, 0 });
-
-  Direction finalDirection =
-      convertDirection(
-          Direction::LEFT);
-
-  Logger::printfLog(
-      Logger::INFO,
-      "Final target: (%d,%d), direction=%s",
-      finalPoint.x,
-      finalPoint.y,
-      directionToString(
-          finalDirection));
+  Direction finalDirection = convertDirection(Direction::LEFT);
 
   // =========================================================
   // 11. 最終地点への経路探索
   // =========================================================
 
-  DijkstraRoutePlanner finalRoutePlanner(
-      mapData.getGates());
+  DijkstraRoutePlanner finalRoutePlanner(mapData.getGates());
 
-  RouteResult finalRoute =
-      finalRoutePlanner.search(
-          currentGridX,
-          currentGridY,
-          currentDirection,
-          finalPoint,
-          finalDirection);
+  RouteResult finalRoute = finalRoutePlanner.search(currentGridX, currentGridY, currentDirection,
+                                                    finalPoint, finalDirection);
 
   if(!finalRoute.found) {
+    Logger::error("Route to final position not found");
 
-    Logger::printfLog(
-        Logger::ERROR,
-        "Route to final position (%d,%d) not found",
-        finalPoint.x,
-        finalPoint.y);
-
-    robot
-        .getWheelMotorControllerInstance()
-        .stopBoth();
+    robot.getWheelMotorControllerInstance().stopBoth();
 
     return;
   }
 
   // =========================================================
-  // 12. 最終経路表示
+  // 12. 最終走行
   // =========================================================
 
-  Logger::printfLog(
-      Logger::INFO,
-      "Final route cost: %d",
-      finalRoute.cost);
-
-  Logger::printfLog(
-      Logger::INFO,
-      "Final route size: %d",
-      static_cast<int>(
-          finalRoute.route.size()));
-
-  for(std::size_t i = 0;
-      i < finalRoute.route.size();
-      ++i) {
-
-    const RouteState& state =
-        finalRoute.route[i];
-
-    const EtRallyMap::Node node =
-        etRallyMap.getNode(
-            state.x,
-            state.y);
-
-    Logger::printfLog(
-        Logger::INFO,
-        "FinalRoute[%d]: "
-        "grid=(%d,%d), "
-        "position=(%.2f, %.2f), "
-        "direction=%s",
-        static_cast<int>(i),
-        state.x,
-        state.y,
-        node.x,
-        node.y,
-        directionToString(
-            state.direction));
-  }
+  routeFollower.run(finalRoute.route);
 
   // =========================================================
-  // 13. 最終地点へ走行
-  //
-  // ここでもRouteFollower自身が、
-  // ゲートを横切る区間だけCameraTrackingを使用する。
+  // 13. 停止
   // =========================================================
 
-  routeFollower.run(
-      finalRoute.route);
+  robot.getWheelMotorControllerInstance().stopBoth();
 
-  // =========================================================
-  // 14. 停止
-  // =========================================================
+  Logger::printfLog(Logger::INFO, "Final grid=(%d,%d) direction=%s", finalPoint.x, finalPoint.y,
+                    directionToString(finalDirection));
 
-  robot
-      .getWheelMotorControllerInstance()
-      .stopBoth();
-
-  Logger::printfLog(
-      Logger::INFO,
-      "Final grid: (%d,%d), direction=%s",
-      finalPoint.x,
-      finalPoint.y,
-      directionToString(
-          finalDirection));
-
-  Logger::info(
-      "RouteFollower Square gate test finished");
+  Logger::info("RouteFollower Square correction test finished");
 }

@@ -14,6 +14,7 @@
 #include <stdexcept>
 #include <string>
 #include <vector>
+#include <filesystem>
 
 namespace {
 
@@ -257,10 +258,26 @@ int main(int argc, char* argv[])
     std::cerr << "使い方: " << argv[0] << " runlog.csv [output.svg]\n";
     return 1;
   }
-  const std::string outputPath = argc == 3 ? argv[2] : "runlog_plot.svg";
+
+  std::filesystem::path inputPath(argv[1]);
+
+  std::filesystem::path outputPath;
+
+  if(argc == 3) {
+    // 出力先を指定された場合はそれを使用
+    outputPath = argv[2];
+  } else {
+    // 指定されなかった場合はCSVと同じディレクトリ
+    outputPath = inputPath.parent_path() / "runlog_plot.svg";
+  }
+
   try {
-    writeSvg(loadRows(argv[1]), outputPath);
-    std::cout << "グラフを出力しました: " << outputPath << std::endl;
+    writeSvg(loadRows(inputPath.string()), outputPath.string());
+
+    std::cout << "グラフを出力しました: "
+              << outputPath.string()
+              << std::endl;
+
     return 0;
   } catch(const std::exception& error) {
     std::cerr << error.what() << std::endl;

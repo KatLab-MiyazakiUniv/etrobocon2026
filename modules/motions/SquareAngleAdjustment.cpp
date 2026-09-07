@@ -9,17 +9,12 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
-
+#include "SystemInfo.h"
 #include "ClockUtil.h"
 #include "Logger.h"
 #include "SocketClient.h"
 
 namespace {
-
-  /**
-   * @brief 円周率
-   */
-  constexpr double PI = 3.14159265358979323846;
 
   /**
    * @brief 最大旋回Power

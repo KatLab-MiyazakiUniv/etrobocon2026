@@ -69,7 +69,7 @@ namespace etrobocon2026_test {
     MockNetworkSystem network;
     SocketClient client(network);
     Robot robot(client);
-    std::string path = (root / "datafiles/commands/Area/LineTraceLeft.csv").string();
+    std::string path = (root / "datafiles/commands/Area/ETZumoLeft.csv").string();
     auto motions = MotionParser::createMotionList(robot, path);
     EXPECT_EQ(motions.size(), 7u);
     if(!motions.empty()) EXPECT_NE(dynamic_cast<ETZumoExit*>(motions.front()), nullptr);

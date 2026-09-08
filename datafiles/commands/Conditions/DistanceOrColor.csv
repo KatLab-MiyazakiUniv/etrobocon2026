@@ -2,5 +2,5 @@
 DistanceOrColor,ID,double,COLOR
 DistanceOrColor,001,500,RED
 DistanceOrColor,002,1000,BLUE
-DistanceOrColor,003,300,BLACK
+DistanceOrColor,003,80,BLACK
 DistanceOrColor,004,3000,BLACK

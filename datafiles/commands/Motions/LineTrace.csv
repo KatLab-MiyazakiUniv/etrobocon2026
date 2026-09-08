@@ -1,8 +1,8 @@
 コマンド名,ID,speed,brightness,brightness_kp,brightness_ki,brightness_kd
 LineTrace,ID,double,int,double,double,double
 # 直線
-LineTrace,001,400,50,0.03,0.0,0.01 
-LineTrace,002,500,50,0.035,0.0,0.018
+LineTrace,001,400,50,0.025,0.00,0.015
+LineTrace,002,400,50,0.06,0.0,0.03
 LineTrace,006,500,50,0.037,0.0,0.01
 
 # カーブ

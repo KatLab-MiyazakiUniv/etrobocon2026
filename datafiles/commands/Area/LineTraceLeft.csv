@@ -1,9 +1,9 @@
 動作コマンド名,動作ID,条件コマンド名,条件ID
 ETZumoExit,001,RepeatCount,001
 #ETzumoArea突破
-Straight,002,Distance,015
-Straight,003,Distance,010
+Straight,003,DistanceOrColor,003
 AbsoluteRotation,004,AbsoluteAngle,004
-LineTrace,001,SensorColor,002
-AbsoluteRotation,004,AbsoluteAngle,004
-Straight,002,Distance,020
+LineTrace,002,Distance,010
+LineTrace,001,DistanceAndColor,004
+AbsoluteRotation,005,AbsoluteAngle,005
+Straight,002,Distance,070

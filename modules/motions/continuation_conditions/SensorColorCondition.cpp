@@ -27,13 +27,13 @@ bool SensorColorCondition::shouldContinue()
   ColorSensorController::HSV hsv;
   robot.getColorSensorControllerInstance().getRawHSV(hsv, true);
 
-Logger::printfLog(
-  Logger::DEBUG,
-  "HSV: H=%u, S=%u, V=%u",
-  static_cast<unsigned int>(hsv.h),
-  static_cast<unsigned int>(hsv.s),
-  static_cast<unsigned int>(hsv.v)
-);
+// Logger::printfLog(
+//   Logger::DEBUG,
+//   "HSV: H=%u, S=%u, V=%u",
+//   static_cast<unsigned int>(hsv.h),
+//   static_cast<unsigned int>(hsv.s),
+//   static_cast<unsigned int>(hsv.v)
+// );
 
   ColorSensorController::COLOR CurrentColor
       = robot.getColorSensorControllerInstance().convertHsvToColor(hsv);

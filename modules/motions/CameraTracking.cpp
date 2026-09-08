@@ -92,12 +92,12 @@ void CameraTracking::executeStep()
       Logger::printfLog(Logger::DEBUG, "CameraTracking:最大色の検知失敗");
     }
 
-    if(colorDetectionRequest.requireLargestColorIndex != -1 && response.largestColorIndex != 3  && response.largestColorIndex != -1) {
-      Logger::printfLog(Logger::DEBUG, "CameraTracking:検知した最大色の添字は[%d]", response.largestColorIndex);
+    if(colorDetectionRequest.requireLargestColorIndex != -1 && response.largestColorIndex != 3
+       && response.largestColorIndex != -1) {
+      Logger::printfLog(Logger::DEBUG, "CameraTracking:検知した最大色の添字は[%d]",
+                        response.largestColorIndex);
       robot.setIndexOfLabel(response.largestColorIndex);
     }
-
-
 
     // バウンディングボックスの中心X座標を計算
     currentX = (response.result.topLeft.x + response.result.bottomRight.x) / 2.0;
@@ -148,6 +148,11 @@ void CameraTracking::wait() {}
 void CameraTracking::finish()
 {
   if(isStopMotorPower) {
+    // 極端にpower値を設定する間隔が短くなっていそうなので、sleep()を挿入し急旋回挙動が減るかどうかを検証>進行中
+    // ------------------------------------------------------------------------------------------------------
+    ClockUtil::sleep(10);  // 10ミリ秒待機
+    // ------------------------------------------------------------------------------------------------------
+
     Logger::printfLog(Logger::DEBUG, "モーターに0をセット");
     // robot.getWheelMotorControllerInstance().stopBoth();
     robot.getWheelMotorControllerInstance().brakeBoth();

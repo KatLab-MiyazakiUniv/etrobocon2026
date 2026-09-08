@@ -70,7 +70,7 @@ class ColorRegionDetector : public BoundingBoxDetector {
 
  private:
   static constexpr double MIN_CONTOUR_AREA
-      = 50.0;                       // これ以下の面積の輪郭はノイズとみなして除外する
+      = 50.0;  // これ以下の面積の輪郭はノイズとみなして除外する
   std::vector<HSVRange> hsvRanges;  // 検出したい色のHSV範囲のリスト
   cv::Rect roi;                     // フレーム全体に対するROI
 

@@ -14,6 +14,7 @@
 
 namespace etrobocon2026_test {
   namespace {
+    // 子動作の継続・終了をテスト中に切り替えるための継続条件
     class SwitchCondition : public BaseContinuationCondition {
      public:
       explicit SwitchCondition(Robot& robot) : BaseContinuationCondition(robot) {}
@@ -22,6 +23,7 @@ namespace etrobocon2026_test {
     };
   }  // namespace
 
+  // 動作の切り替えで共有距離がリセットされず、800mmに到達すると終了するかのテスト
   TEST(ETZumoExitTest, SharedDistanceSurvivesPhasePreparationAndStopsAt800)
   {
     MockNetworkSystem network;
@@ -30,6 +32,7 @@ namespace etrobocon2026_test {
     auto mileage = std::make_shared<ProjectedMileage>();
     auto& wheels = robot.getWheelMotorControllerInstance();
     double current = Mileage::calculateMileage(wheels.getRightCount(), wheels.getLeftCount());
+    // 車輪の累計走行距離を変更せず、基準方向に799mm進んだ状態を作る。
     mileage->reset(current - 799.0, 0.0);
     mileage->update(current, 0.0);
 
@@ -38,9 +41,11 @@ namespace etrobocon2026_test {
     ETZumoExitCondition first(robot, mileage, 800.0, std::move(inner));
     first.prepare();
     EXPECT_TRUE(first.shouldContinue());
+    // 目標距離に未到達でも、子動作の継続条件が成立しなければ終了する。
     tracking->keepRunning = false;
     EXPECT_FALSE(first.shouldContinue());
 
+    // 次の直進動作を準備しても799mmを保持し、800mmに到達した時点で終了する。
     ETZumoExitCondition straight(robot, mileage, 800.0);
     straight.prepare();
     EXPECT_DOUBLE_EQ(mileage->getDistance(), 799.0);
@@ -50,11 +55,12 @@ namespace etrobocon2026_test {
     EXPECT_FALSE(straight.shouldContinue());
   }
 
+  // 実際のCSVからET相撲退出動作と後続動作を含む7個の動作を生成できるかのテスト
   TEST(ETZumoExitTest, ProductionCsvCreatesExitAndKeepsFinishMotions)
   {
-    // MotionParserはプロジェクトの親ディレクトリから実行する仕様。
     const auto original = std::filesystem::current_path();
     const auto root = std::filesystem::path(__FILE__).parent_path().parent_path();
+    // テスト終了時に、実行前の作業ディレクトリへ戻す。
     struct RestoreDirectory {
       std::filesystem::path path;
       ~RestoreDirectory() { std::filesystem::current_path(path); }
@@ -70,9 +76,7 @@ namespace etrobocon2026_test {
     for(auto* motion : motions) delete motion;
   }
 
-}  // namespace etrobocon2026_test
-
-namespace etrobocon2026_test {
+  // 距離計測が未設定・未初期化、または目標距離が不正なときに継続しないかのテスト
   TEST(ETZumoExitTest, InvalidConditionsStopWithoutDereferencingMissingMileage)
   {
     MockNetworkSystem network;
@@ -88,6 +92,7 @@ namespace etrobocon2026_test {
     EXPECT_FALSE(invalidTarget.shouldContinue());
   }
 
+  // 子動作の設定がない場合、動作中の左右モータを停止するかのテスト
   TEST(ETZumoExitTest, MissingMotionConfigurationStopsMotors)
   {
     MockNetworkSystem network;

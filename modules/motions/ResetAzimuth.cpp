@@ -5,8 +5,8 @@
  */
 #include "ResetAzimuth.h"
 
-ResetAzimuth::ResetAzimuth(
-    Robot& robot, std::unique_ptr<BaseContinuationCondition> continuationCondition)
+ResetAzimuth::ResetAzimuth(Robot& robot,
+                           std::unique_ptr<BaseContinuationCondition> continuationCondition)
   : BaseMotion(robot, std::move(continuationCondition))
 {
   LOG_CREATE("ResetAzimuth");
@@ -19,5 +19,6 @@ ResetAzimuth::~ResetAzimuth()
 
 void ResetAzimuth::executeStep()
 {
+  // 現在の機体方位を、以降の方位計測で使用する0度の基準にする。
   robot.getIMUControllerInstance().resetAzimuth();
 }

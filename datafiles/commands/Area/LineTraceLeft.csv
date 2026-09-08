@@ -1,9 +1,43 @@
 動作コマンド名,動作ID,条件コマンド名,条件ID
-ETZumoExit,001,RepeatCount,001
-#ETzumoArea突破
-Straight,003,DistanceOrColor,003
-AbsoluteRotation,004,AbsoluteAngle,004
-LineTrace,002,Distance,010
-LineTrace,001,DistanceAndColor,004
-AbsoluteRotation,005,AbsoluteAngle,005
-Straight,002,Distance,070
+#CameraTracking,002,Distance,008
+# LineTrace,006,Distance,002
+# LineTrace,003,Distance,002
+# LineTrace,006,Distance,003
+# LineTrace,003,Distance,002
+# LineTrace,003,Distance,003
+# LineTrace,003,Distance,004
+# カメラ走行
+#CameraTracking,001,Distance,038
+#CameraTracking,002,Distance,056
+#CameraTracking,012,Distance,090
+#CameraTracking,004,Distance,050
+#CameraTracking,013,Distance,080
+#CameraTracking,005,Distance,090
+#CameraTracking,001,Distance,080
+#CameraTracking,000,Distance,000
+
+
+
+# CameraTracking,001,Distance,008
+# CameraTracking,001,Distance,008
+# CameraTracking,001,Distance,008
+
+#bottleDelivery
+#CameraTracking,007,Distance,030
+#CameraTracking,011,Distance,015
+#CameraTracking,008,Distance,023
+#CameraTracking,006,Distance,023
+#CameraTracking,009,Distance,105
+#CameraTracking,010,Distance,035
+#CameraTracking,009,Distance,030
+#CameraTracking,000,Distance,000
+
+#相撲
+CameraTracking,014,DistanceOrUltraSonic,001
+Straight,002,DistanceOrColor,004
+Straight,003,Distance,015
+
+
+
+# キャリブレイター
+#Calibrator,001,RepeatCount,001

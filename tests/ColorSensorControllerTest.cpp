@@ -46,8 +46,8 @@ namespace etrobocon2026_test {
     EXPECT_EQ(expectedColor, ColorSensorController::convertStringToColor("BLACK"));
   }
 
-  // ColorSensorControllerのCOLORのメンバ変数を文字列に変換できるかを確認
-  TEST(ColorSensorControllerTest, ConvertColorToString)
+  // HSV値を現在の色判定の境界値に従ってCOLORに変換できるかを確認
+  TEST(ColorSensorControllerTest, ConvertHsvToColor)
   {
     // 明度が低い
     ColorSensorController::HSV lowValue = { 0, 100, 9 };
@@ -59,15 +59,20 @@ namespace etrobocon2026_test {
     EXPECT_EQ(ColorSensorController::COLOR::WHITE,
               ColorSensorController::convertHsvToColor(highValue));
 
-    // 彩度が低く,明度も低い
-    ColorSensorController::HSV lowSaturationLowValue = { 0, 46, 94 };
+    // 彩度が37未満で、明度が80未満なら黒
+    ColorSensorController::HSV lowSaturationLowValue = { 0, 36, 79 };
     EXPECT_EQ(ColorSensorController::COLOR::BLACK,
               ColorSensorController::convertHsvToColor(lowSaturationLowValue));
 
-    // 彩度が低く,明度は高い
-    ColorSensorController::HSV lowSaturationHighValue = { 0, 46, 95 };
+    // 彩度が37未満で、明度が80以上なら白
+    ColorSensorController::HSV lowSaturationHighValue = { 0, 36, 80 };
     EXPECT_EQ(ColorSensorController::COLOR::WHITE,
               ColorSensorController::convertHsvToColor(lowSaturationHighValue));
+
+    // 彩度が37以上なら、色相で判定する
+    ColorSensorController::HSV saturationBoundary = { 0, 37, 80 };
+    EXPECT_EQ(ColorSensorController::COLOR::RED,
+              ColorSensorController::convertHsvToColor(saturationBoundary));
 
     // 赤の場合
     ColorSensorController::HSV redValue = { 24, 100, 120 };

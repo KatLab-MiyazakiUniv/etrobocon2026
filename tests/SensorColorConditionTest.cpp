@@ -25,12 +25,15 @@ namespace etrobocon2026_test {
 
     condition.prepare();
 
+    // 他のテストが設定したセンサ値に依存しないよう、目標色と異なる黒を設定する。
+    ColorSensor::setHSV({ 0, 0, 0 });
+
     EXPECT_TRUE(condition.shouldContinue());
     EXPECT_TRUE(condition.shouldContinue());
   }
 
-  // 指定色を2回連続で検知した場合は停止判定になることを確認
-  TEST(SensorColorConditionTest, TwoTimesTargetColor)
+  // 指定色を3回連続で検知した場合は停止判定になることを確認
+  TEST(SensorColorConditionTest, ThreeTimesTargetColor)
   {
     MockNetworkSystem mockNetworkSystem;
     SocketClient mockSocketClient(mockNetworkSystem);
@@ -42,13 +45,11 @@ namespace etrobocon2026_test {
 
     condition.prepare();
 
-    int actualCount = 0;
-    int expectedCount = 3;
-
     // 指定色のHSV値を設定
     spikeapi::ColorSensor::HSV targetHSV = { 0, 100, 100 };  // 赤色のHSV値
     ColorSensor::setHSV(targetHSV);
 
+    EXPECT_TRUE(condition.shouldContinue());
     EXPECT_TRUE(condition.shouldContinue());
     EXPECT_FALSE(condition.shouldContinue());
   }

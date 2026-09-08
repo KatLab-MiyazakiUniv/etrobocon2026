@@ -145,14 +145,14 @@ class Robot {
   IMUController imuController;                  // IMUController インスタンス
   ColorSensorController colorSensorController;  // ColorSensorController インスタンス
   UltraSonicController ultraSonicController;    // UltraSonicController インスタンス
-  SocketClient& cameraSocketClient;             // カメラサーバー用の SocketClient インスタンス
-  Course course;                                // コース(Left or Right)
-  Edge edge;                                    // エッジの左右判定
-  int runningStartTime = 0;                     // 走行開始時間
-  spikeapi::Button button;                      // Buttonインスタンス
-  spikeapi::ForceSensor forceSensor;            // ForceSensorインスタンス
-  spikeapi::Display display;                    // Displayインスタンス
-  char decryptionKey[5] = { 0 };                // 復号キー
-  int targetBrightness = 50;                    // 目標輝度
+  SocketClient& cameraSocketClient;   // カメラサーバー用の SocketClient インスタンス
+  Course course;                      // コース(Left or Right)
+  Edge edge;                          // エッジの左右判定
+  int runningStartTime = 0;           // 走行開始時間
+  spikeapi::Button button;            // Buttonインスタンス
+  spikeapi::ForceSensor forceSensor;  // ForceSensorインスタンス
+  spikeapi::Display display;          // Displayインスタンス
+  char decryptionKey[5] = { 0 };      // 復号キー
+  int targetBrightness = 50;          // 目標輝度
 };
 #endif

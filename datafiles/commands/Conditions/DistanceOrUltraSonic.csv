@@ -1,0 +1,3 @@
+コマンド名,ID,targetDistance,targetSonicDistance
+DistanceOrUltraSonic,ID,double,double
+DistanceOrUltraSonic,001,800,50

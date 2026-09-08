@@ -1,0 +1,4 @@
+コマンド名,ID,targetAngle
+RelativeAngle,ID,double
+RelativeAngle,001,90
+RelativeAngle,002,-90

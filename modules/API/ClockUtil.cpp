@@ -26,7 +26,7 @@ void ClockUtil::sleep(int milliSec)
 
 void ClockUtil::wait(int milliSec)
 {
-  if(milliSec <= 0) {
+  if(milliSec < 0) {
     std::cerr << "ClockUtil::wait() was called with non-positive milliSec: " << milliSec
               << std::endl;
     milliSec = 0;  // 負の値は0に補正

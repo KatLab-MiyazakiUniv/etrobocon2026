@@ -22,4 +22,5 @@ AbsoluteRotation::~AbsoluteRotation()
 void AbsoluteRotation::prepare()
 {
   targetAngle = targetAbsAngle;
+  Rotation::prepare();
 }

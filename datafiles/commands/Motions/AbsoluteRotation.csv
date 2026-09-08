@@ -1,0 +1,7 @@
+コマンド名,ID,a_kp,a_ki,a_kd,targetAbsAngle
+AbsoluteRotation,ID,double,double,double,double
+AbsoluteRotation,001,0.001,0.001,0.001,90
+AbsoluteRotation,002,0.002,0.002,0.002,180
+AbsoluteRotation,003,3.2,2.7,0.0,-20
+AbsoluteRotation,004,3.0,2.2,0.2,-75.0
+AbsoluteRotation,005,3.0,2.2,0.2,-90.0

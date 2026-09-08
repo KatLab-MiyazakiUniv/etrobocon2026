@@ -99,7 +99,7 @@ namespace CameraServer {
    */
   struct ColorRegionDetectorRequest {
     Command command = Command::COLOR_REGION_DETECTION;  // 色領域検出コマンド
-    bool requireLargestColorIndex = false;   // 最も大きい色領域のインデックスを返すかどうか
+    bool requireLargestColorIndex = false;  // 最も大きい色領域のインデックスを返すかどうか
     uint8_t hsvRangeCount = 0;               // hsvRangesの有効な要素数
     HSVRangeData hsvRanges[MAX_HSV_RANGES];  // HSVの範囲の配列
     RectData roi;                            // 検出対象の領域
@@ -113,7 +113,7 @@ namespace CameraServer {
     int32_t largestColorIndex = -1;     // 最も面積が大きい色のインデックス
   };
 
-  static constexpr uint32_t QR_CODE_CORNER_COUNT = 4;   // QRコードの頂点数
+  static constexpr uint32_t QR_CODE_CORNER_COUNT = 4;  // QRコードの頂点数
   static constexpr uint32_t QR_CODE_CONTENT_SIZE = 64;  // QRコードから取得した文字列の最大バイト数
 
   /**
@@ -128,8 +128,8 @@ namespace CameraServer {
    * @brief QRコード検出のレスポンス構造体
    */
   struct QrCodeDetectorResponse {
-    bool wasDetected = false;                      // 検出できたかどうか
-    char content[QR_CODE_CONTENT_SIZE] = {};       // QRコードから取得した文字列
+    bool wasDetected = false;                 // 検出できたかどうか
+    char content[QR_CODE_CONTENT_SIZE] = {};  // QRコードから取得した文字列
     PointData corners[QR_CODE_CORNER_COUNT] = {};  // QRコードの各頂点の座標(左上から時計回りの順)
   };
 }  // namespace CameraServer

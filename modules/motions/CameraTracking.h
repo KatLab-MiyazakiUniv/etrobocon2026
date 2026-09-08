@@ -127,8 +127,8 @@ class CameraTracking : public BaseMotion {
   int targetXCoordinate;                                           // 目標X座標
   DetectionMode detectionMode;                                     // 検出方式
   CameraServer::ColorRegionDetectorRequest colorDetectionRequest;  // 色領域検出リクエスト
-  CameraServer::QrCodeDetectorRequest qrDetectionRequest;          // QRコード検出リクエスト
-  bool isStopMotorPower;                                           // モーターを停止するかどうか
+  CameraServer::QrCodeDetectorRequest qrDetectionRequest;  // QRコード検出リクエスト
+  bool isStopMotorPower;            // モーターを停止するかどうか
   SpeedCalculator speedCalculator;  // 目標速度に対するモータパワー計算
   Pid cameraPid;                    // カメラ画像x座標に対するPID制御
 };

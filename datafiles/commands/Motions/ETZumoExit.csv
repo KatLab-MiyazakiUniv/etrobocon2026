@@ -1,0 +1,3 @@
+コマンド名,ID,targetProjectedDistanceMm,cameraTrackingID,trackingConditionID,absoluteRotationID,absoluteAngleID,straightID
+ETZumoExit,ID,double,string,string,string,string,string
+ETZumoExit,001,750,014,001,003,003,002

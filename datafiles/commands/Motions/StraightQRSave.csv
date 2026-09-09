@@ -1,7 +1,7 @@
 コマンド名,ID,speed,a_kp,a_ki,a_kd,useIMU,isStopMotorPower,roiX,roiY,roiWidth,roiHeight
 StraightQRSave,ID,double,double,double,double,bool,bool,int,int,int,int
 # 全画面ROI・IMU使用あり・停止あり（標準設定）
-StraightQRSave,001,350,0.001,0.0,0.0,1,1,0,0,1920,1080
+StraightQRSave,001,600,0.001,0.001,0.001,0,1,0,0,1920,1080
 # 全画面ROI・IMU使用なし・停止あり
 StraightQRSave,002,350,0.0,0.0,0.0,0,1,0,0,1920,1080
 # 上半分ROI・IMU使用あり・停止あり

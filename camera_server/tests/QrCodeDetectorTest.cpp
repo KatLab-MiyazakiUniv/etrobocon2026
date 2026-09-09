@@ -99,10 +99,7 @@ namespace etrobocon2026_test {
   // 内容「25,35」を正しく取得できることを確認するテスト
   TEST(QrCodeDetectorTest, DetectQrCode)
   {
-    cv::Mat frame = cv::imread("camera_server/tests/test_data/Hint1.png");
-    // cv::Mat frame
-    //     = cv::imread("./../camera_server/datafiles/line_trace/"
-    //                  "det_d0_tlx0_tly0_trx0_try0_blx0_bly0_brx0_bry0_rx0_ry0_rw0_rh0_2494623.JPEG");
+    cv::Mat frame = cv::imread("camera_server/test_data/Hint1.png");
     ASSERT_FALSE(frame.empty());
 
     QrCodeDetector detector(FULL_FRAME_ROI);
@@ -111,7 +108,7 @@ namespace etrobocon2026_test {
     int afterTime = ClockUtil::now();
     Logger::printfLog(Logger::DEBUG, "検出処理にかかった時間は%d", afterTime - beforeTime);
     EXPECT_TRUE(result.wasDetected);
-    // EXPECT_EQ("25,35", result.content);
+    EXPECT_EQ("25,35", result.content);
   }
 
   // 空画像を入力したときに、QRコード未検出となり、

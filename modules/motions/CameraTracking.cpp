@@ -18,7 +18,10 @@ CameraTracking::CameraTracking(
     qrDetectionRequest(),
     isStopMotorPower(_isStopMotorPower),
     speedCalculator(_robot, _targetSpeed),
-    cameraPid(_pidGain.kp, _pidGain.ki, _pidGain.kd, _targetXCoordinate)
+    cameraPid(_pidGain.kp, _pidGain.ki, _pidGain.kd, _targetXCoordinate),
+    shouldUseIMU(false),
+    targetAngle(0.0),
+    anglePid(0.0, 0.0, 0.0, 0.0)
 {
   LOG_CREATE("CameraTracking");
   Logger::printfLog(Logger::DEBUG, "カメラトラッキング作成");
@@ -38,7 +41,32 @@ CameraTracking::CameraTracking(Robot& _robot,
     qrDetectionRequest(_qrDetectionRequest),
     isStopMotorPower(_isStopMotorPower),
     speedCalculator(_robot, _targetSpeed),
-    cameraPid(_pidGain.kp, _pidGain.ki, _pidGain.kd, _targetXCoordinate)
+    cameraPid(_pidGain.kp, _pidGain.ki, _pidGain.kd, _targetXCoordinate),
+    shouldUseIMU(false),
+    targetAngle(0.0),
+    anglePid(0.0, 0.0, 0.0, 0.0)
+{
+  LOG_CREATE("CameraTracking");
+}
+
+CameraTracking::CameraTracking(Robot& _robot,
+                               std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+                               double _targetSpeed, const Pid::PidGain& _anglePidGain,
+                               bool _shouldUseIMU,
+                               const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
+                               bool _isStopMotorPower)
+  : BaseMotion(_robot, std::move(_continuationCondition)),
+    targetSpeed(_targetSpeed),
+    targetXCoordinate(0),
+    detectionMode(DetectionMode::STRAIGHT_QR_CODE),
+    colorDetectionRequest(),
+    qrDetectionRequest(_qrDetectionRequest),
+    isStopMotorPower(_isStopMotorPower),
+    speedCalculator(_robot, _targetSpeed),
+    cameraPid(0.0, 0.0, 0.0, 0.0),
+    shouldUseIMU(_shouldUseIMU),
+    targetAngle(0.0),
+    anglePid(_anglePidGain.kp, _anglePidGain.ki, _anglePidGain.kd, 0.0)
 {
   LOG_CREATE("CameraTracking");
 }
@@ -59,11 +87,47 @@ bool CameraTracking::canStart()
 
 void CameraTracking::prepare()
 {
-  cameraPid.prepare();
+  if(detectionMode == DetectionMode::STRAIGHT_QR_CODE) {
+    if(shouldUseIMU) {
+      targetAngle = robot.getIMUControllerInstance().getAzimuth();
+    }
+    anglePid.prepare();
+  } else {
+    cameraPid.prepare();
+  }
 }
 
 void CameraTracking::executeStep()
 {
+  // --- 直進走行＋QRコード検出・保存モード ---
+  if(detectionMode == DetectionMode::STRAIGHT_QR_CODE) {
+    double requiredRightPower = speedCalculator.calculateRightMotorPower();
+    double requiredLeftPower = speedCalculator.calculateLeftMotorPower();
+    double turningPower = 0.0;
+
+    if(shouldUseIMU) {
+      double currentAngle = robot.getIMUControllerInstance().getAzimuth();
+      double angleDeviation = targetAngle - currentAngle;
+      angleDeviation = AngleNormalizer::normalizeAngle(angleDeviation);
+      turningPower = anglePid.calculatePid(angleDeviation);
+    }
+
+    robot.getWheelMotorControllerInstance().setRightPower(requiredRightPower + turningPower);
+    robot.getWheelMotorControllerInstance().setLeftPower(requiredLeftPower - turningPower);
+
+    // カメラサーバーへQR検出リクエストを送信（サーバー側でフレーム取得・QR検出・フレーム保存が実行される）
+    SocketClient& client = robot.getCameraSocketClientInstance();
+    CameraServer::QrCodeDetectorResponse response;
+    bool success = client.executeQrCodeDetection(qrDetectionRequest, response);
+    if(!success) {
+      Logger::warning("CameraTracking:QRコード検出通信に失敗しました");
+    } else if(response.wasDetected) {
+      Logger::printfLog(Logger::INFO, "CameraTracking:QRコード検出成功: %s", response.content);
+    }
+    return;
+  }
+
+  // --- 色領域追跡 / QRコード追跡 PID走行モード ---
   // 初期Speed値を計算
   double baseRightPower = speedCalculator.calculateRightMotorPower();
   double baseLeftPower = speedCalculator.calculateLeftMotorPower();

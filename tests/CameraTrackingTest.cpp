@@ -137,4 +137,27 @@ namespace etrobocon2026_test {
     EXPECT_EQ(tracking.getDetectionMode(), CameraTracking::DetectionMode::COLOR_REGION);
   }
 
+  // 直進＋QR検出用コンストラクタで初期化した場合、検出方式がSTRAIGHT_QR_CODEになるか検証
+  TEST(CameraTrackingTest, StraightQrConstructorInitializesMembersCorrectly)
+  {
+    MockNetworkSystem mockNet;
+    SocketClient mockClient(mockNet);
+    Robot robot(mockClient);
+
+    Pid::PidGain angleGain(0.1, 0.0, 0.0);
+    CameraServer::QrCodeDetectorRequest req;
+    req.roi = { 0, 0, 1920, 1080 };
+
+    double speed = 80.0;
+    bool shouldUseIMU = true;
+
+    TestCameraTracking tracking(robot, std::make_unique<SimpleContinuationCondition>(robot), speed,
+                                angleGain, shouldUseIMU, req);
+
+    EXPECT_DOUBLE_EQ(tracking.getTargetSpeed(), speed);
+    EXPECT_EQ(tracking.getDetectionMode(), CameraTracking::DetectionMode::STRAIGHT_QR_CODE);
+    EXPECT_TRUE(tracking.getIsStopMotorPower());
+    EXPECT_TRUE(tracking.canStart());
+  }
+
 }  // namespace etrobocon2026_test

@@ -5,12 +5,15 @@
  */
 
 #include "QrCodeDetector.h"
+#include <opencv2/imgproc.hpp>
+#include <vector>
 
 QrCodeDetector::QrCodeDetector(const cv::Rect& _roi) : roi(_roi)
 {
   // QRコードのみを検出対象として設定
   options.setFormats(ZXing::BarcodeFormat::QRCode);
   // QRコードを複数の向きやサイズで詳細に探索し、検出・デコードを行う
+  // 検証のために、コメントアウトし実行したが、検出成功率は変わらず、処理速度も変化なかった
   options.setTryHarder(true);
 
   // デバッグのために追加
@@ -43,6 +46,64 @@ void QrCodeDetector::validateParameters()
   if(roi.height > CAM_MAX_HEIGHT - roi.y) roi.height = CAM_MAX_HEIGHT - roi.y;
 }
 
+cv::Mat QrCodeDetector::applySharpen(const cv::Mat& src, double amount)
+{
+  cv::Mat blurred, sharp;
+  cv::GaussianBlur(src, blurred, cv::Size(0, 0), 3);
+  cv::addWeighted(src, 1.0 + amount, blurred, -amount, 0, sharp);
+  return sharp;
+}
+
+cv::Mat QrCodeDetector::applyCLAHE(const cv::Mat& src, double clipLimit,
+                                   const cv::Size& tileGridSize)
+{
+  cv::Mat result;
+  if(src.channels() == 3) {
+    cv::Mat lab;
+    cv::cvtColor(src, lab, cv::COLOR_BGR2Lab);
+    std::vector<cv::Mat> labPlanes;
+    cv::split(lab, labPlanes);
+    cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE(clipLimit, tileGridSize);
+    clahe->apply(labPlanes[0], labPlanes[0]);
+    cv::merge(labPlanes, lab);
+    cv::cvtColor(lab, result, cv::COLOR_Lab2BGR);
+  } else {
+    cv::Ptr<cv::CLAHE> clahe = cv::createCLAHE(clipLimit, tileGridSize);
+    clahe->apply(src, result);
+  }
+  return result;
+}
+
+cv::Mat QrCodeDetector::applyBilateral(const cv::Mat& src, int d, double sigmaColor,
+                                       double sigmaSpace)
+{
+  cv::Mat filtered;
+  cv::bilateralFilter(src, filtered, d, sigmaColor, sigmaSpace);
+  return filtered;
+}
+
+QrCodeDetectionResult QrCodeDetector::createResult(const ZXing::Barcode& barcode,
+                                                   const cv::Rect& roiRect,
+                                                   const std::string& stepName)
+{
+  QrCodeDetectionResult result;
+  result.wasDetected = true;
+  result.content = barcode.text();
+  result.detectedStep = stepName;
+
+  auto position = barcode.position();
+  result.corners[0]
+      = cv::Point2f(position.topLeft().x + roiRect.x, position.topLeft().y + roiRect.y);
+  result.corners[1]
+      = cv::Point2f(position.topRight().x + roiRect.x, position.topRight().y + roiRect.y);
+  result.corners[2]
+      = cv::Point2f(position.bottomRight().x + roiRect.x, position.bottomRight().y + roiRect.y);
+  result.corners[3]
+      = cv::Point2f(position.bottomLeft().x + roiRect.x, position.bottomLeft().y + roiRect.y);
+
+  return result;
+}
+
 QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
 {
   QrCodeDetectionResult result;
@@ -60,65 +121,47 @@ QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
   }
   cv::Mat roiFrame = frame(roiRect);
 
-  // ROI内のフレームからZXing用のImageViewを生成
-  ZXing::ImageView iv(roiFrame.data, roiFrame.cols, roiFrame.rows, ZXing::ImageFormat::BGR,
-                      static_cast<int>(roiFrame.step));
-
-  // ROI内のフレームからQRコードを検出し、デコード結果を取得
-  // auto qrCode = ZXing::ReadBarcode(iv, options);
-
-  // QRコードが検出できなかった場合は終了
-  // if(!qrCode.isValid()) {
-  //   Logger::error("QrCodeDetector: QRコードの検出に失敗しました。");
-  //   return result;
-  // }
-
-  // ROI内のフレームからQRコードを検出し、デコード結果を取得
-  auto qrCode = ZXing::ReadBarcode(iv, options);
-
-  // 1. 完全成功（検出 OK ＆ デコード OK）
+  // --- Step 1: 生画像 (Raw) でデコード試行 ---
+  ZXing::ImageView ivRaw(roiFrame.data, roiFrame.cols, roiFrame.rows, ZXing::ImageFormat::BGR,
+                         static_cast<int>(roiFrame.step));
+  auto qrCode = ZXing::ReadBarcode(ivRaw, options);
   if(qrCode.isValid()) {
-    // 検出結果を保存
-    // result.wasDetected = true;
-    // result.content = qrCode.text();
-
-    // QRコードの4頂点座標を、ROIのオフセットを加算してフレーム全体基準の座標に変換して保存
-    // auto position = qrCode.position();
-    // result.corners[0]
-    //     = cv::Point2f(position.topLeft().x + roiRect.x, position.topLeft().y + roiRect.y);
-    // result.corners[1]
-    //     = cv::Point2f(position.topRight().x + roiRect.x, position.topRight().y + roiRect.y);
-    // result.corners[2]
-    //     = cv::Point2f(position.bottomRight().x + roiRect.x, position.bottomRight().y +
-    //     roiRect.y);
-    // result.corners[3]
-    //     = cv::Point2f(position.bottomLeft().x + roiRect.x, position.bottomLeft().y + roiRect.y);
-
-    // return result;
-
-    result.wasDetected = true;
-    result.content = qrCode.text();
-
-    auto position = qrCode.position();
-    result.corners[0]
-        = cv::Point2f(position.topLeft().x + roiRect.x, position.topLeft().y + roiRect.y);
-    result.corners[1]
-        = cv::Point2f(position.topRight().x + roiRect.x, position.topRight().y + roiRect.y);
-    result.corners[2]
-        = cv::Point2f(position.bottomRight().x + roiRect.x, position.bottomRight().y + roiRect.y);
-    result.corners[3]
-        = cv::Point2f(position.bottomLeft().x + roiRect.x, position.bottomLeft().y + roiRect.y);
-
-    return result;
+    return createResult(qrCode, roiRect, "Raw");
   }
 
-  // 2. 検出は成功したが、デコード（復号）フェーズで失敗した場合
+  // --- Step 2: シャープ化 + CLAHE (コントラスト強調 & 輪郭強調) でデコード試行 ---
+  cv::Mat imgStep2 = applySharpen(applyCLAHE(roiFrame), 1.5);
+  ZXing::ImageView ivStep2(imgStep2.data, imgStep2.cols, imgStep2.rows, ZXing::ImageFormat::BGR,
+                           static_cast<int>(imgStep2.step));
+  qrCode = ZXing::ReadBarcode(ivStep2, options);
+  if(qrCode.isValid()) {
+    return createResult(qrCode, roiRect, "Sharpen+CLAHE");
+  }
+
+  // --- Step 3: バイラテラル + CLAHE (エッジ保持ノイズ除去 & コントラスト強調) でデコード試行 ---
+  cv::Mat imgStep3 = applyCLAHE(applyBilateral(roiFrame, 5, 50.0, 50.0));
+  ZXing::ImageView ivStep3(imgStep3.data, imgStep3.cols, imgStep3.rows, ZXing::ImageFormat::BGR,
+                           static_cast<int>(imgStep3.step));
+  qrCode = ZXing::ReadBarcode(ivStep3, options);
+  if(qrCode.isValid()) {
+    return createResult(qrCode, roiRect, "Bilateral+CLAHE");
+  }
+
+  // --- Step 4: 複合処理 (バイラテラル + CLAHE + シャープ化) でデコード試行 ---
+  cv::Mat imgStep4 = applySharpen(imgStep3, 1.5);
+  ZXing::ImageView ivStep4(imgStep4.data, imgStep4.cols, imgStep4.rows, ZXing::ImageFormat::BGR,
+                           static_cast<int>(imgStep4.step));
+  qrCode = ZXing::ReadBarcode(ivStep4, options);
+  if(qrCode.isValid()) {
+    return createResult(qrCode, roiRect, "Bilateral+CLAHE+Sharpen");
+  }
+
+  // 検出は成功したが、デコード（復号）フェーズで失敗した場合のログ
   if(qrCode.format() != ZXing::BarcodeFormat::None) {
     auto position = qrCode.position();
     cv::Point2f tl(position.topLeft().x + roiRect.x, position.topLeft().y + roiRect.y);
     cv::Point2f br(position.bottomRight().x + roiRect.x, position.bottomRight().y + roiRect.y);
 
-    // エラー種別（ChecksumError, FormatError など）とメッセージを取得
     std::string errorType = ZXing::ToString(qrCode.error().type());
     std::string errorMsg = qrCode.error().msg();
 
@@ -129,11 +172,10 @@ QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
         errorType.c_str(), errorMsg.c_str(), static_cast<int>(tl.x), static_cast<int>(tl.y),
         static_cast<int>(br.x), static_cast<int>(br.y));
 
-    // ※用途に応じて「位置だけは取れた」として result.corners を詰めて返す設計も可能です
     return result;
   }
 
-  // 3. そもそもQRコードの位置パターンが見つからなかった場合（検出失敗）
+  // そもそもQRコードの位置パターンが見つからなかった場合（検出失敗）
   Logger::debug("QrCodeDetector: [検出失敗] ROI内にQRコードのパターンが見つかりませんでした。");
   return result;
 }

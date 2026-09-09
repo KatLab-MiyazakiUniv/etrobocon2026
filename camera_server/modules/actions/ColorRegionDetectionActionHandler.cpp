@@ -9,7 +9,8 @@
 ColorRegionDetectionActionHandler::ColorRegionDetectionActionHandler(CameraCapture& _camera)
   : camera(_camera),
     detector({ { cv::Scalar(0, 0, 0, 0), cv::Scalar(180, 255, 30, 0) } },
-             cv::Rect(0, 0, 1920, 1080))
+             cv::Rect(0, 0, CAM_MAX_WIDTH, CAM_MAX_HEIGHT)),
+    qrDetector(cv::Rect(0, 0, CAM_MAX_WIDTH, CAM_MAX_HEIGHT))
 {
   LOG_CREATE("ColorRegionDetectionActionHandler");
 }
@@ -70,9 +71,19 @@ void ColorRegionDetectionActionHandler::execute(
     Logger::error("ColorRegionDetectionActionHandler:色領域が検出されませんでした");
   }
 
+  // フレーム保存前にQRコード検出を実行
+  QrCodeDetectionResult qrResult = qrDetector.detect(frame);
+  if(qrResult.wasDetected) {
+    Logger::printfLog(Logger::INFO,
+                      "ColorRegionDetectionActionHandler:QRコードの検出に成功しました: %s",
+                      qrResult.content.c_str());
+  }
+
   std::string directoryPath = "datafiles/line_trace";
   int t1 = ClockUtil::now();
-  MultiThread::wrap([=] mutable { FrameSave::save(frame, directoryPath, localResult, localRoi); });
+  MultiThread::wrap([=]() mutable {
+    FrameSave::save(frame, directoryPath, localResult, localRoi, qrResult);
+  });
   int t2 = ClockUtil::now();
   Logger::printfLog(Logger::ERROR, "並列関数の呼び出しにかかった時間は%d", t2 - t1);
 }

@@ -1,12 +1,8 @@
-/**
- * @file MultiThread.h
- * @brief メンバ関数をマルチスレッドで実行するラッパークラス
- * @author sadomiya-sousi
- */
+#ifndef MULTI_THREAD_H
+#define MULTI_THREAD_H
 
 #include <thread>
 #include <iostream>
-#include <thread>
 #include <functional>
 #include <utility>
 #include <chrono>
@@ -54,3 +50,5 @@ class MultiThread {
    */
   MultiThread();
 };
+
+#endif  // MULTI_THREAD_H

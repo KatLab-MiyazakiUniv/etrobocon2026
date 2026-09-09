@@ -52,3 +52,51 @@ void FrameSave::save(cv::Mat& frame, const std::string& filePath,
 
   save(frame, filePath, fileName);
 }
+
+void FrameSave::save(cv::Mat& frame, const std::string& filePath,
+                     const BoundingBoxDetectionResult& result, const cv::Rect& roi,
+                     const QrCodeDetectionResult& qrResult)
+{
+  // clang-format off
+  std::string fileName = "det_d" + std::to_string(result.wasDetected ? 1 : 0) +
+                          "_tlx" + Utils::toStrInt(result.topLeft.x) +
+                          "_tly" + Utils::toStrInt(result.topLeft.y) +
+                          "_trx" + Utils::toStrInt(result.topRight.x) +
+                          "_try" + Utils::toStrInt(result.topRight.y) +
+                          "_blx" + Utils::toStrInt(result.bottomLeft.x) +
+                          "_bly" + Utils::toStrInt(result.bottomLeft.y) +
+                          "_brx" + Utils::toStrInt(result.bottomRight.x) +
+                          "_bry" + Utils::toStrInt(result.bottomRight.y) +
+                          "_rx"  + Utils::toStrInt(roi.x) +
+                          "_ry"  + Utils::toStrInt(roi.y) +
+                          "_rw"  + Utils::toStrInt(roi.width) +
+                          "_rh"  + Utils::toStrInt(roi.height) +
+                          "_qrd" + std::to_string(qrResult.wasDetected ? 1 : 0) +
+                          "_"    + std::to_string(ClockUtil::now());
+  // clang-format on
+
+  save(frame, filePath, fileName);
+}
+
+void FrameSave::save(cv::Mat& frame, const std::string& filePath,
+                     const QrCodeDetectionResult& qrResult, const cv::Rect& roi)
+{
+  // clang-format off
+  std::string fileName = "qr_d" + std::to_string(qrResult.wasDetected ? 1 : 0) +
+                          "_tlx" + Utils::toStrInt(static_cast<int>(qrResult.corners[0].x)) +
+                          "_tly" + Utils::toStrInt(static_cast<int>(qrResult.corners[0].y)) +
+                          "_trx" + Utils::toStrInt(static_cast<int>(qrResult.corners[1].x)) +
+                          "_try" + Utils::toStrInt(static_cast<int>(qrResult.corners[1].y)) +
+                          "_brx" + Utils::toStrInt(static_cast<int>(qrResult.corners[2].x)) +
+                          "_bry" + Utils::toStrInt(static_cast<int>(qrResult.corners[2].y)) +
+                          "_blx" + Utils::toStrInt(static_cast<int>(qrResult.corners[3].x)) +
+                          "_bly" + Utils::toStrInt(static_cast<int>(qrResult.corners[3].y)) +
+                          "_rx"  + Utils::toStrInt(roi.x) +
+                          "_ry"  + Utils::toStrInt(roi.y) +
+                          "_rw"  + Utils::toStrInt(roi.width) +
+                          "_rh"  + Utils::toStrInt(roi.height) +
+                          "_"    + std::to_string(ClockUtil::now());
+  // clang-format on
+
+  save(frame, filePath, fileName);
+}

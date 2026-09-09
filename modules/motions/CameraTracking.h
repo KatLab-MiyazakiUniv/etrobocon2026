@@ -12,15 +12,17 @@
 #include "SpeedCalculator.h"
 #include "SocketProtocol.h"
 #include "CsvLogger.h"
+#include "AngleNormalizer.h"
 
 class CameraTracking : public BaseMotion {
  public:
   /**
-   * @brief 検出方式の種類
+   * @brief 検出・走行方式の種類
    */
   enum class DetectionMode {
-    COLOR_REGION,  // 色領域検出
-    QR_CODE        // QRコード検出
+    COLOR_REGION,      // 色領域検出PID走行
+    QR_CODE,           // QRコード検出PID走行
+    STRAIGHT_QR_CODE   // 直進走行しながらQRコード検出・フレーム保存
   };
 
   /**
@@ -52,6 +54,22 @@ class CameraTracking : public BaseMotion {
    */
   CameraTracking(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                  double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
+                 const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
+                 bool _isStopMotorPower = true);
+
+  /**
+   * コンストラクタ
+   * @brief 直進走行しながらカメラ画像(QRコード検出・保存)を行うクラスを初期化する
+   * @param _robot ロボットインスタンス
+   * @param _continuationCondition 継続条件クラスのインスタンス
+   * @param _targetSpeed 目標速度
+   * @param _anglePidGain 角度制御用PIDゲイン
+   * @param _shouldUseIMU IMUを使用するかどうか
+   * @param _qrDetectionRequest QRコード検出リクエスト
+   * @param _isStopMotorPower モーターを停止するかどうか
+   */
+  CameraTracking(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+                 double _targetSpeed, const Pid::PidGain& _anglePidGain, bool _shouldUseIMU,
                  const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
                  bool _isStopMotorPower = true);
 
@@ -132,6 +150,9 @@ class CameraTracking : public BaseMotion {
   bool isStopMotorPower;                                           // モーターを停止するかどうか
   SpeedCalculator speedCalculator;  // 目標速度に対するモータパワー計算
   Pid cameraPid;                    // カメラ画像x座標に対するPID制御
+  bool shouldUseIMU;                // IMUを使用するかどうか
+  double targetAngle;               // 目標角度(度)
+  Pid anglePid;                     // 角度制御用PID
 };
 
 #endif

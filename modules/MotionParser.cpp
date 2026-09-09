@@ -386,6 +386,32 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                                               fromString<double>(motionParams[6]) },
                                 qrRequest, motionParams[7] == "true");
     }
+    case MOTION_COMMAND::STRAIGHT_QR_SAVE: {
+      // StraightQRSave: motionParams[2]=speed(double)
+      //                 motionParams[3..5]=anglePid(kp,ki,kd)
+      //                 motionParams[6]=useIMU(bool)
+      //                 motionParams[7]=isStopMotorPower(bool)
+      //                 motionParams[8..11]=roi(x,y,width,height)
+      CameraServer::QrCodeDetectorRequest qrRequest;
+      qrRequest.roi.x = fromString<int32_t>(motionParams[8]);
+      qrRequest.roi.y = fromString<int32_t>(motionParams[9]);
+      qrRequest.roi.width = fromString<int32_t>(motionParams[10]);
+      qrRequest.roi.height = fromString<int32_t>(motionParams[11]);
+
+      Pid::PidGain anglePidGain{ fromString<double>(motionParams[3]),
+                                 fromString<double>(motionParams[4]),
+                                 fromString<double>(motionParams[5]) };
+      bool useIMU = (motionParams[6] == "true" || motionParams[6] == "1");
+      bool isStop = (motionParams[7] == "true" || motionParams[7] == "1");
+
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] StraightQRSave: speed=%.1f useIMU=%d を生成しました",
+                        fromString<double>(motionParams[2]), static_cast<int>(useIMU));
+
+      return new CameraTracking(robot, std::move(condition),
+                                fromString<double>(motionParams[2]),
+                                anglePidGain, useIMU, qrRequest, isStop);
+    }
     case MOTION_COMMAND::CALIBRATOR: {
 
       Logger::printfLog(Logger::DEBUG,
@@ -418,6 +444,7 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
           { "QRTracking", MOTION_COMMAND::QR_TRACKING },
           { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING },
+          { "StraightQRSave", MOTION_COMMAND::STRAIGHT_QR_SAVE },
           { "Calibrator", MOTION_COMMAND::CALIBRATOR },
           { "Snapshot", MOTION_COMMAND::SNAPSHOT }
 

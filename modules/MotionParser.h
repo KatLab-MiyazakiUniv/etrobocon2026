@@ -1,7 +1,7 @@
 /**
  * @file   MotionParser.h
  * @brief  動作コマンドファイルを解析するクラス
- * @author nishijima515
+ * @author nishijima515 sadomiya-sousi
  */
 
 #ifndef MOTION_PARSER_H
@@ -45,6 +45,7 @@ class MotionParser {
     ABSOLUTE_ROTATION,
     RELATIVE_ROTATION,
     QR_TRACKING,
+    STRAIGHT_QR_SAVE,  // 直進走行しながらQR検出・フレーム保存
     CALIBRATOR,
     SNAPSHOT,
     NONE

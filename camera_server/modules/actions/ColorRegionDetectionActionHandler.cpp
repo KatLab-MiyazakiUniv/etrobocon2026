@@ -158,21 +158,21 @@ void ColorRegionDetectionActionHandler::execute(
   }
 
   // 4. QRコード検出（非同期処理内）の計測
-  int t_qr_dispatch_start = ClockUtil::now();
-  MultiThread::wrap([=]() mutable {
-    int t_inner_qr_start = ClockUtil::now();
-    QrCodeDetectionResult qrResult = qrDetector.detect(frame);
-    int t_inner_qr_end = ClockUtil::now();
-    Logger::printfLog(Logger::INFO, "[Perf] 【別スレッド内】QRコード検出処理時間: %d ms", t_inner_qr_end - t_inner_qr_start);
+  // int t_qr_dispatch_start = ClockUtil::now();
+  // MultiThread::wrap([=]() mutable {
+  //   int t_inner_qr_start = ClockUtil::now();
+  //   QrCodeDetectionResult qrResult = qrDetector.detect(frame);
+  //   int t_inner_qr_end = ClockUtil::now();
+  //   Logger::printfLog(Logger::INFO, "[Perf] 【別スレッド内】QRコード検出処理時間: %d ms", t_inner_qr_end - t_inner_qr_start);
 
-    if(qrResult.wasDetected) {
-      Logger::printfLog(Logger::INFO,
-                        "ColorRegionDetectionActionHandler:QRコードの検出に成功しました: %s",
-                        qrResult.content.c_str());
-    }
-  });
-  int t_qr_dispatch_end = ClockUtil::now();
-  Logger::printfLog(Logger::INFO, "[Perf] QRコード非同期タスク発行時間: %d ms", t_qr_dispatch_end - t_qr_dispatch_start);
+  //   if(qrResult.wasDetected) {
+  //     Logger::printfLog(Logger::INFO,
+  //                       "ColorRegionDetectionActionHandler:QRコードの検出に成功しました: %s",
+  //                       qrResult.content.c_str());
+  //   }
+  // });
+  // int t_qr_dispatch_end = ClockUtil::now();
+  // Logger::printfLog(Logger::INFO, "[Perf] QRコード非同期タスク発行時間: %d ms", t_qr_dispatch_end - t_qr_dispatch_start);
 
   // 5. フレーム保存（非同期処理内）の計測
   std::string directoryPath = "datafiles/line_trace";

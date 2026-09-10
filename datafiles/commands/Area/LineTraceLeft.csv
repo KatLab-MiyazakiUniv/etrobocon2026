@@ -1,23 +1,9 @@
 #動作コマンド名,動作ID,条件コマンド名,条件ID
-# カメラ走行
-#フレームを1回捨てる
-Snapshot,clearBuffer1,RepeatCount,001
-#ボトルキャッチ前
-#CameraTracking,LTS001,Distance,065
-
-StraightQRSave,004,Distance,068
-StraightQRSave,004,Distance,068
-StraightQRSave,004,Distance,068
-StraightQRSave,004,Distance,068
-StraightQRSave,004,Distance,068
-
-
-
-#ボトルキャッチ中
-CameraTracking,LTS002,Distance,020
-#ボトルキャッチ後
-CameraTracking,LTS004,Distance,032
-
 # キャリブレーション
 #Calibrator,001,RepeatCount,001
+#ボトルキャッチ前
+CameraTracking,LTS001,Distance,055
+CameraTracking,LTS002,Distance,020
+CameraTracking,LTS003,Distance,010
+CameraTracking,LTS004,Distance,010
 

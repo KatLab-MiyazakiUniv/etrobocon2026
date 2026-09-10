@@ -219,7 +219,7 @@ void EtRobocon2026::start()
    * 正方形の中心が画像中央に来るように
    * ロボットの向きを調整する。
    */
-  const Pid::PidGain squareAnglePid = { 3.0, 0.0, 0.1 };
+  const Pid::PidGain squareAnglePid = { 1.3, 1.0, 0 };
 
   // =========================================================
   // 7. 走行速度

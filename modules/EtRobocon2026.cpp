@@ -20,7 +20,6 @@
 #include "SocketClient.h"
 
 namespace {
-
   /**
    * @brief コースの種類
    */
@@ -100,7 +99,7 @@ namespace {
 
 void EtRobocon2026::start()
 {
-  Logger::info("RouteFollower Square correction test start");
+  Logger::info("RouteFollower Square gate correction test start");
 
   // =========================================================
   // 1. Robot
@@ -115,11 +114,10 @@ void EtRobocon2026::start()
   // =========================================================
   // カメラサーバー接続
   //
-  // 90度回頭後の正方形検出で使用する。
+  // ゲート手前での正方形検出・角度補正に使用する。
   // =========================================================
 
-  Logger::info("EtRobocon2026: "
-               "connect to camera server");
+  Logger::info("EtRobocon2026: connect to camera server");
 
   robot.getCameraSocketClientInstance().connectToServer();
 
@@ -213,11 +211,13 @@ void EtRobocon2026::start()
   const Pid::PidGain straightAnglePid = { 0.033, 0.003, 0.03 };
 
   /**
-   * @brief 正方形角度補正PID
+   * @brief 正方形中心補正PID
    *
-   * 90度回頭後に使用する。
+   * 内側ゲートを通過するときに、
+   * SquareAngleAdjustmentで使用する。
    *
-   * 最初はP制御のみ。
+   * 正方形の中心が画像中央に来るように
+   * ロボットの向きを調整する。
    */
   const Pid::PidGain squareAnglePid = { 3.0, 0.0, 0.1 };
 
@@ -229,10 +229,14 @@ void EtRobocon2026::start()
 
   // =========================================================
   // 8. RouteFollower
+  //
+  // MapDataも渡すことで、
+  // RouteFollower内部で現在の区間が
+  // ゲート通過区間か判定できるようにする。
   // =========================================================
 
-  RouteFollower routeFollower(robot, etRallyMap, TARGET_SPEED, rotationPid, rightPid, leftPid,
-                              straightAnglePid, squareAnglePid);
+  RouteFollower routeFollower(robot, etRallyMap, mapData, TARGET_SPEED, rotationPid, rightPid,
+                              leftPid, straightAnglePid, squareAnglePid);
 
   // =========================================================
   // 9. RED → BLUE → YELLOW × 3
@@ -248,10 +252,8 @@ void EtRobocon2026::start()
     for(const GoalColor targetColor : TARGET_COLORS) {
       Logger::info("==============================");
 
-      Logger::printfLog(Logger::INFO,
-                        "Lap %d / %d "
-                        "Target=%s",
-                        lap, LAP_COUNT, colorToString(targetColor));
+      Logger::printfLog(Logger::INFO, "Lap %d / %d Target=%s", lap, LAP_COUNT,
+                        colorToString(targetColor));
 
       // =====================================================
       // 経路探索
@@ -293,25 +295,43 @@ void EtRobocon2026::start()
       // =====================================================
       // RouteFollower
       //
-      // Straight
+      // 通常区間:
       //
-      // または
-      //
-      // 90° Rotation
-      // ↓
-      // SquareAngleAdjustment
+      // Rotation
       // ↓
       // Straight
       //
-      // 正方形なし:
       //
-      // 90° Rotation
-      // ↓
-      // Square未検出
-      // ↓
-      // SKIP
+      // 内側ゲート区間:
+      //
+      // Rotation
       // ↓
       // Straight
+      // ↓
+      // ゲート375mm手前
+      // ↓
+      // SquareAngleAdjustment 1回目
+      // ↓
+      // Straight 250mm
+      // ↓
+      // ゲート125mm手前
+      // ↓
+      // SquareAngleAdjustment 2回目
+      // ↓
+      // Straight
+      // ↓
+      // ゲート通過
+      //
+      //
+      // 外周ゲート:
+      //
+      // SquareAngleAdjustmentを使用せず
+      // Straightで通過する。
+      //
+      //
+      // SquareAngleAdjustmentで
+      // 正方形を検出できなかった場合も、
+      // 走行を中止せずStraightを継続する。
       //
       // 各制御の切り替え前に
       // stop + 200ms sleep
@@ -366,6 +386,11 @@ void EtRobocon2026::start()
 
   // =========================================================
   // 12. 最終走行
+  //
+  // 通常経路としてRouteFollowerで走行する。
+  //
+  // 途中に登録済みゲート区間が含まれる場合は、
+  // RouteFollower側のゲート判定に従って処理する。
   // =========================================================
 
   routeFollower.run(finalRoute.route);
@@ -379,5 +404,5 @@ void EtRobocon2026::start()
   Logger::printfLog(Logger::INFO, "Final grid=(%d,%d) direction=%s", finalPoint.x, finalPoint.y,
                     directionToString(finalDirection));
 
-  Logger::info("RouteFollower Square correction test finished");
+  Logger::info("RouteFollower Square gate correction test finished");
 }

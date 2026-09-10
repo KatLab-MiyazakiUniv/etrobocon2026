@@ -1,3 +1,3 @@
 コマンド名,ID,以降は動作名・動作ID・条件名・条件IDの繰り返し
 ETZumoFinish,ID,string,string,string,string
-ETZumoFinish,001,ETZumoExit,001,RepeatCount,001,Straight,003,DistanceAndColor,006,AbsoluteRotation,004,AsoluteAngle,004,CameraTracking,015,ProjectedDistance,002,AbsoluteRotation,005,AbsoluteAngle,005,straight,004,ProjectedDistance,003
+ETZumoFinish,001,ETZumoExit,001,RepeatCount,001,Straight,003,DistanceAndColor,006,AbsoluteRotation,004,AbsoluteAngle,004,CameraTracking,015,ProjectedDistance,002,AbsoluteRotation,005,AbsoluteAngle,005,Straight,004,ProjectedDistance,003

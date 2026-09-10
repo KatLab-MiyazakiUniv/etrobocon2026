@@ -111,9 +111,12 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
       Logger::printfLog(Logger::INFO, "[MotionParser] motionList[%zu]: %s ID=%s (条件: %s ID=%s)",
                         motionList.size() - 1, motionName.c_str(), motionId.c_str(),
                         conditionName.c_str(), conditionId.c_str());
-    } else {
+    } else if(convertCommand(motionParams[0]) == MOTION_COMMAND::NONE) {
       Logger::printfLog(Logger::ERROR, "%s:%d Command %s は未定義です", commandFilePath.c_str(),
                         lineNum, motionName.c_str());
+    } else {
+      Logger::printfLog(Logger::ERROR, "%s:%d Command %s ID=%s の生成に失敗しました。参照先のコマンド・ID・設定を確認してください",
+                        commandFilePath.c_str(), lineNum, motionName.c_str(), motionId.c_str());
     }
 
     lineNum++;

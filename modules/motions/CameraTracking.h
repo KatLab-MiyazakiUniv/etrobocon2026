@@ -20,9 +20,9 @@ class CameraTracking : public BaseMotion {
    * @brief 検出・走行方式の種類
    */
   enum class DetectionMode {
-    COLOR_REGION,      // 色領域検出PID走行
-    QR_CODE,           // QRコード検出PID走行
-    STRAIGHT_QR_CODE   // 直進走行しながらQRコード検出・フレーム保存
+    COLOR_REGION,     // 色領域検出PID走行
+    QR_CODE,          // QRコード検出PID走行
+    STRAIGHT_QR_CODE  // 直進走行しながらQRコード検出・フレーム保存
   };
 
   /**
@@ -41,21 +41,22 @@ class CameraTracking : public BaseMotion {
                  const CameraServer::ColorRegionDetectorRequest& _colorDetectionRequest,
                  bool _isStopMotorPower = true);
 
-  /**
-   * コンストラクタ
-   * @brief カメラ画像(QRコード検出)を使ったPID走行クラスを初期化する
-   * @param _robot ロボットインスタンス
-   * @param _continuationCondition 継続条件クラスのインスタンス
-   * @param _targetSpeed 目標速度
-   * @param _targetXCoordinate 目標x座標
-   * @param _pidGain カメラ制御用PIDゲイン
-   * @param _qrDetectionRequest QRコード検出リクエスト
-   * @param _isStopMotorPower モーターを停止するかどうか
-   */
-  CameraTracking(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                 double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
-                 const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
-                 bool _isStopMotorPower = true);
+  // /**
+  //  * コンストラクタ
+  //  * @brief カメラ画像(QRコード検出)を使ったPID走行クラスを初期化する
+  //  * @param _robot ロボットインスタンス
+  //  * @param _continuationCondition 継続条件クラスのインスタンス
+  //  * @param _targetSpeed 目標速度
+  //  * @param _targetXCoordinate 目標x座標
+  //  * @param _pidGain カメラ制御用PIDゲイン
+  //  * @param _qrDetectionRequest QRコード検出リクエスト
+  //  * @param _isStopMotorPower モーターを停止するかどうか
+  //  */
+  // CameraTracking(Robot& _robot, std::unique_ptr<BaseContinuationCondition>
+  // _continuationCondition,
+  //                double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
+  //                const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
+  //                bool _isStopMotorPower = true);
 
   /**
    * コンストラクタ

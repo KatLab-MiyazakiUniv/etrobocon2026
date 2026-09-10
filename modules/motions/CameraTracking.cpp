@@ -27,27 +27,27 @@ CameraTracking::CameraTracking(
   Logger::printfLog(Logger::DEBUG, "カメラトラッキング作成");
 }
 
-CameraTracking::CameraTracking(Robot& _robot,
-                               std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                               double _targetSpeed, int _targetXCoordinate,
-                               const Pid::PidGain& _pidGain,
-                               const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
-                               bool _isStopMotorPower)
-  : BaseMotion(_robot, std::move(_continuationCondition)),
-    targetSpeed(_targetSpeed),
-    targetXCoordinate(_targetXCoordinate),
-    detectionMode(DetectionMode::QR_CODE),
-    colorDetectionRequest(),
-    qrDetectionRequest(_qrDetectionRequest),
-    isStopMotorPower(_isStopMotorPower),
-    speedCalculator(_robot, _targetSpeed),
-    cameraPid(_pidGain.kp, _pidGain.ki, _pidGain.kd, _targetXCoordinate),
-    shouldUseIMU(false),
-    targetAngle(0.0),
-    anglePid(0.0, 0.0, 0.0, 0.0)
-{
-  LOG_CREATE("CameraTracking");
-}
+// CameraTracking::CameraTracking(Robot& _robot,
+//                                std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+//                                double _targetSpeed, int _targetXCoordinate,
+//                                const Pid::PidGain& _pidGain,
+//                                const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
+//                                bool _isStopMotorPower)
+//   : BaseMotion(_robot, std::move(_continuationCondition)),
+//     targetSpeed(_targetSpeed),
+//     targetXCoordinate(_targetXCoordinate),
+//     detectionMode(DetectionMode::QR_CODE),
+//     colorDetectionRequest(),
+//     qrDetectionRequest(_qrDetectionRequest),
+//     isStopMotorPower(_isStopMotorPower),
+//     speedCalculator(_robot, _targetSpeed),
+//     cameraPid(_pidGain.kp, _pidGain.ki, _pidGain.kd, _targetXCoordinate),
+//     shouldUseIMU(false),
+//     targetAngle(0.0),
+//     anglePid(0.0, 0.0, 0.0, 0.0)
+// {
+//   LOG_CREATE("CameraTracking");
+// }
 
 CameraTracking::CameraTracking(Robot& _robot,
                                std::unique_ptr<BaseContinuationCondition> _continuationCondition,

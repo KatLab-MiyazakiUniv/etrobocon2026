@@ -1,4 +1,4 @@
-コマンド名,ID,speed,targetX,camera_kp,camera_ki,camera_kd,isStop,roi.x,roi.y,width,height,colrIndex,red,blue,yellow,black
+コマンド名,ID,speed,targetX,camera_kp,camera_ki,camera_kd,isStop,roi.x,roi.y,width,height,colorIndex,red,blue,yellow,black
 CameraTracking,ID,double,int,double,double,double,bool,int,int,int,int,bool,bool,bool,bool,bool
 # Tracking Area
 CameraTracking,ID,double,int,double,double,double,bool,int,int,int,int

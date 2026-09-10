@@ -1,57 +1,152 @@
 /**
  * @file SquareDetectionActionHandler.cpp
- * @brief 正方形検出アクションを処理するクラス
- * @author okuyama0528
+ * @brief 正方形検出処理を実行するActionHandler
  */
 
 #include "SquareDetectionActionHandler.h"
 
-SquareDetectionActionHandler::SquareDetectionActionHandler(CameraCapture& _camera)
-  : camera(_camera), detector(cv::Rect(0, 0, CAM_MAX_WIDTH, CAM_MAX_HEIGHT))
+#include <memory>
+
+#include "Logger.h"
+#include "SystemInfo.h"
+
+SquareDetectionActionHandler::SquareDetectionActionHandler(
+    CameraCapture& _camera)
+  : camera(_camera),
+    detector(
+        std::make_unique<SquareDetector>(
+            cv::Rect(
+                0,
+                0,
+                CAM_MAX_WIDTH,
+                CAM_MAX_HEIGHT)))
 {
-  LOG_CREATE("SquareDetectionActionHandler");
+  LOG_CREATE(
+      "SquareDetectionActionHandler");
 }
 
 SquareDetectionActionHandler::~SquareDetectionActionHandler()
 {
-  LOG_DESTROY("SquareDetectionActionHandler");
+  LOG_DESTROY(
+      "SquareDetectionActionHandler");
 }
 
-void SquareDetectionActionHandler::execute(const CameraServer::SquareDetectorRequest& request,
-                                            CameraServer::SquareDetectorResponse& response)
+void SquareDetectionActionHandler::execute(
+    const CameraServer::SquareDetectorRequest& request,
+    CameraServer::SquareDetectorResponse& response)
 {
   response = {};
 
+  // =========================================================
+  // ROI
+  // =========================================================
+
+  const cv::Rect localRoi(
+      request.roi.x,
+      request.roi.y,
+      request.roi.width,
+      request.roi.height);
+
+  // =========================================================
+  // Trackingリセット
+  //
+  // Straightを挟んだ後の最初のSquare検出では
+  // 新しいSquareDetectorを生成する。
+  //
+  // これによりpreviousCenterやmissedCountなど
+  // SquareDetector内部の追跡状態が完全に初期化される。
+  // =========================================================
+
+  if(request.resetTracking) {
+
+    Logger::info(
+        "SquareDetectionActionHandler: "
+        "===== TRACKING RESET =====");
+
+    detector =
+        std::make_unique<SquareDetector>(
+            localRoi);
+  }
+
+  if(!detector) {
+
+    detector =
+        std::make_unique<SquareDetector>(
+            localRoi);
+  }
+
+  // =========================================================
+  // ROI設定
+  // =========================================================
+
+  detector->setValidatedRoi(
+      localRoi);
+
+  // =========================================================
+  // カメラ画像取得
+  // =========================================================
+
   cv::Mat frame;
-  if(!camera.getFrame(frame)) {
-    Logger::error("SquareDetectionActionHandler:フレームの取得に失敗しました");
-    response.wasDetected = false;
+
+  if(!camera.getFrame(
+         frame)) {
+
+    Logger::error(
+        "SquareDetectionActionHandler:"
+        "フレームの取得に失敗しました");
+
+    response.wasDetected =
+        false;
+
     return;
   }
 
-  cv::Rect localRoi(request.roi.x, request.roi.y, request.roi.width, request.roi.height);
-  detector.setValidatedRoi(localRoi);
+  // =========================================================
+  // 正方形検出
+  // =========================================================
 
-  BoundingBoxDetectionResult result;
-  detector.detect(frame, result);
+  BoundingBoxDetectionResult result {};
 
-  response.wasDetected = result.wasDetected;
+  detector->detect(
+      frame,
+      result);
 
-if(result.wasDetected) {
-  response.corners[0].x = result.topLeft.x;
-  response.corners[0].y = result.topLeft.y;
+  // =========================================================
+  // 未検出
+  // =========================================================
 
-  response.corners[1].x = result.topRight.x;
-  response.corners[1].y = result.topRight.y;
+  if(!result.wasDetected) {
 
-  response.corners[2].x = result.bottomRight.x;
-  response.corners[2].y = result.bottomRight.y;
+    Logger::error(
+        "SquareDetectionActionHandler:"
+        "正方形が検出されませんでした");
 
-  response.corners[3].x = result.bottomLeft.x;
-  response.corners[3].y = result.bottomLeft.y;
+    response.wasDetected =
+        false;
 
-    Logger::info("SquareDetectionActionHandler:正方形の検出に成功しました");
-  } else {
-    Logger::error("SquareDetectionActionHandler:正方形が検出されませんでした");
+    return;
   }
+
+  // =========================================================
+  // 検出成功
+  // =========================================================
+
+  response.wasDetected =
+      true;
+
+ response.corners[0].x = result.topLeft.x;
+response.corners[0].y = result.topLeft.y;
+
+response.corners[1].x = result.topRight.x;
+response.corners[1].y = result.topRight.y;
+
+response.corners[2].x = result.bottomRight.x;
+response.corners[2].y = result.bottomRight.y;
+
+response.corners[3].x = result.bottomLeft.x;
+response.corners[3].y = result.bottomLeft.y;
+
+  Logger::info(
+      "SquareDetectionActionHandler:"
+      "正方形の検出に成功しました");
 }

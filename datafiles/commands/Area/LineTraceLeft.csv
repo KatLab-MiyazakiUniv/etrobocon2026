@@ -1,9 +1,18 @@
 #動作コマンド名,動作ID,条件コマンド名,条件ID
 # カメラ走行
 #フレームを1回捨てる
-Snapshot,clearBuffer1,RepeatCount,01
+Snapshot,clearBuffer1,RepeatCount,001
 #ボトルキャッチ前
-CameraTracking,LTS001,Distance,065
+#CameraTracking,LTS001,Distance,065
+
+StraightQRSave,004,Distance,068
+StraightQRSave,004,Distance,068
+StraightQRSave,004,Distance,068
+StraightQRSave,004,Distance,068
+StraightQRSave,004,Distance,068
+
+
+
 #ボトルキャッチ中
 CameraTracking,LTS002,Distance,020
 #ボトルキャッチ後

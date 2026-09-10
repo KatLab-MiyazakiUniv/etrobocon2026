@@ -1,6 +1,6 @@
 /**
  * @file   SquareAngleAdjustment.h
- * @brief  正方形を利用してロボットの向きを補正するクラス
+ * @brief  正方形の中心を利用してロボットの向きを補正するクラス
  * @author yutaro-1214
  */
 
@@ -11,34 +11,18 @@
 #include "Robot.h"
 #include "SocketProtocol.h"
 
-/**
- * @class SquareAngleAdjustment
- * @brief 正方形の傾きを利用してロボットの向きを補正するクラス
- */
 class SquareAngleAdjustment {
  public:
-  /**
-   * @brief コンストラクタ
-   *
-   * @param _robot ロボット
-   * @param _squareDetectionRequest 正方形検出リクエスト
-   * @param _pidGain 角度補正PID
-   * @param _angleTolerance 角度補正終了許容誤差[deg]
-   */
-  SquareAngleAdjustment(Robot& _robot,
-                        const CameraServer::SquareDetectorRequest& _squareDetectionRequest,
-                        const Pid::PidGain& _pidGain, double _angleTolerance = 2.0);
+  SquareAngleAdjustment(
+      Robot& _robot,
+      const CameraServer::SquareDetectorRequest& _squareDetectionRequest,
+      const Pid::PidGain& _pidGain,
+      double _centerTolerance = 10.0);
 
-  /**
-   * @brief デストラクタ
-   */
   ~SquareAngleAdjustment();
 
   /**
-   * @brief 正方形を利用して角度補正する
-   *
-   * 正方形を検出できなかった場合は
-   * その回の補正を行わずfalseを返す。
+   * @brief 正方形の中心が画像中央に来るように補正する
    *
    * @return true 補正成功
    * @return false 正方形未検出または通信失敗
@@ -47,37 +31,32 @@ class SquareAngleAdjustment {
 
  private:
   /**
-   * @brief 正方形の上辺の傾きを計算する
+   * @brief 正方形中心と画像中心のX方向誤差を計算する
+   *
+   * 右なら正、左なら負を返す。
    *
    * @param response 正方形検出結果
-   * @return 正方形の傾き[deg]
+   * @return X方向誤差[pixel]
    */
-  double calculateSquareAngle(const CameraServer::SquareDetectorResponse& response) const;
+  double calculateCenterError(
+      const CameraServer::SquareDetectorResponse& response) const;
 
   /**
    * @brief 左右モータを停止する
    */
   void stop();
 
-  /**
-   * @brief ロボット
-   */
+ private:
   Robot& robot;
 
-  /**
-   * @brief 正方形検出リクエスト
-   */
   CameraServer::SquareDetectorRequest squareDetectionRequest;
 
-  /**
-   * @brief 角度補正PID
-   */
-  Pid anglePid;
+  Pid centerPid;
 
   /**
-   * @brief 角度補正終了許容誤差[deg]
+   * @brief 中心補正終了許容誤差[pixel]
    */
-  double angleTolerance;
+  double centerTolerance;
 };
 
 #endif

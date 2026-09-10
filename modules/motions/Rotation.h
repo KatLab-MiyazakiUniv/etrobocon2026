@@ -45,7 +45,7 @@ class Rotation : public BaseMotion {
    */
   double getCurrentAngle();
 
- private:
+ protected:
   Pid anglePid;  // 回頭制御用PIDコントローラ
 };
 

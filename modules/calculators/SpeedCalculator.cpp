@@ -16,10 +16,10 @@ SpeedCalculator::SpeedCalculator(Robot& _robot, double _targetSpeed)
 
 SpeedCalculator::SpeedCalculator(Robot& _robot, const Pid::PidGain& _rightPid,
                                  const Pid::PidGain& _leftPid, double _targetSpeed)
-  : robot(_robot),
+  : targetSpeed(_targetSpeed),
     rightPid(_rightPid.kp, _rightPid.ki, _rightPid.kd, _targetSpeed),
     leftPid(_leftPid.kp, _leftPid.ki, _leftPid.kd, _targetSpeed),
-    targetSpeed(_targetSpeed)
+    robot(_robot)
 
 {
 }

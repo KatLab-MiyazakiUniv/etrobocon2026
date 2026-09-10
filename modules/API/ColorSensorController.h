@@ -24,6 +24,7 @@ class ColorSensorController {
     GREEN = 4,
     YELLOW = 5,
     RED = 6,
+    GRAY = 7,
   };
 
   /**
@@ -104,9 +105,11 @@ class ColorSensorController {
 
  private:
   static constexpr int SATURATION_BORDER = 37;    // 無彩色かどうかの彩度の境界
-  static constexpr int BLACK_LIMIT_BORDER = 10;   // 黒の明度の境界
+  static constexpr int BLACK_LIMIT_BORDER = 30;   // 黒の明度の境界
   static constexpr int WHITE_LIMIT_BORDER = 250;  // 白の明度の境界
-  static constexpr int BLACK_BORDER = 80;         // 無彩色の黒の明度の境界
+  static constexpr int BLACK_BORDER = 30;         // 無彩色の黒の明度の境界
+  static constexpr int GRAY_VALUE_BORDER = 80;    // 灰色と白の明度の境界（要実測調整）
+  static constexpr int CHROMATIC_VALUE_BORDER = 80;         // 有彩色判定を許可する最低明度（要実測調整）
   static constexpr int RED_BORDER = 25;           // 赤の色相の境界
   static constexpr int YELLOW_BORDER = 50;        // 黄の色相の境界
   static constexpr int GREEN_BORDER = 170;        // 緑の色相の境界

@@ -76,4 +76,39 @@ namespace etrobocon2026_test {
     mileage.reset(std::numeric_limits<double>::infinity(), 0.0);
     EXPECT_FALSE(mileage.isValid());
   }
+
+  TEST(ProjectedMileageTest, VerticalDistanceTracksBothDirectionsAndReverse)
+  {
+    ProjectedMileage mileage;
+    mileage.reset(0, 0);
+    mileage.update(100, 0);
+    mileage.update(100, 90);
+    mileage.update(300, 90);
+    EXPECT_NEAR(mileage.getHorizontalDistance(), 100, 1e-4);
+    EXPECT_NEAR(mileage.getVerticalDistance(), 200, 1e-4);
+    mileage.update(250, 90);
+    EXPECT_NEAR(mileage.getVerticalDistance(), 150, 1e-4);
+    mileage.update(250, -90);
+    mileage.update(450, -90);
+    EXPECT_NEAR(mileage.getVerticalDistance(), -50, 1e-4);
+    mileage.reset(450, 0);
+    EXPECT_DOUBLE_EQ(mileage.getHorizontalDistance(), 0);
+    EXPECT_DOUBLE_EQ(mileage.getVerticalDistance(), 0);
+  }
+
+  TEST(ProjectedMileageTest, DiagonalAndWrapPreserveVerticalComponent)
+  {
+    ProjectedMileage mileage;
+    mileage.reset(0, 45);
+    mileage.update(100, 45);
+    EXPECT_NEAR(mileage.getHorizontalDistance(), 100 / std::sqrt(2.0), 1e-4);
+    EXPECT_NEAR(mileage.getVerticalDistance(), 100 / std::sqrt(2.0), 1e-4);
+    const double y = mileage.getVerticalDistance();
+    mileage.update(100, 179);
+    mileage.update(200, -179);
+    EXPECT_NEAR(mileage.getVerticalDistance(), y, 1e-4);
+    mileage.update(300, std::numeric_limits<double>::infinity());
+    EXPECT_FALSE(mileage.isValid());
+    EXPECT_NEAR(mileage.getVerticalDistance(), y, 1e-4);
+  }
 }  // namespace etrobocon2026_test

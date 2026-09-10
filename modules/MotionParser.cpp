@@ -158,8 +158,21 @@ vector<string> MotionParser::extractParamsFromID(const string& filePath, const s
 }
 
 unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
-    Robot& robot, const vector<string>& params)
+    Robot& robot, const vector<string>& params, shared_ptr<ProjectedMileage> mileage)
 {
+  if(!params.empty() && params[0] == "ProjectedDistance") {
+    if(!mileage || params.size() != 4 || (params[2] != "X" && params[2] != "Y")) {
+      Logger::error("ProjectedDistance: ETZumoFinish内で軸X/Yと目標座標を指定してください");
+      return nullptr;
+    }
+    double target;
+    try { target = fromString<double>(params[3]); }
+    catch(const std::invalid_argument&) { return nullptr; }
+    if(!std::isfinite(target)) return nullptr;
+    auto axis = params[2] == "X" ? ProjectedDistanceCondition::Axis::HORIZONTAL
+                                  : ProjectedDistanceCondition::Axis::VERTICAL;
+    return make_unique<ProjectedDistanceCondition>(robot, mileage, axis, target);
+  }
   CONDITION_COMMAND cond = convertCondition(params[0]);
   switch(cond) {
     case CONDITION_COMMAND::DISTANCE: {
@@ -282,11 +295,36 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
 }
 
 BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string>& motionParams,
-                                               unique_ptr<BaseContinuationCondition> condition)
+                                               unique_ptr<BaseContinuationCondition> condition,
+                                               shared_ptr<ProjectedMileage> sharedMileage)
 {
   // TODO: 各動作クラスが完成したら、以下のコメントを外してswitch-caseを実装する
   MOTION_COMMAND command = convertCommand(motionParams[0]);
   switch(command) {
+    case MOTION_COMMAND::ET_ZUMO_FINISH: {
+      // 2列目以降は動作名・動作ID・条件名・条件IDの組。
+      if(motionParams.size() < 6 || (motionParams.size() - 2) % 4 != 0) return nullptr;
+      auto mileage = make_shared<ProjectedMileage>();
+      vector<unique_ptr<BaseMotion>> children;
+      for(size_t i = 2; i < motionParams.size(); i += 4) {
+        // 複合動作自身の参照による再帰を禁止する。
+        if(motionParams[i] == "ETZumoFinish" || motionParams[i] == "ResetAzimuth") return nullptr;
+        // 基準を設定するETZumoExitは先頭にのみ置ける。
+        if(motionParams[i] == "ETZumoExit" && i != 2) return nullptr;
+        auto params = extractParamsFromID(MOTIONS_PATH + motionParams[i] + ".csv", motionParams[i + 1]);
+        auto conditionParams = extractParamsFromID(CONDITIONS_PATH + motionParams[i + 2] + ".csv", motionParams[i + 3]);
+        if(params.empty() || conditionParams.empty()) return nullptr;
+        auto childCondition = createConditionInstance(robot, conditionParams, mileage);
+        if(!childCondition) return nullptr;
+        if(motionParams[i] != "ETZumoExit" && conditionParams[0] != "ProjectedDistance") {
+          childCondition = make_unique<ProjectedDistanceCondition>(robot, mileage, std::move(childCondition));
+        }
+        unique_ptr<BaseMotion> child(createMotionInstance(robot, params, std::move(childCondition), mileage));
+        if(!child) return nullptr;
+        children.push_back(std::move(child));
+      }
+      return new ETZumoFinish(robot, std::move(condition), std::move(children), mileage);
+    }
     case MOTION_COMMAND::ET_ZUMO_EXIT: {
       // ETZumoExit: motionParams[0]=コマンド名
       //             motionParams[1]=動作ID
@@ -298,9 +336,9 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       //             motionParams[7]=Straightの動作ID
 
       // 必要な列数と目標距離を確認する。距離は有限の正の値のみ受け付ける。
-      if(motionParams.size() != 8) {
+      if(motionParams.size() != 8 && motionParams.size() != 9) {
         Logger::printfLog(Logger::ERROR,
-                          "[MotionParser] ETZumoExit: 動作パラメータは8列必要です（実際: %zu列）",
+                          "[MotionParser] ETZumoExit: 動作パラメータは8列（任意の到着色を含む場合9列）必要です（実際: %zu列）",
                           motionParams.size());
         return nullptr;
       }
@@ -321,7 +359,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       }
 
       // 全ての子動作で同じ距離計測を共有し、動作が切り替わっても積算値を引き継ぐ。
-      auto mileage = make_shared<ProjectedMileage>();
+      auto mileage = sharedMileage ? sharedMileage : make_shared<ProjectedMileage>();
       vector<unique_ptr<BaseMotion>> motions;
 
       const string names[] = { "CameraTracking", "AbsoluteRotation", "Straight" };
@@ -362,9 +400,15 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
           }
         }
 
+        const bool requireColor = i == 2 && motionParams.size() == 9;
+        if(requireColor) {
+          auto color = ColorSensorController::convertStringToColor(motionParams[8]);
+          if(color == ColorSensorController::COLOR::NONE) return nullptr;
+          continuationCondition = make_unique<SensorColorCondition>(robot, color);
+        }
         // 0度方向への積算距離が目標に達した場合は、個別の条件に関係なく終了する。
         auto projectedCondition = make_unique<ETZumoExitCondition>(
-            robot, mileage, targetDistance, std::move(continuationCondition));
+            robot, mileage, targetDistance, std::move(continuationCondition), requireColor);
 
         // 途中で生成に失敗しても、生成済みの子動作はunique_ptrによって解放される。
         unique_ptr<BaseMotion> motion(
@@ -486,7 +530,8 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING },
           { "Calibrator", MOTION_COMMAND::CALIBRATOR },
           { "ResetAzimuth", MOTION_COMMAND::RESET_AZIMUTH },
-          { "ETZumoExit", MOTION_COMMAND::ET_ZUMO_EXIT }
+          { "ETZumoExit", MOTION_COMMAND::ET_ZUMO_EXIT },
+          { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH }
 
         };
 

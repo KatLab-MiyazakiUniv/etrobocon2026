@@ -31,6 +31,7 @@ class SensorColorCondition : public BaseContinuationCondition {
    * @brief 指定色を検出する場合、動作を継続しないと判定する
    * @return true/動作を継続する、false/動作を継続しない
    */
+  void prepare() override { colorCount = 0; }
   bool shouldContinue() override;
 
  private:

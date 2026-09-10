@@ -60,8 +60,11 @@ namespace etrobocon2026_test {
               ColorSensorController::convertHsvToColor(highValue));
 
     // 彩度が37未満で、明度が80未満なら黒
+    // 追加仕様: 明度30以上80未満は黒から灰色に分離する。
+    // 灰色の領域は判定保留
+    // 追加仕様: 低彩度の灰色はGRAYとして確定する。
     ColorSensorController::HSV lowSaturationLowValue = { 0, 36, 79 };
-    EXPECT_EQ(ColorSensorController::COLOR::BLACK,
+    EXPECT_EQ(ColorSensorController::COLOR::GRAY,
               ColorSensorController::convertHsvToColor(lowSaturationLowValue));
 
     // 彩度が37未満で、明度が80以上なら白
@@ -98,6 +101,39 @@ namespace etrobocon2026_test {
     ColorSensorController::HSV defaultRedValue = { 300, 100, 120 };
     EXPECT_EQ(ColorSensorController::COLOR::RED,
               ColorSensorController::convertHsvToColor(defaultRedValue));
+  }
+
+
+  TEST(ColorSensorControllerTest, DarkBlueHueDoesNotBecomeBlue)
+  {
+    ColorSensorController::HSV black = { 240, 80, 29 };
+    ColorSensorController::HSV uncertain = { 240, 80, 30 };
+    ColorSensorController::HSV blue = { 240, 80, 80 };
+    EXPECT_EQ(ColorSensorController::COLOR::BLACK, ColorSensorController::convertHsvToColor(black));
+    EXPECT_EQ(ColorSensorController::COLOR::NONE, ColorSensorController::convertHsvToColor(uncertain));
+    EXPECT_EQ(ColorSensorController::COLOR::BLUE, ColorSensorController::convertHsvToColor(blue));
+  }
+
+  TEST(ColorSensorControllerTest, GrayBoundariesAndStringConversion)
+  {
+    using Color = ColorSensorController::COLOR;
+    for(uint16_t hue : { 0, 120, 240, 359 }) {
+      ColorSensorController::HSV black = { hue, 36, 29 };
+      ColorSensorController::HSV grayLower = { hue, 36, 30 };
+      ColorSensorController::HSV grayUpper = { hue, 0, 79 };
+      ColorSensorController::HSV white = { hue, 36, 80 };
+      ColorSensorController::HSV uncertain = { hue, 37, 79 };
+      EXPECT_EQ(Color::BLACK, ColorSensorController::convertHsvToColor(black));
+      EXPECT_EQ(Color::GRAY, ColorSensorController::convertHsvToColor(grayLower));
+      EXPECT_EQ(Color::GRAY, ColorSensorController::convertHsvToColor(grayUpper));
+      EXPECT_EQ(Color::WHITE, ColorSensorController::convertHsvToColor(white));
+      EXPECT_EQ(Color::NONE, ColorSensorController::convertHsvToColor(uncertain));
+    }
+    EXPECT_EQ(Color::GRAY, ColorSensorController::convertStringToColor("GRAY"));
+    EXPECT_STREQ("GRAY", ColorSensorController::convertColorToString(Color::GRAY));
+    ColorSensorController controller;
+    ColorSensorController::HSV gray = { 240, 0, 60 };
+    EXPECT_STREQ("GRAY", controller.getColor(gray));
   }
 
   // 反射光強度を取得できるかのテスト

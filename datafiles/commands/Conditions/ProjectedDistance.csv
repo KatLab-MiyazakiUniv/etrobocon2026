@@ -1,0 +1,5 @@
+コマンド名,ID,axis,targetCoordinateMm
+ProjectedDistance,ID,string,double
+ProjectedDistance,001,X,700
+ProjectedDistance,002,Y,-700
+ProjectedDistance,003,Y,-1400

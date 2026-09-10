@@ -72,6 +72,6 @@ void ETZumoExit::executeStep()
 void ETZumoExit::finish()
 {
   robot.getWheelMotorControllerInstance().stopBoth();
-  Logger::printfLog(Logger::INFO, "ETZumoExit: projected distance = %.1f mm",
-                    mileage->getDistance());
+  Logger::printfLog(Logger::INFO, "ETZumoExit: X=%.1f mm, Y=%.1f mm",
+                    mileage->getHorizontalDistance(), mileage->getVerticalDistance());
 }

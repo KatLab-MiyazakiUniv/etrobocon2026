@@ -9,9 +9,10 @@
 
 ETZumoExitCondition::ETZumoExitCondition(
     Robot& _robot, std::shared_ptr<ProjectedMileage> _mileage, double _targetDistance,
-    std::unique_ptr<BaseContinuationCondition> _continuationCondition)
+    std::unique_ptr<BaseContinuationCondition> _continuationCondition, bool _requireBoth)
   : BaseContinuationCondition(_robot),
     mileage(std::move(_mileage)),
+    requireBoth(_requireBoth),
     targetDistance(_targetDistance),
     continuationCondition(std::move(_continuationCondition))
 {
@@ -54,6 +55,11 @@ bool ETZumoExitCondition::shouldContinue()
   if(!mileage->isValid()) {
     Logger::error("ETZumoExitCondition: 距離の更新に失敗したため終了します");
     return false;
+  }
+  if(requireBoth) {
+    // 距離未達の間は色を数えず、到達後の連続検知で停止する。
+    return mileage->getDistance() < targetDistance
+           || (continuationCondition && continuationCondition->shouldContinue());
   }
   // 共通の距離に到達したら終了する。未到達なら子動作固有の条件も確認する。
   return mileage->getDistance() < targetDistance

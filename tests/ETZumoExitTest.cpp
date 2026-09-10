@@ -55,7 +55,7 @@ namespace etrobocon2026_test {
     EXPECT_FALSE(straight.shouldContinue());
   }
 
-  // 実際のCSVからET相撲退出動作と後続動作を含む7個の動作を生成できるかのテスト
+  // 実際のCSVからET相撲〜フィニッシュの複合動作を生成できるかのテスト
   TEST(ETZumoExitTest, ProductionCsvCreatesExitAndKeepsFinishMotions)
   {
     const auto original = std::filesystem::current_path();
@@ -71,8 +71,8 @@ namespace etrobocon2026_test {
     Robot robot(client);
     std::string path = (root / "datafiles/commands/Area/ETZumoLeft.csv").string();
     auto motions = MotionParser::createMotionList(robot, path);
-    EXPECT_EQ(motions.size(), 7u);
-    if(!motions.empty()) EXPECT_NE(dynamic_cast<ETZumoExit*>(motions.front()), nullptr);
+    EXPECT_EQ(motions.size(), 1u);
+    if(!motions.empty()) EXPECT_NE(dynamic_cast<ETZumoFinish*>(motions.front()), nullptr);
     for(auto* motion : motions) delete motion;
   }
 

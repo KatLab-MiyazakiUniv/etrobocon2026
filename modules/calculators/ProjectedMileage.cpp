@@ -22,6 +22,7 @@ void ProjectedMileage::reset(double mileage, double angle)
   previousMileage = mileage;
   previousAngle = angle;
   distance = 0.0;
+  verticalDistance = 0.0;
 }
 
 void ProjectedMileage::update(double mileage, double angle)
@@ -39,12 +40,15 @@ void ProjectedMileage::update(double mileage, double angle)
   double midpoint = previousAngle + AngleNormalizer::normalizeAngle(angle - previousAngle) / 2.0;
   // 差分距離 × cos(方位)を積算する。後退は負の差分になるため減算される。
   double nextDistance = distance + (mileage - previousMileage) * std::cos(midpoint * PI / 180.0);
-  if(!std::isfinite(nextDistance)) {
+  double nextVerticalDistance
+      = verticalDistance + (mileage - previousMileage) * std::sin(midpoint * PI / 180.0);
+  if(!std::isfinite(nextDistance) || !std::isfinite(nextVerticalDistance)) {
     valid = false;
     Logger::error("ProjectedMileage: 基準方向の距離計算で有限値の範囲を超えました");
     return;
   }
   distance = nextDistance;
+  verticalDistance = nextVerticalDistance;
   // 次の周期では、今回の測定値との差分を使う。
   previousMileage = mileage;
   previousAngle = angle;

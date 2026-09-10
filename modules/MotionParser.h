@@ -33,6 +33,8 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "Calibrator.h"
 #include "ResetAzimuth.h"
 #include "ETZumoExit.h"
+#include "ETZumoFinish.h"
+#include "ProjectedDistanceCondition.h"
 #include "ETZumoExitCondition.h"
 #include "UltraSonicCondition.h"
 #include "./../common/ImageProcessingColor.h"
@@ -50,6 +52,7 @@ class MotionParser {
     CALIBRATOR,
     RESET_AZIMUTH,
     ET_ZUMO_EXIT,
+    ET_ZUMO_FINISH,
     NONE
   };
   // 条件コマンド名を持つ列挙型クラス
@@ -95,7 +98,8 @@ class MotionParser {
    * @return 条件インスタンス（未定義の場合は nullptr）
    */
   static std::unique_ptr<BaseContinuationCondition> createConditionInstance(
-      Robot& robot, const std::vector<std::string>& params);
+      Robot& robot, const std::vector<std::string>& params,
+      std::shared_ptr<ProjectedMileage> mileage = nullptr);
 
   /**
    * @brief パラメータから動作インスタンスを生成する
@@ -106,7 +110,8 @@ class MotionParser {
    */
   static BaseMotion* createMotionInstance(Robot& robot,
                                           const std::vector<std::string>& motionParams,
-                                          std::unique_ptr<BaseContinuationCondition> condition);
+                                          std::unique_ptr<BaseContinuationCondition> condition,
+                                          std::shared_ptr<ProjectedMileage> mileage = nullptr);
 
   /**
    * @brief 文字列を列挙型MOTION_COMMANDに変換する

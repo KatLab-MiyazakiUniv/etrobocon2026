@@ -139,9 +139,9 @@
 //     return createResult(qrCode, roiRect, "Sharpen+CLAHE");
 //   }
 
-//   // --- Step 3: バイラテラル + CLAHE (エッジ保持ノイズ除去 & コントラスト強調) でデコード試行 ---
-//   cv::Mat imgStep3 = applyCLAHE(applyBilateral(roiFrame, 5, 50.0, 50.0));
-//   ZXing::ImageView ivStep3(imgStep3.data, imgStep3.cols, imgStep3.rows, ZXing::ImageFormat::BGR,
+//   // --- Step 3: バイラテラル + CLAHE (エッジ保持ノイズ除去 & コントラスト強調) でデコード試行
+//   --- cv::Mat imgStep3 = applyCLAHE(applyBilateral(roiFrame, 5, 50.0, 50.0)); ZXing::ImageView
+//   ivStep3(imgStep3.data, imgStep3.cols, imgStep3.rows, ZXing::ImageFormat::BGR,
 //                            static_cast<int>(imgStep3.step));
 //   qrCode = ZXing::ReadBarcode(ivStep3, options);
 //   if(qrCode.isValid()) {
@@ -181,7 +181,6 @@
 //   return result;
 // }
 
-
 /**
  * @file    QrCodeDetector.cpp
  * @brief   QRコード検出処理クラス (WeChatQRCode版)
@@ -203,41 +202,35 @@
 //         "sr.prototxt", "sr.caffemodel"
 //     );
 //   } catch (const cv::Exception& e) {
-//     Logger::printfLog(Logger::ERROR, "QrCodeDetector: WeChatQRCodeの初期化に失敗しました: %s", e.what());
+//     Logger::printfLog(Logger::ERROR, "QrCodeDetector: WeChatQRCodeの初期化に失敗しました: %s",
+//     e.what());
 //   }
 
 //   validateParameters();
 //   LOG_CREATE("QrCodeDetector");
 // }
 
-
-
-
 QrCodeDetector::QrCodeDetector(const cv::Rect& _roi) : roi(_roi)
 {
   try {
     weChatDetector = std::make_unique<cv::wechat_qrcode::WeChatQRCode>(
-        "/home/katlab/RasPike-ART/sdk/workspace/etrobocon2026/camera_server/models/detect.prototxt",
-        "/home/katlab/RasPike-ART/sdk/workspace/etrobocon2026/camera_server/models/detect.caffemodel",
-        "/home/katlab/RasPike-ART/sdk/workspace/etrobocon2026/camera_server/models/sr.prototxt",
-        "/home/katlab/RasPike-ART/sdk/workspace/etrobocon2026/camera_server/models/sr.caffemodel"
+
+        "./../camera_server/models/detect.prototxt", "./../camera_server/models/detect.caffemodel",
+        "./../camera_server/models/sr.prototxt", "./../camera_server/models/sr.caffemodel"
+
+        // "/home/katlab/RasPike-ART/sdk/workspace/etrobocon2026/camera_server/models/detect.prototxt",
+        // "/home/katlab/RasPike-ART/sdk/workspace/etrobocon2026/camera_server/models/detect.caffemodel",
+        // "/home/katlab/RasPike-ART/sdk/workspace/etrobocon2026/camera_server/models/sr.prototxt",
+        // "/home/katlab/RasPike-ART/sdk/workspace/etrobocon2026/camera_server/models/sr.caffemodel"
     );
-  } catch (const cv::Exception& e) {
-    Logger::printfLog(Logger::ERROR, "QrCodeDetector: WeChatQRCodeの初期化に失敗しました: %s", e.what());
+  } catch(const cv::Exception& e) {
+    Logger::printfLog(Logger::ERROR, "QrCodeDetector: WeChatQRCodeの初期化に失敗しました: %s",
+                      e.what());
   }
 
   validateParameters();
   LOG_CREATE("QrCodeDetector");
 }
-
-
-
-
-
-
-
-
-
 
 QrCodeDetector::~QrCodeDetector()
 {
@@ -282,18 +275,63 @@ QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
     Logger::error("QrCodeDetector: ROIがフレーム内に収まっていません。");
     return result;
   }
-  cv::Mat roiFrame = frame(roiRect);
+
+  // ★修正: 切り出したROIを clone() してメモリを確実に連続化・独立させる
+  cv::Mat roiFrame = frame(roiRect).clone();
+
+  // ★追加: チャンネル数が3でない場合（グレースケールや4ch等）はBGRに強制変換する
+  if(roiFrame.channels() == 1) {
+    cv::cvtColor(roiFrame, roiFrame, cv::COLOR_GRAY2BGR);
+  } else if(roiFrame.channels() == 4) {
+    cv::cvtColor(roiFrame, roiFrame, cv::COLOR_BGRA2BGR);
+  }
 
   // WeChatQRCodeによる検出とデコードの実行
-  std::vector<cv::Point2f> points;
+  // std::vector<cv::Point2f> points;
+  std::vector<std::vector<cv::Point2f>> points;
+
   std::vector<std::string> decodedStrings;
 
   try {
     decodedStrings = weChatDetector->detectAndDecode(roiFrame, points);
-  } catch (const cv::Exception& e) {
-    Logger::printfLog(Logger::ERROR, "QrCodeDetector: 検出処理中に例外が発生しました: %s", e.what());
+  } catch(const cv::Exception& e) {
+    Logger::printfLog(Logger::ERROR, "QrCodeDetector: 検出処理中に例外が発生しました: %s",
+                      e.what());
     return result;
   }
+
+  // QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
+  // {
+  //   QrCodeDetectionResult result;
+
+  //   if(frame.empty()) {
+  //     Logger::error("QrCodeDetector: 入力フレームが空です。");
+  //     return result;
+  //   }
+
+  //   if(!weChatDetector) {
+  //     Logger::error("QrCodeDetector: WeChatQRCodeが初期化されていません。");
+  //     return result;
+  //   }
+
+  //   // ROI切り出し
+  //   cv::Rect roiRect = roi & cv::Rect(0, 0, frame.cols, frame.rows);
+  //   if(roiRect.empty()) {
+  //     Logger::error("QrCodeDetector: ROIがフレーム内に収まっていません。");
+  //     return result;
+  //   }
+  //   cv::Mat roiFrame = frame(roiRect);
+
+  //   // WeChatQRCodeによる検出とデコードの実行
+  //   std::vector<cv::Point2f> points;
+  //   std::vector<std::string> decodedStrings;
+
+  //   try {
+  //     decodedStrings = weChatDetector->detectAndDecode(roiFrame, points);
+  //   } catch (const cv::Exception& e) {
+  //     Logger::printfLog(Logger::ERROR, "QrCodeDetector: 検出処理中に例外が発生しました: %s",
+  //     e.what()); return result;
+  //   }
 
   // 検出・デコード成功時
   if(!decodedStrings.empty() && !decodedStrings[0].empty()) {
@@ -301,10 +339,11 @@ QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
     result.content = decodedStrings[0];
     result.detectedStep = "WeChatQRCode";
 
-    // points には 4隅の座標が格納される（各QRコードにつき4点）
-    if(points.size() >= 4) {
+    // points は std::vector<std::vector<cv::Point2f>>
+    // なので、1つ目のQRコード(points[0])の各頂点を取り出す
+    if(!points.empty() && points[0].size() >= 4) {
       for(int i = 0; i < 4; ++i) {
-        result.corners[i] = cv::Point2f(points[i].x + roiRect.x, points[i].y + roiRect.y);
+        result.corners[i] = cv::Point2f(points[0][i].x + roiRect.x, points[0][i].y + roiRect.y);
       }
     }
 

@@ -92,7 +92,6 @@
 
 // #endif  // QR_CODE_DETECTOR_H
 
-
 /**
  * @file    QrCodeDetector.h
  * @brief   QRコード検出処理クラス (WeChatQRCode版)
@@ -106,35 +105,37 @@
 #include <memory>
 #include <string>
 
-
 #include "Logger.h"
+#include "SystemInfo.h"
+
+#include "QrCodeDetectionResult.h"
 
 // 検出結果を格納する構造体
-struct QrCodeDetectionResult {
-    bool wasDetected = false;
-    std::string content = "";
-    std::string detectedStep = "";
-    cv::Point2f corners[4];
-};
+// struct QrCodeDetectionResult {
+//   bool wasDetected = false;
+//   std::string content = "";
+//   std::string detectedStep = "";
+//   cv::Point2f corners[4];
+// };
 
 class QrCodeDetector {
-public:
-    explicit QrCodeDetector(const cv::Rect& _roi);
-    ~QrCodeDetector();
+ public:
+  explicit QrCodeDetector(const cv::Rect& _roi);
+  ~QrCodeDetector();
 
-    // ROIの設定・更新
-    void setValidatedRoi(const cv::Rect& _roi);
+  // ROIの設定・更新
+  void setValidatedRoi(const cv::Rect& _roi);
 
-    // QRコードの検出・デコード実行
-    QrCodeDetectionResult detect(const cv::Mat& frame);
+  // QRコードの検出・デコード実行
+  QrCodeDetectionResult detect(const cv::Mat& frame);
 
-private:
-    void validateParameters();
+ private:
+  void validateParameters();
 
-    cv::Rect roi;
-    std::unique_ptr<cv::wechat_qrcode::WeChatQRCode> weChatDetector;
+  cv::Rect roi;
+  std::unique_ptr<cv::wechat_qrcode::WeChatQRCode> weChatDetector;
 
-    // カメラの最大解像度定義（必要に応じて調整）
-    static constexpr int CAM_MAX_WIDTH = 1920;
-    static constexpr int CAM_MAX_HEIGHT = 1080;
+  // カメラの最大解像度定義（必要に応じて調整）
+  static constexpr int CAM_MAX_WIDTH = 1920;
+  static constexpr int CAM_MAX_HEIGHT = 1080;
 };

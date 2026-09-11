@@ -1,20 +1,19 @@
 /**
- * @file SquareDetectionActionHandler.h
- * @brief 正方形検出処理を実行するActionHandler
+ * @file   SquareDetectionActionHandler.h
+ * @brief  正方形検出要求を処理するクラス
+ * @author okuyama0528 yutaro-1214
  */
 
 #ifndef SQUARE_DETECTION_ACTION_HANDLER_H
 #define SQUARE_DETECTION_ACTION_HANDLER_H
 
-#include <memory>
+#include <opencv2/opencv.hpp>
 
 #include "CameraCapture.h"
+#include "Logger.h"
 #include "SocketProtocol.h"
 #include "SquareDetector.h"
 
-/**
- * @brief カメラ画像から正方形を検出するActionHandler
- */
 class SquareDetectionActionHandler {
  public:
   /**
@@ -31,10 +30,10 @@ class SquareDetectionActionHandler {
   ~SquareDetectionActionHandler();
 
   /**
-   * @brief 正方形検出を実行する
+   * @brief 正方形検出要求を処理する
    *
-   * @param request 検出リクエスト
-   * @param response 検出レスポンス
+   * @param request 正方形検出リクエスト
+   * @param response 正方形検出レスポンス
    */
   void execute(
       const CameraServer::SquareDetectorRequest& request,
@@ -48,11 +47,8 @@ class SquareDetectionActionHandler {
 
   /**
    * @brief 正方形検出器
-   *
-   * resetTracking要求が来た場合は、
-   * 新しいSquareDetectorへ作り直す。
    */
-  std::unique_ptr<SquareDetector> detector;
+  SquareDetector detector;
 };
 
 #endif

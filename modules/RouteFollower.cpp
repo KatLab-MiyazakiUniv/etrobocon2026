@@ -560,19 +560,134 @@ const Gate* RouteFollower::findGate(const RouteState& from, const RouteState& to
     const std::vector<GatePass> passes = mapData.getGatePasses(gate.color);
 
     for(const GatePass& pass : passes) {
-      const bool entranceMatches = pass.entrance.x == from.x && pass.entrance.y == from.y;
+      // =====================================================
+      // Y方向の移動
+      //
+      // from
+      //   |
+      // entrance
+      //   |
+      // gate
+      //   |
+      // exit
+      //   |
+      // to
+      // =====================================================
 
-      const bool exitMatches = pass.exit.x == to.x && pass.exit.y == to.y;
+      if(from.x == to.x && pass.entrance.x == from.x && pass.exit.x == from.x) {
+        // -------------------------------------------------
+        // Yが増える方向
+        // -------------------------------------------------
 
-      if(entranceMatches && exitMatches) {
-        return &gate;
+        if(to.y > from.y) {
+          const bool entranceInside = pass.entrance.y >= from.y && pass.entrance.y <= to.y;
+
+          const bool exitInside = pass.exit.y >= from.y && pass.exit.y <= to.y;
+
+          const bool correctDirection = pass.exit.y > pass.entrance.y;
+
+          if(entranceInside && exitInside && correctDirection) {
+            Logger::printfLog(Logger::INFO,
+                              "RouteFollower: "
+                              "findGate MATCH "
+                              "(%d,%d)->(%d,%d) "
+                              "GatePass=(%d,%d)->(%d,%d)",
+                              from.x, from.y, to.x, to.y, pass.entrance.x, pass.entrance.y,
+                              pass.exit.x, pass.exit.y);
+
+            return &gate;
+          }
+        }
+
+        // -------------------------------------------------
+        // Yが減る方向
+        // -------------------------------------------------
+
+        if(to.y < from.y) {
+          const bool entranceInside = pass.entrance.y <= from.y && pass.entrance.y >= to.y;
+
+          const bool exitInside = pass.exit.y <= from.y && pass.exit.y >= to.y;
+
+          const bool correctDirection = pass.exit.y < pass.entrance.y;
+
+          if(entranceInside && exitInside && correctDirection) {
+            Logger::printfLog(Logger::INFO,
+                              "RouteFollower: "
+                              "findGate MATCH "
+                              "(%d,%d)->(%d,%d) "
+                              "GatePass=(%d,%d)->(%d,%d)",
+                              from.x, from.y, to.x, to.y, pass.entrance.x, pass.entrance.y,
+                              pass.exit.x, pass.exit.y);
+
+            return &gate;
+          }
+        }
+      }
+
+      // =====================================================
+      // X方向の移動
+      // =====================================================
+
+      if(from.y == to.y && pass.entrance.y == from.y && pass.exit.y == from.y) {
+        // -------------------------------------------------
+        // Xが増える方向
+        // -------------------------------------------------
+
+        if(to.x > from.x) {
+          const bool entranceInside = pass.entrance.x >= from.x && pass.entrance.x <= to.x;
+
+          const bool exitInside = pass.exit.x >= from.x && pass.exit.x <= to.x;
+
+          const bool correctDirection = pass.exit.x > pass.entrance.x;
+
+          if(entranceInside && exitInside && correctDirection) {
+            Logger::printfLog(Logger::INFO,
+                              "RouteFollower: "
+                              "findGate MATCH "
+                              "(%d,%d)->(%d,%d) "
+                              "GatePass=(%d,%d)->(%d,%d)",
+                              from.x, from.y, to.x, to.y, pass.entrance.x, pass.entrance.y,
+                              pass.exit.x, pass.exit.y);
+
+            return &gate;
+          }
+        }
+
+        // -------------------------------------------------
+        // Xが減る方向
+        // -------------------------------------------------
+
+        if(to.x < from.x) {
+          const bool entranceInside = pass.entrance.x <= from.x && pass.entrance.x >= to.x;
+
+          const bool exitInside = pass.exit.x <= from.x && pass.exit.x >= to.x;
+
+          const bool correctDirection = pass.exit.x < pass.entrance.x;
+
+          if(entranceInside && exitInside && correctDirection) {
+            Logger::printfLog(Logger::INFO,
+                              "RouteFollower: "
+                              "findGate MATCH "
+                              "(%d,%d)->(%d,%d) "
+                              "GatePass=(%d,%d)->(%d,%d)",
+                              from.x, from.y, to.x, to.y, pass.entrance.x, pass.entrance.y,
+                              pass.exit.x, pass.exit.y);
+
+            return &gate;
+          }
+        }
       }
     }
   }
 
+  Logger::printfLog(Logger::WARNING,
+                    "RouteFollower: "
+                    "findGate NO MATCH "
+                    "(%d,%d)->(%d,%d)",
+                    from.x, from.y, to.x, to.y);
+
   return nullptr;
 }
-
 bool RouteFollower::isOuterGate(const Gate& gate) const
 {
   /*

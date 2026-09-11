@@ -16,15 +16,14 @@ namespace {
   /**
    * @brief カメラ画像中央X座標[px]
    *
-   * 画像幅1920pxなので中央は960px。
+   * 1920px / 2 = 960px
    */
   constexpr double IMAGE_CENTER_X = 960.0;
 
   /**
-   * @brief radからdegへの変換係数
+   * @brief rad → deg変換係数
    *
-   * プロジェクト内に同名のRAD_TO_DEGが存在する可能性があるため、
-   * SquareAngleAdjustment専用の名前にしている。
+   * 他ファイルのRAD_TO_DEGとの名前衝突を避ける。
    */
   constexpr double SQUARE_RAD_TO_DEG = 180.0 / 3.14159265358979323846;
 
@@ -70,16 +69,14 @@ SquareAngleAdjustment::Result SquareAngleAdjustment::calculate(
   }
 
   // =====================================================
-  // 2. 四隅から正方形中心を計算
+  // 2. 四隅の平均から中心を計算
   // =====================================================
 
   double sumX = 0.0;
-
   double sumY = 0.0;
 
   for(const auto& corner : response.corners) {
     sumX += corner.x;
-
     sumY += corner.y;
   }
 
@@ -88,37 +85,27 @@ SquareAngleAdjustment::Result SquareAngleAdjustment::calculate(
   const double centerY = sumY / static_cast<double>(CameraServer::SQUARE_CORNER_COUNT);
 
   // =====================================================
-  // 3. 画像Y座標 → 前方距離
+  // 3. 前方距離
   // =====================================================
 
   const double forwardDistance = pixelYToForwardDistance(centerY);
 
   // =====================================================
-  // 4. 画像X,Y座標 → 横方向距離
+  // 4. 横方向距離
   // =====================================================
 
   const double lateralDistance = pixelToLateralDistance(centerX, centerY);
 
   // =====================================================
-  // 5. 補正角度を計算
+  // 5. 補正角度
   // =====================================================
 
   const double correctionAngle = calculateCorrectionAngle(forwardDistance, lateralDistance);
 
   // =====================================================
-  // 6. 回頭後の直進距離を計算
+  // 6. 正方形までの直線距離
   //
-  //          square
-  //             *
-  //            /|
-  //           / |
-  //          /  | forward
-  //         /   |
-  //    robot----+
-  //       lateral
-  //
-  // straightDistance
-  //   = sqrt(forward^2 + lateral^2)
+  // sqrt(forward^2 + lateral^2)
   // =====================================================
 
   const double straightDistance = std::hypot(forwardDistance, lateralDistance);
@@ -130,7 +117,6 @@ SquareAngleAdjustment::Result SquareAngleAdjustment::calculate(
   result.wasDetected = true;
 
   result.centerX = centerX;
-
   result.centerY = centerY;
 
   result.forwardDistance = forwardDistance;
@@ -168,31 +154,25 @@ SquareAngleAdjustment::Result SquareAngleAdjustment::calculate(
 double SquareAngleAdjustment::pixelYToForwardDistance(double y) const
 {
   /*
-   * 校正条件
+   * 実測データから求めた透視変換近似。
    *
-   * カメラ解像度:
-   *   1920 x 1080
+   * y = 1080
+   * → 約200mm
    *
-   * タイヤ軸から画像下端に写る床面:
-   *   200 mm
-   *
-   * 床面の線:
-   *   線幅 2 mm
-   *   線間 10 mm
-   *   中心間 12 mm
-   *
-   * y = 1080 のとき
-   * およそ200mmになる。
+   * 画像上側へ行くほど
+   * 前方距離が大きくなる。
    */
-
   return (-0.153821 * y + 677.174) / (0.00144003 * y + 1.0);
 }
 
 double SquareAngleAdjustment::pixelToLateralDistance(double x, double y) const
 {
   /*
-   * y座標によって、
-   * 横方向12mmが画像上で何pixelになるかが変化する。
+   * yによって横方向のpx/mmが変化する。
+   *
+   * 12mmあたりのpixel数:
+   *
+   * P(y) = 0.04893y + 34.414
    */
   const double pixelsPer12mm = 0.04893 * y + 34.414;
 
@@ -222,18 +202,13 @@ double SquareAngleAdjustment::calculateCorrectionAngle(double forwardDistance,
   }
 
   /*
-   * lateral > 0
-   *   → 正方形が右
-   *
-   * lateral < 0
-   *   → 正方形が左
-   *
    * atan2(
    *   横方向距離,
    *   前方距離
    * )
    *
-   * でロボット正面から見た補正角度を求める。
+   * lateral > 0 → 右
+   * lateral < 0 → 左
    */
   return std::atan2(lateralDistance, forwardDistance) * SQUARE_RAD_TO_DEG;
 }

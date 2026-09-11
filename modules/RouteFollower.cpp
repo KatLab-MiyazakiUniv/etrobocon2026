@@ -27,12 +27,22 @@ namespace {
   constexpr double ROTATION_TOLERANCE = 2.0;
 
   /**
-   * @brief QR①とQR②の間隔[mm]
+   * @brief QR①とQR②の実距離[mm]
+   *
+   * QR①
+   *  |
+   *  | 125mm
+   *  |
+   * ゲート
+   *  |
+   *  | 125mm
+   *  |
+   * QR②
    */
   constexpr double QR_DISTANCE = 250.0;
 
   /**
-   * @brief QRからゲート中心までの距離[mm]
+   * @brief QRからゲート中央までの距離[mm]
    */
   constexpr double QR_TO_GATE_DISTANCE = QR_DISTANCE / 2.0;
 
@@ -67,6 +77,10 @@ void RouteFollower::run(const std::vector<RouteState>& route)
     return;
   }
 
+  /*
+   * route[0]は現在位置。
+   * route[1]から順番に走行する。
+   */
   for(std::size_t i = 1; i < route.size(); ++i) {
     const RouteState& from = route[i - 1];
 
@@ -78,17 +92,25 @@ void RouteFollower::run(const std::vector<RouteState>& route)
                       static_cast<int>(i), from.x, from.y, to.x, to.y);
 
     // =====================================================
-    // 1. 通常の経路回頭
+    // 1. 必要なら回頭
     // =====================================================
 
     const double rotationAngle = calculateRotationAngle(from.direction, to.direction);
 
     if(std::abs(rotationAngle) > ROTATION_TOLERANCE) {
+      Logger::printfLog(Logger::INFO,
+                        "RouteFollower: "
+                        "rotation required %.2f deg",
+                        rotationAngle);
+
       rotate(rotationAngle);
     }
 
     // =====================================================
-    // 2. 同じ座標なら回頭だけなので終了
+    // 2. 座標が同じ場合
+    //
+    // 最終方向変更など、
+    // 回頭だけのRouteState。
     // =====================================================
 
     if(from.x == to.x && from.y == to.y) {
@@ -102,20 +124,27 @@ void RouteFollower::run(const std::vector<RouteState>& route)
     const double distance = calculateDistance(from, to);
 
     if(distance <= 0.0) {
-      Logger::error("RouteFollower: invalid distance");
+      Logger::error("RouteFollower: invalid segment distance");
 
       robot.getWheelMotorControllerInstance().stopBoth();
 
       return;
     }
 
+    Logger::printfLog(Logger::INFO,
+                      "RouteFollower: "
+                      "segment distance=%.2f mm",
+                      distance);
+
     // =====================================================
-    // 4. ゲート区間か確認
+    // 4. ゲート区間判定
     // =====================================================
 
     const Gate* gate = findGate(from, to);
 
     if(gate != nullptr) {
+      Logger::info("RouteFollower: ===== GATE FOUND =====");
+
       runGateSegment(from, to, distance);
 
       continue;
@@ -154,6 +183,9 @@ double RouteFollower::calculateRotationAngle(Direction from, Direction to) const
 
   const double targetHeading = directionToHeading(to);
 
+  /*
+   * 現在のRouteFollowerの座標系に合わせる。
+   */
   return AngleNormalizer::normalizeAngle(currentHeading - targetHeading);
 }
 
@@ -163,15 +195,20 @@ double RouteFollower::calculateDistance(const RouteState& from, const RouteState
 
   const EtRallyMap::Node toNode = map.getNode(to.x, to.y);
 
+  // X方向
   if(from.y == to.y) {
     return std::abs(toNode.x - fromNode.x);
   }
 
+  // Y方向
   if(from.x == to.x) {
     return std::abs(toNode.y - fromNode.y);
   }
 
-  Logger::error("RouteFollower: diagonal route");
+  Logger::printfLog(Logger::ERROR,
+                    "RouteFollower: diagonal route "
+                    "(%d,%d) -> (%d,%d)",
+                    from.x, from.y, to.x, to.y);
 
   return 0.0;
 }
@@ -197,14 +234,14 @@ void RouteFollower::rotate(double angle)
 
   Logger::printfLog(Logger::INFO,
                     "RouteFollower: "
-                    "RelativeRotation START %.2f deg",
+                    "Rotation START %.2f deg",
                     angle);
 
   rotation.run();
 
   Logger::printfLog(Logger::INFO,
                     "RouteFollower: "
-                    "RelativeRotation FINISHED %.2f deg",
+                    "Rotation FINISHED %.2f deg",
                     angle);
 }
 
@@ -244,7 +281,7 @@ void RouteFollower::straight(double distance)
 bool RouteFollower::detectSquare(SquareAngleAdjustment::Result& result)
 {
   // =====================================================
-  // カメラ撮影前に停止
+  // 1. 停止
   // =====================================================
 
   robot.getWheelMotorControllerInstance().stopBoth();
@@ -252,21 +289,23 @@ bool RouteFollower::detectSquare(SquareAngleAdjustment::Result& result)
   ClockUtil::sleep(MOTION_SWITCH_WAIT);
 
   // =====================================================
-  // 検出範囲
+  // 2. 検出リクエスト
   // =====================================================
 
   CameraServer::SquareDetectorRequest request{};
 
+  /*
+   * 画像全体を使用する。
+   *
+   * 1920 x 1080
+   */
   request.roi.x = 0;
-
   request.roi.y = 0;
-
   request.roi.width = CAM_MAX_WIDTH;
-
   request.roi.height = CAM_MAX_HEIGHT;
 
   // =====================================================
-  // 検出
+  // 3. 正方形検出
   // =====================================================
 
   SquareAngleAdjustment adjustment(robot);
@@ -275,26 +314,27 @@ bool RouteFollower::detectSquare(SquareAngleAdjustment::Result& result)
 
   if(!result.wasDetected) {
     Logger::warning("RouteFollower: "
-                    "square detection failed");
+                    "Square detection FAILED");
 
     return false;
   }
 
   Logger::printfLog(Logger::INFO,
                     "RouteFollower: "
-                    "center=(%.2f, %.2f)",
+                    "Square center=(%.2f, %.2f)",
                     result.centerX, result.centerY);
 
   Logger::printfLog(Logger::INFO,
                     "RouteFollower: "
-                    "forward=%.2f mm "
-                    "lateral=%.2f mm",
+                    "Square position "
+                    "forward=%.2f "
+                    "lateral=%.2f",
                     result.forwardDistance, result.lateralDistance);
 
   Logger::printfLog(Logger::INFO,
                     "RouteFollower: "
-                    "angle=%.2f deg "
-                    "distance=%.2f mm",
+                    "Square angle=%.2f "
+                    "distance=%.2f",
                     result.correctionAngle, result.straightDistance);
 
   return true;
@@ -302,27 +342,16 @@ bool RouteFollower::detectSquare(SquareAngleAdjustment::Result& result)
 
 void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to, double distance)
 {
-  Logger::info("RouteFollower: "
-               "===== GATE SEGMENT START =====");
-
-  // =====================================================
-  // 1. ゲート取得
-  // =====================================================
-
   const Gate* gate = findGate(from, to);
 
   if(gate == nullptr) {
-    Logger::warning("RouteFollower: gate not found");
-
     straight(distance);
 
     return;
   }
 
   // =====================================================
-  // 2. 外周ゲート
-  //
-  // 外周はQR補正なし。
+  // 外周ゲート
   // =====================================================
 
   if(isOuterGate(*gate)) {
@@ -333,11 +362,11 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
     return;
   }
 
-  Logger::info("RouteFollower: INNER GATE");
+  // =====================================================
+  // 内側ゲート
+  // =====================================================
 
-  // =====================================================
-  // 3. ゲート中心までのマップ上距離
-  // =====================================================
+  Logger::info("RouteFollower: INNER GATE");
 
   const double distanceToGate = calculateDistanceToGate(from, *gate);
 
@@ -350,14 +379,15 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
     return;
   }
 
+  Logger::printfLog(Logger::INFO,
+                    "RouteFollower: "
+                    "distanceToGate=%.2f mm",
+                    distanceToGate);
+
   // =====================================================
-  // 4. QR①のマップ上位置
+  // QR①のマップ上推定位置
   //
-  // QR①
-  //   ↓ 125mm
-  // ゲート
-  //   ↓ 125mm
-  // QR②
+  // QR①はゲート125mm手前。
   // =====================================================
 
   double nominalDistanceToQr1 = distanceToGate - QR_TO_GATE_DISTANCE;
@@ -367,56 +397,57 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
   }
 
   // =====================================================
-  // 5. QR①検出
+  // 1回目：QR①
   // =====================================================
 
   Logger::info("RouteFollower: "
-               "===== QR1 DETECTION =====");
+               "========== QR1 ==========");
 
   SquareAngleAdjustment::Result firstResult;
 
   const bool firstDetected = detectSquare(firstResult);
 
-  // =====================================================
-  // QR①検出成功
-  // =====================================================
-
-  double firstAngle = 0.0;
-
   if(firstDetected) {
-    firstAngle = firstResult.correctionAngle;
-
-    // ---------------------------------------------------
-    // QR①へ向く
-    // ---------------------------------------------------
+    /*
+     * QR①に向くための角度。
+     */
+    const double firstAngle = firstResult.correctionAngle;
 
     Logger::printfLog(Logger::INFO,
                       "RouteFollower: "
-                      "QR1 rotate %.2f deg",
+                      "QR1 angle=%.2f deg",
                       firstAngle);
 
+    // QR①方向へ回頭
     rotate(firstAngle);
 
-    // ---------------------------------------------------
-    // QR①の真上まで移動
-    //
-    // 画像から計算した実距離を使う。
-    // ---------------------------------------------------
-
+    /*
+     * QR①真上まで移動。
+     *
+     * マップ上の固定値ではなく、
+     * カメラ計測した実距離を使う。
+     */
     Logger::printfLog(Logger::INFO,
                       "RouteFollower: "
-                      "move to QR1 %.2f mm",
+                      "Move to QR1 %.2f mm",
                       firstResult.straightDistance);
 
     straight(firstResult.straightDistance);
 
-    // ---------------------------------------------------
-    // QR①へ向くために回した角度を元へ戻す
-    // ---------------------------------------------------
-
+    /*
+     * QR①へ向くために回した分を戻す。
+     *
+     * +α
+     * ↓
+     * QR①へ移動
+     * ↓
+     * -α
+     *
+     * これで元のゲート通過方向へ戻す。
+     */
     Logger::printfLog(Logger::INFO,
                       "RouteFollower: "
-                      "restore heading %.2f deg",
+                      "Restore heading %.2f deg",
                       -firstAngle);
 
     rotate(-firstAngle);
@@ -425,7 +456,8 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
   // =====================================================
   // QR①検出失敗
   //
-  // マップ上のQR①位置まで通常走行する。
+  // カメラ補正できなかった場合は、
+  // マップ上のQR①位置まで通常走行。
   // =====================================================
 
   else {
@@ -437,46 +469,43 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
   }
 
   // =====================================================
-  // 6. QR②検出
+  // 2回目：QR②
   //
-  // QR①の真上まで移動し、
-  // -αで元の方向へ戻した後に検出する。
+  // QR①真上へ移動し、
+  // -α回頭で元方向へ戻した後に検出する。
   // =====================================================
 
   Logger::info("RouteFollower: "
-               "===== QR2 DETECTION =====");
+               "========== QR2 ==========");
 
   SquareAngleAdjustment::Result secondResult;
 
   const bool secondDetected = detectSquare(secondResult);
 
-  // =====================================================
-  // QR②検出成功
-  // =====================================================
-
   if(secondDetected) {
-    // ---------------------------------------------------
-    // QR②に対して残っている角度誤差を補正
-    // ---------------------------------------------------
+    /*
+     * -αだけでは残る可能性がある
+     * 実機誤差をQR②で補正する。
+     */
+    const double secondAngle = secondResult.correctionAngle;
 
     Logger::printfLog(Logger::INFO,
                       "RouteFollower: "
-                      "QR2 correction %.2f deg",
-                      secondResult.correctionAngle);
+                      "QR2 correction angle=%.2f deg",
+                      secondAngle);
 
-    rotate(secondResult.correctionAngle);
+    rotate(secondAngle);
 
-    // ---------------------------------------------------
-    // QR②の真上まで移動
-    //
-    // QR①からQR②までは理論上250mmだが、
-    // 実際の位置ずれを補正するため、
-    // カメラから算出した距離を優先する。
-    // ---------------------------------------------------
-
+    /*
+     * QR②真上まで移動。
+     *
+     * 理論上はQR①→QR②=250mmだが、
+     * 実際の位置・角度誤差を補正するため
+     * カメラから求めた距離を使用する。
+     */
     Logger::printfLog(Logger::INFO,
                       "RouteFollower: "
-                      "move to QR2 %.2f mm",
+                      "Move to QR2 %.2f mm",
                       secondResult.straightDistance);
 
     straight(secondResult.straightDistance);
@@ -485,8 +514,7 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
   // =====================================================
   // QR②検出失敗
   //
-  // QR①からQR②までは250mmなので、
-  // 固定距離でゲートを通過する。
+  // QR①からQR②までは250mm。
   // =====================================================
 
   else {
@@ -498,29 +526,11 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
   }
 
   // =====================================================
-  // 7. QR②から区間終了地点までの残距離
+  // QR②から区間終端まで
   //
-  // 区間開始
+  // マップ上でのQR②位置:
   //
-  //   ↓
-  //
-  // QR①
-  //
-  //   125mm
-  //
-  // ゲート
-  //
-  //   125mm
-  //
-  // QR②
-  //
-  //   ↓
-  //
-  // 区間終了
-  //
-  // QR②のマップ上位置は
-  //
-  // distanceToGate + 125mm
+  // ゲート中心 + 125mm
   // =====================================================
 
   const double nominalQr2Position = distanceToGate + QR_TO_GATE_DISTANCE;
@@ -531,14 +541,10 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
     remainingDistance = 0.0;
   }
 
-  // =====================================================
-  // 8. 残距離
-  // =====================================================
-
   if(remainingDistance > 0.0) {
     Logger::printfLog(Logger::INFO,
                       "RouteFollower: "
-                      "remaining Straight %.2f mm",
+                      "Remaining Straight %.2f mm",
                       remainingDistance);
 
     straight(remainingDistance);
@@ -569,20 +575,18 @@ const Gate* RouteFollower::findGate(const RouteState& from, const RouteState& to
 
 bool RouteFollower::isOuterGate(const Gate& gate) const
 {
-  // =====================================================
-  // 横向きゲート
-  // =====================================================
-
+  /*
+   * 横向きゲート
+   */
   if(gate.start.y == gate.end.y) {
     const int gateY = gate.start.y;
 
     return gateY == 0 || gateY == SystemInfo::Y_GRID_NUM;
   }
 
-  // =====================================================
-  // 縦向きゲート
-  // =====================================================
-
+  /*
+   * 縦向きゲート
+   */
   if(gate.start.x == gate.end.x) {
     const int gateX = gate.start.x;
 
@@ -596,12 +600,11 @@ double RouteFollower::calculateDistanceToGate(const RouteState& from, const Gate
 {
   const EtRallyMap::Node fromNode = map.getNode(from.x, from.y);
 
-  // =====================================================
-  // 横向きゲート
-  //
-  // Y方向に通過
-  // =====================================================
-
+  /*
+   * 横向きゲート。
+   *
+   * ロボットはY方向に通過する。
+   */
   if(gate.start.y == gate.end.y) {
     const int centerX = (gate.start.x + gate.end.x) / 2;
 
@@ -612,12 +615,11 @@ double RouteFollower::calculateDistanceToGate(const RouteState& from, const Gate
     return std::abs(gateNode.y - fromNode.y);
   }
 
-  // =====================================================
-  // 縦向きゲート
-  //
-  // X方向に通過
-  // =====================================================
-
+  /*
+   * 縦向きゲート。
+   *
+   * ロボットはX方向に通過する。
+   */
   if(gate.start.x == gate.end.x) {
     const int gateX = gate.start.x;
 

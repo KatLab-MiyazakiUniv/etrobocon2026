@@ -20,6 +20,15 @@ class RouteFollower {
  public:
   /**
    * @brief コンストラクタ
+   *
+   * @param _robot ロボット
+   * @param _map ETラリーの実座標マップ
+   * @param _mapData ゲート情報
+   * @param _targetSpeed 直進速度[mm/s]
+   * @param _rotationPid 回頭PID
+   * @param _rightPid 右車輪速度PID
+   * @param _leftPid 左車輪速度PID
+   * @param _straightAnglePid 直進角度PID
    */
   RouteFollower(Robot& _robot, const EtRallyMap& _map, const MapData& _mapData, double _targetSpeed,
                 const Pid::PidGain& _rotationPid, const Pid::PidGain& _rightPid,
@@ -27,6 +36,8 @@ class RouteFollower {
 
   /**
    * @brief 経路に従って走行する
+   *
+   * @param route 経路探索結果
    */
   void run(const std::vector<RouteState>& route);
 
@@ -48,55 +59,56 @@ class RouteFollower {
   Pid::PidGain straightAnglePid;
 
   /**
-   * @brief Directionを方位角へ変換
+   * @brief Directionを方位角へ変換する
    */
   double directionToHeading(Direction direction) const;
 
   /**
-   * @brief 必要回頭角を計算
+   * @brief 必要な相対回頭角度を計算する
    */
   double calculateRotationAngle(Direction from, Direction to) const;
 
   /**
-   * @brief 2地点間の実距離を計算
+   * @brief 2地点間の走行距離を計算する
    */
   double calculateDistance(const RouteState& from, const RouteState& to) const;
 
   /**
-   * @brief 相対回頭
+   * @brief 相対回頭する
    */
   void rotate(double angle);
 
   /**
-   * @brief 直進
+   * @brief 指定距離を直進する
    */
   void straight(double distance);
 
   /**
-   * @brief 正方形を検出して位置情報を取得
+   * @brief 正方形を1回検出し、
+   *        角度・距離を取得する
    *
    * @param result 検出結果
-   * @return 検出成功時true
+   * @return 成功時true
    */
   bool detectSquare(SquareAngleAdjustment::Result& result);
 
   /**
-   * @brief 内側ゲート攻略
+   * @brief ゲート区間を走行する
    */
   void runGateSegment(const RouteState& from, const RouteState& to, double distance);
 
   /**
-   * @brief 区間に存在するゲートを検索
+   * @brief 現在区間のゲートを取得する
    */
   const Gate* findGate(const RouteState& from, const RouteState& to) const;
 
   /**
-   * @brief 外周ゲート判定
+   * @brief 外周ゲートか判定する
    */
   bool isOuterGate(const Gate& gate) const;
 
   /**
-   * @brief 区間開始地点からゲート中心までの距離
+   * @brief 区間開始位置からゲート中央までの距離
    */
   double calculateDistanceToGate(const RouteState& from, const Gate& gate) const;
 };

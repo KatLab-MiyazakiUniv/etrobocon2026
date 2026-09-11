@@ -14,151 +14,91 @@
 #include "Pid.h"
 #include "Robot.h"
 #include "RouteTypes.h"
+#include "SquareAngleAdjustment.h"
 
 class RouteFollower {
  public:
   /**
    * @brief コンストラクタ
    */
-  RouteFollower(
-      Robot& _robot,
-      const EtRallyMap& _map,
-      const MapData& _mapData,
-      double _targetSpeed,
-      const Pid::PidGain& _rotationPid,
-      const Pid::PidGain& _rightPid,
-      const Pid::PidGain& _leftPid,
-      const Pid::PidGain& _straightAnglePid,
-      const Pid::PidGain& _squareAnglePid);
+  RouteFollower(Robot& _robot, const EtRallyMap& _map, const MapData& _mapData, double _targetSpeed,
+                const Pid::PidGain& _rotationPid, const Pid::PidGain& _rightPid,
+                const Pid::PidGain& _leftPid, const Pid::PidGain& _straightAnglePid);
 
   /**
    * @brief 経路に従って走行する
    */
-  void run(
-      const std::vector<RouteState>& route);
+  void run(const std::vector<RouteState>& route);
 
  private:
-  /**
-   * @brief Directionを方位角へ変換する
-   */
-  double directionToHeading(
-      Direction direction) const;
-
-  /**
-   * @brief 必要な回頭角度を計算する
-   */
-  double calculateRotationAngle(
-      Direction from,
-      Direction to) const;
-
-  /**
-   * @brief 2地点間の距離を計算する
-   */
-  double calculateDistance(
-      const RouteState& from,
-      const RouteState& to) const;
-
-  /**
-   * @brief 回頭する
-   */
-  void rotate(
-      double angle);
-
-  /**
-   * @brief Straightで走行する
-   *
-   * Straight終了後は、
-   * 次回のSquare検出で追跡履歴をリセットする。
-   */
-  void straight(
-      double distance);
-
-  /**
-   * @brief 正方形を利用して向きを補正する
-   */
-  bool adjustAngleWithSquare();
-
-  /**
-   * @brief 現在の直進区間内に存在するゲートを探す
-   */
-  const Gate* findGate(
-      const RouteState& from,
-      const RouteState& to) const;
-
-  /**
-   * @brief 外周ゲートか判定する
-   */
-  bool isOuterGate(
-      const Gate& gate) const;
-
-  /**
-   * @brief 現在地点からゲート中心までの距離を計算する
-   */
-  double calculateDistanceToGate(
-      const RouteState& from,
-      const Gate& gate) const;
-
-  /**
-   * @brief ゲート区間を走行する
-   */
-  void runGateSegment(
-      const RouteState& from,
-      const RouteState& to,
-      double distance);
-
- private:
-  /**
-   * @brief ロボット
-   */
   Robot& robot;
 
-  /**
-   * @brief ETラリーマップ
-   */
   const EtRallyMap& map;
 
-  /**
-   * @brief ゲート情報
-   */
   const MapData& mapData;
 
-  /**
-   * @brief Straight速度[mm/s]
-   */
   double targetSpeed;
 
-  /**
-   * @brief 回頭PID
-   */
   Pid::PidGain rotationPid;
 
-  /**
-   * @brief 右車輪PID
-   */
   Pid::PidGain rightPid;
 
-  /**
-   * @brief 左車輪PID
-   */
   Pid::PidGain leftPid;
 
-  /**
-   * @brief Straight角度PID
-   */
   Pid::PidGain straightAnglePid;
 
   /**
-   * @brief Square角度補正PID
+   * @brief Directionを方位角へ変換
    */
-  Pid::PidGain squareAnglePid;
+  double directionToHeading(Direction direction) const;
 
   /**
-   * @brief 次回Square検出時に追跡履歴をリセットするか
-   *
-   * Straightを実行するとtrueになる。
-   * SquareAngleAdjustment開始時に消費されfalseになる。
+   * @brief 必要回頭角を計算
    */
-  bool squareTrackingResetRequired;
+  double calculateRotationAngle(Direction from, Direction to) const;
+
+  /**
+   * @brief 2地点間の実距離を計算
+   */
+  double calculateDistance(const RouteState& from, const RouteState& to) const;
+
+  /**
+   * @brief 相対回頭
+   */
+  void rotate(double angle);
+
+  /**
+   * @brief 直進
+   */
+  void straight(double distance);
+
+  /**
+   * @brief 正方形を検出して位置情報を取得
+   *
+   * @param result 検出結果
+   * @return 検出成功時true
+   */
+  bool detectSquare(SquareAngleAdjustment::Result& result);
+
+  /**
+   * @brief 内側ゲート攻略
+   */
+  void runGateSegment(const RouteState& from, const RouteState& to, double distance);
+
+  /**
+   * @brief 区間に存在するゲートを検索
+   */
+  const Gate* findGate(const RouteState& from, const RouteState& to) const;
+
+  /**
+   * @brief 外周ゲート判定
+   */
+  bool isOuterGate(const Gate& gate) const;
+
+  /**
+   * @brief 区間開始地点からゲート中心までの距離
+   */
+  double calculateDistanceToGate(const RouteState& from, const Gate& gate) const;
 };
 
 #endif

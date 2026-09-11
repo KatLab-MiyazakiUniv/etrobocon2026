@@ -1,87 +1,38 @@
 /**
  * @file   SquareAngleAdjustment.cpp
- * @brief  正方形の中心位置から角度を計算し、RelativeRotationで向きを補正するクラス
+ * @brief  正方形の画像座標からロボット基準の角度・距離を計算するクラス
  * @author yutaro-1214
  */
 
 #include "SquareAngleAdjustment.h"
 
-#include <algorithm>
 #include <cmath>
-#include <memory>
-#include <utility>
 
-#include "ClockUtil.h"
 #include "Logger.h"
-#include "RelativeAngleCondition.h"
-#include "RelativeRotation.h"
 #include "SocketClient.h"
-#include "SystemInfo.h"
 
 namespace {
 
-
   /**
-   * @brief 正方形検出を再試行する最大回数
+   * @brief カメラ画像中央X座標[px]
    *
-   * カメラ画像によって一時的に検出できない場合があるため、
-   * 1回失敗しただけでは終了しない。
+   * 画像幅1920pxなので中央は960px。
    */
-  constexpr int MAX_DETECTION_RETRY_COUNT = 3;
+  constexpr double IMAGE_CENTER_X = 960.0;
 
   /**
-   * @brief 正方形検出再試行までの待機時間[ms]
-   */
-  constexpr int DETECTION_RETRY_WAIT_TIME = 50;
-
-  /**
-   * @brief RelativeRotation後の停止待機時間[ms]
-   */
-  constexpr int AFTER_ROTATION_WAIT_TIME = 100;
-
-  /**
-   * @brief 1回のSquare補正で許可する最大角度[deg]
+   * @brief radからdegへの変換係数
    *
-   * 誤検出によって大きく回頭してしまうことを防ぐ。
+   * プロジェクト内に同名のRAD_TO_DEGが存在する可能性があるため、
+   * SquareAngleAdjustment専用の名前にしている。
    */
-  constexpr double MAX_CORRECTION_ANGLE = 25.0;
-
-  /**
-   * @brief 小さすぎる回頭を行わないための最低角度[deg]
-   */
-  constexpr double MIN_CORRECTION_ANGLE = 0.5;
+  constexpr double SQUARE_RAD_TO_DEG = 180.0 / 3.14159265358979323846;
 
 }  // namespace
 
-SquareAngleAdjustment::SquareAngleAdjustment(
-    Robot& _robot,
-    const CameraServer::SquareDetectorRequest& _squareDetectionRequest,
-    const Pid::PidGain& _rotationPid,
-    double _centerTolerance,
-    double _horizontalFovDeg,
-    double _rotationTolerance)
-  : robot(_robot),
-    squareDetectionRequest(_squareDetectionRequest),
-    rotationPid(_rotationPid),
-    centerTolerance(_centerTolerance),
-    horizontalFovDeg(_horizontalFovDeg),
-    rotationTolerance(_rotationTolerance)
+SquareAngleAdjustment::SquareAngleAdjustment(Robot& _robot) : robot(_robot)
 {
   LOG_CREATE("SquareAngleAdjustment");
-
-  Logger::printfLog(
-      Logger::INFO,
-      "SquareAngleAdjustment: "
-      "rotationPid=(%.6f, %.6f, %.6f) "
-      "centerTolerance=%.2f "
-      "horizontalFov=%.2f "
-      "rotationTolerance=%.2f",
-      rotationPid.kp,
-      rotationPid.ki,
-      rotationPid.kd,
-      centerTolerance,
-      horizontalFovDeg,
-      rotationTolerance);
 }
 
 SquareAngleAdjustment::~SquareAngleAdjustment()
@@ -89,369 +40,200 @@ SquareAngleAdjustment::~SquareAngleAdjustment()
   LOG_DESTROY("SquareAngleAdjustment");
 }
 
-bool SquareAngleAdjustment::run()
+SquareAngleAdjustment::Result SquareAngleAdjustment::calculate(
+    const CameraServer::SquareDetectorRequest& request)
 {
-  Logger::info(
-      "SquareAngleAdjustment: ========== START ==========");
-
-  stop();
-
-  SocketClient& client =
-      robot.getCameraSocketClientInstance();
-
-  CameraServer::SquareDetectorResponse response {};
-
-  bool detected = false;
+  Result result{};
 
   // =====================================================
-  // 正方形検出
+  // 1. 正方形検出
   // =====================================================
 
-  for(int attempt = 0;
-      attempt < MAX_DETECTION_RETRY_COUNT;
-      attempt++) {
+  SocketClient& client = robot.getCameraSocketClientInstance();
 
-    CameraServer::SquareDetectorRequest request =
-        squareDetectionRequest;
+  CameraServer::SquareDetectorResponse response{};
 
-    /*
-     * Straight後にresetTracking=trueになっている場合でも、
-     * リセットするのは最初の検出だけ。
-     *
-     * 2回目以降の検出では追跡状態を維持する。
-     */
-    request.resetTracking =
-        squareDetectionRequest.resetTracking
-        && attempt == 0;
+  const bool success = client.executeSquareDetection(request, response);
 
-    Logger::printfLog(
-        Logger::INFO,
-        "SquareAngleAdjustment: "
-        "detection attempt=%d resetTracking=%s",
-        attempt + 1,
-        request.resetTracking
-            ? "true"
-            : "false");
+  if(!success) {
+    Logger::warning("SquareAngleAdjustment: "
+                    "square detection communication failed");
 
-    response = {};
-
-    const bool communicationSuccess =
-        client.executeSquareDetection(
-            request,
-            response);
-
-    if(!communicationSuccess) {
-
-      Logger::warning(
-          "SquareAngleAdjustment: "
-          "Square detection communication failed");
-
-      if(attempt
-         < MAX_DETECTION_RETRY_COUNT - 1) {
-
-        ClockUtil::sleep(
-            DETECTION_RETRY_WAIT_TIME);
-
-        continue;
-      }
-
-      stop();
-
-      Logger::warning(
-          "SquareAngleAdjustment: "
-          "detection retry limit reached");
-
-      return false;
-    }
-
-    if(!response.wasDetected) {
-
-      Logger::warning(
-          "SquareAngleAdjustment: "
-          "Square not detected");
-
-      if(attempt
-         < MAX_DETECTION_RETRY_COUNT - 1) {
-
-        ClockUtil::sleep(
-            DETECTION_RETRY_WAIT_TIME);
-
-        continue;
-      }
-
-      stop();
-
-      Logger::warning(
-          "SquareAngleAdjustment: "
-          "Square was not detected");
-
-      return false;
-    }
-
-    detected = true;
-
-    break;
+    return result;
   }
 
-  if(!detected) {
+  if(!response.wasDetected) {
+    Logger::warning("SquareAngleAdjustment: "
+                    "square not detected");
 
-    stop();
-
-    return false;
+    return result;
   }
 
   // =====================================================
-  // 正方形中心を計算
+  // 2. 四隅から正方形中心を計算
   // =====================================================
 
-  const double centerX =
-      calculateCenterX(
-          response);
+  double sumX = 0.0;
 
-  const double imageCenterX =
-      CAM_MAX_WIDTH / 2.0;
+  double sumY = 0.0;
 
-  const double pixelError =
-      calculatePixelError(
-          response);
+  for(const auto& corner : response.corners) {
+    sumX += corner.x;
 
-  Logger::printfLog(
-      Logger::INFO,
-      "SquareAngleAdjustment: "
-      "squareCenterX=%.2f "
-      "imageCenterX=%.2f "
-      "pixelError=%.2f",
-      centerX,
-      imageCenterX,
-      pixelError);
-
-  // =====================================================
-  // 既に中央の場合
-  // =====================================================
-
-  if(std::abs(pixelError)
-     <= centerTolerance) {
-
-    stop();
-
-    Logger::printfLog(
-        Logger::INFO,
-        "SquareAngleAdjustment: "
-        "already centered "
-        "error=%.2f tolerance=%.2f",
-        pixelError,
-        centerTolerance);
-
-    Logger::info(
-        "SquareAngleAdjustment: ========== SUCCESS ==========");
-
-    return true;
+    sumY += corner.y;
   }
 
-  // =====================================================
-  // pixel → 角度
-  // =====================================================
+  const double centerX = sumX / static_cast<double>(CameraServer::SQUARE_CORNER_COUNT);
 
-  double rotationAngle =
-      pixelErrorToRotationAngle(
-          pixelError);
+  const double centerY = sumY / static_cast<double>(CameraServer::SQUARE_CORNER_COUNT);
 
   // =====================================================
-  // 最大補正角度制限
+  // 3. 画像Y座標 → 前方距離
   // =====================================================
 
-  rotationAngle =
-      std::max(
-          -MAX_CORRECTION_ANGLE,
-          std::min(
-              rotationAngle,
-              MAX_CORRECTION_ANGLE));
-
-  Logger::printfLog(
-      Logger::INFO,
-      "SquareAngleAdjustment: "
-      "pixelError=%.2f -> rotationAngle=%.2f deg",
-      pixelError,
-      rotationAngle);
+  const double forwardDistance = pixelYToForwardDistance(centerY);
 
   // =====================================================
-  // 小さすぎる角度なら終了
+  // 4. 画像X,Y座標 → 横方向距離
   // =====================================================
 
-  if(std::abs(rotationAngle)
-     < MIN_CORRECTION_ANGLE) {
-
-    stop();
-
-    Logger::printfLog(
-        Logger::INFO,
-        "SquareAngleAdjustment: "
-        "rotation skipped because angle is too small "
-        "%.2f deg",
-        rotationAngle);
-
-    return true;
-  }
+  const double lateralDistance = pixelToLateralDistance(centerX, centerY);
 
   // =====================================================
-  // RelativeRotationによる角度補正
+  // 5. 補正角度を計算
   // =====================================================
 
-  Logger::printfLog(
-      Logger::INFO,
-      "SquareAngleAdjustment: "
-      "RelativeRotation START %.2f deg",
-      rotationAngle);
-
-  rotate(
-      rotationAngle);
-
-  stop();
-
-  ClockUtil::sleep(
-      AFTER_ROTATION_WAIT_TIME);
-
-  Logger::printfLog(
-      Logger::INFO,
-      "SquareAngleAdjustment: "
-      "RelativeRotation FINISHED %.2f deg",
-      rotationAngle);
-
-  Logger::info(
-      "SquareAngleAdjustment: ========== SUCCESS ==========");
-
-  return true;
-}
-
-double SquareAngleAdjustment::calculateCenterX(
-    const CameraServer::SquareDetectorResponse& response) const
-{
-  double centerX = 0.0;
-
-  for(uint32_t i = 0;
-      i < CameraServer::SQUARE_CORNER_COUNT;
-      i++) {
-
-    centerX +=
-        static_cast<double>(
-            response.corners[i].x);
-  }
-
-  centerX /=
-      static_cast<double>(
-          CameraServer::SQUARE_CORNER_COUNT);
-
-  return centerX;
-}
-
-double SquareAngleAdjustment::calculatePixelError(
-    const CameraServer::SquareDetectorResponse& response) const
-{
-  const double centerX =
-      calculateCenterX(
-          response);
-
-  const double imageCenterX =
-      CAM_MAX_WIDTH / 2.0;
-
-  return centerX
-         - imageCenterX;
-}
-
-double SquareAngleAdjustment::pixelErrorToRotationAngle(
-    double pixelError) const
-{
-  // =====================================================
-  // 水平画角をradへ変換
-  // =====================================================
-
-  const double horizontalFovRad =
-      horizontalFovDeg
-      * PI
-      / 180.0;
+  const double correctionAngle = calculateCorrectionAngle(forwardDistance, lateralDistance);
 
   // =====================================================
-  // カメラの焦点距離[pixel]を計算
+  // 6. 回頭後の直進距離を計算
   //
-  //           imageWidth / 2
-  // fx = -------------------------
-  //       tan(horizontalFov / 2)
-  // =====================================================
-
-  const double halfImageWidth =
-      CAM_MAX_WIDTH / 2.0;
-
-  const double focalLengthPixel =
-      halfImageWidth
-      / std::tan(
-          horizontalFovRad / 2.0);
-
-  // =====================================================
-  // pixel差からカメラに対する角度を求める
+  //          square
+  //             *
+  //            /|
+  //           / |
+  //          /  | forward
+  //         /   |
+  //    robot----+
+  //       lateral
   //
-  // angle = atan(pixelError / fx)
+  // straightDistance
+  //   = sqrt(forward^2 + lateral^2)
   // =====================================================
 
-  const double cameraAngleRad =
-      std::atan(
-          pixelError
-          / focalLengthPixel);
+  const double straightDistance = std::hypot(forwardDistance, lateralDistance);
 
-  const double cameraAngleDeg =
-      cameraAngleRad
-      * 180.0
-      / PI;
+  // =====================================================
+  // 7. 結果
+  // =====================================================
+
+  result.wasDetected = true;
+
+  result.centerX = centerX;
+
+  result.centerY = centerY;
+
+  result.forwardDistance = forwardDistance;
+
+  result.lateralDistance = lateralDistance;
+
+  result.correctionAngle = correctionAngle;
+
+  result.straightDistance = straightDistance;
+
+  // =====================================================
+  // 8. ログ
+  // =====================================================
+
+  Logger::printfLog(Logger::INFO,
+                    "SquareAngleAdjustment: "
+                    "center=(%.2f, %.2f)",
+                    centerX, centerY);
+
+  Logger::printfLog(Logger::INFO,
+                    "SquareAngleAdjustment: "
+                    "forward=%.2f mm "
+                    "lateral=%.2f mm",
+                    forwardDistance, lateralDistance);
+
+  Logger::printfLog(Logger::INFO,
+                    "SquareAngleAdjustment: "
+                    "angle=%.2f deg "
+                    "distance=%.2f mm",
+                    correctionAngle, straightDistance);
+
+  return result;
+}
+
+double SquareAngleAdjustment::pixelYToForwardDistance(double y) const
+{
+  /*
+   * 校正条件
+   *
+   * カメラ解像度:
+   *   1920 x 1080
+   *
+   * タイヤ軸から画像下端に写る床面:
+   *   200 mm
+   *
+   * 床面の線:
+   *   線幅 2 mm
+   *   線間 10 mm
+   *   中心間 12 mm
+   *
+   * y = 1080 のとき
+   * およそ200mmになる。
+   */
+
+  return (-0.153821 * y + 677.174) / (0.00144003 * y + 1.0);
+}
+
+double SquareAngleAdjustment::pixelToLateralDistance(double x, double y) const
+{
+  /*
+   * y座標によって、
+   * 横方向12mmが画像上で何pixelになるかが変化する。
+   */
+  const double pixelsPer12mm = 0.04893 * y + 34.414;
+
+  if(pixelsPer12mm <= 0.0) {
+    Logger::error("SquareAngleAdjustment: "
+                  "invalid lateral conversion");
+
+    return 0.0;
+  }
 
   /*
-   * 画像上で
-   *
-   * pixelError > 0
-   *
-   * の場合、正方形はロボットから見て右側にある。
-   *
-   * 現在のRouteFollower / RelativeRotationの符号では、
-   * 右回頭を負の角度として扱うため反転する。
+   * x < 960 : 左
+   * x = 960 : 正面
+   * x > 960 : 右
    */
-  const double rotationAngle =
-      -cameraAngleDeg;
-
-  Logger::printfLog(
-      Logger::INFO,
-      "SquareAngleAdjustment: "
-      "pixelToAngle "
-      "pixel=%.2f "
-      "focal=%.2f "
-      "cameraAngle=%.2f "
-      "rotationAngle=%.2f",
-      pixelError,
-      focalLengthPixel,
-      cameraAngleDeg,
-      rotationAngle);
-
-  return rotationAngle;
+  return 12.0 * (x - IMAGE_CENTER_X) / pixelsPer12mm;
 }
 
-void SquareAngleAdjustment::rotate(
-    double angle)
+double SquareAngleAdjustment::calculateCorrectionAngle(double forwardDistance,
+                                                       double lateralDistance) const
 {
-  auto condition =
-      std::make_unique<RelativeAngleCondition>(
-          robot,
-          angle,
-          rotationTolerance);
+  if(forwardDistance <= 0.0) {
+    Logger::warning("SquareAngleAdjustment: "
+                    "invalid forward distance");
 
-  RelativeRotation rotation(
-      robot,
-      std::move(condition),
-      rotationPid,
-      angle);
+    return 0.0;
+  }
 
-  rotation.run();
-}
-
-void SquareAngleAdjustment::stop()
-{
-  robot
-      .getWheelMotorControllerInstance()
-      .stopBoth();
+  /*
+   * lateral > 0
+   *   → 正方形が右
+   *
+   * lateral < 0
+   *   → 正方形が左
+   *
+   * atan2(
+   *   横方向距離,
+   *   前方距離
+   * )
+   *
+   * でロボット正面から見た補正角度を求める。
+   */
+  return std::atan2(lateralDistance, forwardDistance) * SQUARE_RAD_TO_DEG;
 }

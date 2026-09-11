@@ -1,35 +1,91 @@
 /**
  * @file   SquareAngleAdjustment.h
- * @brief  正方形の中心位置から角度を計算し、RelativeRotationで向きを補正するクラス
+ * @brief  正方形の画像座標からロボット基準の角度・距離を計算するクラス
  * @author yutaro-1214
  */
 
 #ifndef SQUARE_ANGLE_ADJUSTMENT_H
 #define SQUARE_ANGLE_ADJUSTMENT_H
 
-#include "Pid.h"
 #include "Robot.h"
 #include "SocketProtocol.h"
 
+/**
+ * @brief 正方形検出結果から補正角度と距離を計算するクラス
+ *
+ * 正方形の中心座標をカメラ画像から取得し、
+ *
+ * 画像座標
+ *   (x, y)
+ *
+ * を
+ *
+ * ロボット基準座標
+ *   前方距離[mm]
+ *   横方向距離[mm]
+ *
+ * に変換する。
+ *
+ * その後、
+ *
+ *   補正角度 = atan2(横方向距離, 前方距離)
+ *
+ *   直進距離 = sqrt(前方距離^2 + 横方向距離^2)
+ *
+ * を計算する。
+ *
+ * このクラス自身はモータを動かさない。
+ */
 class SquareAngleAdjustment {
  public:
   /**
-   * @brief コンストラクタ
-   *
-   * @param _robot ロボット
-   * @param _squareDetectionRequest 正方形検出リクエスト
-   * @param _rotationPid RelativeRotationで使用するPID
-   * @param _centerTolerance 中央とみなす許容ピクセル差
-   * @param _horizontalFovDeg カメラの水平画角[deg]
-   * @param _rotationTolerance RelativeRotationの終了許容角度[deg]
+   * @brief 正方形補正計算結果
    */
-  SquareAngleAdjustment(
-      Robot& _robot,
-      const CameraServer::SquareDetectorRequest& _squareDetectionRequest,
-      const Pid::PidGain& _rotationPid,
-      double _centerTolerance = 5.0,
-      double _horizontalFovDeg = 70.0,
-      double _rotationTolerance = 1.0);
+  struct Result {
+    /**
+     * @brief 正方形を検出できたか
+     */
+    bool wasDetected = false;
+
+    /**
+     * @brief 正方形中心X座標[px]
+     */
+    double centerX = 0.0;
+
+    /**
+     * @brief 正方形中心Y座標[px]
+     */
+    double centerY = 0.0;
+
+    /**
+     * @brief タイヤ軸から正方形までの前方距離[mm]
+     */
+    double forwardDistance = 0.0;
+
+    /**
+     * @brief ロボット中心から正方形までの横方向距離[mm]
+     *
+     * 負：左
+     * 正：右
+     */
+    double lateralDistance = 0.0;
+
+    /**
+     * @brief 正方形方向へ向くための相対回頭角度[deg]
+     */
+    double correctionAngle = 0.0;
+
+    /**
+     * @brief 回頭後に正方形まで直進する距離[mm]
+     */
+    double straightDistance = 0.0;
+  };
+
+  /**
+   * @brief コンストラクタ
+   * @param _robot ロボットインスタンス
+   */
+  explicit SquareAngleAdjustment(Robot& _robot);
 
   /**
    * @brief デストラクタ
@@ -37,90 +93,44 @@ class SquareAngleAdjustment {
   ~SquareAngleAdjustment();
 
   /**
-   * @brief 正方形を検出して角度補正を行う
+   * @brief 正方形を検出して補正値を計算する
    *
-   * @return true 補正成功または既に中央にある
-   * @return false 正方形を検出できなかった
+   * @param request 正方形検出リクエスト
+   * @return 計算結果
    */
-  bool run();
+  Result calculate(const CameraServer::SquareDetectorRequest& request);
 
  private:
   /**
-   * @brief 正方形の中心X座標を求める
-   *
-   * @param response 正方形検出結果
-   * @return double 中心X座標[pixel]
-   */
-  double calculateCenterX(
-      const CameraServer::SquareDetectorResponse& response) const;
-
-  /**
-   * @brief 画像中心からのピクセル誤差を求める
-   *
-   * @param response 正方形検出結果
-   * @return double ピクセル誤差
-   *
-   * 正:
-   *   正方形が画像中心より右
-   *
-   * 負:
-   *   正方形が画像中心より左
-   */
-  double calculatePixelError(
-      const CameraServer::SquareDetectorResponse& response) const;
-
-  /**
-   * @brief ピクセル誤差をRelativeRotation用の角度へ変換する
-   *
-   * @param pixelError 画像中心からのピクセル差
-   * @return double 補正角度[deg]
-   */
-  double pixelErrorToRotationAngle(
-      double pixelError) const;
-
-  /**
-   * @brief RelativeRotationで角度補正する
-   *
-   * @param angle 補正角度[deg]
-   */
-  void rotate(
-      double angle);
-
-  /**
-   * @brief 左右モータを停止する
-   */
-  void stop();
-
- private:
-  /**
-   * @brief ロボット
+   * @brief ロボットインスタンス
    */
   Robot& robot;
 
   /**
-   * @brief 正方形検出リクエスト
+   * @brief 画像Y座標から前方距離を計算する
+   *
+   * @param y 画像Y座標[px]
+   * @return タイヤ軸からの前方距離[mm]
    */
-  CameraServer::SquareDetectorRequest squareDetectionRequest;
+  double pixelYToForwardDistance(double y) const;
 
   /**
-   * @brief RelativeRotation用PID
+   * @brief 画像座標から横方向距離を計算する
+   *
+   * @param x 画像X座標[px]
+   * @param y 画像Y座標[px]
+   * @return 横方向距離[mm]
    */
-  Pid::PidGain rotationPid;
+  double pixelToLateralDistance(double x, double y) const;
 
   /**
-   * @brief 正方形中心の許容誤差[pixel]
+   * @brief 前方距離と横方向距離から回頭角度を計算する
+   *
+   * @param forwardDistance 前方距離[mm]
+   * @param lateralDistance 横方向距離[mm]
+   * @return 相対回頭角度[deg]
    */
-  double centerTolerance;
-
-  /**
-   * @brief カメラ水平画角[deg]
-   */
-  double horizontalFovDeg;
-
-  /**
-   * @brief RelativeRotation終了許容角度[deg]
-   */
-  double rotationTolerance;
+  double calculateCorrectionAngle(double forwardDistance, double lateralDistance) const;
 };
 
-#endif  // SQUARE_ANGLE_ADJUSTMENT_H
+#endif

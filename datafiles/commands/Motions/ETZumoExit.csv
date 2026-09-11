@@ -1,3 +1,3 @@
 コマンド名,ID,targetProjectedDistanceMm,cameraTrackingID,trackingConditionID,absoluteRotationID,absoluteAngleID,straightID,arrivalColor
 ETZumoExit,ID,double,string,string,string,string,string,COLOR
-ETZumoExit,001,700,014,001,003,003,002,BLACK
+ETZumoExit,001,550,014,001,003,003,002,BLACK

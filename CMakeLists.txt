@@ -31,3 +31,112 @@ pkg_check_modules(OPENSSL REQUIRED openssl)
 
 enable_testing()
 include(GoogleTest)
+
+## 走行システム ##
+
+# 必要なインクルードディレクトリの設定
+set(RUNNING_INCLUDE_DIRS
+  ${RUNNING_MODULE_DIR}
+  ${RUNNING_MODULE_DIR}/calculators
+  ${RUNNING_MODULE_DIR}/API
+  ${RUNNING_MODULE_DIR}/client
+  ${RUNNING_MODULE_DIR}/motions
+  ${RUNNING_MODULE_DIR}/motions/continuation_conditions
+  ${PROJECT_SOURCE_DIR}/common
+  ${PROJECT_SOURCE_DIR}/common/customs
+  ${RUNNING_TEST_DIR}
+  ${RUNNING_TEST_DIR}/dummy
+  ${RUNNING_TEST_DIR}/datafiles/logfiles
+)
+
+# ソースファイルの登録
+file(GLOB_RECURSE RUNNING_SOURCES
+  "${RUNNING_MODULE_DIR}/*.cpp"
+  "${RUNNING_TEST_DIR}/dummy/utils/*.cpp"
+  "${PROJECT_SOURCE_DIR}/common/*.cpp"
+)
+
+# ライブラリターゲットを作成
+add_library(running_impl STATIC ${RUNNING_SOURCES})
+target_include_directories(running_impl PUBLIC ${RUNNING_INCLUDE_DIRS})
+target_link_libraries(running_impl PUBLIC ${OPENSSL_LIBRARIES})
+
+# tests ディレクトリ内の *Test.cpp をすべてテストソースとして登録
+file(GLOB RUNNING_TEST_SOURCES
+  "${RUNNING_TEST_DIR}/*Test.cpp"
+)
+
+# テスト実行可能ファイルの作成
+add_executable(running_test ${RUNNING_TEST_SOURCES})
+target_link_libraries(running_test
+  PRIVATE
+    running_impl
+    gtest_main
+    ${OPENSSL_LIBRARIES}
+)
+
+# テストの登録
+gtest_discover_tests(running_test)
+
+## 撮影システム ##
+
+# テスト有効化オプション
+option(ENABLE_CAMERA_TESTS "Build camera tests" ON)
+
+if(ENABLE_CAMERA_TESTS)
+  find_package(OpenCV REQUIRED)
+  pkg_check_modules(ZXING REQUIRED zxing)
+
+  # 必要なインクルードディレクトリの設定
+  set(CAMERA_INCLUDE_DIRS
+    ${CAMERA_MODULE_DIR}
+    ${CAMERA_MODULE_DIR}/camera
+    ${CAMERA_MODULE_DIR}/utils
+    ${CAMERA_MODULE_DIR}/server
+    ${CAMERA_MODULE_DIR}/image_processors
+    ${CAMERA_MODULE_DIR}/actions
+    ${PROJECT_SOURCE_DIR}/common
+    ${PROJECT_SOURCE_DIR}/common/customs
+    ${RUNNING_MODULE_DIR}/API
+    ${RUNNING_TEST_DIR}/dummy
+    ${CAMERA_TEST_DIR}/dummy
+  )
+
+  # ソースファイルの登録
+  file(GLOB_RECURSE CAMERA_SOURCES
+    "${CAMERA_MODULE_DIR}/camera/*.cpp"
+    "${CAMERA_MODULE_DIR}/utils/*.cpp"
+    "${CAMERA_MODULE_DIR}/server/*.cpp"
+    "${CAMERA_MODULE_DIR}/image_processors/*.cpp"
+    "${CAMERA_MODULE_DIR}/actions/*.cpp"
+    "${PROJECT_SOURCE_DIR}/common/*.cpp"
+    "${RUNNING_MODULE_DIR}/API/*.cpp"
+  )
+
+  # ライブラリターゲットを作成
+  add_library(camera_server_impl STATIC ${CAMERA_SOURCES})
+  target_include_directories(camera_server_impl PUBLIC ${CAMERA_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} ${ZXING_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIRS})
+  target_link_libraries(camera_server_impl ${OpenCV_LIBS} ${ZXING_LIBRARIES} ${OPENSSL_LIBRARIES})
+
+  # camera_server/tests ディレクトリ内の *Test.cpp をすべてテストソースとして登録
+  file(GLOB CAMERA_TEST_SOURCES
+    "${CAMERA_TEST_DIR}/*Test.cpp"
+  )
+
+  # テスト実行時に必要な画像データをビルドディレクトリへコピー
+  file(COPY ${CAMERA_TEST_DIR}/test_data
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/camera_server)
+
+  # テスト実行可能ファイルの作成
+  add_executable(camera_server_test ${CAMERA_TEST_SOURCES})
+  target_link_libraries(camera_server_test
+    PRIVATE
+      camera_server_impl
+      gtest_main
+      ${OpenCV_LIBS}
+  )
+
+  # テストの登録
+  gtest_discover_tests(camera_server_test)
+
+endif()

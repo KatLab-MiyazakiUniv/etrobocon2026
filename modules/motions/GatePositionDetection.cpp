@@ -59,7 +59,7 @@ void GatePositionDetection::executeStep()
     // AesDecryptor decryptor(std::string(robot.getDecryptionKey()), qrResponse.content);
     // 青・黄色：復号する
     gatePositionData
-        = Decryptor::Decrypt(std::string(robot.getDecryptionKey()), qrResponse.content);
+        = Decrypter::Decrypt(std::string(robot.getDecryptionKey()), qrResponse.content);
 
     if(gatePositionData.empty()) {
       Logger::error("GatePositionDetection: QRコードの復号に失敗しました。");

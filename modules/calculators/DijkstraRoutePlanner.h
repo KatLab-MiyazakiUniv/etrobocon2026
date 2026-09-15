@@ -20,93 +20,194 @@ class DijkstraRoutePlanner {
  public:
   /**
    * @brief コンストラクタ
-   * @param gates ゲートの情報
+   *
+   * @param gates ゲート情報
    */
-  explicit DijkstraRoutePlanner(const std::vector<Gate>& gates);
+  explicit DijkstraRoutePlanner(
+      const std::vector<Gate>& gates);
 
   /**
-   * @brief 指定された1地点まで経路探索する
-   * @param startX 開始時点のX座標
-   * @param startY 開始時点のY座標
-   * @param startDirection 開始時点のロボットが向いてる方向
-   * @param goal ゴールの座標
-   * @param goalDirection ゴールの座標でロボットが向くべき方向
-   * @return 経路探索の結果
+   * @brief 指定地点までの最小コスト経路を探索する
+   *
+   * @param startX 開始X座標
+   * @param startY 開始Y座標
+   * @param startDirection 開始方向
+   * @param goal ゴール座標
+   * @param goalDirection ゴール時の方向
+   *
+   * @return 経路探索結果
    */
-  RouteResult search(int startX, int startY, Direction startDirection, const Point& goal,
-                     Direction goalDirection);
+  RouteResult search(
+      int startX,
+      int startY,
+      Direction startDirection,
+      const Point& goal,
+      Direction goalDirection);
 
  private:
-  static constexpr int MAP_MIN = 0;    // ETRallyMapの最小座標値
-  static constexpr int MAP_MAX = 10;   // ETRallyMapの最大座標値
-  static constexpr int MOVE_STEP = 2;  // 1マスの移動の際の座標変化量
+  /**
+   * @brief 登録されているゲート
+   */
+  const std::vector<Gate>& gates;
 
+  /**
+   * @brief 90度回頭コスト
+   */
+  static constexpr int TURN_90_COST = 2;
+
+  /**
+   * @brief 180度回頭コスト
+   */
+  static constexpr int TURN_180_COST = 4;
+
+  /**
+   * @brief 直進コスト
+   */
+  static constexpr int STRAIGHT_COST = 1;
+
+  /**
+   * @brief 回頭時にゲート足との接触危険がある場合のコスト
+   */
+  static constexpr int NEAR_GATE_TURN_COST = 100;
+
+  /**
+   * @brief 1回の移動量
+   */
+  static constexpr int MOVE_STEP = 2;
+
+  /**
+   * @brief 方向数
+   */
+  static constexpr int DIRECTION_COUNT = 4;
+
+  /**
+   * @brief マップ最小座標
+   */
+  static constexpr int MAP_MIN = 0;
+
+  /**
+   * @brief マップ最大座標
+   *
+   * 実際のマップサイズに合わせて変更する。
+   */
+  static constexpr int MAP_MAX = 10;
+
+  /**
+   * @brief グリッドサイズ
+   */
   static constexpr int GRID_SIZE
-      = 6;  // X・Y方向の移動可能なグリッド地点の数（0～10を2刻みで6地点）
-
-  static constexpr int DIRECTION_COUNT = 4;  // ロボットの向きの種類
-
-  static constexpr int STRAIGHT_COST = 1;          // 直進コスト
-  static constexpr int TURN_90_COST = 3;           // 90度回頭コスト
-  static constexpr int TURN_180_COST = 6;          // 180度回頭コスト
-  static constexpr int NEAR_GATE_TURN_COST = 100;  // ゲート足付近の回頭コスト
-
-  std::vector<Gate> gates;  // ゲートの情報
+      = MAP_MAX / MOVE_STEP + 1;
 
   /**
-   * @brief 現在の方向から次の方向へ旋回する際のコストを計算する
-   * @param currentDirection 現在向いている方向
-   * @param nextDirection 次に向かう方向
-   * @return 旋回に必要なコスト
+   * @brief 回頭中心からロボット最後端までの距離
+   *
+   * グリッド座標単位。
+   *
+   * 例:
+   * 1グリッド = 122.5mm
+   * 回頭中心から後端 = 220mm
+   *
+   * 220 / 122.5 ≒ 1.8
+   *
+   * 実機に合わせて調整する。
    */
-  int calculateTurnCost(Direction currentDirection, Direction nextDirection) const;
+  static constexpr double TURN_SWEEP_RADIUS = 2.0;
 
   /**
-   * @brief 現在地点を考慮して1回の移動コストを計算する
-   * @param currentX 現在地点のX座標
-   * @param currentY 現在地点のY座標
-   * @param currentDirection 現在向いている方向
-   * @param nextDirection 次に向かう方向
-   * @return 1回の移動に必要な総コスト
+   * @brief 接触判定の余裕
+   *
+   * グリッド座標単位。
    */
-  int calculateMoveCost(int currentX, int currentY, Direction currentDirection,
-                        Direction nextDirection) const;
+  static constexpr double TURN_SWEEP_MARGIN = 0.3;
 
   /**
-   * @brief 指定地点がゲートの足付近か判定する
-   * @param x X座標
-   * @param y Y座標
-   * @return 足付近ならtrue
+   * @brief 回頭角度を考慮した回頭コストを取得する
    */
-  bool isNearGatePost(int x, int y) const;
+  int calculateTurnCost(
+      Direction currentDirection,
+      Direction nextDirection) const;
 
   /**
-   * @brief 指定地点が外周か判定する
-   * @param x X座標
-   * @param y Y座標
-   * @return 外周ならtrue
+   * @brief 1移動分のコストを計算する
    */
-  bool isOuterArea(int x, int y) const;
+  int calculateMoveCost(
+      int currentX,
+      int currentY,
+      Direction currentDirection,
+      Direction nextDirection) const;
 
   /**
-   * @brief 指定した座標が経路探索可能な範囲内か判定する
+   * @brief ゲート足付近か判定する
    */
-  bool isValid(int x, int y) const;
+  bool isNearGatePost(
+      int x,
+      int y) const;
 
   /**
-   * @brief 現在地点から次の地点への移動がゲートによって妨げられているか判定する
+   * @brief 外周領域か判定する
    */
-  bool isBlockedMove(int currentX, int currentY, int nextX, int nextY) const;
+  bool isOuterArea(
+      int x,
+      int y) const;
 
   /**
-   * @brief 座標と方向を状態番号へ変換する
+   * @brief 回頭時にロボット後部が通る範囲に
+   *        ゲート足が存在するか判定する
+   *
+   * @param x 回頭中心X
+   * @param y 回頭中心Y
+   * @param currentDirection 回頭前方向
+   * @param nextDirection 回頭後方向
+   *
+   * @return 接触の危険がある場合true
    */
-  int stateToIndex(int x, int y, Direction direction) const;
+  bool isTurnBlockedByGatePost(
+      int x,
+      int y,
+      Direction currentDirection,
+      Direction nextDirection) const;
 
   /**
-   * @brief 状態番号を座標と方向へ変換する
+   * @brief Directionを前方向ベクトルへ変換する
    */
-  RouteState indexToState(int index) const;
+  Point directionToVector(
+      Direction direction) const;
+
+  /**
+   * @brief 角度を-pi～piへ正規化する
+   */
+  double normalizeRad(
+      double angle) const;
+
+  /**
+   * @brief 座標が探索可能範囲か判定する
+   */
+  bool isValid(
+      int x,
+      int y) const;
+
+  /**
+   * @brief 移動時にゲートを横切るか判定する
+   */
+  bool isBlockedMove(
+      int currentX,
+      int currentY,
+      int nextX,
+      int nextY) const;
+
+  /**
+   * @brief 状態を1次元インデックスへ変換する
+   */
+  int stateToIndex(
+      int x,
+      int y,
+      Direction direction) const;
+
+  /**
+   * @brief 1次元インデックスを状態へ戻す
+   */
+  RouteState indexToState(
+      int index) const;
 };
 
-#endif  // DIJKSTRA_ROUTE_PLANNER_H
+#endif

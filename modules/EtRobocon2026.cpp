@@ -173,25 +173,25 @@ void EtRobocon2026::start()
   mapData.setGate(
       GoalColor::RED,
       convertPoint(
-          { 1, 5 }),
+          { 7, 7 }),
       convertPoint(
-          { 3, 5 }));
+          { 9, 7 }));
 
   // BLUE
   mapData.setGate(
       GoalColor::BLUE,
       convertPoint(
-          { 5, 7 }),
+          { 3, 7 }),
       convertPoint(
-          { 5, 9 }));
+          { 3, 9 }));
 
   // YELLOW
   mapData.setGate(
       GoalColor::YELLOW,
       convertPoint(
-          { 7, 5 }),
+          { 5, 3 }),
       convertPoint(
-          { 9, 5 }));
+          { 7, 3 }));
 
   Logger::printfLog(
       Logger::INFO,
@@ -260,7 +260,7 @@ void EtRobocon2026::start()
    */
   const Pid::PidGain squareRotationPid = {
       5.8,
-      2.2,
+      15.0,
       0.0
   };
 

@@ -2,9 +2,6 @@
 cmake_minimum_required(VERSION 3.14)
 project(etrobocon2026)
 
-# C++標準とカバレッジ用フラグ# GoogleTest用のCMakeLists.txt
-cmake_minimum_required(VERSION 3.14)
-project(etrobocon2026)
 
 # C++標準とカバレッジ用フラグ
 set(CMAKE_CXX_STANDARD 17)

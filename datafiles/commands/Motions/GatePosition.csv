@@ -1,0 +1,3 @@
+コマンド名,"ID",fileName,decryptRequired,roiX,roiY,roiWidth,roiHeight
+GatePosition,"ID",String,bool,int,int,int,int
+GatePosition,001,QR2,1,0,0,1920,1080

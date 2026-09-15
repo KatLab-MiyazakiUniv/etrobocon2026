@@ -19,13 +19,16 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "BaseMotion.h"
 #include "Logger.h"
 #include "DistanceCondition.h"
+#include "Calibrator.h"
+#include "GatePositionDetection.h"
+#include "RepeatCountCondition.h"
 
 class MotionParser {
  public:
   // 動作コマンド名を持つ列挙型クラス
-  enum class MOTION_COMMAND { STRAIGHT, QR_TRACKING, NONE };
+  enum class MOTION_COMMAND { STRAIGHT, QR_TRACKING,GATE_POSITION, CALIBRATOR,NONE };
   // 条件コマンド名を持つ列挙型クラス
-  enum class CONDITION_COMMAND { DISTANCE, NONE };
+  enum class CONDITION_COMMAND { DISTANCE,REPEATCOUNT, NONE };
 
   /**
    * @brief Area CSVファイルを解析して動作インスタンスのリストを生成する

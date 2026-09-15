@@ -167,6 +167,10 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
       double targetDistance = fromString<double>(params[2]);
       return make_unique<DistanceCondition>(robot, targetDistance);
     }
+    case CONDITION_COMMAND::REPEATCOUNT: {
+      double targetCount = fromString<int>(params[2]);
+      return make_unique<DistanceCondition>(robot, 1);
+    }
     // ↓ 他の条件コマンドはここに追加していく
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Condition %s は未実装です",
@@ -219,6 +223,23 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                                               fromString<double>(motionParams[6]) },
                                 qrRequest, motionParams[7] == "true");
     }
+    case MOTION_COMMAND::GATE_POSITION: {
+      // QRTracking: motionParams[2]=speed(double)
+      //                 motionParams[3]=targetXCoordinate(int)
+      //                 motionParams[4..6]=cameraPid(kp,ki,kd)
+      //                 motionParams[7]=isStopMotorPower(string: "true"/"false")
+      //                 motionParams[8..11]=roi(x,y,width,height)
+      CameraServer::QrCodeDetectorRequest qrRequest;
+      qrRequest.roi.x = fromString<int32_t>(motionParams[4]);
+      qrRequest.roi.y = fromString<int32_t>(motionParams[5]);
+      qrRequest.roi.width = fromString<int32_t>(motionParams[6]);
+      qrRequest.roi.height = fromString<int32_t>(motionParams[7]);
+      return new GatePositionDetection(robot, motionParams[2], fromString<bool>(motionParams[3]),
+  qrRequest, std::move(condition));
+   }
+    case MOTION_COMMAND::CALIBRATOR: {
+      return new Calibrator(robot, std::move(condition));
+    }
     // ↓ 他のコマンドはここに追加していく
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
@@ -233,6 +254,8 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
   static const unordered_map<string, MOTION_COMMAND> commandMap = {
     { "Straight", MOTION_COMMAND::STRAIGHT },
     { "QRTracking", MOTION_COMMAND::QR_TRACKING },
+    { "GatePosition", MOTION_COMMAND::GATE_POSITION },
+    { "Calibrator", MOTION_COMMAND::CALIBRATOR },
   };
 
   // コマンド文字列に対応するMOTION_COMMAND値をマップから取得。なければMOTION_COMMAND::NONEを返す
@@ -249,6 +272,7 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
   // 条件コマンド文字列と、それに対応する列挙型CONDITION_COMMANDのマッピングを定義
   static const unordered_map<string, CONDITION_COMMAND> conditionMap = {
     { "Distance", CONDITION_COMMAND::DISTANCE },
+    { "RepeatCount", CONDITION_COMMAND::REPEATCOUNT }
   };
 
   // 条件コマンド文字列に対応するCONDITION_COMMAND値をマップから取得。なければCONDITION_COMMAND::NONEを返す

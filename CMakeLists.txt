@@ -2,6 +2,7 @@
 cmake_minimum_required(VERSION 3.14)
 project(etrobocon2026)
 
+
 # C++標準とカバレッジ用フラグ
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -37,6 +38,9 @@ include(GoogleTest)
 
 ## 走行システム ##
 
+# OpenSSL の検索と設定
+find_package(OpenSSL REQUIRED)
+
 # 必要なインクルードディレクトリの設定 (適宜登録)
 set(RUNNING_INCLUDE_DIRS
   ${RUNNING_MODULE_DIR}
@@ -62,6 +66,7 @@ file(GLOB_RECURSE RUNNING_SOURCES
 # ライブラリターゲットを作成
 add_library(running_impl STATIC ${RUNNING_SOURCES})
 target_include_directories(running_impl PUBLIC ${RUNNING_INCLUDE_DIRS})
+target_link_libraries(running_impl PUBLIC OpenSSL::Crypto)
 
 # tests ディレクトリ内の *Test.cpp をすべてテストソースとして登録
 file(GLOB RUNNING_TEST_SOURCES
@@ -74,6 +79,7 @@ target_link_libraries(running_test
   PRIVATE
     running_impl
     gtest_main
+    OpenSSL::Crypto
 )
 
 # テストの登録
@@ -118,8 +124,8 @@ if(ENABLE_CAMERA_TESTS)
 
   # ライブラリターゲットを作成
   add_library(camera_server_impl STATIC ${CAMERA_SOURCES})
-  target_include_directories(camera_server_impl PUBLIC ${CAMERA_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} ${ZXING_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIRS})
-  target_link_libraries(camera_server_impl ${OpenCV_LIBS} ${ZXING_LIBRARIES} ${OPENSSL_LIBRARIES})
+  target_include_directories(camera_server_impl PUBLIC ${CAMERA_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS} ${ZXING_INCLUDE_DIRS})
+  target_link_libraries(camera_server_impl ${OpenCV_LIBS} ${ZXING_LIBRARIES})
 
   # camera_server/tests ディレクトリ内の *Test.cpp をすべてテストソースとして登録
   file(GLOB CAMERA_TEST_SOURCES

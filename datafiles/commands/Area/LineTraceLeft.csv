@@ -1,9 +1,13 @@
 #動作コマンド名,動作ID,条件コマンド名,条件ID
 # キャリブレーション
 #Calibrator,001,RepeatCount,001
-#ボトルキャッチ前
-CameraTracking,LTS001,Distance,055
-CameraTracking,LTS002,Distance,020
-CameraTracking,LTS003,Distance,010
-CameraTracking,LTS004,Distance,010
+#4色走行ボトルキャッチ前
+
+Snapshot,clearBuffer1,RepeatCount,001
+CameraTracking,LTS001,Distance,060
+#ボトルキャッチ中
+CameraTracking,LTS002,Distance,040
+#ボトルキャッチ後
+CameraTracking,LTS003,Distance,005
+
 

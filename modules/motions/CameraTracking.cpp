@@ -214,12 +214,12 @@ void CameraTracking::finish()
   if(isStopMotorPower) {
     // 極端にpower値を設定する間隔が短くなっていそうなので、sleep()を挿入し急旋回挙動が減るかどうかを検証>進行中
     // ------------------------------------------------------------------------------------------------------
-    // ClockUtil::sleep(10);  // 10ミリ秒待機
+    ClockUtil::sleep(10);  // 10ミリ秒待機
     // ------------------------------------------------------------------------------------------------------
 
     Logger::printfLog(Logger::DEBUG, "モーターに0をセット");
-    // robot.getWheelMotorControllerInstance().stopBoth();
-    robot.getWheelMotorControllerInstance().brakeBoth();
+    robot.getWheelMotorControllerInstance().stopBoth();
+    // robot.getWheelMotorControllerInstance().brakeBoth();
   }
 }
 

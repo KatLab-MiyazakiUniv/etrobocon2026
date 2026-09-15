@@ -1,24 +1,43 @@
 動作コマンド名,動作ID,条件コマンド名,条件ID
 
 #QR1検出位置まで直進
-RelativeRotation,005,RelativeAngle,-045
-Straight,001,Distance,060
+RelativeRotation,005,RelativeAngle,-025
+Straight,001,Distance,065
 
 # QR1検出
-Snapshot,qr-1,RepeatCount,03
+Snapshot,clearBuffer1,RepeatCount,001
+Snapshot,011,RepeatCount,001
+Snapshot,012,RepeatCount,001
+Snapshot,013,RepeatCount,001
+Snapshot,014,RepeatCount,001
+Snapshot,015,RepeatCount,001
+
 
 #QR1取得後の直線
 RelativeRotation,005,RelativeAngle,-040
-CameraTracking,LBS003,Distance,125
+Snapshot,clearBuffer1,RepeatCount,001
+#ライン上を沿って走らせるための低速走行
+CameraTracking,LBS004,Distance,030
+#350から550へ加速するための400速度で走行
+CameraTracking,LBS005,Distance,020
+CameraTracking,LBS003,Distance,050
+
+#QR2取得前カーブ直前
+CameraTracking,LBL001,Distance,020
+
+
 
 # QR2検出
-Snapshot,qr-2,RepeatCount,03
+Snapshot,clearBuffer1,RepeatCount,001
+Snapshot,021,RepeatCount,001
+Snapshot,022,RepeatCount,001
+Snapshot,023,RepeatCount,001
+Snapshot,024,RepeatCount,001
+Snapshot,025,RepeatCount,001
 
 #黄色まで移動
 #RelativeRotation,004,RelativeAngle,-035
 #CameraTracking,LBY,Distance,035
-
 #Straight,004,Distance,005
-
 
 #CameraTracking,000,Distance,000

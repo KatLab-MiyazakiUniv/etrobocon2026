@@ -14,8 +14,8 @@ void EtRobocon2026::start()
   RealNetworkSystem real;
   SocketClient client(real);
   Robot robot(client);
-  // int voltage = BatteryController::getVoltage();
-  // Logger::printfLog(Logger::INFO, "バッテリー電圧: %d mV", voltage);
+  int voltage = BatteryController::getVoltage();
+  Logger::printfLog(Logger::INFO, "バッテリー電圧: %d mV", voltage);
   robot.getCameraSocketClientInstance().connectToServer();
 
   // Rコース

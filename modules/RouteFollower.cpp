@@ -48,6 +48,24 @@ namespace {
       = QR_DISTANCE / 2.0;
 
   /**
+   * @brief 正方形を検出する距離[mm]
+   *
+   * QRコードの約200mm手前で停止して検出する。
+   */
+  constexpr double SQUARE_DETECTION_DISTANCE = 200.0;
+
+  /**
+   * @brief QR①到達後、QR②検出位置まで進む距離[mm]
+   *
+   * QR①とQR②の距離は250mm。
+   * QR②の200mm手前で検出するため、
+   *
+   * 250 - 200 = 50mm
+   */
+  constexpr double MOVE_BEFORE_SECOND_DETECTION
+      = QR_DISTANCE - SQUARE_DETECTION_DISTANCE;
+
+  /**
    * @brief 動作切り替え時の待機時間[ms]
    */
   constexpr int MOTION_SWITCH_WAIT = 200;
@@ -81,6 +99,7 @@ void RouteFollower::run(
     const std::vector<RouteState>& route)
 {
   if(route.size() < 2) {
+
     Logger::warning(
         "RouteFollower: route size < 2");
 
@@ -546,6 +565,8 @@ void RouteFollower::runGateSegment(
 
   // =====================================================
   // 外周ゲート
+  //
+  // 外周ゲートでは正方形補正を行わない。
   // =====================================================
 
   if(isOuterGate(
@@ -566,6 +587,10 @@ void RouteFollower::runGateSegment(
 
   Logger::info(
       "RouteFollower: INNER GATE");
+
+  // =====================================================
+  // 区間開始位置からゲート中心までの距離
+  // =====================================================
 
   const double distanceToGate
       = calculateDistanceToGate(
@@ -592,22 +617,65 @@ void RouteFollower::runGateSegment(
   }
 
   // =====================================================
-  // QR①のマップ上位置
+  // QR①の位置
   //
-  // QR①はゲート中心の125mm手前
+  // QR①はゲート中心の125mm手前。
   // =====================================================
 
-  double nominalDistanceToQr1
+  double distanceToQr1
       = distanceToGate
         - QR_TO_GATE_DISTANCE;
 
-  if(nominalDistanceToQr1 < 0.0) {
+  if(distanceToQr1 < 0.0) {
 
-    nominalDistanceToQr1 = 0.0;
+    distanceToQr1 = 0.0;
   }
 
   // =====================================================
-  // QR①検出
+  // 1回目の正方形検出位置
+  //
+  // QR①の200mm手前で検出する。
+  //
+  // 例:
+  //
+  // ロボット
+  //   |
+  //   | 200mm
+  //   |
+  // QR①
+  //   |
+  //   | 125mm
+  //   |
+  // ゲート
+  // =====================================================
+
+  double distanceToFirstDetection
+      = distanceToQr1
+        - SQUARE_DETECTION_DISTANCE;
+
+  if(distanceToFirstDetection < 0.0) {
+
+    distanceToFirstDetection = 0.0;
+  }
+
+  Logger::printfLog(
+      Logger::INFO,
+      "RouteFollower: "
+      "distanceToFirstDetection=%.2f mm",
+      distanceToFirstDetection);
+
+  // =====================================================
+  // QR①の200mm手前まで通常直進
+  // =====================================================
+
+  if(distanceToFirstDetection > 0.0) {
+
+    straight(
+        distanceToFirstDetection);
+  }
+
+  // =====================================================
+  // 1回目の正方形検出
   // =====================================================
 
   Logger::info(
@@ -620,16 +688,20 @@ void RouteFollower::runGateSegment(
       = detectSquare(
           firstResult);
 
+  /*
+   * 2回目の検出失敗時に使用するため、
+   * if文の外で保持する。
+   */
+  double firstAngle = 0.0;
+
+  // =====================================================
+  // QR①検出成功
+  // =====================================================
+
   if(firstDetected) {
 
-    const double firstAngle
+    firstAngle
         = firstResult.correctionAngle;
-
-    // ---------------------------------------------------
-    // QR①へ向く
-    //
-    // 補正専用PIDを使用
-    // ---------------------------------------------------
 
     Logger::printfLog(
         Logger::INFO,
@@ -637,11 +709,17 @@ void RouteFollower::runGateSegment(
         "QR1 correction angle=%.2f deg",
         firstAngle);
 
+    // ---------------------------------------------------
+    // QR①の方向へ回頭
+    // ---------------------------------------------------
+
     rotateForSquare(
         firstAngle);
 
     // ---------------------------------------------------
-    // QR①の真上まで移動
+    // QR①まで直進
+    //
+    // カメラ画像から計算された距離を使用する。
     // ---------------------------------------------------
 
     Logger::printfLog(
@@ -657,8 +735,6 @@ void RouteFollower::runGateSegment(
     // QR①へ向くために回した角度を戻す
     //
     // +α → QR①へ移動 → -α
-    //
-    // ここも補正専用PID
     // ---------------------------------------------------
 
     Logger::printfLog(
@@ -673,6 +749,9 @@ void RouteFollower::runGateSegment(
 
   // =====================================================
   // QR①検出失敗
+  //
+  // 検出地点はQR①の200mm手前なので、
+  // マップ情報を使用して200mm進む。
   // =====================================================
 
   else {
@@ -680,17 +759,38 @@ void RouteFollower::runGateSegment(
     Logger::warning(
         "RouteFollower: "
         "QR1 detection failed "
-        "-> use map distance");
+        "-> straight 200mm");
 
     straight(
-        nominalDistanceToQr1);
+        SQUARE_DETECTION_DISTANCE);
   }
 
   // =====================================================
-  // QR②検出
+  // QR②検出位置まで移動
   //
-  // QR①真上へ移動して、
-  // -α回頭した後に検出する。
+  // QR① → QR② = 250mm
+  //
+  // QR②を200mm手前から検出するため、
+  //
+  // 250 - 200 = 50mm
+  //
+  // QR①から50mm進んでから検出する。
+  // =====================================================
+
+  Logger::printfLog(
+      Logger::INFO,
+      "RouteFollower: "
+      "Move before QR2 detection %.2f mm",
+      MOVE_BEFORE_SECOND_DETECTION);
+
+  if(MOVE_BEFORE_SECOND_DETECTION > 0.0) {
+
+    straight(
+        MOVE_BEFORE_SECOND_DETECTION);
+  }
+
+  // =====================================================
+  // 2回目の正方形検出
   // =====================================================
 
   Logger::info(
@@ -703,16 +803,14 @@ void RouteFollower::runGateSegment(
       = detectSquare(
           secondResult);
 
+  // =====================================================
+  // QR②検出成功
+  // =====================================================
+
   if(secondDetected) {
 
     const double secondAngle
         = secondResult.correctionAngle;
-
-    // ---------------------------------------------------
-    // QR②への残りのズレを補正
-    //
-    // 補正専用PIDを使用
-    // ---------------------------------------------------
 
     Logger::printfLog(
         Logger::INFO,
@@ -720,11 +818,15 @@ void RouteFollower::runGateSegment(
         "QR2 correction angle=%.2f deg",
         secondAngle);
 
+    // ---------------------------------------------------
+    // QR②の方向へ回頭
+    // ---------------------------------------------------
+
     rotateForSquare(
         secondAngle);
 
     // ---------------------------------------------------
-    // QR②真上まで移動
+    // QR②まで直進
     // ---------------------------------------------------
 
     Logger::printfLog(
@@ -745,21 +847,72 @@ void RouteFollower::runGateSegment(
 
     Logger::warning(
         "RouteFollower: "
-        "QR2 detection failed "
-        "-> use 250mm");
+        "QR2 detection failed");
 
-    /*
-     * QR① → QR② = 250mm
-     */
+    // ---------------------------------------------------
+    // QR①の検出に成功していた場合
+    //
+    // QR①で補正した角度と逆方向に回頭する。
+    //
+    // QR①で +α 補正していた場合、
+    // QR②検出失敗時は -α 回頭する。
+    // ---------------------------------------------------
+
+    if(firstDetected) {
+
+      Logger::printfLog(
+          Logger::INFO,
+          "RouteFollower: "
+          "QR2 fallback rotation %.2f deg",
+          -firstAngle);
+
+      rotateForSquare(
+          -firstAngle);
+    }
+
+    // ---------------------------------------------------
+    // QR①も検出失敗していた場合
+    //
+    // 使用できる補正角度がないため回頭しない。
+    // ---------------------------------------------------
+
+    else {
+
+      Logger::warning(
+          "RouteFollower: "
+          "QR1 also failed "
+          "-> skip fallback rotation");
+    }
+
+    // ---------------------------------------------------
+    // QR②まで残り200mm直進
+    //
+    // 既にQR①から50mm進んでいるので、
+    //
+    // QR① → QR② = 250mm
+    // 250 - 50 = 200mm
+    //
+    // となる。
+    // ---------------------------------------------------
+
+    Logger::printfLog(
+        Logger::INFO,
+        "RouteFollower: "
+        "QR2 fallback straight %.2f mm",
+        SQUARE_DETECTION_DISTANCE);
+
     straight(
-        QR_DISTANCE);
+        SQUARE_DETECTION_DISTANCE);
   }
 
   // =====================================================
   // QR②から区間終端まで
   //
-  // QR②位置:
-  // gate center + 125mm
+  // QR②のマップ上の位置は、
+  //
+  // ゲート中心 + 125mm
+  //
+  // として計算する。
   // =====================================================
 
   const double nominalQr2Position
@@ -780,6 +933,10 @@ void RouteFollower::runGateSegment(
       "RouteFollower: "
       "remainingDistance=%.2f mm",
       remainingDistance);
+
+  // =====================================================
+  // QR②から区間終端まで通常直進
+  // =====================================================
 
   if(remainingDistance > 0.0) {
 

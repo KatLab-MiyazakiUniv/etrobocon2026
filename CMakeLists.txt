@@ -1,17 +1,22 @@
+# GoogleTest用のCMakeLists.txt
 cmake_minimum_required(VERSION 3.14)
 project(etrobocon2026)
 
+# C++標準とカバレッジ用フラグ
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# デバッグビルド用のフラグ
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 
+# カバレッジレポート作成のオプション
 option(ENABLE_COVERAGE "Enable test coverage reporting" ON)
 if(ENABLE_COVERAGE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage")
 endif()
 
+# GoogleTest のフェッチとビルド
 include(FetchContent)
 FetchContent_Declare(
   googletest
@@ -20,21 +25,19 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
+# プロジェクトのライブラリターゲットを作成
 set(RUNNING_MODULE_DIR ${PROJECT_SOURCE_DIR}/modules)
 set(RUNNING_TEST_DIR ${PROJECT_SOURCE_DIR}/tests)
 set(CAMERA_MODULE_DIR ${PROJECT_SOURCE_DIR}/camera_server/modules)
 set(CAMERA_TEST_DIR ${PROJECT_SOURCE_DIR}/camera_server/tests)
 
-# OpenSSL
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(OPENSSL REQUIRED openssl)
-
+# テスト設定
 enable_testing()
 include(GoogleTest)
 
 ## 走行システム ##
 
-# 必要なインクルードディレクトリの設定
+# 必要なインクルードディレクトリの設定 (適宜登録)
 set(RUNNING_INCLUDE_DIRS
   ${RUNNING_MODULE_DIR}
   ${RUNNING_MODULE_DIR}/calculators
@@ -49,7 +52,7 @@ set(RUNNING_INCLUDE_DIRS
   ${RUNNING_TEST_DIR}/datafiles/logfiles
 )
 
-# ソースファイルの登録
+# ソースファイルの登録 (適宜登録)
 file(GLOB_RECURSE RUNNING_SOURCES
   "${RUNNING_MODULE_DIR}/*.cpp"
   "${RUNNING_TEST_DIR}/dummy/utils/*.cpp"
@@ -59,7 +62,6 @@ file(GLOB_RECURSE RUNNING_SOURCES
 # ライブラリターゲットを作成
 add_library(running_impl STATIC ${RUNNING_SOURCES})
 target_include_directories(running_impl PUBLIC ${RUNNING_INCLUDE_DIRS})
-target_link_libraries(running_impl PUBLIC ${OPENSSL_LIBRARIES})
 
 # tests ディレクトリ内の *Test.cpp をすべてテストソースとして登録
 file(GLOB RUNNING_TEST_SOURCES
@@ -72,7 +74,6 @@ target_link_libraries(running_test
   PRIVATE
     running_impl
     gtest_main
-    ${OPENSSL_LIBRARIES}
 )
 
 # テストの登録
@@ -85,9 +86,11 @@ option(ENABLE_CAMERA_TESTS "Build camera tests" ON)
 
 if(ENABLE_CAMERA_TESTS)
   find_package(OpenCV REQUIRED)
+  find_package(PkgConfig REQUIRED)
   pkg_check_modules(ZXING REQUIRED zxing)
+  pkg_check_modules(OPENSSL REQUIRED openssl)
 
-  # 必要なインクルードディレクトリの設定
+  # 必要なインクルードディレクトリの設定 (適宜登録)
   set(CAMERA_INCLUDE_DIRS
     ${CAMERA_MODULE_DIR}
     ${CAMERA_MODULE_DIR}/camera
@@ -102,7 +105,7 @@ if(ENABLE_CAMERA_TESTS)
     ${CAMERA_TEST_DIR}/dummy
   )
 
-  # ソースファイルの登録
+  # ソースファイルの登録 (適宜登録)
   file(GLOB_RECURSE CAMERA_SOURCES
     "${CAMERA_MODULE_DIR}/camera/*.cpp"
     "${CAMERA_MODULE_DIR}/utils/*.cpp"
@@ -123,7 +126,7 @@ if(ENABLE_CAMERA_TESTS)
     "${CAMERA_TEST_DIR}/*Test.cpp"
   )
 
-  # テスト実行時に必要な画像データをビルドディレクトリへコピー
+  # テスト実行時に必要な画像データをビルドディレクトリへコピーするための設定
   file(COPY ${CAMERA_TEST_DIR}/test_data
      DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/camera_server)
 

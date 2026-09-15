@@ -5,9 +5,9 @@
 
 Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,LTS001,Distance,060
-#ボトルキャッチ中
-CameraTracking,LTS002,Distance,045
-#ボトルキャッチ後
-CameraTracking,LTS003,Distance,005
+#ボトルキャッチ中(上半分roi)
+CameraTracking,LTS002,Distance,025
+#ボトルキャッチ後(下半分roi)
+CameraTracking,LTS008,Distance,025
 
 

@@ -14,7 +14,7 @@ QrCodeDetector::QrCodeDetector(const cv::Rect& _roi) : roi(_roi)
   options.setFormats(ZXing::BarcodeFormat::QRCode);
   // QRコードを複数の向きやサイズで詳細に探索し、検出・デコードを行う
   // 検証のために、コメントアウトし実行したが、検出成功率は変わらず、処理速度も変化なかった
-  // options.setTryHarder(true);
+  options.setTryHarder(false);
 
   // デバッグのために追加
   options.setReturnErrors(true);

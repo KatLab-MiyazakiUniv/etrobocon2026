@@ -24,31 +24,22 @@ class RouteFollower {
    * @param _robot ロボット
    * @param _map ETラリーマップ
    * @param _mapData ゲート情報
-   * @param _targetSpeed 直進速度[mm/s]
-   * @param _rotationPid 通常回頭用PID
-   * @param _squareRotationPid 正方形補正回頭用PID
-   * @param _rightPid 右モータ速度PID
-   * @param _leftPid 左モータ速度PID
+   * @param _targetSpeed 直進速度
+   * @param _rotationPid 通常回頭PID
+   * @param _squareRotationPid 正方形補正回頭PID
+   * @param _rightPid 右モーターPID
+   * @param _leftPid 左モーターPID
    * @param _straightAnglePid 直進角度PID
    */
-  RouteFollower(
-      Robot& _robot,
-      const EtRallyMap& _map,
-      const MapData& _mapData,
-      double _targetSpeed,
-      const Pid::PidGain& _rotationPid,
-      const Pid::PidGain& _squareRotationPid,
-      const Pid::PidGain& _rightPid,
-      const Pid::PidGain& _leftPid,
-      const Pid::PidGain& _straightAnglePid);
+  RouteFollower(Robot& _robot, const EtRallyMap& _map, const MapData& _mapData, double _targetSpeed,
+                const Pid::PidGain& _rotationPid, const Pid::PidGain& _squareRotationPid,
+                const Pid::PidGain& _rightPid, const Pid::PidGain& _leftPid,
+                const Pid::PidGain& _straightAnglePid);
 
   /**
-   * @brief 経路に従って走行する
-   *
-   * @param route 経路探索結果
+   * @brief 経路を走行する
    */
-  void run(
-      const std::vector<RouteState>& route);
+  void run(const std::vector<RouteState>& route);
 
  private:
   Robot& robot;
@@ -59,14 +50,8 @@ class RouteFollower {
 
   double targetSpeed;
 
-  /**
-   * @brief 通常の90度回頭などで使用するPID
-   */
   Pid::PidGain rotationPid;
 
-  /**
-   * @brief 正方形を利用した補正回頭用PID
-   */
   Pid::PidGain squareRotationPid;
 
   Pid::PidGain rightPid;
@@ -76,83 +61,66 @@ class RouteFollower {
   Pid::PidGain straightAnglePid;
 
   /**
-   * @brief Directionを方位角へ変換する
+   * @brief Directionを角度へ変換する
    */
-  double directionToHeading(
-      Direction direction) const;
+  double directionToHeading(Direction direction) const;
 
   /**
    * @brief 必要な回頭角度を計算する
    */
-  double calculateRotationAngle(
-      Direction from,
-      Direction to) const;
+  double calculateRotationAngle(Direction from, Direction to) const;
 
   /**
-   * @brief 2地点間の実距離を計算する
+   * @brief 2地点間の距離を計算する
    */
-  double calculateDistance(
-      const RouteState& from,
-      const RouteState& to) const;
+  double calculateDistance(const RouteState& from, const RouteState& to) const;
 
   /**
-   * @brief 通常回頭を行う
-   *
-   * rotationPidを使用する。
+   * @brief 通常回頭
    */
-  void rotate(
-      double angle);
+  void rotate(double angle);
 
   /**
-   * @brief 正方形補正用回頭を行う
-   *
-   * squareRotationPidを使用する。
+   * @brief 正方形補正用回頭
    */
-  void rotateForSquare(
-      double angle);
+  void rotateForSquare(double angle);
 
   /**
-   * @brief 指定距離を直進する
+   * @brief 直進
    */
-  void straight(
-      double distance);
+  void straight(double distance);
 
   /**
-   * @brief 正方形を検出する
-   *
-   * @param result 検出・計算結果
-   * @return 成功時true
+   * @brief 正方形を検出し補正情報を取得する
    */
-  bool detectSquare(
-      SquareAngleAdjustment::Result& result);
+  bool detectSquare(SquareAngleAdjustment::Result& result);
 
   /**
    * @brief ゲートを含む区間を走行する
+   *
+   * @param from 区間開始
+   * @param to 区間終了
+   * @param distance 区間距離
+   * @param rotatedAtSegmentStart
+   *        この区間開始時に回頭したか
    */
-  void runGateSegment(
-      const RouteState& from,
-      const RouteState& to,
-      double distance);
+  void runGateSegment(const RouteState& from, const RouteState& to, double distance,
+                      bool rotatedAtSegmentStart);
 
   /**
-   * @brief 区間内に存在するゲートを探す
+   * @brief 区間に存在するゲートを取得する
    */
-  const Gate* findGate(
-      const RouteState& from,
-      const RouteState& to) const;
+  const Gate* findGate(const RouteState& from, const RouteState& to) const;
 
   /**
-   * @brief 外周ゲートか判定する
+   * @brief 外周ゲートか
    */
-  bool isOuterGate(
-      const Gate& gate) const;
+  bool isOuterGate(const Gate& gate) const;
 
   /**
-   * @brief 区間開始地点からゲート中央までの距離を計算する
+   * @brief 区間開始位置からゲート中央までの距離
    */
-  double calculateDistanceToGate(
-      const RouteState& from,
-      const Gate& gate) const;
+  double calculateDistanceToGate(const RouteState& from, const Gate& gate) const;
 };
 
-#endif
+#endif  // ROUTE_FOLLOWER_H

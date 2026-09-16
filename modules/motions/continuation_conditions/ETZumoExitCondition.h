@@ -45,8 +45,8 @@ class ETZumoExitCondition : public BaseContinuationCondition {
 
  private:
   std::shared_ptr<ProjectedMileage> mileage;  // 基準方向の距離計測
-  bool requireBoth;       // trueなら距離到達後に子条件の成立を待つ
-  double targetDistance;  // 基準方向の目標距離[mm]
+  bool requireBoth;                           // trueなら距離到達後に子条件の成立を待つ
+  double targetDistance;                      // 基準方向の目標距離[mm]
   std::unique_ptr<BaseContinuationCondition> continuationCondition;  // 子動作の継続条件
 };
 

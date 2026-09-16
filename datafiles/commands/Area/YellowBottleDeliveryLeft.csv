@@ -29,7 +29,7 @@ Snapshot,clearBuffer1,RepeatCount,001
 
 
 
-CameraTracking,LBS003,Distance,120
+CameraTracking,LBS003,Distance,118
 
 #QR2取得前カーブ直前
 #CameraTracking,LBL001,Distance,030

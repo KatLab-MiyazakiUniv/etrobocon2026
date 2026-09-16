@@ -29,7 +29,7 @@ Snapshot,clearBuffer1,RepeatCount,001
 
 
 
-CameraTracking,LBS003,Distance,120
+CameraTracking,LBS003,Distance,118
 
 #QR2取得前カーブ直前
 #CameraTracking,LBL001,Distance,030
@@ -49,9 +49,11 @@ Snapshot,025,RepeatCount,001
 
 #黄色まで移動
 RelativeRotation,008,RelativeAngle,-050
-
 Straight,001,Distance,090
-Straight,-001,Distance,090
+Straight,-001,Distance,070
 RelativeRotation,002,RelativeAngle,-025
+
 #ETラリーにつなげる
-LineTrace,010,Distance,020
+CameraTracking,LBS007,
+Straight,001,Distance,060
+RelativeRotation,001,RelativeAngle,-090

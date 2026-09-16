@@ -17,69 +17,45 @@ namespace {
   /**
    * @brief radからdegへの変換係数
    */
-  constexpr double SQUARE_RAD_TO_DEG
-      = 180.0 / 3.14159265358979323846;
-
-  /**
-   * @brief 正方形まで進む距離の補正係数
-   *
-   * 計算された距離より少し手前で停止する。
-   *
-   * 1.00 : 計算距離そのまま
-   * 0.90 : 計算距離の90%
-   */
-  constexpr double DISTANCE_SCALE
-      = 0.90;
+  constexpr double SQUARE_RAD_TO_DEG = 180.0 / 3.14159265358979323846;
 
 }  // namespace
 
-SquareAngleAdjustment::SquareAngleAdjustment(
-    Robot& _robot)
-  : robot(_robot)
+SquareAngleAdjustment::SquareAngleAdjustment(Robot& _robot) : robot(_robot)
 {
-  LOG_CREATE(
-      "SquareAngleAdjustment");
+  LOG_CREATE("SquareAngleAdjustment");
 }
 
 SquareAngleAdjustment::~SquareAngleAdjustment()
 {
-  LOG_DESTROY(
-      "SquareAngleAdjustment");
+  LOG_DESTROY("SquareAngleAdjustment");
 }
 
-SquareAngleAdjustment::Result
-SquareAngleAdjustment::calculate(
+SquareAngleAdjustment::Result SquareAngleAdjustment::calculate(
     const CameraServer::SquareDetectorRequest& request)
 {
-  Result result {};
+  Result result{};
 
-  Logger::info(
-      "SquareAngleAdjustment: "
-      "calculate CALLED");
+  Logger::info("SquareAngleAdjustment: "
+               "calculate CALLED");
 
   // =====================================================
   // 1. SocketClient取得
   // =====================================================
 
-  SocketClient& client
-      = robot.getCameraSocketClientInstance();
+  SocketClient& client = robot.getCameraSocketClientInstance();
 
-  CameraServer::SquareDetectorResponse response {};
+  CameraServer::SquareDetectorResponse response{};
 
   // =====================================================
   // 2. 正方形検出要求
   // =====================================================
 
-  const bool success
-      = client.executeSquareDetection(
-          request,
-          response);
+  const bool success = client.executeSquareDetection(request, response);
 
   if(!success) {
-
-    Logger::warning(
-        "SquareAngleAdjustment: "
-        "square detection communication failed");
+    Logger::warning("SquareAngleAdjustment: "
+                    "square detection communication failed");
 
     return result;
   }
@@ -89,10 +65,8 @@ SquareAngleAdjustment::calculate(
   // =====================================================
 
   if(!response.wasDetected) {
-
-    Logger::warning(
-        "SquareAngleAdjustment: "
-        "square not detected");
+    Logger::warning("SquareAngleAdjustment: "
+                    "square not detected");
 
     return result;
   }
@@ -104,115 +78,84 @@ SquareAngleAdjustment::calculate(
   // カメラサーバー側で実施する。
   // =====================================================
 
-  const double centerX
-      = response.centerX;
+  const double centerX = response.centerX;
 
-  const double centerY
-      = response.centerY;
+  const double centerY = response.centerY;
 
-  const double forwardDistance
-      = response.forwardDistance;
+  const double forwardDistance = response.forwardDistance;
 
-  const double lateralDistance
-      = response.lateralDistance;
+  const double lateralDistance = response.lateralDistance;
 
   // =====================================================
   // 5. 補正角度
   // =====================================================
 
-  const double correctionAngle
-      = calculateCorrectionAngle(
-          forwardDistance,
-          lateralDistance);
+  const double correctionAngle = calculateCorrectionAngle(forwardDistance, lateralDistance);
 
   // =====================================================
   // 6. 正方形までの直線距離
+  //
+  // 前方距離と横方向距離から
+  // 正方形までの実際の直線距離を求める。
+  //
+  // 距離補正は行わず、
+  // 計算された距離をそのまま使用する。
   // =====================================================
 
-  const double calculatedDistance
-      = std::hypot(
-          forwardDistance,
-          lateralDistance);
-
-  /*
-   * 少し手前で停止させるため、
-   * 補正係数を掛ける。
-   */
-  const double straightDistance
-      = calculatedDistance
-        * DISTANCE_SCALE;
+  const double straightDistance = std::hypot(forwardDistance, lateralDistance);
 
   // =====================================================
   // 7. 結果格納
   // =====================================================
 
-  result.wasDetected
-      = true;
+  result.wasDetected = true;
 
-  result.centerX
-      = centerX;
+  result.centerX = centerX;
 
-  result.centerY
-      = centerY;
+  result.centerY = centerY;
 
-  result.forwardDistance
-      = forwardDistance;
+  result.forwardDistance = forwardDistance;
 
-  result.lateralDistance
-      = lateralDistance;
+  result.lateralDistance = lateralDistance;
 
-  result.correctionAngle
-      = correctionAngle;
+  result.correctionAngle = correctionAngle;
 
-  result.straightDistance
-      = straightDistance;
+  result.straightDistance = straightDistance;
 
   // =====================================================
   // 8. ログ
   // =====================================================
 
-  Logger::printfLog(
-      Logger::INFO,
-      "SquareAngleAdjustment: "
-      "pixel=(%.2f, %.2f)",
-      centerX,
-      centerY);
+  Logger::printfLog(Logger::INFO,
+                    "SquareAngleAdjustment: "
+                    "pixel=(%.2f, %.2f)",
+                    centerX, centerY);
 
-  Logger::printfLog(
-      Logger::INFO,
-      "SquareAngleAdjustment: "
-      "forward=%.2f mm "
-      "lateral=%.2f mm",
-      forwardDistance,
-      lateralDistance);
+  Logger::printfLog(Logger::INFO,
+                    "SquareAngleAdjustment: "
+                    "forward=%.2f mm "
+                    "lateral=%.2f mm",
+                    forwardDistance, lateralDistance);
 
-  Logger::printfLog(
-      Logger::INFO,
-      "SquareAngleAdjustment: "
-      "angle=%.2f deg",
-      correctionAngle);
+  Logger::printfLog(Logger::INFO,
+                    "SquareAngleAdjustment: "
+                    "angle=%.2f deg",
+                    correctionAngle);
 
-  Logger::printfLog(
-      Logger::INFO,
-      "SquareAngleAdjustment: "
-      "calculatedDistance=%.2f mm "
-      "straightDistance=%.2f mm",
-      calculatedDistance,
-      straightDistance);
+  Logger::printfLog(Logger::INFO,
+                    "SquareAngleAdjustment: "
+                    "straightDistance=%.2f mm",
+                    straightDistance);
 
   return result;
 }
 
-double
-SquareAngleAdjustment::calculateCorrectionAngle(
-    double forwardDistance,
-    double lateralDistance) const
+double SquareAngleAdjustment::calculateCorrectionAngle(double forwardDistance,
+                                                       double lateralDistance) const
 {
   if(forwardDistance <= 0.0) {
-
-    Logger::warning(
-        "SquareAngleAdjustment: "
-        "invalid forward distance");
+    Logger::warning("SquareAngleAdjustment: "
+                    "invalid forward distance");
 
     return 0.0;
   }
@@ -224,9 +167,5 @@ SquareAngleAdjustment::calculateCorrectionAngle(
    * lateral < 0
    *   -> 正方形が左側
    */
-  return
-      std::atan2(
-          lateralDistance,
-          forwardDistance)
-      * SQUARE_RAD_TO_DEG;
+  return std::atan2(lateralDistance, forwardDistance) * SQUARE_RAD_TO_DEG;
 }

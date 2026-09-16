@@ -43,13 +43,16 @@ namespace CameraServer {
    * @brief スナップショット撮影アクションのリクエストデータ構造
    */
   struct SnapshotActionRequest {
+    /**
+     * @brief スナップショットコマンド
+     */
     Command command =
         Command::SNAPSHOT;
 
     /**
      * @brief 保存するファイル名
      */
-    char fileName[64];
+    char fileName[64] = {};
   };
 
   /**
@@ -59,7 +62,7 @@ namespace CameraServer {
     /**
      * @brief 撮影が成功したか
      */
-    bool success;
+    bool success = false;
   };
 
   // =========================================================
@@ -79,10 +82,25 @@ namespace CameraServer {
    * @brief 矩形領域データ
    */
   struct RectData {
-    int32_t x = 0;       // 左上のx座標
-    int32_t y = 0;       // 左上のy座標
-    int32_t width = 0;   // 幅
-    int32_t height = 0;  // 高さ
+    /**
+     * @brief 左上X座標
+     */
+    int32_t x = 0;
+
+    /**
+     * @brief 左上Y座標
+     */
+    int32_t y = 0;
+
+    /**
+     * @brief 幅
+     */
+    int32_t width = 0;
+
+    /**
+     * @brief 高さ
+     */
+    int32_t height = 0;
   };
 
   /**
@@ -178,7 +196,7 @@ namespace CameraServer {
     /**
      * @brief HSV範囲
      */
-    HSVRangeData hsvRanges[MAX_HSV_RANGES];
+    HSVRangeData hsvRanges[MAX_HSV_RANGES] = {};
 
     /**
      * @brief 検出対象ROI
@@ -279,21 +297,29 @@ namespace CameraServer {
      * @brief SquareDetectorの追跡状態をリセットするか
      *
      * true:
-     *   今回の正方形検出前に、
+     *   今回の正方形検出前に
      *   previous detectionなどの追跡状態を破棄する。
      *
      * false:
      *   前回検出位置を引き継いで追跡する。
      *
-     * Straightを挟んだ後の最初の正方形検出ではtrueを指定し、
-     * 同じSquareAngleAdjustment内の2回目以降の検出では
-     * falseを指定する。
+     * 現在のSquareDetectorで追跡機能を使用していない場合は、
+     * この値は実質使用しない。
      */
     bool resetTracking = false;
   };
 
   /**
    * @brief 正方形検出レスポンス
+   *
+   * カメラサーバー側で、
+   *
+   * 1. 正方形検出
+   * 2. 中心座標計算
+   * 3. ホモグラフィ変換
+   * 4. 前方距離・横方向距離計算
+   *
+   * まで行い、その結果を走行体側へ送信する。
    */
   struct SquareDetectorResponse {
     /**
@@ -303,8 +329,42 @@ namespace CameraServer {
 
     /**
      * @brief 正方形の4頂点
+     *
+     * 0: 左上
+     * 1: 右上
+     * 2: 右下
+     * 3: 左下
      */
     PointData corners[SQUARE_CORNER_COUNT] = {};
+
+    /**
+     * @brief 画像上の正方形中心X座標[px]
+     */
+    double centerX = 0.0;
+
+    /**
+     * @brief 画像上の正方形中心Y座標[px]
+     */
+    double centerY = 0.0;
+
+    /**
+     * @brief カメラ直下の床点から見た前方距離[mm]
+     *
+     * カメラサーバー側で
+     * ホモグラフィ変換結果から計算する。
+     */
+    double forwardDistance = 0.0;
+
+    /**
+     * @brief カメラ正面中心から見た横方向距離[mm]
+     *
+     * 左側:
+     *   負
+     *
+     * 右側:
+     *   正
+     */
+    double lateralDistance = 0.0;
   };
 
 }  // namespace CameraServer

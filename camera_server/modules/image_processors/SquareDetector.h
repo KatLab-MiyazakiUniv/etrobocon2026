@@ -7,21 +7,56 @@
 #ifndef SQUARE_DETECTOR_H
 #define SQUARE_DETECTOR_H
 
-#include <vector>
-
 #include <opencv2/opencv.hpp>
 
-#include "BoundingBoxDetector.h"
+#include "CameraCapture.h"
 #include "Logger.h"
-#include "SystemInfo.h"
+#include "SocketProtocol.h"
 
-class SquareDetector : public BoundingBoxDetector {
+/**
+ * @brief 正方形検出結果
+ */
+struct BoundingBoxDetectionResult {
+  /**
+   * @brief 正方形を検出できたか
+   */
+  bool wasDetected = false;
+
+  /**
+   * @brief 左上
+   */
+  cv::Point topLeft;
+
+  /**
+   * @brief 右上
+   */
+  cv::Point topRight;
+
+  /**
+   * @brief 右下
+   */
+  cv::Point bottomRight;
+
+  /**
+   * @brief 左下
+   */
+  cv::Point bottomLeft;
+};
+
+/**
+ * @brief 正方形を画像から検出するクラス
+ *
+ * 各detect呼び出しは独立して処理する。
+ * 前回の正方形検出位置は使用しない。
+ */
+class SquareDetector {
  public:
   /**
    * @brief コンストラクタ
-   * @param roi 注目領域
+   *
+   * @param _roi 正方形検出対象領域
    */
-  explicit SquareDetector(const cv::Rect& roi);
+  explicit SquareDetector(const cv::Rect& _roi);
 
   /**
    * @brief デストラクタ
@@ -29,80 +64,87 @@ class SquareDetector : public BoundingBoxDetector {
   ~SquareDetector();
 
   /**
-   * @brief フレームから正方形を検出
-   * @param frame 入力フレーム
-   * @param result 検出結果
+   * @brief 正方形を検出する
+   *
+   * 前回の検出結果は使用せず、
+   * 渡されたフレームだけから正方形を検出する。
+   *
+   * @param frame 入力画像
+   * @param result 正方形検出結果
    */
-  void detect(
-      const cv::Mat& frame,
-      BoundingBoxDetectionResult& result) override;
+  void detect(const cv::Mat& frame, BoundingBoxDetectionResult& result);
 
   /**
-   * @brief ROIを検証したうえで設定する
-   * @param _roi 設定するROI
+   * @brief ROIを設定する
+   *
+   * 指定されたROIが画像範囲外の場合は、
+   * 画像内に収まるように補正する。
+   *
+   * @param _roi 新しいROI
    */
   void setValidatedRoi(const cv::Rect& _roi);
 
  private:
   /**
-   * @brief フレーム全体に対するROI
+   * @brief 正方形検出対象ROI
    */
   cv::Rect roi;
 
   /**
-   * @brief 検出対象とする最小輪郭面積
+   * @brief 最小輪郭面積
+   *
+   * この値より小さい輪郭は
+   * ノイズとして除外する。
    */
   static constexpr double MIN_CONTOUR_AREA = 100.0;
 
   /**
-   * @brief 正方形らしさの最小値
+   * @brief 正方形として許容する最小縦横比
    *
    * min(width, height) / max(width, height)
-   */
-  static constexpr double MIN_RATIO = 0.5;
-
-  /**
-   * @brief 外接矩形に対する輪郭面積の最小割合
-   */
-  static constexpr double MIN_FILL_RATIO = 0.75;
-
-  /**
-   * @brief 円形度の最大値
    *
-   * 円は1.0に近く、
-   * 正方形は約0.785。
-   */
-  static constexpr double MAX_CIRCULARITY = 0.88;
-
-  /**
-   * @brief 前フレームから許容する最大中心移動量[pixel]
+   * 1.0に近いほど正方形。
    *
-   * これを超えて移動した候補は誤検出とみなす。
+   * 例:
+   *
+   * 1.00
+   *   完全な正方形
+   *
+   * 0.80
+   *   多少変形した正方形も許可
    */
-  static constexpr double MAX_CENTER_MOVE = 80.0;
+  static constexpr double MIN_RATIO = 0.75;
 
   /**
-   * @brief 正方形を見失った場合に保持する最大フレーム数
+   * @brief 外接矩形に対する最低面積割合
+   *
+   * contourArea / rotatedRectArea
+   *
+   * 値が大きいほど、
+   * 外接矩形をしっかり埋めている形だけを
+   * 正方形として扱う。
    */
-  static constexpr int MAX_MISSED_FRAMES = 5;
+  static constexpr double MIN_FILL_RATIO = 0.70;
 
   /**
-   * @brief 前回検出した正方形の中心位置
+   * @brief 許容する最大円形度
+   *
+   * 円形度:
+   *
+   * 4 * PI * area / perimeter^2
+   *
+   * 円:
+   *   約1.0
+   *
+   * 正方形:
+   *   約0.785
+   *
+   * 円に近すぎる輪郭を除外する。
    */
-  cv::Point2f previousCenter;
+  static constexpr double MAX_CIRCULARITY = 0.92;
 
   /**
-   * @brief 前回の正方形検出結果を保持しているか
-   */
-  bool hasPreviousDetection;
-
-  /**
-   * @brief 正方形を連続して見失ったフレーム数
-   */
-  int missedFrames;
-
-  /**
-   * @brief ROIがフレーム内に収まるように補正する
+   * @brief ROIパラメータを画像範囲内に補正する
    */
   void validateParameters();
 };

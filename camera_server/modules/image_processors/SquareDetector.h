@@ -59,12 +59,12 @@ class SquareDetector : public BoundingBoxDetector {
    *
    * min(width, height) / max(width, height)
    */
-  static constexpr double MIN_RATIO = 0.6;
+  static constexpr double MIN_RATIO = 0.5;
 
   /**
    * @brief 外接矩形に対する輪郭面積の最小割合
    */
-  static constexpr double MIN_FILL_RATIO = 0.82;
+  static constexpr double MIN_FILL_RATIO = 0.75;
 
   /**
    * @brief 円形度の最大値

@@ -248,7 +248,7 @@ void EtRobocon2026::start()
   const Pid::PidGain rotationPid = {
       1.3,
       1.0,
-      0.05
+      0.02
   };
 
   /**

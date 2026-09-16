@@ -75,14 +75,14 @@ class SquareDetector {
   /**
    * @brief 外接矩形に対する最低面積割合
    */
-  static constexpr double MIN_FILL_RATIO = 0.70;
+  static constexpr double MIN_FILL_RATIO = 0.60;
 
   /**
    * @brief 許容する最大円形度
    *
    * 円に近すぎる輪郭を除外する。
    */
-  static constexpr double MAX_CIRCULARITY = 0.92;
+  static constexpr double MAX_CIRCULARITY = 0.82;
 
   /**
    * @brief ROIパラメータを画像範囲内に補正する

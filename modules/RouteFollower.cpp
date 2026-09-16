@@ -52,8 +52,7 @@ namespace {
    * QRの250mm手前から検出する。
    *
    * QR①からQR②までの距離も250mmなので、
-   * QR①到達地点がそのまま
-   * QR②の250mm手前の検出地点となる。
+   * QR①到達位置がそのままQR②検出位置になる。
    */
   constexpr double SQUARE_DETECTION_DISTANCE = 250.0;
 
@@ -106,7 +105,7 @@ void RouteFollower::run(const std::vector<RouteState>& route)
     const double rotationAngle = calculateRotationAngle(from.direction, to.direction);
 
     /*
-     * この区間の開始時に回頭したかを保存する。
+     * この区間開始時に回頭したかを保存する。
      *
      * ゲート直前回頭判定に使用する。
      */
@@ -421,7 +420,7 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
   // =====================================================
   // QR①位置
   //
-  // ゲート125mm手前
+  // ゲート中心の125mm手前
   // =====================================================
 
   double distanceToQr1 = distanceToGate - QR_TO_GATE_DISTANCE;
@@ -435,28 +434,17 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
   //
   // QR①の250mm手前
   //
-  // QR①はゲート中心の125mm手前。
-  //
-  // したがって、
+  // QR①はゲート中心の125mm手前なので、
   //
   // 125 + 250 = 375mm
   //
-  // ゲート中心の375mm手前で
-  // QR①を検出する。
+  // ゲート中心の375mm手前で検出する。
   // =====================================================
 
   const double distanceToFirstDetection = distanceToQr1 - SQUARE_DETECTION_DISTANCE;
 
   // =====================================================
-  // ゲート直前回頭判定
-  //
-  // 1. 区間開始時に回頭している
-  //
-  // 2. QR①を250mm手前から見るだけの
-  //    距離を確保できない
-  //
-  // この両方を満たした場合、
-  // QR①補正をスキップする。
+  // QR①補正スキップ判定
   // =====================================================
 
   const bool skipFirstCorrection = rotatedAtSegmentStart && distanceToFirstDetection <= 0.0;
@@ -470,15 +458,7 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
                     skipFirstCorrection ? 1 : 0);
 
   // =====================================================
-  // 1回目の補正情報
-  // =====================================================
-
-  bool firstDetected = false;
-
-  double firstAngle = 0.0;
-
-  // =====================================================
-  // QR①補正を行う場合
+  // QR①補正
   // =====================================================
 
   if(!skipFirstCorrection) {
@@ -511,24 +491,24 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
 
     SquareAngleAdjustment::Result firstResult{};
 
-    firstDetected = detectSquare(firstResult);
+    const bool firstDetected = detectSquare(firstResult);
 
     // ===================================================
     // QR①検出成功
     // ===================================================
 
     if(firstDetected) {
-      firstAngle = firstResult.correctionAngle;
+      const double firstAngle = firstResult.correctionAngle;
 
       Logger::printfLog(Logger::INFO,
                         "RouteFollower: "
                         "QR1 correction angle=%.2f deg",
                         firstAngle);
 
-      // QR①方向へ向く
+      // QR①方向へ回頭
       rotateForSquare(firstAngle);
 
-      // QR①方向へ進む
+      // QR①まで進む
       Logger::printfLog(Logger::INFO,
                         "RouteFollower: "
                         "Move to QR1 %.2f mm",
@@ -538,9 +518,6 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
 
       // =================================================
       // 元の進行方向へ戻す
-      //
-      // 現在はQR1補正後に元の方向へ戻してから
-      // QR2を検出する。
       // =================================================
 
       Logger::printfLog(Logger::INFO,
@@ -561,24 +538,18 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
                       "-> straight 250mm");
 
       /*
-       * QR①の250mm手前で検出しているため、
-       * 250mm直進するとQR①位置へ到達する。
-       *
-       * QR①位置はそのまま
-       * QR②の250mm手前の位置でもある。
+       * QR①の250mm手前なので、
+       * 250mm通常直進してQR①位置まで進む。
        */
       straight(SQUARE_DETECTION_DISTANCE);
     }
 
     // ===================================================
-    // QR②検出前の追加直進は行わない
+    // QR①位置 = QR②検出位置
     //
-    // QR①とQR②の間隔 = 250mm
-    //
-    // QR②検出距離      = 250mm
-    //
-    // よってQR①位置がそのまま
-    // QR②検出位置になる。
+    // QR①とQR②の距離が250mmで、
+    // QR②を250mm手前から検出するため、
+    // 追加直進は行わない。
     // ===================================================
 
     Logger::info("RouteFollower: "
@@ -587,10 +558,7 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
   }
 
   // =====================================================
-  // ゲート直前で回頭した場合
-  //
-  // QR①補正をスキップする。
-  // QR②検出位置へ直接移動する。
+  // QR①をスキップする場合
   // =====================================================
 
   else {
@@ -598,20 +566,17 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
                     "===== QR1 SKIPPED =====");
 
     /*
-     * QR②位置:
+     * QR②位置
      *
-     *   ゲート中心 + 125mm
+     *   ゲート中心 +125mm
      *
-     * QR②検出位置:
+     * QR②検出位置
      *
-     *   QR② - 250mm
-     *
-     * = ゲート中心
      *   +125 -250
      *
      * = ゲート中心 -125mm
      *
-     * つまりQR①位置。
+     * = QR①位置
      */
 
     double distanceToSecondDetection
@@ -634,8 +599,6 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
 
   // =====================================================
   // QR②検出
-  //
-  // QR②の250mm手前から検出する。
   // =====================================================
 
   Logger::info("RouteFollower: "
@@ -657,10 +620,10 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
                       "QR2 correction angle=%.2f deg",
                       secondAngle);
 
-    // QR②方向へ向く
+    // QR②方向へ回頭
     rotateForSquare(secondAngle);
 
-    // QR②方向へ進む
+    // QR②まで進む
     Logger::printfLog(Logger::INFO,
                       "RouteFollower: "
                       "Move to QR2 %.2f mm",
@@ -671,16 +634,17 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
 
   // =====================================================
   // QR②検出失敗
+  //
+  // 回頭は行わない。
+  //
+  // QR②の250mm手前にいるため、
+  // そのまま250mm通常直進する。
   // =====================================================
 
   else {
     Logger::warning("RouteFollower: "
-                    "QR2 detection failed");
-
-    /*
-     * QR②の250mm手前から検出しているため、
-     * 検出失敗時はそのまま250mm進む。
-     */
+                    "QR2 detection failed "
+                    "-> no rotation");
 
     Logger::printfLog(Logger::INFO,
                       "RouteFollower: "

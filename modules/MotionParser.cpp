@@ -115,7 +115,9 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
       Logger::printfLog(Logger::ERROR, "%s:%d Command %s は未定義です", commandFilePath.c_str(),
                         lineNum, motionName.c_str());
     } else {
-      Logger::printfLog(Logger::ERROR, "%s:%d Command %s ID=%s の生成に失敗しました。参照先のコマンド・ID・設定を確認してください",
+      Logger::printfLog(Logger::ERROR,
+                        "%s:%d Command %s ID=%s "
+                        "の生成に失敗しました。参照先のコマンド・ID・設定を確認してください",
                         commandFilePath.c_str(), lineNum, motionName.c_str(), motionId.c_str());
     }
 
@@ -169,11 +171,14 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
       return nullptr;
     }
     double target;
-    try { target = fromString<double>(params[3]); }
-    catch(const std::invalid_argument&) { return nullptr; }
+    try {
+      target = fromString<double>(params[3]);
+    } catch(const std::invalid_argument&) {
+      return nullptr;
+    }
     if(!std::isfinite(target)) return nullptr;
     auto axis = params[2] == "X" ? ProjectedDistanceCondition::Axis::HORIZONTAL
-                                  : ProjectedDistanceCondition::Axis::VERTICAL;
+                                 : ProjectedDistanceCondition::Axis::VERTICAL;
     return make_unique<ProjectedDistanceCondition>(robot, mileage, axis, target);
   }
   CONDITION_COMMAND cond = convertCondition(params[0]);
@@ -314,15 +319,19 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
         if(motionParams[i] == "ETZumoFinish" || motionParams[i] == "ResetAzimuth") return nullptr;
         // 基準を設定するETZumoExitは先頭にのみ置ける。
         if(motionParams[i] == "ETZumoExit" && i != 2) return nullptr;
-        auto params = extractParamsFromID(MOTIONS_PATH + motionParams[i] + ".csv", motionParams[i + 1]);
-        auto conditionParams = extractParamsFromID(CONDITIONS_PATH + motionParams[i + 2] + ".csv", motionParams[i + 3]);
+        auto params
+            = extractParamsFromID(MOTIONS_PATH + motionParams[i] + ".csv", motionParams[i + 1]);
+        auto conditionParams = extractParamsFromID(CONDITIONS_PATH + motionParams[i + 2] + ".csv",
+                                                   motionParams[i + 3]);
         if(params.empty() || conditionParams.empty()) return nullptr;
         auto childCondition = createConditionInstance(robot, conditionParams, mileage);
         if(!childCondition) return nullptr;
         if(motionParams[i] != "ETZumoExit" && conditionParams[0] != "ProjectedDistance") {
-          childCondition = make_unique<ProjectedDistanceCondition>(robot, mileage, std::move(childCondition));
+          childCondition
+              = make_unique<ProjectedDistanceCondition>(robot, mileage, std::move(childCondition));
         }
-        unique_ptr<BaseMotion> child(createMotionInstance(robot, params, std::move(childCondition), mileage));
+        unique_ptr<BaseMotion> child(
+            createMotionInstance(robot, params, std::move(childCondition), mileage));
         if(!child) return nullptr;
         children.push_back(std::move(child));
       }
@@ -341,7 +350,8 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       // 必要な列数と目標距離を確認する。距離は有限の正の値のみ受け付ける。
       if(motionParams.size() != 8 && motionParams.size() != 9) {
         Logger::printfLog(Logger::ERROR,
-                          "[MotionParser] ETZumoExit: 動作パラメータは8列（任意の到着色を含む場合9列）必要です（実際: %zu列）",
+                          "[MotionParser] ETZumoExit: "
+                          "動作パラメータは8列（任意の到着色を含む場合9列）必要です（実際: %zu列）",
                           motionParams.size());
         return nullptr;
       }

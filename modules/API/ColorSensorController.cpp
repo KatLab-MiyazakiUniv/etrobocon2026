@@ -44,7 +44,6 @@ const char* ColorSensorController::convertColorToString(const COLOR& color)
 
 ColorSensorController::COLOR ColorSensorController::convertHsvToColor(HSV& hsv)
 {
-  // 暗い領域では色相・彩度が不安定になるため、先に明度で判定する。
   // 明度が極端に低ければ、黒を返す
   if(hsv.v < BLACK_LIMIT_BORDER) return COLOR::BLACK;
   // 明度が極端に高ければ、白を返す
@@ -58,7 +57,6 @@ ColorSensorController::COLOR ColorSensorController::convertHsvToColor(HSV& hsv)
     // 明度が高ければ、白を返す
     return COLOR::WHITE;
   }
-  // 黒と有彩色の間は判定保留。灰色を黒や青に強制分類しない。
   // この判定保留は彩度37以上の暗色だけに適用する。
   if(hsv.v < CHROMATIC_VALUE_BORDER) return COLOR::NONE;
   // 各色相の境界によって、色を判別する

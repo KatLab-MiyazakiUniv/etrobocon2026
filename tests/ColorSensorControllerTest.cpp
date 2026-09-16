@@ -103,14 +103,14 @@ namespace etrobocon2026_test {
               ColorSensorController::convertHsvToColor(defaultRedValue));
   }
 
-
   TEST(ColorSensorControllerTest, DarkBlueHueDoesNotBecomeBlue)
   {
     ColorSensorController::HSV black = { 240, 80, 29 };
     ColorSensorController::HSV uncertain = { 240, 80, 30 };
     ColorSensorController::HSV blue = { 240, 80, 80 };
     EXPECT_EQ(ColorSensorController::COLOR::BLACK, ColorSensorController::convertHsvToColor(black));
-    EXPECT_EQ(ColorSensorController::COLOR::NONE, ColorSensorController::convertHsvToColor(uncertain));
+    EXPECT_EQ(ColorSensorController::COLOR::NONE,
+              ColorSensorController::convertHsvToColor(uncertain));
     EXPECT_EQ(ColorSensorController::COLOR::BLUE, ColorSensorController::convertHsvToColor(blue));
   }
 

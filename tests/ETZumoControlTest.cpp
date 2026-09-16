@@ -11,9 +11,9 @@
 namespace etrobocon2026_test {
   class AbsoluteRotationProbe : public AbsoluteRotation {
    public:
+    using AbsoluteRotation::AbsoluteRotation;
     using AbsoluteRotation::executeStep;
     using AbsoluteRotation::prepare;
-    using AbsoluteRotation::AbsoluteRotation;
     void target(double angle) { targetAngle = angle; }
   };
 
@@ -23,7 +23,7 @@ namespace etrobocon2026_test {
     SocketClient client(network);
     Robot robot(client);
     AbsoluteRotationProbe rotation(robot, std::make_unique<RepeatCountCondition>(robot, 1),
-                           { 0.001, 0, 0 }, 0);
+                                   { 0.001, 0, 0 }, 0);
     for(double angle : { 5.0, -5.0 }) {
       robot.getIMUControllerInstance().resetAzimuth();
       rotation.prepare();

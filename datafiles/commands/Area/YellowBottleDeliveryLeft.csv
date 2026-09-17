@@ -1,7 +1,7 @@
 動作コマンド名,動作ID,条件コマンド名,条件ID
 
 #QR1検出位置まで直進
-RelativeRotation,004,RelativeAngle,-038
+RelativeRotation,-038,RelativeAngle,-038
 Straight,001,Distance,065
 
 # QR1検出
@@ -17,7 +17,7 @@ Snapshot,015,RepeatCount,001
 
 
 #QR1取得後の直線
-RelativeRotation,005,RelativeAngle,-050
+RelativeRotation,-050,RelativeAngle,-050
 Snapshot,clearBuffer1,RepeatCount,001
 
 #ライン上を沿って走らせるための低速走行
@@ -47,19 +47,13 @@ Snapshot,025,RepeatCount,001
 
 
 
-#黄色まで移動
-RelativeRotation,007,RelativeAngle,-050
-#1度目の青色検知で止まる
+#赤色まで移動
+RelativeRotation,-050,RelativeAngle,-050
+Straight,001,Distance,090
+Straight,-001,Distance,070
+RelativeRotation,-025,RelativeAngle,-025
 
-Straight,001,Distance,035
-Straight,-001,Distance,035
-RelativeRotation,002,RelativeAngle,-025
 #ETラリーにつなげる
-LineTrace,010,Distance,020
-
-
-#RelativeRotation,004,RelativeAngle,-035
-#CameraTracking,LBY,Distance,035
-#Straight,004,Distance,005
-
-#CameraTracking,000,Distance,000
+CameraTracking,LBS007,
+Straight,001,Distance,060
+RelativeRotation,-090,RelativeAngle,-090

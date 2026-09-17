@@ -37,7 +37,7 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "ProjectedDistanceCondition.h"
 #include "ETZumoExitCondition.h"
 #include "UltraSonicCondition.h"
-#include "./../common/ImageProcessingColor.h"
+#include "ImageProcessingColor.h"
 
 class MotionParser {
  public:
@@ -58,6 +58,7 @@ class MotionParser {
   // 条件コマンド名を持つ列挙型クラス
   enum class CONDITION_COMMAND {
     DISTANCE,
+    PROJECTED_DISTANCE,
     ABSOLUTE_ANGLE,
     RELATIVE_ANGLE,
     SENSOR_COLOR,
@@ -111,7 +112,8 @@ class MotionParser {
   static BaseMotion* createMotionInstance(Robot& robot,
                                           const std::vector<std::string>& motionParams,
                                           std::unique_ptr<BaseContinuationCondition> condition,
-                                          std::shared_ptr<ProjectedMileage> mileage = nullptr);
+                                          std::shared_ptr<ProjectedMileage> sharedMileage
+                                          = nullptr);
 
   /**
    * @brief 文字列を列挙型MOTION_COMMANDに変換する

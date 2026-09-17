@@ -55,6 +55,8 @@ namespace etrobocon2026_test {
       RelativeRotationProbe rotation(robot, std::make_unique<RepeatCountCondition>(robot, 1),
                                      { 1.0, 0, 0 }, angle);
       rotation.prepare();
+      // ダミーIMUは読み取りごとに1度進むため、準備時と同じ方位に戻す。
+      robot.getIMUControllerInstance().resetAzimuth();
       rotation.executeStep();
       EXPECT_EQ(-angle, robot.getWheelMotorControllerInstance().getRightPower());
       EXPECT_EQ(angle, robot.getWheelMotorControllerInstance().getLeftPower());

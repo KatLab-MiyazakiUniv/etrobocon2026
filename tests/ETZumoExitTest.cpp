@@ -48,7 +48,7 @@ namespace etrobocon2026_test {
     // 次の直進動作を準備しても799mmを保持し、800mmに到達した時点で終了する。
     ETZumoExitCondition straight(robot, mileage, 800.0);
     straight.prepare();
-    EXPECT_DOUBLE_EQ(mileage->getDistance(), 799.0);
+    EXPECT_DOUBLE_EQ(mileage->getHorizontalDistance(), 799.0);
     EXPECT_TRUE(straight.shouldContinue());
     mileage->reset(current - 800.0, 0.0);
     mileage->update(current, 0.0);

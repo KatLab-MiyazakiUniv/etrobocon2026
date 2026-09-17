@@ -54,9 +54,14 @@ void ProjectedMileage::update(double mileage, double angle)
   previousAngle = angle;
 }
 
-double ProjectedMileage::getDistance() const
+double ProjectedMileage::getHorizontalDistance() const
 {
   return distance;
+}
+
+double ProjectedMileage::getVerticalDistance() const
+{
+  return verticalDistance;
 }
 
 bool ProjectedMileage::isValid() const

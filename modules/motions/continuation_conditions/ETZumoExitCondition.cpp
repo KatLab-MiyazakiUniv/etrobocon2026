@@ -58,10 +58,10 @@ bool ETZumoExitCondition::shouldContinue()
   }
   if(requireBoth) {
     // 距離未達の間は色を数えず、到達後の連続検知で停止する。
-    return mileage->getDistance() < targetDistance
+    return mileage->getHorizontalDistance() < targetDistance
            || (continuationCondition && continuationCondition->shouldContinue());
   }
   // 共通の距離に到達したら終了する。未到達なら子動作固有の条件も確認する。
-  return mileage->getDistance() < targetDistance
+  return mileage->getHorizontalDistance() < targetDistance
          && (!continuationCondition || continuationCondition->shouldContinue());
 }

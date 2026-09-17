@@ -44,16 +44,6 @@ bool ETZumoExit::canStart()
   return true;
 }
 
-void ETZumoExit::prepare()
-{
-  robot.getWheelMotorControllerInstance().stopBoth();
-  // この向きを0度とし、追尾開始前の車輪位置を距離計測の起点にする。
-  robot.getIMUControllerInstance().resetAzimuth();
-  mileage->reset(Mileage::calculateMileage(robot.getWheelMotorControllerInstance().getRightCount(),
-                                           robot.getWheelMotorControllerInstance().getLeftCount()),
-                 0.0);
-}
-
 void ETZumoExit::executeStep()
 {
   // リストは追尾→回頭→直進の順。計測異常時は後続の子動作を実行しない。

@@ -28,7 +28,7 @@ class ETZumoExit : public BaseMotion {
   /**
    * @brief デストラクタ
    */
-  ~ETZumoExit() override;
+  ~ETZumoExit();
 
  protected:
   /**
@@ -38,13 +38,10 @@ class ETZumoExit : public BaseMotion {
   bool canStart() override;
 
   /**
-   * @brief 方位を0度にリセットし、距離計測の起点を設定する
-   */
-  void prepare() override;
-  /**
    * @brief 追尾、回頭、直進を順に実行する
    */
   void executeStep() override;
+
   /**
    * @brief モーターを停止し、基準方向の移動距離を記録する
    */

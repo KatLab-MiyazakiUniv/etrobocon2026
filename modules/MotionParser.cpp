@@ -165,24 +165,25 @@ vector<string> MotionParser::extractParamsFromID(const string& filePath, const s
 unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
     Robot& robot, const vector<string>& params, shared_ptr<ProjectedMileage> mileage)
 {
-  if(!params.empty() && params[0] == "ProjectedDistance") {
-    if(!mileage || params.size() != 4 || (params[2] != "X" && params[2] != "Y")) {
-      Logger::error("ProjectedDistance: ETZumoFinish内で軸X/Yと目標座標を指定してください");
-      return nullptr;
-    }
-    double target;
-    try {
-      target = fromString<double>(params[3]);
-    } catch(const std::invalid_argument&) {
-      return nullptr;
-    }
-    if(!std::isfinite(target)) return nullptr;
-    auto axis = params[2] == "X" ? ProjectedDistanceCondition::Axis::HORIZONTAL
-                                 : ProjectedDistanceCondition::Axis::VERTICAL;
-    return make_unique<ProjectedDistanceCondition>(robot, mileage, axis, target);
-  }
+  if(params.empty()) return nullptr;
   CONDITION_COMMAND cond = convertCondition(params[0]);
   switch(cond) {
+    case CONDITION_COMMAND::PROJECTED_DISTANCE: {
+      if(!mileage || params.size() != 4 || (params[2] != "X" && params[2] != "Y")) {
+        Logger::error("ProjectedDistance: ETZumoFinish内で軸X/Yと目標座標を指定してください");
+        return nullptr;
+      }
+      double target;
+      try {
+        target = fromString<double>(params[3]);
+      } catch(const std::invalid_argument&) {
+        return nullptr;
+      }
+      if(!std::isfinite(target)) return nullptr;
+      auto axis = params[2] == "X" ? ProjectedDistanceCondition::Axis::HORIZONTAL
+                                   : ProjectedDistanceCondition::Axis::VERTICAL;
+      return make_unique<ProjectedDistanceCondition>(robot, mileage, axis, target);
+    }
     case CONDITION_COMMAND::DISTANCE: {
       double targetDistance = fromString<double>(params[2]);
       return make_unique<DistanceCondition>(robot, targetDistance);
@@ -562,6 +563,7 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
   // 条件コマンド文字列と、それに対応する列挙型CONDITION_COMMANDのマッピングを定義
   static const unordered_map<string, CONDITION_COMMAND> conditionMap
       = { { "Distance", CONDITION_COMMAND::DISTANCE },
+          { "ProjectedDistance", CONDITION_COMMAND::PROJECTED_DISTANCE },
           { "AbsoluteAngle", CONDITION_COMMAND::ABSOLUTE_ANGLE },
           { "RelativeAngle", CONDITION_COMMAND::RELATIVE_ANGLE },
           { "SensorColor", CONDITION_COMMAND::SENSOR_COLOR },

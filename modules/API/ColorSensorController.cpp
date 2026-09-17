@@ -57,7 +57,7 @@ ColorSensorController::COLOR ColorSensorController::convertHsvToColor(HSV& hsv)
     // 明度が高ければ、白を返す
     return COLOR::WHITE;
   }
-  // この判定保留は彩度37以上の暗色だけに適用する。
+  // この判定保留はSATURATION_BORDER以上の暗色だけに適用する。
   if(hsv.v < CHROMATIC_VALUE_BORDER) return COLOR::NONE;
   // 各色相の境界によって、色を判別する
   if(hsv.h < RED_BORDER) return COLOR::RED;

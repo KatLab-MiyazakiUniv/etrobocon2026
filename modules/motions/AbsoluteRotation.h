@@ -27,8 +27,14 @@ class AbsoluteRotation : public Rotation {
   ~AbsoluteRotation();
 
  protected:
-  // 回頭動作の準備処理を行う
+  /**
+   * @brief 回頭動作を開始する前に、子条件の準備処理を行う
+   */
   void prepare() override;
+
+  /**
+   * @brief 回頭動作を1ステップ実行する
+   */
   void executeStep() override;
 
  private:

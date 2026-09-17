@@ -78,7 +78,7 @@ class SocketClient {
 
   /**
    * @brief 正方形検出アクションを実行する
-   * @param request リクエスト 
+   * @param request リクエスト
    * @param response レスポンス
    * @return true アクションの実行に成功した場合
    * @return false アクションの実行に失敗した場合

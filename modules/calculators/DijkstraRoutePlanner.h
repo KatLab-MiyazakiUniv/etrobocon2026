@@ -23,8 +23,7 @@ class DijkstraRoutePlanner {
    *
    * @param gates ゲート情報
    */
-  explicit DijkstraRoutePlanner(
-      const std::vector<Gate>& gates);
+  explicit DijkstraRoutePlanner(const std::vector<Gate>& gates);
 
   /**
    * @brief 指定地点までの最小コスト経路を探索する
@@ -37,12 +36,8 @@ class DijkstraRoutePlanner {
    *
    * @return 経路探索結果
    */
-  RouteResult search(
-      int startX,
-      int startY,
-      Direction startDirection,
-      const Point& goal,
-      Direction goalDirection);
+  RouteResult search(int startX, int startY, Direction startDirection, const Point& goal,
+                     Direction goalDirection);
 
  private:
   /**
@@ -95,8 +90,7 @@ class DijkstraRoutePlanner {
   /**
    * @brief グリッドサイズ
    */
-  static constexpr int GRID_SIZE
-      = MAP_MAX / MOVE_STEP + 1;
+  static constexpr int GRID_SIZE = MAP_MAX / MOVE_STEP + 1;
 
   /**
    * @brief 回頭中心からロボット最後端までの距離
@@ -123,32 +117,23 @@ class DijkstraRoutePlanner {
   /**
    * @brief 回頭角度を考慮した回頭コストを取得する
    */
-  int calculateTurnCost(
-      Direction currentDirection,
-      Direction nextDirection) const;
+  int calculateTurnCost(Direction currentDirection, Direction nextDirection) const;
 
   /**
    * @brief 1移動分のコストを計算する
    */
-  int calculateMoveCost(
-      int currentX,
-      int currentY,
-      Direction currentDirection,
-      Direction nextDirection) const;
+  int calculateMoveCost(int currentX, int currentY, Direction currentDirection,
+                        Direction nextDirection) const;
 
   /**
    * @brief ゲート足付近か判定する
    */
-  bool isNearGatePost(
-      int x,
-      int y) const;
+  bool isNearGatePost(int x, int y) const;
 
   /**
    * @brief 外周領域か判定する
    */
-  bool isOuterArea(
-      int x,
-      int y) const;
+  bool isOuterArea(int x, int y) const;
 
   /**
    * @brief 回頭時にロボット後部が通る範囲に
@@ -161,53 +146,38 @@ class DijkstraRoutePlanner {
    *
    * @return 接触の危険がある場合true
    */
-  bool isTurnBlockedByGatePost(
-      int x,
-      int y,
-      Direction currentDirection,
-      Direction nextDirection) const;
+  bool isTurnBlockedByGatePost(int x, int y, Direction currentDirection,
+                               Direction nextDirection) const;
 
   /**
    * @brief Directionを前方向ベクトルへ変換する
    */
-  Point directionToVector(
-      Direction direction) const;
+  Point directionToVector(Direction direction) const;
 
   /**
    * @brief 角度を-pi～piへ正規化する
    */
-  double normalizeRad(
-      double angle) const;
+  double normalizeRad(double angle) const;
 
   /**
    * @brief 座標が探索可能範囲か判定する
    */
-  bool isValid(
-      int x,
-      int y) const;
+  bool isValid(int x, int y) const;
 
   /**
    * @brief 移動時にゲートを横切るか判定する
    */
-  bool isBlockedMove(
-      int currentX,
-      int currentY,
-      int nextX,
-      int nextY) const;
+  bool isBlockedMove(int currentX, int currentY, int nextX, int nextY) const;
 
   /**
    * @brief 状態を1次元インデックスへ変換する
    */
-  int stateToIndex(
-      int x,
-      int y,
-      Direction direction) const;
+  int stateToIndex(int x, int y, Direction direction) const;
 
   /**
    * @brief 1次元インデックスを状態へ戻す
    */
-  RouteState indexToState(
-      int index) const;
+  RouteState indexToState(int index) const;
 };
 
 #endif

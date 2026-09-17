@@ -8,19 +8,29 @@
 #define ROUTE_FOLLOWER_H
 
 #include <vector>
+#include <cmath>
+#include <memory>
 
+#include "AngleNormalizer.h"
+#include "ClockUtil.h"
+#include "DistanceCondition.h"
 #include "EtRallyMap.h"
+#include "Logger.h"
 #include "MapData.h"
 #include "Pid.h"
+#include "RelativeAngleCondition.h"
+#include "RelativeRotation.h"
 #include "Robot.h"
 #include "RouteTypes.h"
+#include "SocketProtocol.h"
 #include "SquareAngleAdjustment.h"
+#include "Straight.h"
+#include "SystemInfo.h"
 
 class RouteFollower {
  public:
   /**
    * @brief コンストラクタ
-   *
    * @param _robot ロボット
    * @param _map ETラリーマップ
    * @param _mapData ゲート情報

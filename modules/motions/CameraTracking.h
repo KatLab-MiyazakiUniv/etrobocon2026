@@ -18,9 +18,9 @@ class CameraTracking : public BaseMotion {
    * @brief 検出方式の種類
    */
   enum class DetectionMode {
-    COLOR_REGION,  // 色領域検出
-    QR_CODE ,       // QRコード検出
-    SQUARE_DETECTION // 正方形検出
+    COLOR_REGION,     // 色領域検出
+    QR_CODE,          // QRコード検出
+    SQUARE_DETECTION  // 正方形検出
   };
 
   /**

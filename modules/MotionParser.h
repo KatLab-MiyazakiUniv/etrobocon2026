@@ -73,9 +73,7 @@ class MotionParser {
    * @param commandFilePath AreaコマンドCSVのパス
    * @return 生成した動作リスト
    */
-  static std::vector<BaseMotion*> createMotionList(
-      Robot& robot,
-      std::string& commandFilePath);
+  static std::vector<BaseMotion*> createMotionList(Robot& robot, std::string& commandFilePath);
 
  private:
   /**
@@ -92,9 +90,8 @@ class MotionParser {
    * @param id 検索するID
    * @return IDに対応するパラメータ一覧
    */
-  static std::vector<std::string> extractParamsFromID(
-      const std::string& filePath,
-      const std::string& id);
+  static std::vector<std::string> extractParamsFromID(const std::string& filePath,
+                                                      const std::string& id);
 
   /**
    * @brief 継続条件インスタンスを生成する
@@ -103,10 +100,8 @@ class MotionParser {
    * @param params 条件CSVから取得したパラメータ
    * @return 継続条件インスタンス
    */
-  static std::unique_ptr<BaseContinuationCondition>
-      createConditionInstance(
-          Robot& robot,
-          const std::vector<std::string>& params);
+  static std::unique_ptr<BaseContinuationCondition> createConditionInstance(
+      Robot& robot, const std::vector<std::string>& params);
 
   /**
    * @brief 動作インスタンスを生成する
@@ -116,10 +111,9 @@ class MotionParser {
    * @param condition 継続条件
    * @return 動作インスタンス
    */
-  static BaseMotion* createMotionInstance(
-      Robot& robot,
-      const std::vector<std::string>& motionParams,
-      std::unique_ptr<BaseContinuationCondition> condition);
+  static BaseMotion* createMotionInstance(Robot& robot,
+                                          const std::vector<std::string>& motionParams,
+                                          std::unique_ptr<BaseContinuationCondition> condition);
 
   /**
    * @brief 動作コマンド文字列を列挙型へ変換する
@@ -138,8 +132,7 @@ class MotionParser {
    * @param str 動作コマンド名
    * @return 動作コマンド
    */
-  static MOTION_COMMAND convertCommand(
-      const std::string& str);
+  static MOTION_COMMAND convertCommand(const std::string& str);
 
   /**
    * @brief 条件コマンド文字列を列挙型へ変換する
@@ -152,8 +145,7 @@ class MotionParser {
    * @param str 条件コマンド名
    * @return 条件コマンド
    */
-  static CONDITION_COMMAND convertCondition(
-      const std::string& str);
+  static CONDITION_COMMAND convertCondition(const std::string& str);
 };
 
 #endif

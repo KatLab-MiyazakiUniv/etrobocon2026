@@ -32,8 +32,7 @@ namespace CameraServer {
   /**
    * @brief コマンド型のバイトサイズ
    */
-  constexpr size_t COMMAND_SIZE =
-      sizeof(Command);
+  constexpr size_t COMMAND_SIZE = sizeof(Command);
 
   // =========================================================
   // Snapshot
@@ -46,8 +45,7 @@ namespace CameraServer {
     /**
      * @brief スナップショットコマンド
      */
-    Command command =
-        Command::SNAPSHOT;
+    Command command = Command::SNAPSHOT;
 
     /**
      * @brief 保存するファイル名
@@ -180,8 +178,7 @@ namespace CameraServer {
     /**
      * @brief 色領域検出コマンド
      */
-    Command command =
-        Command::COLOR_REGION_DETECTION;
+    Command command = Command::COLOR_REGION_DETECTION;
 
     /**
      * @brief 最も大きい色領域のインデックスを返すか
@@ -240,8 +237,7 @@ namespace CameraServer {
     /**
      * @brief QRコード検出コマンド
      */
-    Command command =
-        Command::QR_CODE_DETECTION;
+    Command command = Command::QR_CODE_DETECTION;
 
     /**
      * @brief 検出対象ROI
@@ -285,8 +281,7 @@ namespace CameraServer {
     /**
      * @brief 正方形検出コマンド
      */
-    Command command =
-        Command::SQUARE_DETECTION;
+    Command command = Command::SQUARE_DETECTION;
 
     /**
      * @brief 検出対象ROI

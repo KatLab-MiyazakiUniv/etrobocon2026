@@ -6,60 +6,13 @@
 
 #include "RouteFollower.h"
 
-#include <cmath>
-#include <memory>
-
-#include "AngleNormalizer.h"
-#include "ClockUtil.h"
-#include "DistanceCondition.h"
-#include "Logger.h"
-#include "RelativeAngleCondition.h"
-#include "RelativeRotation.h"
-#include "SocketProtocol.h"
-#include "Straight.h"
-#include "SystemInfo.h"
-
 namespace {
 
-  /**
-   * @brief 回頭終了判定許容誤差[deg]
-   */
-  constexpr double ROTATION_TOLERANCE = 0.5;
-
-  /**
-   * @brief QR①からQR②までの距離[mm]
-   *
-   * QR①
-   *  |
-   *  | 125mm
-   *  |
-   * ゲート
-   *  |
-   *  | 125mm
-   *  |
-   * QR②
-   */
-  constexpr double QR_DISTANCE = 250.0;
-
-  /**
-   * @brief QRとゲート中央の距離[mm]
-   */
-  constexpr double QR_TO_GATE_DISTANCE = QR_DISTANCE / 2.0;
-
-  /**
-   * @brief QRを検出する基準距離[mm]
-   *
-   * QRの250mm手前から検出する。
-   *
-   * QR①からQR②までの距離も250mmなので、
-   * QR①到達位置がそのままQR②検出位置になる。
-   */
-  constexpr double SQUARE_DETECTION_DISTANCE = 250.0;
-
-  /**
-   * @brief 動作切り替え待機時間[ms]
-   */
-  constexpr int MOTION_SWITCH_WAIT = 200;
+  constexpr double ROTATION_TOLERANCE = 0.5;                 // 回頭終了判定許容誤差[deg]
+  constexpr double QR_DISTANCE = 250.0;                      // QR①とQR②の距離[mm]
+  constexpr double QR_TO_GATE_DISTANCE = QR_DISTANCE / 2.0;  // QRとゲート中央の距離[mm]
+  constexpr double SQUARE_DETECTION_DISTANCE = 250.0;        // QRを検出する基準距離[mm]
+  constexpr int MOTION_SWITCH_WAIT = 200;                    // 動作切り替え待機時間[ms]
 
 }  // namespace
 
@@ -83,67 +36,52 @@ RouteFollower::RouteFollower(Robot& _robot, const EtRallyMap& _map, const MapDat
 void RouteFollower::run(const std::vector<RouteState>& route)
 {
   if(route.size() < 2) {
-    Logger::warning("RouteFollower: route size < 2");
-
+    Logger::warning("RouteFollower: 経路が2点未満のため走行できません");
     return;
   }
 
   for(std::size_t i = 1; i < route.size(); ++i) {
+    // 区間の開始地点と終了地点を取得する
     const RouteState& from = route[i - 1];
-
     const RouteState& to = route[i];
 
-    Logger::printfLog(Logger::INFO,
-                      "RouteFollower[%d]: "
-                      "(%d,%d) -> (%d,%d)",
-                      static_cast<int>(i), from.x, from.y, to.x, to.y);
+    // 現在走行する区間
+    Logger::printfLog(Logger::INFO, "RouteFollower[%d]: (%d,%d) → (%d,%d)", static_cast<int>(i),
+                      from.x, from.y, to.x, to.y);
 
-    // =====================================================
-    // 1. 通常回頭
-    // =====================================================
-
+    // 次の区間を走行するために必要な回頭角度を計算する
     const double rotationAngle = calculateRotationAngle(from.direction, to.direction);
 
-    /*
-     * この区間開始時に回頭したかを保存する。
-     *
-     * ゲート直前回頭判定に使用する。
-     */
-    const bool rotatedAtSegmentStart = std::abs(rotationAngle) > ROTATION_TOLERANCE;
+   // 区間開始時に回頭が必要だったかを判定する
+const bool rotatedAtSegmentStart =
+    std::abs(rotationAngle) > ROTATION_TOLERANCE;
 
-    if(rotatedAtSegmentStart) {
-      Logger::printfLog(Logger::INFO,
-                        "RouteFollower: "
-                        "rotation required %.2f deg",
-                        rotationAngle);
+if(rotatedAtSegmentStart) {
+  Logger::printfLog(
+      Logger::INFO,
+      "RouteFollower: 回頭開始 %.2f deg",
+      rotationAngle);
 
-      rotate(rotationAngle);
-    }
+  // 次の区間の進行方向へ回頭する
+  rotate(rotationAngle);
+}
 
-    // =====================================================
-    // 2. 同一座標
-    //
-    // 回頭だけを表すRouteStateの場合
-    // =====================================================
+    // 同一座標の場合は、回頭のみ行って次の区間へ進む。
+if(from.x == to.x && from.y == to.y) {
+  continue;
+}
 
-    if(from.x == to.x && from.y == to.y) {
-      continue;
-    }
+  // 区間の走行距離を計算する。
+const double distance = calculateDistance(from, to);
 
-    // =====================================================
-    // 3. 区間距離
-    // =====================================================
+if(distance <= 0.0) {
+  Logger::error("RouteFollower: 区間距離が不正です");
 
-    const double distance = calculateDistance(from, to);
+  // 異常な距離の場合はモーターを停止する。
+  robot.getWheelMotorControllerInstance().stopBoth();
 
-    if(distance <= 0.0) {
-      Logger::error("RouteFollower: invalid distance");
-
-      robot.getWheelMotorControllerInstance().stopBoth();
-
-      return;
-    }
-
+  return;
+}
     Logger::printfLog(Logger::INFO,
                       "RouteFollower: "
                       "segment distance=%.2f mm",

@@ -100,9 +100,9 @@ class SocketServer {
   const QrCodeDetectionActionHandler& getQrCodeDetectionHandler() const;
 
   /*
-  * @brief 正方形検出のハンドラを取得する
-  * @return SquareDetectionActionHandler& 正方形検出のハンドラへの参照
-  */
+   * @brief 正方形検出のハンドラを取得する
+   * @return SquareDetectionActionHandler& 正方形検出のハンドラへの参照
+   */
   const SquareDetectionActionHandler& getSquareDetectionHandler() const;
 
   /**

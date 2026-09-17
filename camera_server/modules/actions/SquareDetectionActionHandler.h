@@ -22,8 +22,7 @@ class SquareDetectionActionHandler {
    *
    * @param _camera カメラ
    */
-  explicit SquareDetectionActionHandler(
-      CameraCapture& _camera);
+  explicit SquareDetectionActionHandler(CameraCapture& _camera);
 
   /**
    * @brief デストラクタ
@@ -40,9 +39,8 @@ class SquareDetectionActionHandler {
    * @param request 正方形検出リクエスト
    * @param response 正方形検出レスポンス
    */
-  void execute(
-      const CameraServer::SquareDetectorRequest& request,
-      CameraServer::SquareDetectorResponse& response);
+  void execute(const CameraServer::SquareDetectorRequest& request,
+               CameraServer::SquareDetectorResponse& response);
 
  private:
   /**
@@ -74,9 +72,7 @@ class SquareDetectionActionHandler {
    *
    * @return 校正用紙上の座標[mm]
    */
-  cv::Point2f pixelToWorld(
-      double pixelX,
-      double pixelY) const;
+  cv::Point2f pixelToWorld(double pixelX, double pixelY) const;
 };
 
 #endif  // SQUARE_DETECTION_ACTION_HANDLER_H

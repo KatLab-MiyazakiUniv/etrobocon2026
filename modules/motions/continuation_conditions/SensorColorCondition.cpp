@@ -17,6 +17,11 @@ SensorColorCondition::~SensorColorCondition()
   LOG_DESTROY("SensorColorCondition");
 }
 
+void SensorColorCondition::prepare()
+{
+  colorCount = 0;
+}
+
 bool SensorColorCondition::shouldContinue()
 {
   if(targetColor == ColorSensorController::COLOR::NONE) {

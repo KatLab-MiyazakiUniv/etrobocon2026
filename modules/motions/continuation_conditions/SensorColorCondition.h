@@ -28,6 +28,11 @@ class SensorColorCondition : public BaseContinuationCondition {
   ~SensorColorCondition();
 
   /**
+   * @brief 判定開始前に指定色の連続検知回数を初期化する
+   */
+  void prepare() override;
+
+  /**
    * @brief 指定色を検出する場合、動作を継続しないと判定する
    * @return true/動作を継続する、false/動作を継続しない
    */

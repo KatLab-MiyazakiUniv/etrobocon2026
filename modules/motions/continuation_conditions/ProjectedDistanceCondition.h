@@ -36,6 +36,11 @@ class ProjectedDistanceCondition : public BaseContinuationCondition {
                              double target);
 
   /**
+   * @brief デストラクタ
+   */
+  ~ProjectedDistanceCondition();
+
+  /**
    * @brief 子条件がある場合、判定開始前の準備処理を行う
    */
   void prepare() override;

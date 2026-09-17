@@ -87,6 +87,8 @@ namespace etrobocon2026_test {
     EXPECT_FALSE(condition.shouldContinue());
     condition.prepare();
     EXPECT_TRUE(condition.shouldContinue());
+    EXPECT_TRUE(condition.shouldContinue());
+    EXPECT_FALSE(condition.shouldContinue());
   }
 
   class RecordingMotion : public BaseMotion {

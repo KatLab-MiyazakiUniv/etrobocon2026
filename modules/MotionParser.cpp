@@ -230,7 +230,7 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
     case CONDITION_COMMAND::REPEAT_COUNT: {
       int targetCount = fromString<int>(params[2]);
       Logger::printfLog(Logger::DEBUG,
-                        "[MotionParser] RepeatCountCondition: targetCount=%.1f を生成しました",
+                        "[MotionParser] RepeatCountCondition: targetCount=%d を生成しました",
                         targetCount);
       return make_unique<RepeatCountCondition>(robot, targetCount);
     }
@@ -261,7 +261,7 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
 
       Logger::printfLog(
           Logger::DEBUG,
-          "[MotionParser] DistanceAndColor: targetDistance=%.1f, targetColor=%s を生成しました",
+          "[MotionParser] DistanceORColor: targetDistance=%.1f, targetColor=%s を生成しました",
           targetDistance, targetColorName.c_str());
 
       auto distanceCondition = std::make_unique<DistanceCondition>(robot, targetDistance);

@@ -5,6 +5,7 @@
  */
 
 #include "ProjectedDistanceCondition.h"
+#include "Logger.h"
 #include "Mileage.h"
 #include <cmath>
 #include <utility>
@@ -14,6 +15,7 @@ ProjectedDistanceCondition::ProjectedDistanceCondition(
     std::unique_ptr<BaseContinuationCondition> child)
   : BaseContinuationCondition(robot), mileage(std::move(mileage)), child(std::move(child))
 {
+  LOG_CREATE("ProjectedDistanceCondition");
 }
 
 ProjectedDistanceCondition::ProjectedDistanceCondition(Robot& robot,
@@ -25,6 +27,12 @@ ProjectedDistanceCondition::ProjectedDistanceCondition(Robot& robot,
     target(target),
     useTarget(true)
 {
+  LOG_CREATE("ProjectedDistanceCondition");
+}
+
+ProjectedDistanceCondition::~ProjectedDistanceCondition()
+{
+  LOG_DESTROY("ProjectedDistanceCondition");
 }
 
 void ProjectedDistanceCondition::prepare()

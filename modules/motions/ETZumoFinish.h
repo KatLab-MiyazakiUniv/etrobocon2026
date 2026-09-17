@@ -44,7 +44,7 @@ class ETZumoFinish : public BaseMotion {
 
  private:
   std::vector<std::unique_ptr<BaseMotion>> motions;  // 実行順に保持する子動作
-  std::shared_ptr<ProjectedMileage> mileage;  // 子動作と共有する基準方向の距離計測
-  bool completed = false;  // 子動作の実行が完了または中止した場合はtrue
+  std::shared_ptr<ProjectedMileage> mileage;         // 子動作と共有する基準方向の距離計測
+  bool completed = false;                            // 子動作の実行が完了または中止した場合はtrue
 };
 #endif

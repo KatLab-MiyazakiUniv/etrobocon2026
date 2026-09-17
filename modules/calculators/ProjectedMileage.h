@@ -24,11 +24,11 @@ class ProjectedMileage {
    */
   void update(double mileage, double angle);
 
-  /** 
+  /**
    * @brief 基準方向をXとした符号付き累積距離[mm]
    */
   double getHorizontalDistance() const;
- 
+
   /**
    * @brief 基準方向をの+90度方向をYとした符号付き累積距離[mm]
    */

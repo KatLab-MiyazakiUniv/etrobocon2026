@@ -20,7 +20,7 @@ class ETZumoExitCondition : public BaseContinuationCondition {
    * @param _mileage 追尾・回頭・直進で共有する距離計測（nullptrは不可）
    * @param _targetDistance 基準方向の目標距離[mm]（有限の正の値）
    * @param _continuationCondition 子動作の継続条件（直進時はnullptrで省略）
-    * @param _requireBoth trueなら距離到達後に子条件の成立を待つ、falseなら距離到達で即終了
+   * @param _requireBoth trueなら距離到達後に子条件の成立を待つ、falseなら距離到達で即終了
    */
   ETZumoExitCondition(Robot& _robot, std::shared_ptr<ProjectedMileage> _mileage,
                       double _targetDistance,

@@ -22,7 +22,8 @@ namespace etrobocon2026_test {
     EXPECT_NEAR(mileage.getHorizontalDistance(), 469.8463104, 1e-4);
     mileage.update(600.0, -20.0);
     // 基準方向の残り距離を、方位-20度で必要な走行距離に換算する。
-    const double remaining = (800.0 - mileage.getHorizontalDistance()) / std::cos(20.0 * PI / 180.0);
+    const double remaining
+        = (800.0 - mileage.getHorizontalDistance()) / std::cos(20.0 * PI / 180.0);
     mileage.update(600.0 + remaining, -20.0);
     EXPECT_NEAR(mileage.getHorizontalDistance(), 800.0, 1e-4);
   }

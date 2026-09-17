@@ -17,7 +17,7 @@ class ResetAzimuth : public BaseMotion {
    * @param continuationCondition 動作を継続する条件を判定するクラスのインスタンス
    */
   ResetAzimuth(Robot& robot, std::unique_ptr<BaseContinuationCondition> continuationCondition);
-  
+
   /**
    * デストラクタ
    */

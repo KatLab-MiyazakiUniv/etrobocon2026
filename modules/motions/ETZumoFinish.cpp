@@ -22,7 +22,9 @@ void ETZumoFinish::prepare()
   completed = false;
   robot.getWheelMotorControllerInstance().stopBoth();
   robot.getIMUControllerInstance().resetAzimuth();
-  mileage->reset(Mileage::calculateMileage(robot.getWheelMotorControllerInstance().getRightCount(), robot.getWheelMotorControllerInstance().getLeftCount()), 0.0);
+  mileage->reset(Mileage::calculateMileage(robot.getWheelMotorControllerInstance().getRightCount(),
+                                           robot.getWheelMotorControllerInstance().getLeftCount()),
+                 0.0);
 }
 
 void ETZumoFinish::executeStep()

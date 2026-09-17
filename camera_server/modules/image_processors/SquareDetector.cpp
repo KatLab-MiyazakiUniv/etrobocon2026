@@ -1,7 +1,7 @@
 /**
  * @file   SquareDetector.cpp
  * @brief  正方形検出用の画像処理クラス
- * @author okuyama0528
+ * @author okuyama0528 yutaro-1214
  */
 
 #include "SquareDetector.h"
@@ -10,11 +10,12 @@
 #include <climits>
 #include <cmath>
 #include <limits>
+#include <string>
 
 namespace {
 
   /**
-   * @brief 正方形候補の情報
+   * @brief 正方形候補
    */
   struct SquareCandidate {
     cv::RotatedRect rect;
@@ -22,30 +23,45 @@ namespace {
   };
 
   /**
-   * @brief 候補として残す面積割合
-   *
-   * 最大面積の70%以上の候補だけを
-   * 最終候補の選択対象とする。
-   *
-   * 小さなノイズを誤検出しにくくする。
-   */
-  constexpr double AREA_RATIO = 0.70;
-
-  /**
    * @brief 正方形を探す基準Y位置
-   *
-   * 画像下側にQRが映ることを想定し、
-   * 画像高さの82%付近を基準とする。
-   *
-   * 1920x1080の場合
-   *
-   * targetY = 約886px
    */
   constexpr double TARGET_Y_RATIO = 0.82;
 
+  /**
+   * @brief 画像端から除外する幅[px]
+   */
+  constexpr int BORDER_MARGIN = 20;
+
+  /**
+   * @brief 基準位置から許容する最大距離[px]
+   */
+  constexpr double MAX_TARGET_DISTANCE = 700.0;
+
+  /**
+   * @brief Canny下限閾値
+   */
+  constexpr double CANNY_THRESHOLD_LOW = 50.0;
+
+  /**
+   * @brief Canny上限閾値
+   */
+  constexpr double CANNY_THRESHOLD_HIGH = 150.0;
+
+  /**
+   * @brief モルフォロジー処理のカーネルサイズ
+   */
+  constexpr int MORPH_KERNEL_SIZE = 7;
+
+  /**
+   * @brief デバッグ画像保存用カウンタ
+   */
+  int saveCount = 0;
+
 }  // namespace
 
-SquareDetector::SquareDetector(const cv::Rect& _roi) : roi(_roi)
+SquareDetector::SquareDetector(
+    const cv::Rect& _roi)
+  : roi(_roi)
 {
   validateParameters();
 
@@ -57,67 +73,195 @@ SquareDetector::~SquareDetector()
   LOG_DESTROY("SquareDetector");
 }
 
-void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& result)
+void SquareDetector::detect(
+    const cv::Mat& frame,
+    BoundingBoxDetectionResult& result)
 {
   result.wasDetected = false;
+
+  ++saveCount;
 
   // =====================================================
   // 入力画像確認
   // =====================================================
 
   if(frame.empty()) {
-    Logger::error("SquareDetector:"
-                  "入力フレームが空です。");
+    Logger::error(
+        "SquareDetector:入力フレームが空です。");
 
     return;
   }
 
   // =====================================================
-  // ROI設定
+  // ROI
   // =====================================================
 
-  const cv::Rect frameRect(0, 0, frame.cols, frame.rows);
+  const cv::Rect frameRect(
+      0,
+      0,
+      frame.cols,
+      frame.rows);
 
-  const cv::Rect roiRect = roi & frameRect;
+  const cv::Rect roiRect
+      = roi & frameRect;
 
   if(roiRect.empty()) {
-    Logger::error("SquareDetector:"
-                  "ROIがフレーム内に収まっていません。");
+    Logger::error(
+        "SquareDetector:"
+        "ROIがフレーム内に収まっていません。");
 
     return;
   }
 
-  const cv::Mat roiFrame = frame(roiRect);
+  const cv::Mat roiFrame
+      = frame(roiRect);
 
   // =====================================================
-  // グレースケール化
+  // 01 Original
+  // =====================================================
+
+  const std::string originalPath
+      = "/tmp/square_"
+        + std::to_string(saveCount)
+        + "_01_original.jpg";
+
+  cv::imwrite(
+      originalPath,
+      roiFrame);
+
+  Logger::printfLog(
+      Logger::INFO,
+      "SquareDetector: original image saved: %s",
+      originalPath.c_str());
+
+  // =====================================================
+  // Gray
   // =====================================================
 
   cv::Mat grayFrame;
 
-  cv::cvtColor(roiFrame, grayFrame, cv::COLOR_BGR2GRAY);
+  cv::cvtColor(
+      roiFrame,
+      grayFrame,
+      cv::COLOR_BGR2GRAY);
 
   // =====================================================
-  // ノイズ除去
+  // 02 Gray
   // =====================================================
 
-  cv::GaussianBlur(grayFrame, grayFrame, cv::Size(5, 5), 0);
+  const std::string grayPath
+      = "/tmp/square_"
+        + std::to_string(saveCount)
+        + "_02_gray.jpg";
+
+  cv::imwrite(
+      grayPath,
+      grayFrame);
+
+  Logger::printfLog(
+      Logger::INFO,
+      "SquareDetector: gray image saved: %s",
+      grayPath.c_str());
 
   // =====================================================
-  // 二値化
+  // GaussianBlur
   // =====================================================
 
-  cv::Mat binary;
+  cv::Mat blurFrame;
 
-  cv::threshold(grayFrame, binary, 0, 255, cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
+  cv::GaussianBlur(
+      grayFrame,
+      blurFrame,
+      cv::Size(5, 5),
+      0);
 
   // =====================================================
-  // モルフォロジー処理
+  // 03 Blur
   // =====================================================
 
-  const cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
+  const std::string blurPath
+      = "/tmp/square_"
+        + std::to_string(saveCount)
+        + "_03_blur.jpg";
 
-  cv::morphologyEx(binary, binary, cv::MORPH_CLOSE, kernel);
+  cv::imwrite(
+      blurPath,
+      blurFrame);
+
+  Logger::printfLog(
+      Logger::INFO,
+      "SquareDetector: blur image saved: %s",
+      blurPath.c_str());
+
+  // =====================================================
+  // Canny
+  // =====================================================
+
+  cv::Mat edgeFrame;
+
+  cv::Canny(
+      blurFrame,
+      edgeFrame,
+      CANNY_THRESHOLD_LOW,
+      CANNY_THRESHOLD_HIGH);
+
+  // =====================================================
+  // 04 Canny
+  // =====================================================
+
+  const std::string cannyPath
+      = "/tmp/square_"
+        + std::to_string(saveCount)
+        + "_04_canny.jpg";
+
+  cv::imwrite(
+      cannyPath,
+      edgeFrame);
+
+  Logger::printfLog(
+      Logger::INFO,
+      "SquareDetector: canny image saved: %s",
+      cannyPath.c_str());
+
+  // =====================================================
+  // Morphology
+  //
+  // QR内部の細かい線をまとめるために
+  // MORPH_CLOSEを行う。
+  // =====================================================
+
+  cv::Mat morphFrame;
+
+  const cv::Mat kernel
+      = cv::getStructuringElement(
+          cv::MORPH_RECT,
+          cv::Size(
+              MORPH_KERNEL_SIZE,
+              MORPH_KERNEL_SIZE));
+
+  cv::morphologyEx(
+      edgeFrame,
+      morphFrame,
+      cv::MORPH_CLOSE,
+      kernel);
+
+  // =====================================================
+  // 05 Morphology
+  // =====================================================
+
+  const std::string morphPath
+      = "/tmp/square_"
+        + std::to_string(saveCount)
+        + "_05_morphology.jpg";
+
+  cv::imwrite(
+      morphPath,
+      morphFrame);
+
+  Logger::printfLog(
+      Logger::INFO,
+      "SquareDetector: morphology image saved: %s",
+      morphPath.c_str());
 
   // =====================================================
   // 輪郭検出
@@ -125,25 +269,41 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
 
   std::vector<std::vector<cv::Point>> contours;
 
-  cv::findContours(binary, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+  cv::findContours(
+      morphFrame,
+      contours,
+      cv::RETR_EXTERNAL,
+      cv::CHAIN_APPROX_SIMPLE);
 
-  Logger::printfLog(Logger::INFO, "SquareDetector: contour count = %d",
-                    static_cast<int>(contours.size()));
+  Logger::printfLog(
+      Logger::INFO,
+      "SquareDetector: contour count = %d",
+      static_cast<int>(contours.size()));
 
   // =====================================================
-  // 正方形候補を探す
+  // 候補抽出
   // =====================================================
 
   std::vector<SquareCandidate> candidates;
 
   for(const auto& contour : contours) {
-    const double area = cv::contourArea(contour);
 
     // ---------------------------------------------------
-    // 小さすぎる輪郭を除外
+    // 面積
     // ---------------------------------------------------
+
+    const double area
+        = cv::contourArea(contour);
 
     if(area < MIN_CONTOUR_AREA) {
+      Logger::printfLog(
+          Logger::DEBUG,
+          "SquareDetector: "
+          "small area rejected "
+          "area=%.2f minimum=%.2f",
+          area,
+          MIN_CONTOUR_AREA);
+
       continue;
     }
 
@@ -151,7 +311,10 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
     // 周長
     // ---------------------------------------------------
 
-    const double perimeter = cv::arcLength(contour, true);
+    const double perimeter
+        = cv::arcLength(
+            contour,
+            true);
 
     if(perimeter <= 0.0) {
       continue;
@@ -159,22 +322,22 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
 
     // ---------------------------------------------------
     // 円形度
-    //
-    // 円:
-    //   1.0に近い
-    //
-    // 正方形:
-    //   約0.785
     // ---------------------------------------------------
 
-    const double circularity = 4.0 * CV_PI * area / (perimeter * perimeter);
+    const double circularity
+        = 4.0
+          * CV_PI
+          * area
+          / (perimeter * perimeter);
 
     if(circularity > MAX_CIRCULARITY) {
-      Logger::printfLog(Logger::DEBUG,
-                        "SquareDetector: "
-                        "circle rejected "
-                        "area=%.2f circularity=%.2f",
-                        area, circularity);
+      Logger::printfLog(
+          Logger::DEBUG,
+          "SquareDetector: "
+          "circle rejected "
+          "area=%.2f circularity=%.2f",
+          area,
+          circularity);
 
       continue;
     }
@@ -183,76 +346,166 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
     // 最小外接回転矩形
     // ---------------------------------------------------
 
-    const cv::RotatedRect rect = cv::minAreaRect(contour);
+    const cv::RotatedRect rect
+        = cv::minAreaRect(contour);
 
-    const double width = rect.size.width;
+    const double width
+        = rect.size.width;
 
-    const double height = rect.size.height;
+    const double height
+        = rect.size.height;
 
-    if(width <= 0.0 || height <= 0.0) {
+    if(width <= 0.0
+       || height <= 0.0) {
+
+      continue;
+    }
+
+    // ---------------------------------------------------
+    // 中心位置
+    // ---------------------------------------------------
+
+    const double centerX
+        = rect.center.x
+          + static_cast<double>(
+              roiRect.x);
+
+    const double centerY
+        = rect.center.y
+          + static_cast<double>(
+              roiRect.y);
+
+    // ---------------------------------------------------
+    // 画像端判定
+    // ---------------------------------------------------
+
+    const cv::Rect boundingRect
+        = rect.boundingRect();
+
+    const int globalLeft
+        = boundingRect.x
+          + roiRect.x;
+
+    const int globalTop
+        = boundingRect.y
+          + roiRect.y;
+
+    const int globalRight
+        = globalLeft
+          + boundingRect.width;
+
+    const int globalBottom
+        = globalTop
+          + boundingRect.height;
+
+    if(globalLeft <= BORDER_MARGIN
+       || globalTop <= BORDER_MARGIN
+       || globalRight >= frame.cols - BORDER_MARGIN
+       || globalBottom >= frame.rows - BORDER_MARGIN) {
+
+      Logger::printfLog(
+          Logger::DEBUG,
+          "SquareDetector: "
+          "border rejected "
+          "area=%.2f "
+          "left=%d top=%d "
+          "right=%d bottom=%d",
+          area,
+          globalLeft,
+          globalTop,
+          globalRight,
+          globalBottom);
+
       continue;
     }
 
     // ---------------------------------------------------
     // 縦横比
-    //
-    // 1.0に近いほど正方形
     // ---------------------------------------------------
 
-    const double ratio = std::min(width, height) / std::max(width, height);
+    const double ratio
+        = std::min(
+              width,
+              height)
+          / std::max(
+              width,
+              height);
 
     if(ratio < MIN_RATIO) {
-      Logger::printfLog(Logger::DEBUG,
-                        "SquareDetector: "
-                        "ratio rejected "
-                        "area=%.2f ratio=%.2f",
-                        area, ratio);
+      Logger::printfLog(
+          Logger::DEBUG,
+          "SquareDetector: "
+          "ratio rejected "
+          "area=%.2f "
+          "width=%.2f "
+          "height=%.2f "
+          "ratio=%.2f",
+          area,
+          width,
+          height,
+          ratio);
 
       continue;
     }
 
     // ---------------------------------------------------
-    // 外接矩形に対する面積割合
+    // 矩形面積
     // ---------------------------------------------------
 
-    const double rectArea = width * height;
+    const double rectArea
+        = width * height;
 
     if(rectArea <= 0.0) {
       continue;
     }
 
-    const double fillRatio = area / rectArea;
+    // ---------------------------------------------------
+    // 充填率
+    // ---------------------------------------------------
+
+    const double fillRatio
+        = area / rectArea;
 
     if(fillRatio < MIN_FILL_RATIO) {
-      Logger::printfLog(Logger::DEBUG,
-                        "SquareDetector: "
-                        "fill rejected "
-                        "area=%.2f fill=%.2f",
-                        area, fillRatio);
+      Logger::printfLog(
+          Logger::DEBUG,
+          "SquareDetector: "
+          "fill rejected "
+          "area=%.2f fill=%.2f",
+          area,
+          fillRatio);
 
       continue;
     }
 
     // ---------------------------------------------------
-    // フレーム全体での中心位置
+    // 有効候補
     // ---------------------------------------------------
 
-    const double centerX = rect.center.x + static_cast<double>(roiRect.x);
+    Logger::printfLog(
+        Logger::INFO,
+        "SquareDetector: candidate "
+        "area=%.2f "
+        "width=%.2f "
+        "height=%.2f "
+        "ratio=%.2f "
+        "fill=%.2f "
+        "circularity=%.2f "
+        "center=(%.1f,%.1f)",
+        area,
+        width,
+        height,
+        ratio,
+        fillRatio,
+        circularity,
+        centerX,
+        centerY);
 
-    const double centerY = rect.center.y + static_cast<double>(roiRect.y);
-
-    Logger::printfLog(Logger::INFO,
-                      "SquareDetector: candidate "
-                      "area=%.2f "
-                      "width=%.2f "
-                      "height=%.2f "
-                      "ratio=%.2f "
-                      "fill=%.2f "
-                      "circularity=%.2f "
-                      "center=(%.1f,%.1f)",
-                      area, width, height, ratio, fillRatio, circularity, centerX, centerY);
-
-    candidates.push_back(SquareCandidate{ rect, area });
+    candidates.push_back(
+        SquareCandidate{
+            rect,
+            area
+        });
   }
 
   // =====================================================
@@ -260,155 +513,179 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
   // =====================================================
 
   if(candidates.empty()) {
-    Logger::warning("SquareDetector: "
-                    "正方形候補が見つかりませんでした。");
+    Logger::warning(
+        "SquareDetector:"
+        "正方形候補が見つかりませんでした。");
 
     return;
   }
 
   // =====================================================
-  // 最大面積を取得
-  // =====================================================
-
-  double maxArea = 0.0;
-
-  for(const auto& candidate : candidates) {
-    if(candidate.area > maxArea) {
-      maxArea = candidate.area;
-    }
-  }
-
-  // =====================================================
-  // 面積が極端に小さい候補を除外する
-  // =====================================================
-
-  const double minimumArea = maxArea * AREA_RATIO;
-
-  // =====================================================
-  // 今回の画像だけを使用して候補を決定
+  // 基準位置
   //
-  // X:
-  //   画像中央
+  // 最大面積は使用しない。
   //
-  // Y:
-  //   画像高さの82%
-  //
-  // 前回の検出結果は一切使用しない。
+  // 条件を満たした候補の中から、
+  // 画像中央下側の基準位置に
+  // 一番近い候補を選択する。
   // =====================================================
 
-  const double targetX = CAM_MAX_WIDTH / 2.0;
+  const double targetX
+      = CAM_MAX_WIDTH
+        / 2.0;
 
-  const double targetY = CAM_MAX_HEIGHT * TARGET_Y_RATIO;
+  const double targetY
+      = CAM_MAX_HEIGHT
+        * TARGET_Y_RATIO;
 
-  double bestTargetDistance = std::numeric_limits<double>::max();
+  double bestTargetDistance
+      = std::numeric_limits<double>::max();
 
-  bool foundCandidate = false;
+  bool foundCandidate
+      = false;
 
-  SquareCandidate bestCandidate = candidates.front();
+  SquareCandidate bestCandidate{};
 
-  for(const auto& candidate : candidates) {
+  // =====================================================
+  // 最終候補選択
+  // =====================================================
+
+  for(const auto& candidate
+      : candidates) {
+
+    const double centerX
+        = candidate.rect.center.x
+          + static_cast<double>(
+              roiRect.x);
+
+    const double centerY
+        = candidate.rect.center.y
+          + static_cast<double>(
+              roiRect.y);
+
+    const double dx
+        = centerX
+          - targetX;
+
+    const double dy
+        = centerY
+          - targetY;
+
+    const double targetDistance
+        = std::sqrt(
+            dx * dx
+            + dy * dy);
+
+    Logger::printfLog(
+        Logger::INFO,
+        "SquareDetector: "
+        "selection candidate "
+        "area=%.2f "
+        "center=(%.1f,%.1f) "
+        "target=(%.1f,%.1f) "
+        "targetDistance=%.1f",
+        candidate.area,
+        centerX,
+        centerY,
+        targetX,
+        targetY,
+        targetDistance);
+
     // ---------------------------------------------------
-    // 面積が小さすぎる候補を除外
+    // 遠すぎる候補は除外
     // ---------------------------------------------------
 
-    if(candidate.area < minimumArea) {
-      Logger::printfLog(Logger::DEBUG,
-                        "SquareDetector: "
-                        "candidate area rejected "
-                        "area=%.2f minimumArea=%.2f",
-                        candidate.area, minimumArea);
+    if(targetDistance
+       > MAX_TARGET_DISTANCE) {
+
+      Logger::printfLog(
+          Logger::DEBUG,
+          "SquareDetector: "
+          "target distance rejected "
+          "area=%.2f "
+          "distance=%.1f "
+          "maxDistance=%.1f",
+          candidate.area,
+          targetDistance,
+          MAX_TARGET_DISTANCE);
 
       continue;
     }
 
     // ---------------------------------------------------
-    // フレーム全体での中心位置
+    // 基準位置に最も近い候補
     // ---------------------------------------------------
 
-    const double centerX = candidate.rect.center.x + static_cast<double>(roiRect.x);
+    if(!foundCandidate
+       || targetDistance
+              < bestTargetDistance) {
 
-    const double centerY = candidate.rect.center.y + static_cast<double>(roiRect.y);
+      bestCandidate
+          = candidate;
 
-    // ---------------------------------------------------
-    // 基準位置との距離
-    // ---------------------------------------------------
+      bestTargetDistance
+          = targetDistance;
 
-    const double dx = centerX - targetX;
-
-    const double dy = centerY - targetY;
-
-    const double targetDistance = std::sqrt(dx * dx + dy * dy);
-
-    Logger::printfLog(Logger::INFO,
-                      "SquareDetector: "
-                      "selection candidate "
-                      "area=%.2f "
-                      "center=(%.1f,%.1f) "
-                      "target=(%.1f,%.1f) "
-                      "targetDistance=%.1f",
-                      candidate.area, centerX, centerY, targetX, targetY, targetDistance);
-
-    // ---------------------------------------------------
-    // 基準位置に一番近い候補を選択
-    // ---------------------------------------------------
-
-    if(!foundCandidate || targetDistance < bestTargetDistance) {
-      bestCandidate = candidate;
-
-      bestTargetDistance = targetDistance;
-
-      foundCandidate = true;
+      foundCandidate
+          = true;
     }
   }
 
   // =====================================================
-  // 念のため候補が選択されなかった場合
-  //
-  // 最大面積候補を使用
+  // 有効候補なし
   // =====================================================
 
   if(!foundCandidate) {
-    Logger::warning("SquareDetector: "
-                    "target candidate not found "
-                    "-> use largest area");
+    Logger::warning(
+        "SquareDetector:"
+        "条件を満たす正方形候補がありません。");
 
-    bestCandidate = candidates.front();
-
-    for(const auto& candidate : candidates) {
-      if(candidate.area > bestCandidate.area) {
-        bestCandidate = candidate;
-      }
-    }
+    return;
   }
 
   // =====================================================
-  // 選択された正方形
+  // 選択候補
   // =====================================================
 
-  const cv::RotatedRect bestRect = bestCandidate.rect;
+  const cv::RotatedRect bestRect
+      = bestCandidate.rect;
 
-  const cv::Point2f currentCenter(bestRect.center.x + static_cast<float>(roiRect.x),
-                                  bestRect.center.y + static_cast<float>(roiRect.y));
+  const cv::Point2f currentCenter(
+      bestRect.center.x
+          + static_cast<float>(
+              roiRect.x),
+      bestRect.center.y
+          + static_cast<float>(
+              roiRect.y));
 
   // =====================================================
-  // 4頂点を取得
+  // 4頂点取得
   // =====================================================
 
   cv::Point2f rectPoints[4];
 
-  bestRect.points(rectPoints);
+  bestRect.points(
+      rectPoints);
 
   std::vector<cv::Point> corners;
 
   corners.reserve(4);
 
-  for(int i = 0; i < 4; ++i) {
-    corners.emplace_back(static_cast<int>(rectPoints[i].x) + roiRect.x,
-                         static_cast<int>(rectPoints[i].y) + roiRect.y);
+  for(int i = 0;
+      i < 4;
+      ++i) {
+
+    corners.emplace_back(
+        static_cast<int>(
+            rectPoints[i].x)
+            + roiRect.x,
+        static_cast<int>(
+            rectPoints[i].y)
+            + roiRect.y);
   }
 
   // =====================================================
-  // 4頂点をTL / TR / BR / BLに分類
+  // TL / TR / BR / BL
   // =====================================================
 
   cv::Point topLeft;
@@ -416,85 +693,116 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
   cv::Point bottomLeft;
   cv::Point bottomRight;
 
-  int minSum = INT_MAX;
+  int minSum
+      = INT_MAX;
 
-  int maxSum = INT_MIN;
+  int maxSum
+      = INT_MIN;
 
-  int minDiff = INT_MAX;
+  int minDiff
+      = INT_MAX;
 
-  int maxDiff = INT_MIN;
+  int maxDiff
+      = INT_MIN;
 
-  for(const auto& point : corners) {
-    const int sum = point.x + point.y;
+  for(const auto& point
+      : corners) {
 
-    const int diff = point.x - point.y;
+    const int sum
+        = point.x
+          + point.y;
 
-    // 左上
+    const int diff
+        = point.x
+          - point.y;
+
     if(sum < minSum) {
-      minSum = sum;
+      minSum
+          = sum;
 
-      topLeft = point;
+      topLeft
+          = point;
     }
 
-    // 右下
     if(sum > maxSum) {
-      maxSum = sum;
+      maxSum
+          = sum;
 
-      bottomRight = point;
+      bottomRight
+          = point;
     }
 
-    // 右上
     if(diff > maxDiff) {
-      maxDiff = diff;
+      maxDiff
+          = diff;
 
-      topRight = point;
+      topRight
+          = point;
     }
 
-    // 左下
     if(diff < minDiff) {
-      minDiff = diff;
+      minDiff
+          = diff;
 
-      bottomLeft = point;
+      bottomLeft
+          = point;
     }
   }
 
   // =====================================================
-  // 結果設定
+  // 結果
   // =====================================================
 
-  result.topLeft = topLeft;
+  result.topLeft
+      = topLeft;
 
-  result.topRight = topRight;
+  result.topRight
+      = topRight;
 
-  result.bottomRight = bottomRight;
+  result.bottomRight
+      = bottomRight;
 
-  result.bottomLeft = bottomLeft;
+  result.bottomLeft
+      = bottomLeft;
 
-  result.wasDetected = true;
+  result.wasDetected
+      = true;
 
   // =====================================================
   // ログ
   // =====================================================
 
-  Logger::printfLog(Logger::INFO,
-                    "SquareDetector: "
-                    "===== SQUARE DETECTED ===== "
-                    "area=%.2f "
-                    "center=(%.1f,%.1f)",
-                    bestCandidate.area, currentCenter.x, currentCenter.y);
+  Logger::printfLog(
+      Logger::INFO,
+      "SquareDetector: "
+      "===== SQUARE DETECTED ===== "
+      "area=%.2f "
+      "center=(%.1f,%.1f) "
+      "targetDistance=%.1f",
+      bestCandidate.area,
+      currentCenter.x,
+      currentCenter.y,
+      bestTargetDistance);
 
-  Logger::printfLog(Logger::INFO,
-                    "SquareDetector: "
-                    "TL=(%d,%d) "
-                    "TR=(%d,%d) "
-                    "BR=(%d,%d) "
-                    "BL=(%d,%d)",
-                    result.topLeft.x, result.topLeft.y, result.topRight.x, result.topRight.y,
-                    result.bottomRight.x, result.bottomRight.y, result.bottomLeft.x,
-                    result.bottomLeft.y);
+  Logger::printfLog(
+      Logger::INFO,
+      "SquareDetector: "
+      "TL=(%d,%d) "
+      "TR=(%d,%d) "
+      "BR=(%d,%d) "
+      "BL=(%d,%d)",
+      result.topLeft.x,
+      result.topLeft.y,
+      result.topRight.x,
+      result.topRight.y,
+      result.bottomRight.x,
+      result.bottomRight.y,
+      result.bottomLeft.x,
+      result.bottomLeft.y);
 }
 
-void SquareDetector::setValidatedRoi(const cv::Rect& _roi)
+void SquareDetector::setValidatedRoi(
+    const cv::Rect& _roi)
 {
   roi = _roi;
 
@@ -503,10 +811,6 @@ void SquareDetector::setValidatedRoi(const cv::Rect& _roi)
 
 void SquareDetector::validateParameters()
 {
-  // =====================================================
-  // X座標
-  // =====================================================
-
   if(roi.x < 0) {
     roi.x = 0;
   }
@@ -514,10 +818,6 @@ void SquareDetector::validateParameters()
   if(roi.x > CAM_MAX_WIDTH) {
     roi.x = CAM_MAX_WIDTH;
   }
-
-  // =====================================================
-  // Y座標
-  // =====================================================
 
   if(roi.y < 0) {
     roi.y = 0;
@@ -527,27 +827,27 @@ void SquareDetector::validateParameters()
     roi.y = CAM_MAX_HEIGHT;
   }
 
-  // =====================================================
-  // 幅
-  // =====================================================
-
   if(roi.width < 0) {
     roi.width = 0;
   }
 
-  if(roi.width > CAM_MAX_WIDTH - roi.x) {
-    roi.width = CAM_MAX_WIDTH - roi.x;
-  }
+  if(roi.width
+     > CAM_MAX_WIDTH - roi.x) {
 
-  // =====================================================
-  // 高さ
-  // =====================================================
+    roi.width
+        = CAM_MAX_WIDTH
+          - roi.x;
+  }
 
   if(roi.height < 0) {
     roi.height = 0;
   }
 
-  if(roi.height > CAM_MAX_HEIGHT - roi.y) {
-    roi.height = CAM_MAX_HEIGHT - roi.y;
+  if(roi.height
+     > CAM_MAX_HEIGHT - roi.y) {
+
+    roi.height
+        = CAM_MAX_HEIGHT
+          - roi.y;
   }
 }

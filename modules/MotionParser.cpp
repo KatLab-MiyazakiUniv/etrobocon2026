@@ -259,6 +259,37 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
                                                  std::move(colorCondition2),
                                                  CompoundCondition::LogicalOperator::OR);
     }
+    case CONDITION_COMMAND::COLOR_REGION_CENTER: {
+      double targetCenterX = fromString<double>(params[2]);
+      double toleranceX = fromString<double>(params[3]);
+
+      CameraServer::ColorRegionDetectorRequest request;
+      request.roi = { fromString<int>(params[4]), fromString<int>(params[5]),
+                      fromString<int>(params[6]), fromString<int>(params[7]) };
+      request.requireLargestColorIndex = fromString<bool>(params[8]);
+
+      int count = 0;
+      for(size_t i = 0; i < ImageProcessingColor::BottleColors.size(); i++) {
+        if(fromString<bool>(params[9 + i])) {
+          request.hsvRanges[count] = ImageProcessingColor::BottleColors[i];
+          count++;
+        }
+      }
+      request.hsvRangeCount = count;
+
+      int consecutiveCountThreshold = 1;
+      if(params.size() > 13 && !params[13].empty()) {
+        consecutiveCountThreshold = fromString<int>(params[13]);
+      }
+
+      Logger::printfLog(
+          Logger::DEBUG,
+          "[MotionParser] ColorRegionCenterCondition: targetCenterX=%.1f, toleranceX=%.1f を生成しました",
+          targetCenterX, toleranceX);
+
+      return std::make_unique<ColorRegionCenterCondition>(
+          robot, request, targetCenterX, toleranceX, consecutiveCountThreshold);
+    }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Condition %s は未実装です",
                         params[0].c_str());
@@ -474,7 +505,7 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
     { "RepeatCount", CONDITION_COMMAND::REPEAT_COUNT },
     { "DistanceAndColor", CONDITION_COMMAND::DISTANCE_AND_COLOR },
     { "ColorOrColor", CONDITION_COMMAND::COLOR_OR_COLOR },
-
+    { "ColorRegionCenter", CONDITION_COMMAND::COLOR_REGION_CENTER },
   };
 
   // 条件コマンド文字列に対応するCONDITION_COMMAND値をマップから取得。なければCONDITION_COMMAND::NONEを返す

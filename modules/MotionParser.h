@@ -32,6 +32,7 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "CameraTracking.h"
 #include "Calibrator.h"
 #include "UltraSonicCondition.h"
+#include "ColorRegionCenterCondition.h"
 #include "./../common/ImageProcessingColor.h"
 
 class MotionParser {
@@ -62,6 +63,7 @@ class MotionParser {
     DISTANCE_AND_COLOR,
     ULTRA_SONIC,
     COLOR_OR_COLOR,
+    COLOR_REGION_CENTER,
     NONE
   };
 

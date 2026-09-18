@@ -2,4 +2,4 @@ Command,ID,relativeAngle,tolerance
 説明,説明,説明,説明
 RelativeAngle,1,90,2
 RelativeAngle,2,-90,2
-RelativeAngle,3,180,3
+RelativeAngle,15,-15,2

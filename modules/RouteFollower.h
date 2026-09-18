@@ -15,7 +15,6 @@
 #include "DistanceCondition.h"
 #include "EtRallyMap.h"
 #include "Logger.h"
-#include "MapData.h"
 #include "Pid.h"
 #include "RelativeAngleCondition.h"
 #include "RelativeRotation.h"
@@ -32,7 +31,6 @@ class RouteFollower {
    * @brief コンストラクタ
    * @param _robot ロボット
    * @param _map ETラリーマップ
-   * @param _mapData ゲート情報
    * @param _targetSpeed 直進速度
    * @param _rotationPid 通常回頭PID
    * @param _squareRotationPid 正方形補正回頭PID
@@ -40,10 +38,10 @@ class RouteFollower {
    * @param _leftPid 左モーターPID
    * @param _straightAnglePid 直進角度PID
    */
-  RouteFollower(Robot& _robot, const EtRallyMap& _map, const MapData& _mapData, double _targetSpeed,
-                const Pid::PidGain& _rotationPid, const Pid::PidGain& _squareRotationPid,
-                const Pid::PidGain& _rightPid, const Pid::PidGain& _leftPid,
-                const Pid::PidGain& _straightAnglePid);
+RouteFollower(Robot& _robot, const EtRallyMap& _map, double _targetSpeed,
+              const Pid::PidGain& _rotationPid, const Pid::PidGain& _squareRotationPid,
+              const Pid::PidGain& _rightPid, const Pid::PidGain& _leftPid,
+              const Pid::PidGain& _straightAnglePid);
 
   /**
    * @brief 経路を走行する
@@ -51,23 +49,13 @@ class RouteFollower {
   void run(const std::vector<RouteState>& route);
 
  private:
-  Robot& robot;
-
-  const EtRallyMap& map;
-
-  const MapData& mapData;
-
-  double targetSpeed;
-
-  Pid::PidGain rotationPid;
-
-  Pid::PidGain squareRotationPid;
-
-  Pid::PidGain rightPid;
-
-  Pid::PidGain leftPid;
-
-  Pid::PidGain straightAnglePid;
+  Robot& robot;                    // ロボット本体
+  const EtRallyMap& map;           // ETラリーのマップ情報
+  double targetSpeed;              // 目標走行速度
+  Pid::PidGain rotationPid;        // 回頭用PIDゲイン
+  Pid::PidGain squareRotationPid;  // 正方形補正用回頭PIDゲイン
+  Pid::PidGain rightPid;           // 右モーター用PIDゲイン
+  Pid::PidGain leftPid;            // 左モーター用PIDゲイン
 
   /**
    * @brief Directionを角度へ変換する
@@ -106,7 +94,6 @@ class RouteFollower {
 
   /**
    * @brief ゲートを含む区間を走行する
-   *
    * @param from 区間開始
    * @param to 区間終了
    * @param distance 区間距離
@@ -116,18 +103,26 @@ class RouteFollower {
   void runGateSegment(const RouteState& from, const RouteState& to, double distance,
                       bool rotatedAtSegmentStart);
 
-  /**
+   /**
    * @brief 区間に存在するゲートを取得する
+   * @param from 区間の開始位置
+   * @param to 区間の終了位置
+   * @return 区間内に存在するゲートへのポインタ。存在しない場合はnullptr
    */
   const Gate* findGate(const RouteState& from, const RouteState& to) const;
 
   /**
-   * @brief 外周ゲートか
+   * @brief 外周ゲートか判定する
+   * @param gate 判定するゲート
+   * @return 外周ゲートの場合はtrue、それ以外はfalse
    */
   bool isOuterGate(const Gate& gate) const;
 
   /**
-   * @brief 区間開始位置からゲート中央までの距離
+   * @brief 区間開始位置からゲート中央までの距離を計算する
+   * @param from 区間の開始位置
+   * @param gate 距離を計算するゲート
+   * @return 区間開始位置からゲート中央までの距離[mm]
    */
   double calculateDistanceToGate(const RouteState& from, const Gate& gate) const;
 };

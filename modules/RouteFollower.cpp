@@ -16,13 +16,12 @@ namespace {
 
 }  // namespace
 
-RouteFollower::RouteFollower(Robot& _robot, const EtRallyMap& _map, const MapData& _mapData,
+RouteFollower::RouteFollower(Robot& _robot, const EtRallyMap& _map,
                              double _targetSpeed, const Pid::PidGain& _rotationPid,
                              const Pid::PidGain& _squareRotationPid, const Pid::PidGain& _rightPid,
                              const Pid::PidGain& _leftPid, const Pid::PidGain& _straightAnglePid)
   : robot(_robot),
     map(_map),
-    mapData(_mapData),
     targetSpeed(_targetSpeed),
     rotationPid(_rotationPid),
     squareRotationPid(_squareRotationPid),
@@ -516,9 +515,8 @@ Logger::info("RouteFollower: "
 
 const Gate* RouteFollower::findGate(const RouteState& from, const RouteState& to) const
 {
-  for(const Gate& gate : mapData.getGates()) {
-    const std::vector<GatePass> passes = mapData.getGatePasses(gate.color);
-
+  for(const Gate& gate : robot.getMapData().getGates()) {
+    const std::vector<GatePass> passes = robot.getMapData().getGatePasses(gate.color);
     for(const GatePass& pass : passes) {
       // Y方向
       if(from.x == to.x && pass.entrance.x == from.x && pass.exit.x == from.x) {

@@ -5,11 +5,14 @@
  */
 
 #include "MotionParser.h"
-
+#include "RelativeRotation.h"
 #include "CameraTracking.h"
 #include "LineTrace.h"
 #include "SocketProtocol.h"
 #include "Straight.h"
+#include "RelativeAngleCondition.h"
+#include "Snapshot.h"
+#include "RepeatCountCondition.h"
 
 #include <algorithm>
 
@@ -231,6 +234,49 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
           targetDistance);
     }
 
+    case CONDITION_COMMAND::RELATIVE_ANGLE: {
+  /**
+   * RelativeAngle.csv
+   *
+   * params[0] = "RelativeAngle"
+   * params[1] = ID
+   * params[2] = relativeAngle
+   * params[3] = tolerance
+   */
+
+  if(params.size() < 4) {
+    Logger::printfLog(
+        Logger::ERROR,
+        "[MotionParser] RelativeAngleのパラメータ数が不足しています");
+    return nullptr;
+  }
+
+  return make_unique<RelativeAngleCondition>(
+      robot,
+      fromString<double>(params[2]),
+      fromString<double>(params[3]));
+}
+
+case CONDITION_COMMAND::REPEAT_COUNT: {
+  /**
+   * RepeatCount.csv
+   *
+   * params[0] = "RepeatCount"
+   * params[1] = ID
+   * params[2] = targetRepeats
+   */
+
+  if(params.size() < 3) {
+    Logger::printfLog(
+        Logger::ERROR,
+        "[MotionParser] RepeatCountのパラメータ数が不足しています");
+    return nullptr;
+  }
+
+  return make_unique<RepeatCountCondition>(
+      robot,
+      fromString<int>(params[2]));
+}
     // ↓ 他の条件コマンドはここに追加していく
 
     default:
@@ -450,6 +496,60 @@ BaseMotion* MotionParser::createMotionInstance(
     }
 
     // ↓ 他のコマンドはここに追加していく
+case MOTION_COMMAND::RELATIVE_ROTATION: {
+  /**
+   * RelativeRotation.csv
+   *
+   * motionParams[0] = "RelativeRotation"
+   * motionParams[1] = ID
+   * motionParams[2] = relativeAngle
+   * motionParams[3] = angleKp
+   * motionParams[4] = angleKi
+   * motionParams[5] = angleKd
+   */
+
+  if(motionParams.size() < 6) {
+    Logger::printfLog(
+        Logger::ERROR,
+        "[MotionParser] RelativeRotationのパラメータ数が不足しています");
+    return nullptr;
+  }
+
+  Pid::PidGain anglePid{
+    fromString<double>(motionParams[3]),
+    fromString<double>(motionParams[4]),
+    fromString<double>(motionParams[5])
+  };
+
+  return new RelativeRotation(
+      robot,
+      std::move(condition),
+      anglePid,
+      fromString<double>(motionParams[2]));
+}
+
+case MOTION_COMMAND::SNAPSHOT: {
+  /**
+   * Snapshot.csv
+   *
+   * motionParams[0] = "Snapshot"
+   * motionParams[1] = ID
+   * motionParams[2] = fileName
+   */
+
+  if(motionParams.size() < 3) {
+    Logger::printfLog(
+        Logger::ERROR,
+        "[MotionParser] Snapshotのパラメータ数が不足しています");
+    return nullptr;
+  }
+
+  return new Snapshot(
+      robot,
+      motionParams[2],
+      std::move(condition));
+}
+
 
     default:
       Logger::printfLog(
@@ -469,6 +569,8 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
     { "Straight", MOTION_COMMAND::STRAIGHT },
     { "QRTracking", MOTION_COMMAND::QR_TRACKING },
     { "LineTrace", MOTION_COMMAND::LINETRACE },
+    { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
+    { "Snapshot", MOTION_COMMAND::SNAPSHOT },
   };
 
   auto it = commandMap.find(str);
@@ -486,6 +588,8 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
   // それに対応する列挙型CONDITION_COMMANDのマッピング
   static const unordered_map<string, CONDITION_COMMAND> conditionMap = {
     { "Distance", CONDITION_COMMAND::DISTANCE },
+    { "RelativeAngle", CONDITION_COMMAND::RELATIVE_ANGLE },
+    { "RepeatCount", CONDITION_COMMAND::REPEAT_COUNT },
   };
 
   auto it = conditionMap.find(str);

@@ -1,3 +1,17 @@
 動作コマンド名,動作ID,条件コマンド名,条件ID
 #第1直線
 Straight,001,Distance,070
+Snapshot,1,RepeatCount,3
+RelativeRotation,1,RelativeAngle,1
+Straight,001,Distance,070
+Snapshot,1,RepeatCount,3
+RelativeRotation,1,RelativeAngle,1
+Straight,001,Distance,070
+Snapshot,1,RepeatCount,3
+RelativeRotation,1,RelativeAngle,1
+Straight,001,Distance,070
+Snapshot,1,RepeatCount,3
+RelativeRotation,1,RelativeAngle,1
+Straight,001,Distance,070
+Snapshot,1,RepeatCount,3
+RelativeRotation,1,RelativeAngle,1

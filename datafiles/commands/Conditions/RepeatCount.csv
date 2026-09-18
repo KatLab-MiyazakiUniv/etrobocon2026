@@ -1,0 +1,5 @@
+Command,ID,targetRepeats
+説明,説明,説明
+RepeatCount,1,3
+RepeatCount,2,5
+RepeatCount,3,100

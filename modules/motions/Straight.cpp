@@ -8,7 +8,7 @@
 
 Straight::Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                    double _targetSpeed, const Pid::PidGain& _rightPid, const Pid::PidGain& _leftPid,
-                   const Pid::PidGain& _anglePidGain, bool _shouldUseIMU)
+                   const Pid::PidGain& _anglePidGain, bool _shouldUseIMU,double _deadbandRate, double _maxoutRate)
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
     speedCalculator(_robot, _rightPid, _leftPid, _targetSpeed),
@@ -30,6 +30,18 @@ bool Straight::canStart()
   if(targetSpeed == 0.0) {
     return false;
   }
+    // マックスアウトの割合が0.0〜1.0の範囲外の場合は開始しない
+  if(maxoutRate < 0.0 || maxoutRate > 1.0) {
+    Logger::warning("マックスアウトの割合は0.0〜1.0の範囲で設定してください");
+    return false;
+  }
+
+  // デッドバンドの割合がマックスアウトの割合を上回る場合は開始しない
+  if(deadbandRate < 0.0 || deadbandRate > maxoutRate) {
+    Logger::warning("デッドバンドの割合は0.0以上かつマックスアウトの割合以下で設定してください");
+    return false;
+  }
+
   return true;
 }
 
@@ -48,6 +60,18 @@ void Straight::executeStep()
   double requiredRightPower = speedCalculator.calculateRightMotorPower();
   double requiredLeftPower = speedCalculator.calculateLeftMotorPower();
   double turningPower = 0.0;
+
+   // デッドバンドとマックスアウトを適用
+  double deadbandPower = deadbandRate * targetSpeed;
+  double maxoutPower = maxoutRate * targetSpeed;
+
+  // デッドバンド: 閾値未満の旋回値を無視し、微小な揺れを防ぐ
+  if(std::abs(turningPower) < deadbandPower) {
+    turningPower = 0.0;
+  } else {
+    // マックスアウト: 閾値を超える旋回値を制限し、急激な旋回を防ぐ
+    turningPower = std::min(std::max(turningPower, -maxoutPower), maxoutPower);
+  }
 
   if(shouldUseIMU) {
     // 目標角度と現在角度の差

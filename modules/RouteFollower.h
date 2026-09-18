@@ -10,7 +10,6 @@
 #include <vector>
 #include <cmath>
 #include <memory>
-
 #include "AngleNormalizer.h"
 #include "ClockUtil.h"
 #include "DistanceCondition.h"

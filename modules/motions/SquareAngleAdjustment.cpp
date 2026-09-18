@@ -7,10 +7,7 @@
 #include "SquareAngleAdjustment.h"
 
 namespace {
-
-  /**
-   * @brief radからdegへの変換係数
-   */
+  // radからdegへの変換係数
   constexpr double SQUARE_RAD_TO_DEG = 180.0 / 3.14159265358979323846;
 
 }  // namespace
@@ -72,14 +69,10 @@ SquareAngleAdjustment::Result SquareAngleAdjustment::calculate(
   result.correctionAngle = correctionAngle;
   result.straightDistance = straightDistance;
 
-  // 計算結果をログに出力する。
   Logger::printfLog(Logger::INFO, "SquareAngleAdjustment: 中心座標=(%.2f, %.2f)", centerX, centerY);
-
   Logger::printfLog(Logger::INFO, "SquareAngleAdjustment: 前方距離=%.2f mm 横方向距離=%.2f mm",
                     forwardDistance, lateralDistance);
-
   Logger::printfLog(Logger::INFO, "SquareAngleAdjustment: 補正角度=%.2f deg", correctionAngle);
-
   Logger::printfLog(Logger::INFO, "SquareAngleAdjustment: 直線距離=%.2f mm", straightDistance);
 
   return result;

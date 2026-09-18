@@ -10,6 +10,8 @@
 
 #include <opencv2/opencv.hpp>
 #include <vector>
+#include <string>
+#include <vector>
 #include "CameraCapture.h"
 #include "Logger.h"
 #include "SocketProtocol.h"

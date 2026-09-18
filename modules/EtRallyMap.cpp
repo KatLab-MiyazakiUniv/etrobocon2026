@@ -19,14 +19,6 @@ void EtRallyMap::updateNodes()
       nodes[gridX][gridY].gridX = gridX;
       nodes[gridX][gridY].gridY = gridY;
 
-      // =====================================================
-      // X方向の実座標
-      //
-      // 0 → 1                  : firstXGridSize
-      // 1 → X_GRID_NUM - 1     : gridSizeX
-      // X_GRID_NUM - 1 → 最後 : lastXGridSize
-      // =====================================================
-
       if(gridX == 0) {
         nodes[gridX][gridY].x = 0.0;
 
@@ -39,16 +31,6 @@ void EtRallyMap::updateNodes()
       } else {
         nodes[gridX][gridY].x = firstXGridSize + (gridX - 1) * gridSizeX;
       }
-
-      // =====================================================
-      // Y方向の実座標
-      //
-      // 0 → 1                  : firstYGridSize
-      // 1 → Y_GRID_NUM - 1     : gridSizeY
-      // Y_GRID_NUM - 1 → 最後 : lastYGridSize
-      //
-      // Y方向は下方向をマイナスとして扱う
-      // =====================================================
 
       if(gridY == 0) {
         nodes[gridX][gridY].y = 0.0;
@@ -74,41 +56,35 @@ EtRallyMap::Node EtRallyMap::getNode(int gridX, int gridY) const
 void EtRallyMap::setFirstXGridSize(double value)
 {
   firstXGridSize = value;
-
   updateNodes();
 }
 
 void EtRallyMap::setGridSizeX(double value)
 {
   gridSizeX = value;
-
   updateNodes();
 }
 
 void EtRallyMap::setLastXGridSize(double value)
 {
   lastXGridSize = value;
-
   updateNodes();
 }
 
 void EtRallyMap::setFirstYGridSize(double value)
 {
   firstYGridSize = value;
-
   updateNodes();
 }
 
 void EtRallyMap::setGridSizeY(double value)
 {
   gridSizeY = value;
-
   updateNodes();
 }
 
 void EtRallyMap::setLastYGridSize(double value)
 {
   lastYGridSize = value;
-
   updateNodes();
 }

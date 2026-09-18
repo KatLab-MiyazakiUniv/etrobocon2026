@@ -15,7 +15,7 @@
 #include "SocketProtocol.h"
 
 /**
- * @brief 正方形状の領域を画像から検出するクラス
+ * @brief QRコード全体に近い矩形領域を検出するクラス
  */
 class SquareDetector {
  public:
@@ -31,14 +31,12 @@ class SquareDetector {
   ~SquareDetector();
 
   /**
-   * @brief 正方形状の領域を検出する
+   * @brief QRコード全体に近い矩形領域を検出する
    *
    * @param frame 入力画像
    * @param result 検出結果
    */
-  void detect(
-      const cv::Mat& frame,
-      BoundingBoxDetectionResult& result);
+  void detect(const cv::Mat& frame, BoundingBoxDetectionResult& result);
 
   /**
    * @brief ROIを設定する
@@ -56,26 +54,31 @@ class SquareDetector {
   /**
    * @brief 最小輪郭面積
    *
-   * 小さいノイズやQR内部の細かい模様を除外する。
+   * QR内部のファインダーパターンや細かい模様を除外し、
+   * QR全体に近い大きな輪郭のみを候補にする。
    */
-  static constexpr double MIN_CONTOUR_AREA = 2000.0;
+  static constexpr double MIN_CONTOUR_AREA = 9000.0;
 
   /**
    * @brief 最小縦横比
    *
-   * カメラの遠近によって横長に見える場合を考慮する。
+   * 床面上のQRコードは透視変形によって横長に見えるため、
+   * 0.35まで許容する。
    */
-  static constexpr double MIN_RATIO = 0.40;
+  static constexpr double MIN_RATIO = 0.35;
 
   /**
    * @brief 最小充填率
+   *
+   * QRコード内部には多数の空白部分が存在するため、
+   * 0.40まで許容する。
    */
-  static constexpr double MIN_FILL_RATIO = 0.60;
+  static constexpr double MIN_FILL_RATIO = 0.40;
 
   /**
    * @brief 最大円形度
    *
-   * 円に近い輪郭を除外する。
+   * 円形に近い輪郭を除外する。
    */
   static constexpr double MAX_CIRCULARITY = 0.82;
 

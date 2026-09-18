@@ -1,0 +1,4 @@
+Command,ID,RelativeAngle,AngleKp,AngleKi,AngleKd
+説明,説明,説明,説明,説明,説明
+RelativeRotation,001,90,1.1,0.95,0.0
+RelativeRotation,002,-90,1.2,1.0,0.0

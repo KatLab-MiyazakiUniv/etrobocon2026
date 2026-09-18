@@ -1,0 +1,4 @@
+Command,ID,RelativeAngle,Tolerance
+説明,説明,説明,説明
+RelativeAngle,001,90,2.0
+RelativeAngle,002,-90,2.0

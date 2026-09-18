@@ -14,7 +14,9 @@ Straight::Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _co
     speedCalculator(_robot, _rightPid, _leftPid, _targetSpeed),
     anglePid(_anglePidGain.kp, _anglePidGain.ki, _anglePidGain.kd, 0.0),
     shouldUseIMU(_shouldUseIMU),
-    targetAngle(0.0)
+    targetAngle(0.0),
+    deadbandRate(_deadbandRate),
+    maxoutRate(_maxoutRate)
 {
   LOG_CREATE("Straight");
 }
@@ -54,41 +56,46 @@ void Straight::prepare()
 
   anglePid.prepare();
 }
-
 void Straight::executeStep()
 {
   double requiredRightPower = speedCalculator.calculateRightMotorPower();
   double requiredLeftPower = speedCalculator.calculateLeftMotorPower();
   double turningPower = 0.0;
 
-   // デッドバンドとマックスアウトを適用
-  double deadbandPower = deadbandRate * targetSpeed;
-  double maxoutPower = maxoutRate * targetSpeed;
-
-  // デッドバンド: 閾値未満の旋回値を無視し、微小な揺れを防ぐ
-  if(std::abs(turningPower) < deadbandPower) {
-    turningPower = 0.0;
-  } else {
-    // マックスアウト: 閾値を超える旋回値を制限し、急激な旋回を防ぐ
-    turningPower = std::min(std::max(turningPower, -maxoutPower), maxoutPower);
-  }
-
   if(shouldUseIMU) {
-    // 目標角度と現在角度の差
+    // 現在角度を取得
     double currentAngle = robot.getIMUControllerInstance().getAzimuth();
+
+    // 目標角度との差を計算
     double angleDeviation = targetAngle - currentAngle;
 
-    // 角度の誤差を-180度から180度の範囲に正規化
+    // -180〜180度に正規化
     angleDeviation = AngleNormalizer::normalizeAngle(angleDeviation);
 
+    // PID制御で旋回量を計算
     turningPower = anglePid.calculatePid(angleDeviation);
+
+    // デッドバンドとマックスアウトを計算
+    double deadbandPower = deadbandRate * std::abs(targetSpeed);
+    double maxoutPower = maxoutRate * std::abs(targetSpeed);
+
+    // デッドバンド
+    if(std::abs(turningPower) < deadbandPower) {
+      turningPower = 0.0;
+    } else {
+      // マックスアウト
+      turningPower
+          = std::min(std::max(turningPower, -maxoutPower), maxoutPower);
+    }
   }
 
   // モーターにPower値をセット
-  robot.getWheelMotorControllerInstance().setRightPower(requiredRightPower + turningPower);
-  robot.getWheelMotorControllerInstance().setLeftPower(requiredLeftPower - turningPower);
-}
+  robot.getWheelMotorControllerInstance().setRightPower(
+      requiredRightPower + turningPower);
 
+  robot.getWheelMotorControllerInstance().setLeftPower(
+      requiredLeftPower - turningPower);
+}
 void Straight::finish()
 {
   robot.getWheelMotorControllerInstance().stopBoth();

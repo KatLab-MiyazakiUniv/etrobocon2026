@@ -1,15 +1,10 @@
 /**
  * @file   SquareDetector.cpp
  * @brief  正方形検出用の画像処理クラス
- * @author okuyama0528
+ * @author okuyama0528 yutaro-1214
  */
 
 #include "SquareDetector.h"
-
-#include <algorithm>
-#include <climits>
-#include <cmath>
-#include <limits>
 
 namespace {
 
@@ -23,23 +18,14 @@ namespace {
 
   /**
    * @brief 候補として残す面積割合
-   *
    * 最大面積の70%以上の候補だけを
    * 最終候補の選択対象とする。
-   *
    * 小さなノイズを誤検出しにくくする。
    */
   constexpr double AREA_RATIO = 0.70;
 
   /**
-   * @brief 正方形を探す基準Y位置
-   *
-   * 画像下側にQRが映ることを想定し、
-   * 画像高さの82%付近を基準とする。
-   *
-   * 1920x1080の場合
-   *
-   * targetY = 約886px
+   * @brief 正方形を探す優先位置
    */
   constexpr double TARGET_Y_RATIO = 0.82;
 
@@ -61,10 +47,7 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
 {
   result.wasDetected = false;
 
-  // =====================================================
   // 入力画像確認
-  // =====================================================
-
   if(frame.empty()) {
     Logger::error("SquareDetector:"
                   "入力フレームが空です。");
@@ -77,7 +60,6 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
   // =====================================================
 
   const cv::Rect frameRect(0, 0, frame.cols, frame.rows);
-
   const cv::Rect roiRect = roi & frameRect;
 
   if(roiRect.empty()) {
@@ -89,26 +71,15 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
 
   const cv::Mat roiFrame = frame(roiRect);
 
-  // =====================================================
   // グレースケール化
-  // =====================================================
-
   cv::Mat grayFrame;
-
   cv::cvtColor(roiFrame, grayFrame, cv::COLOR_BGR2GRAY);
 
-  // =====================================================
   // ノイズ除去
-  // =====================================================
-
   cv::GaussianBlur(grayFrame, grayFrame, cv::Size(5, 5), 0);
 
-  // =====================================================
   // 二値化
-  // =====================================================
-
   cv::Mat binary;
-
   cv::threshold(grayFrame, binary, 0, 255, cv::THRESH_BINARY_INV | cv::THRESH_OTSU);
 
   // =====================================================

@@ -6,13 +6,6 @@
 
 #include "CameraTracking.h"
 
-#include <algorithm>
-#include <utility>
-
-// =====================================================
-// 色領域検出用コンストラクタ
-// =====================================================
-
 CameraTracking::CameraTracking(
     Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
     double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
@@ -30,10 +23,6 @@ CameraTracking::CameraTracking(
 {
   LOG_CREATE("CameraTracking");
 }
-
-// =====================================================
-// QRコード検出用コンストラクタ
-// =====================================================
 
 CameraTracking::CameraTracking(Robot& _robot,
                                std::unique_ptr<BaseContinuationCondition> _continuationCondition,
@@ -54,10 +43,6 @@ CameraTracking::CameraTracking(Robot& _robot,
 {
   LOG_CREATE("CameraTracking");
 }
-
-// =====================================================
-// 正方形検出用コンストラクタ
-// =====================================================
 
 CameraTracking::CameraTracking(Robot& _robot,
                                std::unique_ptr<BaseContinuationCondition> _continuationCondition,
@@ -88,10 +73,8 @@ bool CameraTracking::canStart()
 {
   if(targetSpeed == 0.0) {
     Logger::error("CameraTracking:目標スピードが0です");
-
     return false;
   }
-
   return true;
 }
 
@@ -99,18 +82,14 @@ void CameraTracking::prepare()
 {
   cameraPid.prepare();
 
-  Logger::printfLog(Logger::INFO, "CameraTracking: start targetSpeed=%.2f targetX=%d mode=%d",
+  Logger::printfLog(Logger::INFO, "CameraTracking: 開始 目標速度=%.2f 目標X=%d モード=%d",
                     targetSpeed, targetXCoordinate, static_cast<int>(detectionMode));
 }
 
 void CameraTracking::executeStep()
 {
-  // =====================================================
   // 基本モータPower
-  // =====================================================
-
   const double baseRightPower = speedCalculator.calculateRightMotorPower();
-
   const double baseLeftPower = speedCalculator.calculateLeftMotorPower();
 
   SocketClient& client = robot.getCameraSocketClientInstance();
@@ -120,10 +99,7 @@ void CameraTracking::executeStep()
 
   double currentX = 0.0;
 
-  // =====================================================
   // 色領域検出
-  // =====================================================
-
   if(detectionMode == DetectionMode::COLOR_REGION) {
     CameraServer::ColorRegionDetectorResponse response{};
 
@@ -137,10 +113,7 @@ void CameraTracking::executeStep()
       }
     }
 
-    // =====================================================
     // QRコード検出
-    // =====================================================
-
   } else if(detectionMode == DetectionMode::QR_CODE) {
     CameraServer::QrCodeDetectorResponse response{};
 
@@ -160,10 +133,7 @@ void CameraTracking::executeStep()
       }
     }
 
-    // =====================================================
     // 正方形検出
-    // =====================================================
-
   } else if(detectionMode == DetectionMode::SQUARE_DETECTION) {
     CameraServer::SquareDetectorResponse response{};
 
@@ -184,58 +154,33 @@ void CameraTracking::executeStep()
         currentX = sumX / CameraServer::SQUARE_CORNER_COUNT;
 
         const double currentY = sumY / CameraServer::SQUARE_CORNER_COUNT;
-
         const double errorX = currentX - static_cast<double>(targetXCoordinate);
 
-        /*
-         * 正方形を検出できているときのログ。
-         */
         Logger::printfLog(Logger::INFO,
-                          "CameraTracking: SQUARE DETECTED "
-                          "center=(%.2f, %.2f) "
-                          "targetX=%d errorX=%.2f",
+                          "CameraTracking: 正方形検出 中心=(%.2f, %.2f) 目標X=%d X誤差=%.2f",
                           currentX, currentY, targetXCoordinate, errorX);
 
       } else {
-        /*
-         * 通信には成功しているが、
-         * 正方形が画像に存在しなかった場合。
-         */
-        Logger::warning("CameraTracking: SQUARE NOT DETECTED");
+        Logger::warning("CameraTracking: 正方形を検出できませんでした");
       }
     }
 
   } else {
-    Logger::error("CameraTracking: invalid detection mode");
+    Logger::error("CameraTracking: 無効な検出モードです");
 
     return;
   }
 
-  // =====================================================
   // 通信失敗
-  // =====================================================
-
   if(!success) {
-    Logger::warning("CameraTracking: detection communication failed");
-
+    Logger::warning("CameraTracking: 検出処理との通信に失敗しました");
     return;
   }
 
-  // =====================================================
   // 検出失敗
-  // =====================================================
-
   if(!wasDetected) {
-    /*
-     * 正方形モードの場合は、
-     * 一時的に見失っても通常直進する。
-     *
-     * そうしないと停止状態のまま
-     * DistanceConditionが終了しない可能性がある。
-     */
     if(detectionMode == DetectionMode::SQUARE_DETECTION) {
       robot.getWheelMotorControllerInstance().setRightPower(baseRightPower);
-
       robot.getWheelMotorControllerInstance().setLeftPower(baseLeftPower);
 
       Logger::printfLog(Logger::WARNING,
@@ -245,28 +190,16 @@ void CameraTracking::executeStep()
 
       return;
     }
-
     Logger::warning("CameraTracking:検出対象が検出できませんでした");
-
     return;
   }
 
-  // =====================================================
   // PID角度補正
-  // =====================================================
-
   const double turningPower = cameraPid.calculatePid(currentX) * -1.0;
-
   const double rightPower = baseRightPower > 0.0 ? std::max(baseRightPower - turningPower, 0.0)
                                                  : std::min(baseRightPower + turningPower, 0.0);
-
   const double leftPower = baseLeftPower > 0.0 ? std::max(baseLeftPower + turningPower, 0.0)
                                                : std::min(baseLeftPower - turningPower, 0.0);
-
-  // =====================================================
-  // 正方形モードのPIDログ
-  // =====================================================
-
   if(detectionMode == DetectionMode::SQUARE_DETECTION) {
     Logger::printfLog(Logger::INFO,
                       "CameraTracking: square PID "
@@ -276,20 +209,13 @@ void CameraTracking::executeStep()
                       currentX, targetXCoordinate, turningPower, rightPower, leftPower);
   }
 
-  // =====================================================
   // モータ出力
-  // =====================================================
-
   robot.getWheelMotorControllerInstance().setRightPower(rightPower);
-
   robot.getWheelMotorControllerInstance().setLeftPower(leftPower);
 }
 
 void CameraTracking::wait()
 {
-  /*
-   * 0msだとClockUtil::sleepで警告が出るため1ms。
-   */
   ClockUtil::sleep(1);
 }
 

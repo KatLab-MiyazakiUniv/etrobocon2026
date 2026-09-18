@@ -29,337 +29,135 @@ namespace CameraServer {
     SHUTDOWN = 255               // サーバーをシャットダウン
   };
 
-  /**
-   * @brief コマンド型のバイトサイズ
-   */
-  constexpr size_t COMMAND_SIZE = sizeof(Command);
+  constexpr size_t COMMAND_SIZE = sizeof(Command);  // コマンド型のバイトサイズ
 
-  // =========================================================
-  // Snapshot
-  // =========================================================
-
-  /**
-   * @brief スナップショット撮影アクションのリクエストデータ構造
-   */
+  // スナップショット撮影アクションのリクエストデータ構造
   struct SnapshotActionRequest {
-    /**
-     * @brief スナップショットコマンド
-     */
-    Command command = Command::SNAPSHOT;
-
-    /**
-     * @brief 保存するファイル名
-     */
-    char fileName[64] = {};
+    Command command = Command::SNAPSHOT;  // SNAPSHOTを期待
+    char fileName[64] = {};               // 保存するファイル名
   };
 
-  /**
-   * @brief スナップショット撮影アクションのレスポンスデータ構造
-   */
+  // スナップショット撮影アクションのレスポンスデータ構造
   struct SnapshotActionResponse {
-    /**
-     * @brief 撮影が成功したか
-     */
-    bool success = false;
+    bool success = false;  // 撮影成功かどうか
   };
-
-  // =========================================================
-  // 共通データ構造
-  // =========================================================
 
   /**
    * @brief HSVの3要素データ
    */
   struct ScalarData {
-    double h = 0.0;
-    double s = 0.0;
-    double v = 0.0;
+    double h = 0.0;  // h
+    double s = 0.0;  // s
+    double v = 0.0;  // v
   };
 
   /**
    * @brief 矩形領域データ
    */
   struct RectData {
-    /**
-     * @brief 左上X座標
-     */
-    int32_t x = 0;
-
-    /**
-     * @brief 左上Y座標
-     */
-    int32_t y = 0;
-
-    /**
-     * @brief 幅
-     */
-    int32_t width = 0;
-
-    /**
-     * @brief 高さ
-     */
-    int32_t height = 0;
+    int32_t x = 0;       // 左上X座標
+    int32_t y = 0;       // 左上Y座標
+    int32_t width = 0;   // 幅
+    int32_t height = 0;  // 高さ
   };
 
   /**
    * @brief 画像サイズデータ
    */
   struct SizeData {
-    int32_t width = 0;
-    int32_t height = 0;
+    int32_t width = 0;   // 幅
+    int32_t height = 0;  // 高さ
   };
 
   /**
    * @brief 座標データ
    */
   struct PointData {
-    int32_t x = 0;
-    int32_t y = 0;
+    int32_t x = 0;  // X座標
+    int32_t y = 0;  // Y座標
   };
 
   /**
    * @brief バウンディングボックスを表す座標
    */
   struct BoundingBoxDetectionResult {
-    /**
-     * @brief 検出できたか
-     */
-    bool wasDetected = false;
-
-    /**
-     * @brief 左上
-     */
-    PointData topLeft;
-
-    /**
-     * @brief 右上
-     */
-    PointData topRight;
-
-    /**
-     * @brief 左下
-     */
-    PointData bottomLeft;
-
-    /**
-     * @brief 右下
-     */
-    PointData bottomRight;
+    bool wasDetected = false;  // 正方形を検出できたか
+    PointData topLeft;         // 左上の座標
+    PointData topRight;        // 右上の座標
+    PointData bottomLeft;      // 左下の座標
+    PointData bottomRight;     // 右下の座標
   };
 
-  // =========================================================
-  // ColorRegionDetection
-  // =========================================================
-
-  /**
-   * @brief 1リクエストで指定可能なHSV範囲の最大数
-   */
-  static constexpr uint32_t MAX_HSV_RANGES = 5;
+  static constexpr uint32_t MAX_HSV_RANGES = 5;  // 1リクエストで指定可能なHSV範囲の最大数
 
   /**
    * @brief 1つの色に対応するHSV範囲
    */
   struct HSVRangeData {
-    /**
-     * @brief HSV下限値
-     */
-    ScalarData lower;
-
-    /**
-     * @brief HSV上限値
-     */
-    ScalarData upper;
+    ScalarData lower;  // HSV下限値
+    ScalarData upper;  // HSV上限値
   };
 
   /**
    * @brief カメラサーバーに色領域検出を要求するリクエスト構造体
    */
   struct ColorRegionDetectorRequest {
-    /**
-     * @brief 色領域検出コマンド
-     */
-    Command command = Command::COLOR_REGION_DETECTION;
-
-    /**
-     * @brief 最も大きい色領域のインデックスを返すか
-     */
-    bool requireLargestColorIndex = false;
-
-    /**
-     * @brief hsvRangesの有効要素数
-     */
-    uint8_t hsvRangeCount = 0;
-
-    /**
-     * @brief HSV範囲
-     */
-    HSVRangeData hsvRanges[MAX_HSV_RANGES] = {};
-
-    /**
-     * @brief 検出対象ROI
-     */
-    RectData roi;
+    Command command = Command::COLOR_REGION_DETECTION;  // 色領域検出コマンド
+    bool requireLargestColorIndex = false;   // 最も大きい色領域のインデックスを返すかどうか
+    uint8_t hsvRangeCount = 0;               // hsvRangesの有効な要素数
+    HSVRangeData hsvRanges[MAX_HSV_RANGES];  // HSVの範囲の配列
+    RectData roi;                            // 検出対象の領域
   };
 
   /**
-   * @brief 色領域検出レスポンス
+   * @brief 色領域検出のレスポンス構造体
    */
   struct ColorRegionDetectorResponse {
-    /**
-     * @brief 色領域検出結果
-     */
-    BoundingBoxDetectionResult result;
-
-    /**
-     * @brief 最も面積が大きい色のインデックス
-     */
-    int32_t largestColorIndex = -1;
+    BoundingBoxDetectionResult result;  // 色領域の検出結果
+    int32_t largestColorIndex = -1;     // 最も面積が大きい色のインデックス
   };
 
-  // =========================================================
-  // QR Code Detection
-  // =========================================================
+  static constexpr uint32_t QR_CODE_CORNER_COUNT = 4;   // QRコードの頂点数
+  static constexpr uint32_t QR_CODE_CONTENT_SIZE = 64;  // QRコードから取得した文字列の最大バイト数
 
   /**
-   * @brief QRコードの頂点数
-   */
-  static constexpr uint32_t QR_CODE_CORNER_COUNT = 4;
-
-  /**
-   * @brief QRコードから取得した文字列の最大バイト数
-   */
-  static constexpr uint32_t QR_CODE_CONTENT_SIZE = 64;
-
-  /**
-   * @brief カメラサーバーにQRコード検出を要求するリクエスト構造体
+   * @brief カメラサーバーにQRコード検出を要求する際のリクエスト構造体
    */
   struct QrCodeDetectorRequest {
-    /**
-     * @brief QRコード検出コマンド
-     */
-    Command command = Command::QR_CODE_DETECTION;
-
-    /**
-     * @brief 検出対象ROI
-     */
-    RectData roi;
+    Command command = Command::QR_CODE_DETECTION;  // QRコード検出コマンド
+    RectData roi;                                  // 検出対象の領域
   };
 
   /**
-   * @brief QRコード検出レスポンス
+   * @brief QRコード検出のレスポンス構造体
    */
   struct QrCodeDetectorResponse {
-    /**
-     * @brief QRコードを検出できたか
-     */
-    bool wasDetected = false;
-
-    /**
-     * @brief QRコードの内容
-     */
-    char content[QR_CODE_CONTENT_SIZE] = {};
-
-    /**
-     * @brief QRコードの4頂点
-     */
-    PointData corners[QR_CODE_CORNER_COUNT] = {};
+    bool wasDetected = false;                      // 検出できたかどうか
+    char content[QR_CODE_CONTENT_SIZE] = {};       // QRコードから取得した文字列
+    PointData corners[QR_CODE_CORNER_COUNT] = {};  // QRコードの各頂点の座標(左上から時計回りの順)
   };
 
-  // =========================================================
-  // Square Detection
-  // =========================================================
-
-  /**
-   * @brief 正方形の頂点数
-   */
-  static constexpr uint32_t SQUARE_CORNER_COUNT = 4;
+  static constexpr uint32_t SQUARE_CORNER_COUNT = 4;  // 正方形の頂点数
 
   /**
    * @brief カメラサーバーに正方形検出を要求するリクエスト構造体
    */
   struct SquareDetectorRequest {
-    /**
-     * @brief 正方形検出コマンド
-     */
-    Command command = Command::SQUARE_DETECTION;
-
-    /**
-     * @brief 検出対象ROI
-     */
-    RectData roi;
-
-    /**
-     * @brief SquareDetectorの追跡状態をリセットするか
-     *
-     * true:
-     *   今回の正方形検出前に
-     *   previous detectionなどの追跡状態を破棄する。
-     *
-     * false:
-     *   前回検出位置を引き継いで追跡する。
-     *
-     * 現在のSquareDetectorで追跡機能を使用していない場合は、
-     * この値は実質使用しない。
-     */
-    bool resetTracking = false;
+    Command command = Command::SQUARE_DETECTION;  // 正方形検出コマンド
+    RectData roi;                                 // 検出対象の領域
+    bool resetTracking = false;                   // 前回の検出結果をリセットするかどうか
   };
 
   /**
-   * @brief 正方形検出レスポンス
-   *
-   * カメラサーバー側で、
-   *
-   * 1. 正方形検出
-   * 2. 中心座標計算
-   * 3. ホモグラフィ変換
-   * 4. 前方距離・横方向距離計算
-   *
-   * まで行い、その結果を走行体側へ送信する。
+   * @brief 正方形検出のレスポンス構造体
    */
   struct SquareDetectorResponse {
-    /**
-     * @brief 正方形を検出できたか
-     */
-    bool wasDetected = false;
-
-    /**
-     * @brief 正方形の4頂点
-     *
-     * 0: 左上
-     * 1: 右上
-     * 2: 右下
-     * 3: 左下
-     */
-    PointData corners[SQUARE_CORNER_COUNT] = {};
-
-    /**
-     * @brief 画像上の正方形中心X座標[px]
-     */
-    double centerX = 0.0;
-
-    /**
-     * @brief 画像上の正方形中心Y座標[px]
-     */
-    double centerY = 0.0;
-
-    /**
-     * @brief カメラ直下の床点から見た前方距離[mm]
-     *
-     * カメラサーバー側で
-     * ホモグラフィ変換結果から計算する。
-     */
-    double forwardDistance = 0.0;
-
-    /**
-     * @brief カメラ正面中心から見た横方向距離[mm]
-     *
-     * 左側:
-     *   負
-     *
-     * 右側:
-     *   正
-     */
-    double lateralDistance = 0.0;
+    bool wasDetected = false;                     // 正方形を検出できたかどうか
+    PointData corners[SQUARE_CORNER_COUNT] = {};  // 正方形の各頂点の座標
+    double centerX = 0.0;                         // 画像上の正方形中心X座標[px]
+    double centerY = 0.0;                         // 画像上の正方形中心Y座標[px]
+    double forwardDistance = 0.0;                 // 正方形までの前方距離[mm]
+    double lateralDistance = 0.0;                 // 正方形までの横方向距離[mm]
   };
 
 }  // namespace CameraServer

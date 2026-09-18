@@ -52,36 +52,32 @@ void RouteFollower::run(const std::vector<RouteState>& route)
     // 次の区間を走行するために必要な回頭角度を計算する
     const double rotationAngle = calculateRotationAngle(from.direction, to.direction);
 
-   // 区間開始時に回頭が必要だったかを判定する
-const bool rotatedAtSegmentStart =
-    std::abs(rotationAngle) > ROTATION_TOLERANCE;
+    // 区間開始時に回頭が必要だったかを判定する
+    const bool rotatedAtSegmentStart = std::abs(rotationAngle) > ROTATION_TOLERANCE;
 
-if(rotatedAtSegmentStart) {
-  Logger::printfLog(
-      Logger::INFO,
-      "RouteFollower: 回頭開始 %.2f deg",
-      rotationAngle);
+    if(rotatedAtSegmentStart) {
+      Logger::printfLog(Logger::INFO, "RouteFollower: 回頭開始 %.2f deg", rotationAngle);
 
-  // 次の区間の進行方向へ回頭する
-  rotate(rotationAngle);
-}
+      // 次の区間の進行方向へ回頭する
+      rotate(rotationAngle);
+    }
 
     // 同一座標の場合は、回頭のみ行って次の区間へ進む。
-if(from.x == to.x && from.y == to.y) {
-  continue;
-}
+    if(from.x == to.x && from.y == to.y) {
+      continue;
+    }
 
-  // 区間の走行距離を計算する。
-const double distance = calculateDistance(from, to);
+    // 区間の走行距離を計算する。
+    const double distance = calculateDistance(from, to);
 
-if(distance <= 0.0) {
-  Logger::error("RouteFollower: 区間距離が不正です");
+    if(distance <= 0.0) {
+      Logger::error("RouteFollower: 区間距離が不正です");
 
-  // 異常な距離の場合はモーターを停止する。
-  robot.getWheelMotorControllerInstance().stopBoth();
+      // 異常な距離の場合はモーターを停止する。
+      robot.getWheelMotorControllerInstance().stopBoth();
 
-  return;
-}
+      return;
+    }
     Logger::printfLog(Logger::INFO,
                       "RouteFollower: "
                       "segment distance=%.2f mm",

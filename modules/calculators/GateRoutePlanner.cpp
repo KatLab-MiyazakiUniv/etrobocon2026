@@ -23,15 +23,11 @@ namespace {
 
   /**
    * @brief 進行方向にある次の偶数格子座標を取得する
-   *
    * 格子座標系
    * UP    : Yが減る
    * RIGHT : Xが減る
    * DOWN  : Yが増える
    * LEFT  : Xが増える
-   *
-   * 現在座標が偶数の場合も、その次の偶数座標まで進む。
-   *
    * @param current 現在地点
    * @param direction 進行方向
    * @return 次の偶数格子座標
@@ -113,30 +109,20 @@ GateRouteResult GateRoutePlanner::search(int currentX, int currentY, Direction c
 
     bestCost = totalCost;
 
-    // =====================================================
     // ゲート入口までの経路
-    // =====================================================
-
     std::vector<RouteState> fullRoute = candidate.route;
 
-    // =====================================================
     // ゲート出口を追加
-    // =====================================================
-
     fullRoute.push_back({ pass.exit.x, pass.exit.y, pass.direction });
 
     /*
      * 通過後の最終停止位置。
-     *
      * 外周に到達した場合はゲート出口のまま。
      * 外周以外の場合は、この後で次の偶数座標へ変更する。
      */
     Point finalPosition = pass.exit;
 
-    // =====================================================
     // 外周以外なら次の偶数座標まで進む
-    // =====================================================
-
     if(!isOuterGrid(pass.exit)) {
       finalPosition = getNextEvenPoint(pass.exit, pass.direction);
 
@@ -146,37 +132,16 @@ GateRouteResult GateRoutePlanner::search(int currentX, int currentY, Direction c
       totalCost += STRAIGHT_COST;
     }
 
-    // =====================================================
     // 経路を圧縮
-    // =====================================================
-
     std::vector<RouteState> compressedRoute = compressRoute(fullRoute);
 
-    // =====================================================
     // 探索結果を保存
-    // =====================================================
-
     result.found = true;
-
     result.color = goalColor;
-
     result.entrance = pass.entrance;
-
-    /*
-     * EtRobocon2026側で
-     *
-     * currentGridX = routeResult.exit.x;
-     * currentGridY = routeResult.exit.y;
-     *
-     * として次回の探索開始地点に使用しているため、
-     * 実際に停止する最終地点をexitとして返す。
-     */
     result.exit = finalPosition;
-
     result.exitDirection = pass.direction;
-
     result.cost = totalCost;
-
     result.route = compressedRoute;
 
     /*
@@ -203,9 +168,7 @@ std::vector<RouteState> GateRoutePlanner::compressRoute(const std::vector<RouteS
   // robotの向きが変わる地点を追加する
   for(size_t i = 1; i + 1 < route.size(); ++i) {
     const RouteState& previous = route[i - 1];
-
     const RouteState& current = route[i];
-
     const RouteState& next = route[i + 1];
 
     // 同じ位置で向きだけ変わった場合

@@ -9,7 +9,7 @@
 #define SQUARE_DETECTION_ACTION_HANDLER_H
 
 #include <opencv2/opencv.hpp>
-
+#include <vector>
 #include "CameraCapture.h"
 #include "Logger.h"
 #include "SocketProtocol.h"
@@ -19,7 +19,6 @@ class SquareDetectionActionHandler {
  public:
   /**
    * @brief コンストラクタ
-   *
    * @param _camera カメラ
    */
   explicit SquareDetectionActionHandler(CameraCapture& _camera);
@@ -31,11 +30,9 @@ class SquareDetectionActionHandler {
 
   /**
    * @brief 正方形検出要求を処理する
-   *
    * 正方形を検出した後、
    * ホモグラフィ変換によって
    * カメラ基準の前方距離・横方向距離を計算する。
-   *
    * @param request 正方形検出リクエスト
    * @param response 正方形検出レスポンス
    */
@@ -43,15 +40,9 @@ class SquareDetectionActionHandler {
                CameraServer::SquareDetectorResponse& response);
 
  private:
-  /**
-   * @brief カメラ
-   */
-  CameraCapture& camera;
+  CameraCapture& camera;  // カメラ
 
-  /**
-   * @brief 正方形検出器
-   */
-  SquareDetector detector;
+  SquareDetector detector;  // 正方形検出器
 
   /**
    * @brief 画像座標から実座標へ変換する
@@ -66,10 +57,8 @@ class SquareDetectionActionHandler {
 
   /**
    * @brief 画像座標を校正用紙上の実座標へ変換する
-   *
    * @param pixelX 画像X座標[px]
    * @param pixelY 画像Y座標[px]
-   *
    * @return 校正用紙上の座標[mm]
    */
   cv::Point2f pixelToWorld(double pixelX, double pixelY) const;

@@ -10,6 +10,7 @@
  * @brief ダイクストラ法の優先度付きキューで使用するノード
  */
 namespace {
+  constexpr double RAD_TO_DEG = 180.0 / 3.14159265358979323846;
 
   struct QueueNode {
     int cost;
@@ -19,13 +20,7 @@ namespace {
   };
 
   /**
-   * @brief 円周率
-   */
-  constexpr double PI = 3.14159265358979323846;
-
-  /**
    * @brief ゲート付近で回頭した場合の追加コスト
-   *
    * ゲート直前・直後での回頭を避け、
    * できるだけQR①・QR②の両方で
    * 正方形補正を行えるルートを
@@ -364,17 +359,15 @@ bool DijkstraRoutePlanner::isTurnBlockedByGatePost(int x, int y, Direction curre
   // =====================================================
   // 後方向の角度
   // =====================================================
+  const double currentRearAngle = std::atan2(currentRearY, currentRearX) * 180.0 / M_PI;
 
-  const double currentRearAngle = std::atan2(currentRearY, currentRearX);
-
-  const double nextRearAngle = std::atan2(nextRearY, nextRearX);
+  const double nextRearAngle = std::atan2(nextRearY, nextRearX) * 180.0 / M_PI;
 
   // =====================================================
   // 回頭方向
   // =====================================================
 
-  const double totalTurn = normalizeRad(nextRearAngle - currentRearAngle);
-
+  const double totalTurn = AngleNormalizer::normalizeAngle(nextRearAngle - currentRearAngle);
   // =====================================================
   // 各ゲート足を確認
   // =====================================================
@@ -412,16 +405,14 @@ bool DijkstraRoutePlanner::isTurnBlockedByGatePost(int x, int y, Direction curre
       // -------------------------------------------------
       // ゲート足の角度
       // -------------------------------------------------
+      const double postAngle = std::atan2(dy, dx) * RAD_TO_DEG;
 
-      const double postAngle = std::atan2(dy, dx);
-
-      const double postTurn = normalizeRad(postAngle - currentRearAngle);
+      const double postTurn = AngleNormalizer::normalizeAngle(postAngle - currentRearAngle);
 
       // =================================================
       // 180度回頭
       // =================================================
-
-      if(std::abs(std::abs(totalTurn) - PI) < 0.01) {
+      if(std::abs(std::abs(totalTurn) - 180.0) < 0.01) {
         /*
          * 180度回頭の場合は、
          * 後部が半円を通る。
@@ -487,19 +478,6 @@ Point DijkstraRoutePlanner::directionToVector(Direction direction) const
   }
 
   return { 0, 0 };
-}
-
-double DijkstraRoutePlanner::normalizeRad(double angle) const
-{
-  while(angle > PI) {
-    angle -= 2.0 * PI;
-  }
-
-  while(angle < -PI) {
-    angle += 2.0 * PI;
-  }
-
-  return angle;
 }
 
 bool DijkstraRoutePlanner::isNearGatePost(int x, int y) const

@@ -232,6 +232,16 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
                                                  std::move(colorCondition),
                                                  CompoundCondition::LogicalOperator::AND);
     }
+   case CONDITION_COMMAND::DISTANCE_OR_COLOR: {
+    double targetDistance = fromString<double>(params[2]);
+    std::string targetColorName = params[3];
+    auto targetColor = ColorSensorController::convertStringToColor(targetColorName);
+    Logger::printfLog(Logger::DEBUG, "[MotionParser] DistanceORColor: targetDistance=%.1f, targetColor=%s を生成しました", targetDistance, targetColorName.c_str());
+    auto distanceCondition = std::make_unique<DistanceCondition>(robot, targetDistance);
+    auto colorCondition = std::make_unique<SensorColorCondition>(robot, targetColor);
+    return std::make_unique<CompoundCondition>(robot, std::move(distanceCondition), std::move(colorCondition), CompoundCondition::LogicalOperator::OR);
+  }
+
     case CONDITION_COMMAND::ULTRA_SONIC: {
       double targetDistance = fromString<double>(params[2]);
       Logger::printfLog(
@@ -504,6 +514,7 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
     { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC },
     { "RepeatCount", CONDITION_COMMAND::REPEAT_COUNT },
     { "DistanceAndColor", CONDITION_COMMAND::DISTANCE_AND_COLOR },
+     { "DistanceOrColor", CONDITION_COMMAND::DISTANCE_OR_COLOR },
     { "ColorOrColor", CONDITION_COMMAND::COLOR_OR_COLOR },
     { "ColorRegionCenter", CONDITION_COMMAND::COLOR_REGION_CENTER },
   };

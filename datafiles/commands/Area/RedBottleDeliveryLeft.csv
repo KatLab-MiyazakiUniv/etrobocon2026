@@ -2,7 +2,12 @@
 
 #QR1検出位置まで直進
 RelativeRotation,-043,RelativeAngle,-043
-Straight,001,Distance,068
+#Straight,001,Distance,068
+
+Straight,001,Distance,028
+Snapshot,clearBuffer1,RepeatCount,001
+CameraTracking,LBS009,DistanceOrColor,002
+Straight,001,DistanceOrColor,002
 
 # QR1検出
 Snapshot,clearBuffer1,RepeatCount,001
@@ -17,11 +22,16 @@ Snapshot,015,RepeatCount,001
 #QR1取得後の直線
 RelativeRotation,-040,RelativeAngle,-040
 Snapshot,clearBuffer1,RepeatCount,001
-CameraTracking,LBS003,Distance,105
+
+
+
+CameraTracking,LBS003,Distance,095
+CameraTracking,LBS003,DistanceOrColor,005
+
 #CameraTracking,LBS008,Distance,015
 
 #QR2取得前カーブ直前
-Straight,001,Distance,025
+Straight,001,Distance,035
 
 # QR2検出
 Snapshot,clearBuffer1,RepeatCount,001
@@ -34,10 +44,13 @@ Snapshot,025,RepeatCount,001
 
 
 #赤色まで移動
-RelativeRotation,-060,RelativeAngle,-060
+RelativeRotation,-055,RelativeAngle,-055
 
 #Straight,001,Distance,100
-Straight,001,SensorColor,001
+
+Straight,001,DistanceOrColor,001
+
+#Straight,001,SensorColor,001
 Straight,001,Distance,005
 
 Straight,-001,Distance,050

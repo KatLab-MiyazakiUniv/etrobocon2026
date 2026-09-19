@@ -9,6 +9,8 @@
 #include "Rotation.h"
 #include "AngleNormalizer.h"
 #include "Logger.h"
+#include <algorithm>
+#include <cmath>
 
 class RelativeRotation : public Rotation {
  public:
@@ -37,8 +39,16 @@ class RelativeRotation : public Rotation {
    */
   void prepare() override;
 
+  /**
+   * @brief 回頭動作を1ステップ実行する
+   */
+  void executeStep() override;
+
  private:
   double relativeTargetAngle;  // 回頭したい相対角度
+  static constexpr double MIN_TURN_POWER = 18.0;  // 実機で静止摩擦に合わせて調整
+  static constexpr double MAX_TURN_POWER = 60.0;
+  Pid::PidGain anglePidGain;
 };
 
 #endif

@@ -1,3 +1,4 @@
 コマンド名,"ID",speed,targetX,kp,ki,kd,isStopMotorPower,roiX,roiY,roiWidth,roiHeight
 QRTracking,"ID",double,int,double,double,double,string,int,int,int,int
 QRTracking,001,350.0,960,.00215,0.0009,0.0010,true,300,540,1320,540
+QRTracking,002,350.0,960,.00215,0.0009,0.0010,true,0,0,1920,180

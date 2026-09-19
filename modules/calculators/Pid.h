@@ -54,6 +54,11 @@ class Pid {
   void setPidGain(double _kp, double _ki, double _kd);
 
   /**
+   * @brief PIDゲインを取得する
+   */
+  const PidGain& getPidGain() const;
+
+  /**
    * @brief Pidの初回呼び出し時間を設定する
    */
   void prepare();

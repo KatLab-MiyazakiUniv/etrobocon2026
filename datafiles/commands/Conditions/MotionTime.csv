@@ -1,0 +1,4 @@
+コマンド名,ID,targetTime
+MotionTime,ID,double
+MotionTime,001,1.5
+MotionTime,002,2.0

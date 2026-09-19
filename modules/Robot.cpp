@@ -114,3 +114,13 @@ int Robot::getTargetBrightness() const
 {
   return targetBrightness;
 }
+
+void Robot::setIndexOfLabel(int _indexOfLabel)
+{
+  indexOfLabel = _indexOfLabel;
+}
+
+int Robot::getIndexOfLabel()
+{
+  return indexOfLabel;
+}

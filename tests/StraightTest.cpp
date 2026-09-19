@@ -15,8 +15,8 @@ namespace etrobocon2026_test {
   class StraightTest : public ::testing::Test {
    protected:
     // テスト用のPidゲイン
-    Pid::PidGain rightPid = { 0.00535, 0.00115, 0.000 };
-    Pid::PidGain leftPid = { 0.00578, 0.0008535, 0.000 };
+    // Pid::PidGain rightPid = { 0.00535, 0.00115, 0.000 };
+    // Pid::PidGain leftPid = { 0.00578, 0.0008535, 0.000 };
     Pid::PidGain anglePid = { 0.0055, 0.0009, 0.0 };
   };
 
@@ -26,7 +26,7 @@ namespace etrobocon2026_test {
     MockNetworkSystem mockNetworkSystem;
     SocketClient mockSocketClient(mockNetworkSystem);
     Robot robot(mockSocketClient);
-    double targetSpeed = 1000.0;   // 目標速度
+    double targetSpeed = 200.0;    // 目標速度
     double targetDistance = 10.0;  // 目標距離
 
     // 直進前の走行距離を計算
@@ -36,7 +36,7 @@ namespace etrobocon2026_test {
 
     // 直進動作を実行
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                      targetSpeed, rightPid, leftPid, anglePid, false);
+                      targetSpeed, anglePid, false);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -67,7 +67,7 @@ namespace etrobocon2026_test {
 
     // 直進動作を実行
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                      targetSpeed, rightPid, leftPid, anglePid, false);
+                      targetSpeed, anglePid, false);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -95,7 +95,7 @@ namespace etrobocon2026_test {
 
     // 直進動作を実行
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                      targetSpeed, rightPid, leftPid, anglePid, false);
+                      targetSpeed, anglePid, false);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -124,7 +124,7 @@ namespace etrobocon2026_test {
 
     // 直進動作を実行
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                      targetSpeed, rightPid, leftPid, anglePid, false);
+                      targetSpeed, anglePid, false);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -143,7 +143,7 @@ namespace etrobocon2026_test {
     MockNetworkSystem mockNetworkSystem;
     SocketClient mockSocketClient(mockNetworkSystem);
     Robot robot(mockSocketClient);
-    double targetSpeed = 1000.0;   // 目標速度
+    double targetSpeed = 200.0;    // 目標速度
     double targetDistance = 10.0;  // 目標距離
 
     // 直進前の走行距離を計算
@@ -153,7 +153,7 @@ namespace etrobocon2026_test {
 
     // 直進動作を実行
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                      targetSpeed, rightPid, leftPid, anglePid, true);
+                      targetSpeed, anglePid, true);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -184,7 +184,7 @@ namespace etrobocon2026_test {
 
     // 直進動作を実行
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                      targetSpeed, rightPid, leftPid, anglePid, true);
+                      targetSpeed, anglePid, true);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -212,7 +212,7 @@ namespace etrobocon2026_test {
 
     // 直進動作を実行
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                      targetSpeed, rightPid, leftPid, anglePid, true);
+                      targetSpeed, anglePid, true);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -241,7 +241,7 @@ namespace etrobocon2026_test {
 
     // 直進動作を実行
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                      targetSpeed, rightPid, leftPid, anglePid, true);
+                      targetSpeed, anglePid, true);
     straight.run();
 
     // 直進後の走行距離を計算

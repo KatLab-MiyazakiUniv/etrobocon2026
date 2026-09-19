@@ -31,12 +31,12 @@ class AreaMaster {
  private:
   Robot& robot;  // Robotインスタンスの参照
   Area area;     // エリアの指定(Enum型のArea)
-
+  std::string commandFilePath;
   // 各エリアのコマンドファイルベースパス
   static const std::string basePath;
 
   // コマンドファイル名（各エリア名）
-  static const std::array<std::string, 2> areaCommandNames;
+  static const std::array<std::string, 5> areaCommandNames;
 
   /**
    * @brief 動作リストを実行してメモリを解放する

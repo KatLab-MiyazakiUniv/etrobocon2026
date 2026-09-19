@@ -1,3 +1,13 @@
-動作コマンド名,動作ID,条件コマンド名,条件ID
-Straight,001,Distance,001
-Straight,002,Distance,002
+#動作コマンド名,動作ID,条件コマンド名,条件ID
+# キャリブレーション
+#Calibrator,001,RepeatCount,001
+#4色走行ボトルキャッチ前
+
+Snapshot,clearBuffer1,RepeatCount,001
+CameraTracking,LTS001,Distance,060
+#ボトルキャッチ中(上半分roi)
+CameraTracking,LTS002,Distance,025
+#ボトルキャッチ後(下半分roi)
+CameraTracking,LTS008,Distance,028
+
+

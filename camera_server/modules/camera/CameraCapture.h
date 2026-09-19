@@ -55,7 +55,7 @@ class CameraCapture {
   bool openCamera();
 
   /**
-   * @brief カメラフレームの高さと幅を設定する
+   * @brief カメラフレームの高さと幅とフレームのバッファ数を設定する
    * @param width 設定するフレームの幅 (px)
    * @param height 設定するフレームの高さ (px)
    */

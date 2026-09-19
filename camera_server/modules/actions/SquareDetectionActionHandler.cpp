@@ -6,10 +6,6 @@
 
 #include "SquareDetectionActionHandler.h"
 
-#include <opencv2/opencv.hpp>
-
-#include "Logger.h"
-
 namespace {
 
   /**

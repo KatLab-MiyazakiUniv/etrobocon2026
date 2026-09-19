@@ -56,6 +56,7 @@ RouteFollower(Robot& _robot, const EtRallyMap& _map, double _targetSpeed,
   Pid::PidGain squareRotationPid;  // 正方形補正用回頭PIDゲイン
   Pid::PidGain rightPid;           // 右モーター用PIDゲイン
   Pid::PidGain leftPid;            // 左モーター用PIDゲイン
+  Pid::PidGain straightAnglePid;  // 直進角度PIDゲイン
 
   /**
    * @brief Directionを角度へ変換する

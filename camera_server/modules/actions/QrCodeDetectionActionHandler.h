@@ -13,9 +13,6 @@
 #include "QrCodeDetector.h"
 #include <cmath>
 #include <cstring>
-#include <functional>
-#include "MultiThread.h"
-#include "FrameSave.h"
 
 class QrCodeDetectionActionHandler {
  public:

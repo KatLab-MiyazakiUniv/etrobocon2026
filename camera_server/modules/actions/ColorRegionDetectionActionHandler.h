@@ -15,7 +15,6 @@
 #include <functional>
 #include "MultiThread.h"
 #include "FrameSave.h"
-#include "QrCodeDetector.h"
 
 class ColorRegionDetectionActionHandler {
  public:
@@ -41,7 +40,6 @@ class ColorRegionDetectionActionHandler {
  private:
   CameraCapture& camera;
   ColorRegionDetector detector;
-  QrCodeDetector qrDetector;
 };
 
 #endif  // COLOR_REGION_DETECTION_ACTION_HANDLER_H

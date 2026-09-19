@@ -234,10 +234,9 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
     }
     case CONDITION_COMMAND::ULTRA_SONIC: {
       double targetDistance = fromString<double>(params[2]);
-      Logger::printfLog(
-          Logger::DEBUG,
-          "[MotionParser] UltraSonic: targetDistance=%.1f", targetDistance);
-      return std::make_unique<UltraSonicCondition>(robot,targetDistance);
+      Logger::printfLog(Logger::DEBUG, "[MotionParser] UltraSonic: targetDistance=%.1f",
+                        targetDistance);
+      return std::make_unique<UltraSonicCondition>(robot, targetDistance);
     }
     case CONDITION_COMMAND::COLOR_OR_COLOR: {
       std::string targetColorName1 = params[2];
@@ -250,7 +249,6 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
           Logger::DEBUG,
           "[MotionParser] ColorAndColor: targetColor1=%s, targetColor2=%s を生成しました",
           targetColorName1.c_str(), targetColorName2.c_str());
-
 
       auto colorCondition1 = std::make_unique<SensorColorCondition>(robot, targetColor1);
       auto colorCondition2 = std::make_unique<SensorColorCondition>(robot, targetColor2);
@@ -282,13 +280,13 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
         consecutiveCountThreshold = fromString<int>(params[13]);
       }
 
-      Logger::printfLog(
-          Logger::DEBUG,
-          "[MotionParser] ColorRegionCenterCondition: targetCenterX=%.1f, toleranceX=%.1f を生成しました",
-          targetCenterX, toleranceX);
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] ColorRegionCenterCondition: targetCenterX=%.1f, "
+                        "toleranceX=%.1f を生成しました",
+                        targetCenterX, toleranceX);
 
-      return std::make_unique<ColorRegionCenterCondition>(
-          robot, request, targetCenterX, toleranceX, consecutiveCountThreshold);
+      return std::make_unique<ColorRegionCenterCondition>(robot, request, targetCenterX, toleranceX,
+                                                          consecutiveCountThreshold);
     }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Condition %s は未実装です",
@@ -309,15 +307,14 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       //           motionParams[6..8]=leftPid(kp,ki,kd)
       //           motionParams[9..11]=anglePid(kp,ki,kd)
       //           motionParams[12]=useIMU(string: "true"/"false")
-      Logger::printfLog(Logger::DEBUG,
-                        "[MotionParser] Straight: targetdistance=%.d を生成しました",
+      Logger::printfLog(Logger::DEBUG, "[MotionParser] Straight: targetdistance=%.d を生成しました",
                         fromString<double>(motionParams[2]));
 
-      return new Straight(
-          robot, std::move(condition), fromString<double>(motionParams[2]),
-          Pid::PidGain{ fromString<double>(motionParams[3]), fromString<double>(motionParams[4]),
-                        fromString<double>(motionParams[5]) },
-          fromString<bool>(motionParams[6]));
+      return new Straight(robot, std::move(condition), fromString<double>(motionParams[2]),
+                          Pid::PidGain{ fromString<double>(motionParams[3]),
+                                        fromString<double>(motionParams[4]),
+                                        fromString<double>(motionParams[5]) },
+                          fromString<bool>(motionParams[6]));
     }
     case MOTION_COMMAND::LINETRACE: {
       // LineTrace: motionParams[2]=speed(double)
@@ -417,45 +414,15 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                                               fromString<double>(motionParams[6]) },
                                 qrRequest, motionParams[7] == "true");
     }
-    case MOTION_COMMAND::STRAIGHT_QR_SAVE: {
-      // StraightQRSave: motionParams[2]=speed(double)
-      //                 motionParams[3..5]=anglePid(kp,ki,kd)
-      //                 motionParams[6]=useIMU(bool)
-      //                 motionParams[7]=isStopMotorPower(bool)
-      //                 motionParams[8..11]=roi(x,y,width,height)
-      CameraServer::QrCodeDetectorRequest qrRequest;
-      qrRequest.roi.x = fromString<int32_t>(motionParams[8]);
-      qrRequest.roi.y = fromString<int32_t>(motionParams[9]);
-      qrRequest.roi.width = fromString<int32_t>(motionParams[10]);
-      qrRequest.roi.height = fromString<int32_t>(motionParams[11]);
-
-      Pid::PidGain anglePidGain{ fromString<double>(motionParams[3]),
-                                 fromString<double>(motionParams[4]),
-                                 fromString<double>(motionParams[5]) };
-      bool useIMU = (motionParams[6] == "true" || motionParams[6] == "1");
-      bool isStop = (motionParams[7] == "true" || motionParams[7] == "1");
-
-      Logger::printfLog(Logger::DEBUG,
-                        "[MotionParser] StraightQRSave: speed=%.1f useIMU=%d を生成しました",
-                        fromString<double>(motionParams[2]), static_cast<int>(useIMU));
-
-      return new CameraTracking(robot, std::move(condition),
-                                fromString<double>(motionParams[2]),
-                                anglePidGain, useIMU, qrRequest, isStop);
-    }
     case MOTION_COMMAND::CALIBRATOR: {
-
-      Logger::printfLog(Logger::DEBUG,
-                        "[MotionParser] Calibratorを生成しました");
+      Logger::printfLog(Logger::DEBUG, "[MotionParser] Calibratorを生成しました");
 
       return new Calibrator(robot, std::move(condition));
     }
     case MOTION_COMMAND::SNAPSHOT: {
+      Logger::printfLog(Logger::DEBUG, "[MotionParser] Snapshotを生成しました");
 
-      Logger::printfLog(Logger::DEBUG,
-                        "[MotionParser] Snapshotを生成しました");
-
-      return new Snapshot(robot,motionParams[2], std::move(condition));
+      return new Snapshot(robot, motionParams[2], std::move(condition));
     }
     // ↓ 他のコマンドはここに追加していく
     default:
@@ -475,12 +442,10 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
           { "QRTracking", MOTION_COMMAND::QR_TRACKING },
           { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING },
-          { "StraightQRSave", MOTION_COMMAND::STRAIGHT_QR_SAVE },
           { "Calibrator", MOTION_COMMAND::CALIBRATOR },
           { "Snapshot", MOTION_COMMAND::SNAPSHOT }
 
-
-         };
+        };
 
   // コマンド文字列に対応するMOTION_COMMAND値をマップから取得。なければMOTION_COMMAND::NONEを返す
   auto it = commandMap.find(str);

@@ -1,3 +1,8 @@
+/**
+ * @file MultiThread.h
+ * @brief メンバ関数をマルチスレッドで実行するラッパークラス
+ * @author
+ */
 #ifndef MULTI_THREAD_H
 #define MULTI_THREAD_H
 

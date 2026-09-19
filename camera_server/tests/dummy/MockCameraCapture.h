@@ -24,13 +24,6 @@ namespace etrobocon2026_test {
       outFrame = mockFrame.clone();
       return true;
     }
-
-    int clearBufferCallCount = 0;
-    void clearBuffer(int dropCount = 5) override
-    {
-      (void)dropCount;
-      clearBufferCallCount++;
-    }
   };
 
 }  // namespace etrobocon2026_test

@@ -36,10 +36,5 @@ void EtRobocon2026::start()
   AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
   bottleDeliveryAreaMaster.run();
 
-  // QRTracking走行
-  // Area QRTrackingArea = Area::QRTracking;
-  // AreaMaster QRTrackingAreaMaster(robot, QRTrackingArea);
-  // QRTrackingAreaMaster.run();
-
   CsvLogger::outputToFile();
 }

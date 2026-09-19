@@ -103,8 +103,6 @@ void CameraCapture::setCapProps(double width, double height)
 {
   cap.set(cv::CAP_PROP_FRAME_WIDTH, width);
   cap.set(cv::CAP_PROP_FRAME_HEIGHT, height);
-  // バッファサイズを1に指定（※LinuxのV4L2など、対応しているバックエンドでのみ有効）>試し中
- // cap.set(cv::CAP_PROP_BUFFERSIZE, 1);
 }
 
 bool CameraCapture::getFrame(cv::Mat& outFrame)
@@ -114,8 +112,7 @@ bool CameraCapture::getFrame(cv::Mat& outFrame)
     return false;
   }
 
-  for(int i = 0; i < 5; i++) {
-    Logger::printfLog(Logger::DEBUG, "CameraCaptureフレーム取得にかかったカウントは%d", i );
+  for(int i = 0; i < 7; i++) {
     cap >> outFrame;
     if(!outFrame.empty()) {
       return true;
@@ -124,46 +121,4 @@ bool CameraCapture::getFrame(cv::Mat& outFrame)
   }
   Logger::error("フレームの取得に失敗しました。");
   return false;
-}
-
-void CameraCapture::clearBuffer(int dropCount)
-{
-  if(!cap.isOpened()) {
-    Logger::error("CameraCapture:カメラが開いていません");
-    return;
-  }
-
-  for(int i = 0; i < dropCount; i++) {
-    if(!cap.grab()) {
-      break;
-    }
-  }
-  Logger::printfLog(Logger::INFO, "カメラバッファをクリアしました (%d フレーム)", dropCount);
-}
-
-bool CameraCapture::getFrames(vector<cv::Mat>& frames, int numFrames, int millisecondInterval)
-{
-  if(numFrames <= 0) {
-    Logger::printfLog(Logger::ERROR, "フレーム数が無効です。動作を終了します。: %d", numFrames);
-    return false;
-  }
-  if(millisecondInterval <= 0) {
-    Logger::printfLog(Logger::ERROR, "インターバルが無効です。動作を終了します。: %d ms",
-                      millisecondInterval);
-    return false;
-  }
-
-  frames.resize(numFrames);
-  bool allSuccess = true;
-  for(int i = 0; i < numFrames; ++i) {
-    if(!getFrame(frames[i])) {
-      Logger::printfLog(Logger::ERROR, "フレーム %d の取得に失敗しました。", i);
-      allSuccess = false;
-    }
-    if(i < numFrames - 1) {
-      // 最後の1回以外は、milliseconds ミリ秒だけ待機
-      this_thread::sleep_for(chrono::milliseconds(millisecondInterval));
-    }
-  }
-  return allSuccess;
 }

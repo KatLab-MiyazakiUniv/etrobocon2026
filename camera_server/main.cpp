@@ -3,8 +3,6 @@
 #include "SocketServer.h"
 #include "RealNetworkSystem.h"
 
-#include "QrCodeDetector.h"
-
 int main()
 {
   Logger::info("Hello KATLAB");
@@ -31,6 +29,5 @@ int main()
     return -1;
   }
   server.run();
-
   return 0;
 }

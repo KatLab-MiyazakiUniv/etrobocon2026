@@ -22,5 +22,4 @@ AbsoluteRotation::~AbsoluteRotation()
 void AbsoluteRotation::prepare()
 {
   targetAngle = targetAbsAngle;
-  // Logger::printfLog(Logger::INFO, "AbsoluteAngle:prepare:目標角度は%lf", targetAbsAngle);
 }

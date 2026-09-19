@@ -12,7 +12,6 @@
 #include "SpeedCalculator.h"
 #include <memory>
 #include "Logger.h"
-#include "CsvLogger.h"
 
 class LineTrace : public BaseMotion {
  public:

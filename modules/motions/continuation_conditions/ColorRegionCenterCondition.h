@@ -21,12 +21,10 @@ class ColorRegionCenterCondition : public BaseContinuationCondition {
    * @param _toleranceX 許容誤差範囲 (目標 ± toleranceX)
    * @param _consecutiveCountThreshold 終了判定に必要な連続合致回数 (デフォルト1)
    */
-  ColorRegionCenterCondition(
-      Robot& _robot,
-      const CameraServer::ColorRegionDetectorRequest& _colorDetectionRequest,
-      double _targetCenterX,
-      double _toleranceX,
-      int _consecutiveCountThreshold = 1);
+  ColorRegionCenterCondition(Robot& _robot,
+                             const CameraServer::ColorRegionDetectorRequest& _colorDetectionRequest,
+                             double _targetCenterX, double _toleranceX,
+                             int _consecutiveCountThreshold = 1);
 
   /**
    * デストラクタ
@@ -56,10 +54,10 @@ class ColorRegionCenterCondition : public BaseContinuationCondition {
 
  private:
   CameraServer::ColorRegionDetectorRequest colorDetectionRequest;
-  double targetCenterX;              // 目標中心X座標
-  double toleranceX;                 // 許容誤差 (±toleranceX)
-  int consecutiveCountThreshold;     // 条件を満たす必要がある連続回数
-  int inRangeCount;                  // 範囲内に入った連続回数
+  double targetCenterX;           // 目標中心X座標
+  double toleranceX;              // 許容誤差 (±toleranceX)
+  int consecutiveCountThreshold;  // 条件を満たす必要がある連続回数
+  int inRangeCount;               // 範囲内に入った連続回数
 };
 
 #endif  // COLOR_REGION_CENTER_CONDITION_H

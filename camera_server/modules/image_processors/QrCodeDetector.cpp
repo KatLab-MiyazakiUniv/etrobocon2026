@@ -82,7 +82,7 @@ cv::Mat QrCodeDetector::applyBilateral(const cv::Mat& src, int d, double sigmaCo
   return filtered;
 }
 
-QrCodeDetectionResult QrCodeDetector::createResult(const ZXing::Barcode& barcode,
+QrCodeDetectionResult QrCodeDetector::createResult(const ZXing::Result& barcode,
                                                    const cv::Rect& roiRect,
                                                    const std::string& stepName)
 {

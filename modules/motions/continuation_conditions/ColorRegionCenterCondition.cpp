@@ -6,11 +6,8 @@
 #include "ColorRegionCenterCondition.h"
 
 ColorRegionCenterCondition::ColorRegionCenterCondition(
-    Robot& _robot,
-    const CameraServer::ColorRegionDetectorRequest& _colorDetectionRequest,
-    double _targetCenterX,
-    double _toleranceX,
-    int _consecutiveCountThreshold)
+    Robot& _robot, const CameraServer::ColorRegionDetectorRequest& _colorDetectionRequest,
+    double _targetCenterX, double _toleranceX, int _consecutiveCountThreshold)
   : BaseContinuationCondition(_robot),
     colorDetectionRequest(_colorDetectionRequest),
     targetCenterX(_targetCenterX),
@@ -51,9 +48,10 @@ bool ColorRegionCenterCondition::shouldContinue()
   // 目標値 ± toleranceX の範囲内か判定
   if(diff <= toleranceX) {
     inRangeCount++;
-    Logger::printfLog(Logger::DEBUG,
-                      "ColorRegionCenterCondition: 範囲内検出 (%d/%d) [CenterX: %.1f, Target: %.1f, Diff: %.1f]",
-                      inRangeCount, consecutiveCountThreshold, currentCenterX, targetCenterX, diff);
+    Logger::printfLog(
+        Logger::DEBUG,
+        "ColorRegionCenterCondition: 範囲内検出 (%d/%d) [CenterX: %.1f, Target: %.1f, Diff: %.1f]",
+        inRangeCount, consecutiveCountThreshold, currentCenterX, targetCenterX, diff);
   } else {
     inRangeCount = 0;
   }

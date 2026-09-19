@@ -17,6 +17,7 @@
 #include "Button.h"
 #include "ForceSensor.h"
 #include "Display.h"
+#include "MapData.h"
 #include <cstring>
 
 class Robot {
@@ -139,6 +140,13 @@ class Robot {
    */
   int getTargetBrightness() const;
 
+
+  /**
+ * @brief マップデータの参照を返す
+ * @return MapDataの参照
+ */
+MapData& getMapData();
+
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
   ArmMotorController armMotorController;        // ArmMotorController インスタンス
@@ -154,5 +162,7 @@ class Robot {
   spikeapi::Display display;                    // Displayインスタンス
   char decryptionKey[5] = { 0 };                // 復号キー
   int targetBrightness = 50;                    // 目標輝度
+  MapData mapData;
+
 };
 #endif

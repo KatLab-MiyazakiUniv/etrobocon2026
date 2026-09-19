@@ -11,7 +11,7 @@ namespace {
   /**
    * @brief 回頭終了判定許容誤差[deg]
    */
-  constexpr double ROTATION_TOLERANCE = 0.5;
+  constexpr double ROTATION_TOLERANCE = 2.0;
 
   /**
    * @brief QR①とQR②の距離[mm]

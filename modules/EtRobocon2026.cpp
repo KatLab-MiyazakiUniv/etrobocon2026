@@ -202,7 +202,7 @@ void EtRobocon2026::start()
    * QR①後の-α、
    * QR②への微調整に使用する。
    */
-  const Pid::PidGain squareRotationPid = { 5.8, 15.0, 0.0 };
+  const Pid::PidGain squareRotationPid = {5.0,0.0,0.1 };
 
   /**
    * 右モータ速度PID

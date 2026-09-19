@@ -4,17 +4,6 @@
  * @author HaruArima08
  */
 
-#include "EtRobocon2026.h"
-
-void EtRobocon2026::start()
-{
-  Logger::info("Hello KATLAB");
-}
-/**
- * @file   EtRobocon2026.cpp
- * @brief  時間判定付きで3色ゲートを最大3周し、最終地点へ向かう
- * @author HaruArima08 yutaro-1214
- */
 
 #include "EtRobocon2026.h"
 
@@ -258,9 +247,7 @@ void EtRobocon2026::start()
    * 90度回頭などに使用。
    */
   const Pid::PidGain rotationPid = {
-      1.3,
-      1.0,
-      0.02
+    1.18,0.95,0.2
   };
 
   /**
@@ -310,13 +297,14 @@ void EtRobocon2026::start()
   RouteFollower routeFollower(
       robot,
       etRallyMap,
-      mapData,
       TARGET_SPEED,
       rotationPid,
       squareRotationPid,
       rightPid,
       leftPid,
-      straightAnglePid);
+      straightAnglePid,
+    0.24,0.54
+  );
 
   // =========================================================
   // 9. 開始時刻

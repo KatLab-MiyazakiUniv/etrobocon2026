@@ -37,11 +37,17 @@ class RouteFollower {
    * @param _rightPid 右モーターPID
    * @param _leftPid 左モーターPID
    * @param _straightAnglePid 直進角度PID
+   * @param _straightDeadbandRate 直進デッドバンド
+　 * @param _straightMaxoutRate 直進マックスアウト
    */
 RouteFollower(Robot& _robot, const EtRallyMap& _map, double _targetSpeed,
-              const Pid::PidGain& _rotationPid, const Pid::PidGain& _squareRotationPid,
-              const Pid::PidGain& _rightPid, const Pid::PidGain& _leftPid,
-              const Pid::PidGain& _straightAnglePid);
+              const Pid::PidGain& _rotationPid,
+              const Pid::PidGain& _squareRotationPid,
+              const Pid::PidGain& _rightPid,
+              const Pid::PidGain& _leftPid,
+              const Pid::PidGain& _straightAnglePid,
+              double _straightDeadbandRate,
+              double _straightMaxoutRate);
 
   /**
    * @brief 経路を走行する
@@ -57,6 +63,8 @@ RouteFollower(Robot& _robot, const EtRallyMap& _map, double _targetSpeed,
   Pid::PidGain rightPid;           // 右モーター用PIDゲイン
   Pid::PidGain leftPid;            // 左モーター用PIDゲイン
   Pid::PidGain straightAnglePid;  // 直進角度PIDゲイン
+  double straightDeadbandRate;        // 直進デッドバンド率
+double straightMaxoutRate;          // 直進マックスアウト率
 
   /**
    * @brief Directionを角度へ変換する

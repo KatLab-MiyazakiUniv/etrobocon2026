@@ -17,9 +17,14 @@ namespace {
 }  // namespace
 
 RouteFollower::RouteFollower(Robot& _robot, const EtRallyMap& _map,
-                             double _targetSpeed, const Pid::PidGain& _rotationPid,
-                             const Pid::PidGain& _squareRotationPid, const Pid::PidGain& _rightPid,
-                             const Pid::PidGain& _leftPid, const Pid::PidGain& _straightAnglePid)
+                             double _targetSpeed,
+                             const Pid::PidGain& _rotationPid,
+                             const Pid::PidGain& _squareRotationPid,
+                             const Pid::PidGain& _rightPid,
+                             const Pid::PidGain& _leftPid,
+                             const Pid::PidGain& _straightAnglePid,
+                             double _straightDeadbandRate,
+                             double _straightMaxoutRate)
   : robot(_robot),
     map(_map),
     targetSpeed(_targetSpeed),
@@ -27,7 +32,9 @@ RouteFollower::RouteFollower(Robot& _robot, const EtRallyMap& _map,
     squareRotationPid(_squareRotationPid),
     rightPid(_rightPid),
     leftPid(_leftPid),
-    straightAnglePid(_straightAnglePid)
+    straightAnglePid(_straightAnglePid),
+    straightDeadbandRate(_straightDeadbandRate),
+    straightMaxoutRate(_straightMaxoutRate)
 {
   LOG_CREATE("RouteFollower");
 }
@@ -231,8 +238,17 @@ void RouteFollower::straight(double distance)
 
   auto condition = std::make_unique<DistanceCondition>(robot, distance);
 
-  Straight straightMotion(robot, std::move(condition), targetSpeed, rightPid, leftPid,
-                          straightAnglePid, true);
+ Straight straightMotion(
+    robot,
+    std::move(condition),
+    targetSpeed,
+    rightPid,
+    leftPid,
+    straightAnglePid,
+    true,
+    straightDeadbandRate,
+    straightMaxoutRate);
+    
 Logger::printfLog(
   Logger::INFO,
   "RouteFollower: "

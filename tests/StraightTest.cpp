@@ -15,9 +15,7 @@ namespace etrobocon2026_test {
   class StraightTest : public ::testing::Test {
    protected:
     // テスト用のPidゲイン
-    Pid::PidGain rightPid = { 0.00535, 0.00115, 0.000 };
-    Pid::PidGain leftPid = { 0.00578, 0.0008535, 0.000 };
-    Pid::PidGain anglePid = { 0.0055, 0.0009, 0.0 };
+    Pid::PidGain anglePid = { 0.033, 0.003, 0.003 };
   };
 
   // IMU無しの場合、目標距離が正の時、run()で直進後、走行距離が目標距離だけ増加するかテスト（誤差あり）
@@ -36,7 +34,7 @@ namespace etrobocon2026_test {
 
     // 直進動作を実行
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                      targetSpeed, rightPid, leftPid, anglePid, false);
+                      targetSpeed, anglePid, false);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -67,7 +65,7 @@ namespace etrobocon2026_test {
 
     // 直進動作を実行
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                      targetSpeed, rightPid, leftPid, anglePid, false);
+                      targetSpeed, anglePid, false);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -95,7 +93,7 @@ namespace etrobocon2026_test {
 
     // 直進動作を実行
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                      targetSpeed, rightPid, leftPid, anglePid, false);
+                      targetSpeed, anglePid, false);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -124,7 +122,7 @@ namespace etrobocon2026_test {
 
     // 直進動作を実行
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                      targetSpeed, rightPid, leftPid, anglePid, false);
+                      targetSpeed, anglePid, false);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -153,7 +151,7 @@ namespace etrobocon2026_test {
 
     // 直進動作を実行
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                      targetSpeed, rightPid, leftPid, anglePid, true);
+                      targetSpeed, anglePid, true);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -184,7 +182,7 @@ namespace etrobocon2026_test {
 
     // 直進動作を実行
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                      targetSpeed, rightPid, leftPid, anglePid, true);
+                      targetSpeed, anglePid, true);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -212,7 +210,7 @@ namespace etrobocon2026_test {
 
     // 直進動作を実行
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                      targetSpeed, rightPid, leftPid, anglePid, true);
+                      targetSpeed, anglePid, true);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -241,7 +239,7 @@ namespace etrobocon2026_test {
 
     // 直進動作を実行
     Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
-                      targetSpeed, rightPid, leftPid, anglePid, true);
+                      targetSpeed, anglePid, true);
     straight.run();
 
     // 直進後の走行距離を計算

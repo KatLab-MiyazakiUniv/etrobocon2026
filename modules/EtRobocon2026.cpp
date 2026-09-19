@@ -193,7 +193,7 @@ void EtRobocon2026::start()
    *
    * 90度回頭などに使用。
    */
-  const Pid::PidGain rotationPid = { 1.18, 0.95, 0.2 };
+  const Pid::PidGain rotationPid = { 1.18, 0.95, 0.05};
 
   /**
    * 正方形補正回頭用PID
@@ -207,12 +207,12 @@ void EtRobocon2026::start()
   /**
    * 右モータ速度PID
    */
-  const Pid::PidGain rightPid = { 0.016, 0.005, 0.0015 };
+  const Pid::PidGain rightPid = { 0.01471422,0.004473,0.001505 };
 
   /**
    * 左モータ速度PID
    */
-  const Pid::PidGain leftPid = { 0.016, 0.0045, 0.0015 };
+  const Pid::PidGain leftPid = { 0.016,0.0045,0.0015 };
 
   /**
    * 直進角度PID

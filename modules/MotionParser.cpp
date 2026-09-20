@@ -459,12 +459,21 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                                          fromString<double>(motionParams[5]),
                                          fromString<double>(motionParams[6]) });
     }
+
     case MOTION_COMMAND::CAMERA_TRACKING: {
       CameraServer::ColorRegionDetectorRequest request;
-      request.requireLargestColorIndex = false;
-      request.hsvRangeCount = 1;
-      request.hsvRanges[0].lower = { 0, 0, 0 };
-      request.hsvRanges[0].upper = { 179, 255, 30 };
+      request.requireLargestColorIndex = fromString<bool>(motionParams[12]);
+      // request.hsvRanges = ImageProcessingColor::BottleColors;
+      int count = 0;
+      for(int i = 0; i < ImageProcessingColor::BottleColors.size(); i++) {
+        if(fromString<bool>(motionParams[13 + i])) {
+          request.hsvRanges[count] = ImageProcessingColor::BottleColors[i];
+          count++;
+        }
+      }
+      request.hsvRangeCount = count;
+      // request.hsvRanges[3]
+      //     = ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::BLACK);
 
       request.roi = { fromString<int>(motionParams[8]), fromString<int>(motionParams[9]),
                       fromString<int>(motionParams[10]), fromString<int>(motionParams[11]) };
@@ -480,7 +489,11 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
           Pid::PidGain(fromString<double>(motionParams[4]), fromString<double>(motionParams[5]),
                        fromString<double>(motionParams[6])),
           request, fromString<bool>(motionParams[7]));
+      // ここでCameraTrackigのメンバ変数のdetectorのメンバ変数のhsvRangesをセットする
     }
+
+
+
     case MOTION_COMMAND::ABSOLUTE_ROTATION: {
       // AbsoluteRotation:
       // motionParams[2]=anglePid.kp
@@ -523,6 +536,13 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
     case MOTION_COMMAND::CALIBRATOR: {
       return new Calibrator(robot, std::move(condition));
     }
+
+    case MOTION_COMMAND::SNAPSHOT: {
+      Logger::printfLog(Logger::DEBUG, "[MotionParser] Snapshotを生成しました");
+
+      return new Snapshot(robot, motionParams[2], std::move(condition));
+    }
+
     case MOTION_COMMAND::RESET_AZIMUTH: {
       return new ResetAzimuth(robot, std::move(condition));
     }
@@ -543,6 +563,7 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
           { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING },
           { "Calibrator", MOTION_COMMAND::CALIBRATOR },
+           { "Snapshot", MOTION_COMMAND::SNAPSHOT },
           { "ResetAzimuth", MOTION_COMMAND::RESET_AZIMUTH },
           { "ETZumoExit", MOTION_COMMAND::ET_ZUMO_EXIT },
           { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH }

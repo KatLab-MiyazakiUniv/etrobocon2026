@@ -1,13 +1,11 @@
-動作コマンド名,動作ID,条件コマンド名,条件ID
-
 #QR1検出位置まで直進
 RelativeRotation,-043,RelativeAngle,-043
 #Straight,001,Distance,068
 
 Straight,001,Distance,028
 Snapshot,clearBuffer1,RepeatCount,001
-CameraTracking,LBS009,Distance,035
-Straight,001,DistanceOrColor,BLUE035
+CameraTracking,LBS009,Distance,030
+Straight,001,DistanceOrColor,BLUE010
 
 # QR1検出
 Snapshot,clearBuffer1,RepeatCount,001

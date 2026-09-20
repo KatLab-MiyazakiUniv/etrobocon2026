@@ -47,7 +47,7 @@ namespace {
   /**
    * @brief 走行速度[mm/s]
    */
-  constexpr double TARGET_SPEED = 200.0;
+  constexpr double TARGET_SPEED = 300.0;
 
   /**
    * @brief Lコース座標を現在コース用へ変換
@@ -150,7 +150,7 @@ void EtRobocon2026::start()
   mapData.setGate(GoalColor::RED, convertPoint({ 7, 7 }), convertPoint({ 9, 7 }));
 
   // BLUE
-  mapData.setGate(GoalColor::BLUE, convertPoint({ 3, 7 }), convertPoint({ 3, 9 }));
+  mapData.setGate(GoalColor::BLUE, convertPoint({ 3, 5 }), convertPoint({ 3, 7 }));
 
   // YELLOW
   mapData.setGate(GoalColor::YELLOW, convertPoint({ 5, 3 }), convertPoint({ 7, 3 }));
@@ -170,13 +170,13 @@ void EtRobocon2026::start()
   // 5. 開始状態
   // =========================================================
 
-  const Point startPoint = convertPoint({ 2, 2 });
+  const Point startPoint = convertPoint({ 0, 4 });
 
   int currentGridX = startPoint.x;
 
   int currentGridY = startPoint.y;
 
-  Direction currentDirection = convertDirection(Direction::DOWN);
+  Direction currentDirection = convertDirection(Direction::LEFT);
 
   // =========================================================
   // 6. ゲート順
@@ -202,12 +202,12 @@ void EtRobocon2026::start()
    * QR①後の-α、
    * QR②への微調整に使用する。
    */
-  const Pid::PidGain squareRotationPid = {3.0,0.0,0.8 };
+  const Pid::PidGain squareRotationPid = {4.9,0.0,0.12 };
 
   /**
    * 右モータ速度PID
    */
-  const Pid::PidGain rightPid = { 0.01471422,0.004473,0.001505 };
+  const Pid::PidGain rightPid = { 0.0147673647,0.004475,0.0015 };
 
   /**
    * 左モータ速度PID

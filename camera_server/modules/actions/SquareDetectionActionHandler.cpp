@@ -65,7 +65,7 @@ namespace {
    *
    * 実際に設置した距離に合わせて変更すること。
    */
-  constexpr double CAMERA_TO_BOARD_NEAR_EDGE = 200.0;
+  constexpr double CAMERA_TO_BOARD_NEAR_EDGE = 160.0;
 
   /**
    * @brief 1回の検出で取得するフレーム数

@@ -3,3 +3,5 @@ Command,ID,RelativeAngle,AngleKp,AngleKi,AngleKd
 RelativeRotation,1,90,1.18,0.95,0.05
 RelativeRotation,2,-90,1.2,1.0,0.0
 RelativeRotation,15,-15,1.2,1.0,0.0
+RelativeRotation,11,15,3.0,0.0,0.8
+RelativeRotation,12,90,1.05,0.95,0.2

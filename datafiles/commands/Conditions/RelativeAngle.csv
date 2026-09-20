@@ -1,5 +1,5 @@
 Command,ID,relativeAngle,tolerance
 説明,説明,説明,説明
-RelativeAngle,1,90,2
+RelativeAngle,1,5,2
 RelativeAngle,2,-90,2
 RelativeAngle,15,-15,2

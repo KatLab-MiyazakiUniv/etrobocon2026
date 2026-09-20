@@ -366,6 +366,9 @@ if(globalLeft <= BORDER_MARGIN
       = CAM_MAX_HEIGHT
         * TARGET_Y_RATIO;
 
+   double bestCenterY
+    = -1.0;     
+
   double bestTargetDistance
       = std::numeric_limits<double>::max();
 
@@ -435,19 +438,17 @@ if(globalLeft <= BORDER_MARGIN
     }
 
     // 基準位置に最も近い候補
-    if(!foundCandidate
-       || targetDistance
-              < bestTargetDistance) {
+    // 手前（画面下）を優先し、同じくらいなら中央に近い方を選ぶ
+if(!foundCandidate
+   || centerY > bestCenterY + 40.0
+   || (std::abs(centerY - bestCenterY) <= 40.0
+       && targetDistance < bestTargetDistance)) {
 
-      bestCandidate
-          = candidate;
-
-      bestTargetDistance
-          = targetDistance;
-
-      foundCandidate
-          = true;
-    }
+  bestCandidate = candidate;
+  bestCenterY = centerY;
+  bestTargetDistance = targetDistance;
+  foundCandidate = true;
+}
   }
 
   // 有効候補なし

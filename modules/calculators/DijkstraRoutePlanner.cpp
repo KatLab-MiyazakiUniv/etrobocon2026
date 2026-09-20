@@ -6,13 +6,13 @@
 
 #include "DijkstraRoutePlanner.h"
 
-/**
- * @brief ダイクストラ法の優先度付きキューで使用するノード
- */
 namespace {
 
   constexpr double RAD_TO_DEG = 180.0 / 3.14159265358979323846;
 
+  /**
+   * @brief ダイクストラ法の優先度付きキューで使用するノード
+   */
   struct QueueNode {
     int cost;
     int index;
@@ -39,6 +39,138 @@ namespace {
    * この経路を選択することができる。
    */
   constexpr int GATE_APPROACH_TURN_PENALTY = 10;
+
+  /**
+   * @brief ゲート方向へ回頭する位置を「ゲート直前」とみなす距離[マス座標]
+   *
+   * DijkstraRoutePlanner クラスの MOVE_STEP はクラスメンバのため、
+   * 無名名前空間内の補助関数から直接参照できない。
+   *
+   * ゲート中心までの座標差が3以下なら、
+   * QR①のための助走距離が不足する可能性が高いため
+   * ペナルティ対象とする。
+   */
+  constexpr int GATE_APPROACH_DISTANCE = 1;
+
+  /**
+   * @brief QR①付近からゲート方向を向くか判定する
+   *
+   * @param gates ゲート一覧
+   * @param currentX 現在X座標
+   * @param currentY 現在Y座標
+   * @param nextDirection 回頭後の方向
+   * @return true QR①付近からゲート方向を向く
+   * @return false それ以外
+   *
+   * @details
+   * 通常の移動時だけでなく、
+   * ゴール地点で行われる最終回頭にも同じ判定を使用する。
+   *
+   * 例えばBLUEゲートが
+   *
+   *   (3,7)
+   *     |
+   *     |
+   *   (3,9)
+   *
+   * にある場合、
+   *
+   *   (4,8)
+   *
+   * からRIGHT方向を向くとゲート方向を向く。
+   *
+   * このようなQR①付近での回頭を検出する。
+   */
+  bool isTurningTowardGateNearEntrance(const std::vector<Gate>& gates, int currentX, int currentY,
+                                       Direction nextDirection)
+  {
+    for(const Gate& gate : gates) {
+      // =====================================================
+      // 縦向きゲート
+      //
+      // X方向へ通過する。
+      // =====================================================
+
+      if(gate.start.x == gate.end.x) {
+        const int gateX = gate.start.x;
+
+        const int minY = std::min(gate.start.y, gate.end.y);
+        const int maxY = std::max(gate.start.y, gate.end.y);
+
+        // ゲートの通過範囲と同じY位置にいるか
+        if(currentY >= minY && currentY <= maxY) {
+          const int distanceToGate = std::abs(currentX - gateX);
+
+          // ゲート中心までの座標差が3以下ならQR①直前と判定
+          if(distanceToGate <= GATE_APPROACH_DISTANCE) {
+            // -------------------------------------------------
+            // ゲートの右側からゲートへ向かう
+            //
+            // この座標系では
+            // RIGHT = X -
+            // -------------------------------------------------
+
+            if(currentX > gateX && nextDirection == Direction::RIGHT) {
+              return true;
+            }
+
+            // -------------------------------------------------
+            // ゲートの左側からゲートへ向かう
+            //
+            // LEFT = X +
+            // -------------------------------------------------
+
+            if(currentX < gateX && nextDirection == Direction::LEFT) {
+              return true;
+            }
+          }
+        }
+      }
+
+      // =====================================================
+      // 横向きゲート
+      //
+      // Y方向へ通過する。
+      // =====================================================
+
+      if(gate.start.y == gate.end.y) {
+        const int gateY = gate.start.y;
+
+        const int minX = std::min(gate.start.x, gate.end.x);
+        const int maxX = std::max(gate.start.x, gate.end.x);
+
+        // ゲートの通過範囲と同じX位置にいるか
+        if(currentX >= minX && currentX <= maxX) {
+          const int distanceToGate = std::abs(currentY - gateY);
+
+          // ゲート中心までの座標差が3以下ならQR①直前と判定
+          if(distanceToGate <= GATE_APPROACH_DISTANCE) {
+            // -------------------------------------------------
+            // ゲートの下側からゲートへ向かう
+            //
+            // UP = Y -
+            // -------------------------------------------------
+
+            if(currentY > gateY && nextDirection == Direction::UP) {
+              return true;
+            }
+
+            // -------------------------------------------------
+            // ゲートの上側からゲートへ向かう
+            //
+            // DOWN = Y +
+            // -------------------------------------------------
+
+            if(currentY < gateY && nextDirection == Direction::DOWN) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+
+    return false;
+  }
 
 }  // namespace
 
@@ -195,6 +327,43 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
       finalTurnCost += GATE_NEAR_TURN_PENALTY;
     }
 
+    // ===================================================
+    // QR①付近での最終回頭ペナルティ
+    // ===================================================
+    //
+    // 通常の探索中の回頭はcalculateMoveCost()で
+    // GATE_APPROACH_TURN_PENALTYが加算される。
+    //
+    // しかしゴール地点での最終回頭は
+    // calculateMoveCost()を通らない。
+    //
+    // 例えばBLUEゲートが
+    //
+    //   (3,7)
+    //     |
+    //     |
+    //   (3,9)
+    //
+    // の場合、
+    //
+    //   (4,8) UP
+    //
+    // で到着して、
+    //
+    //   (4,8) RIGHT
+    //
+    // へ最終回頭すると、
+    // QR①上でゲート方向を向くことになる。
+    //
+    // この回頭にも通常のQR①回頭と
+    // 同じペナルティを加える。
+    // ===================================================
+
+    if(arrivalDirection != goalDirection
+       && isTurningTowardGateNearEntrance(gates, goal.x, goal.y, goalDirection)) {
+      finalTurnCost += GATE_APPROACH_TURN_PENALTY;
+    }
+
     const int finalCost = distance[index] + finalTurnCost;
 
     if(finalCost < bestCost) {
@@ -310,11 +479,12 @@ int DijkstraRoutePlanner::calculateMoveCost(int currentX, int currentY, Directio
   // QR①付近でゲート方向へ回頭する経路を避ける
   // =====================================================
   //
-  // 例：
+  // 例えばBLUEゲートが
   //
-  // BLUEゲートが
-  //
-  //   x = 3
+  //   (3,7)
+  //     |
+  //     |
+  //   (3,9)
   //
   // にあり、
   //
@@ -324,14 +494,14 @@ int DijkstraRoutePlanner::calculateMoveCost(int currentX, int currentY, Directio
   // (4,8)はQR①付近になる。
   //
   // ここで別方向からRIGHTへ回頭すると、
-  // QR①を検出するための250mmの助走距離を
+  // QR①を検出するために必要な助走距離を
   // 確保できない。
   //
   // そのため、
   //
-  //   「ゲート直前」
-  //   ＋
-  //   「ゲート方向へ向きを変える」
+  // 「ゲート直前」
+  // ＋
+  // 「ゲート方向へ向きを変える」
   //
   // 場合だけ大きな追加コストを与える。
   //
@@ -339,108 +509,7 @@ int DijkstraRoutePlanner::calculateMoveCost(int currentX, int currentY, Directio
   // 他に経路がない場合はこの経路も使用可能。
   // =====================================================
 
-  bool turnsTowardGateNearEntrance = false;
-
-  for(const Gate& gate : gates) {
-    // -----------------------------------------------------
-    // 縦向きゲート
-    //
-    // 例：
-    //
-    //   |
-    //   |
-    //
-    // X方向へ通過する。
-    // -----------------------------------------------------
-
-    if(gate.start.x == gate.end.x) {
-      const int gateX = gate.start.x;
-
-      const int minY = std::min(gate.start.y, gate.end.y);
-
-      const int maxY = std::max(gate.start.y, gate.end.y);
-
-      // ゲートの通過範囲と同じY位置にいるか。
-      if(currentY >= minY && currentY <= maxY) {
-        const int distanceToGate = std::abs(currentX - gateX);
-
-        /*
-         * MOVE_STEP以内ならゲート直前と判定。
-         *
-         * 例えば、
-         *
-         * gateX = 3
-         * currentX = 4
-         *
-         * のような位置。
-         *
-         * QR①付近での回頭を避けることが目的。
-         */
-        if(distanceToGate <= MOVE_STEP) {
-          // 右側からゲートへ向かう。
-          //
-          // この座標系では
-          //
-          // RIGHT = X -
-          //
-          if(currentX > gateX && nextDirection == Direction::RIGHT) {
-            turnsTowardGateNearEntrance = true;
-          }
-
-          // 左側からゲートへ向かう。
-          //
-          // LEFT = X +
-          //
-          if(currentX < gateX && nextDirection == Direction::LEFT) {
-            turnsTowardGateNearEntrance = true;
-          }
-        }
-      }
-    }
-
-    // -----------------------------------------------------
-    // 横向きゲート
-    //
-    // Y方向へ通過する。
-    // -----------------------------------------------------
-
-    if(gate.start.y == gate.end.y) {
-      const int gateY = gate.start.y;
-
-      const int minX = std::min(gate.start.x, gate.end.x);
-
-      const int maxX = std::max(gate.start.x, gate.end.x);
-
-      // ゲートの通過範囲と同じX位置にいるか。
-      if(currentX >= minX && currentX <= maxX) {
-        const int distanceToGate = std::abs(currentY - gateY);
-
-        if(distanceToGate <= MOVE_STEP) {
-          // 下側からゲートへ向かう。
-          //
-          // UP = Y -
-          //
-          if(currentY > gateY && nextDirection == Direction::UP) {
-            turnsTowardGateNearEntrance = true;
-          }
-
-          // 上側からゲートへ向かう。
-          //
-          // DOWN = Y +
-          //
-          if(currentY < gateY && nextDirection == Direction::DOWN) {
-            turnsTowardGateNearEntrance = true;
-          }
-        }
-      }
-    }
-
-    if(turnsTowardGateNearEntrance) {
-      break;
-    }
-  }
-
-  if(turnsTowardGateNearEntrance) {
+  if(isTurningTowardGateNearEntrance(gates, currentX, currentY, nextDirection)) {
     turnCost += GATE_APPROACH_TURN_PENALTY;
   }
 

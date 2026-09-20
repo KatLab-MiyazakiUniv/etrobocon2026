@@ -6,8 +6,8 @@ RelativeRotation,-043,RelativeAngle,-043
 
 Straight,001,Distance,028
 Snapshot,clearBuffer1,RepeatCount,001
-CameraTracking,LBS009,DistanceOrColor,002
-Straight,001,DistanceOrColor,002
+CameraTracking,LBS009,Distance,035
+Straight,001,DistanceOrColor,BLUE035
 
 # QR1検出
 Snapshot,clearBuffer1,RepeatCount,001
@@ -26,7 +26,7 @@ Snapshot,clearBuffer1,RepeatCount,001
 
 
 CameraTracking,LBS003,Distance,095
-CameraTracking,LBS003,DistanceOrColor,005
+CameraTracking,LBS003,DistanceOrColor,BLACK100
 
 #CameraTracking,LBS008,Distance,015
 
@@ -48,7 +48,7 @@ RelativeRotation,-055,RelativeAngle,-055
 
 #Straight,001,Distance,100
 
-Straight,001,DistanceOrColor,001
+Straight,001,DistanceOrColor,100RED
 
 #Straight,001,SensorColor,001
 Straight,001,Distance,005

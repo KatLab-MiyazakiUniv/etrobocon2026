@@ -31,9 +31,13 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "RelativeRotation.h"
 #include "CameraTracking.h"
 #include "Calibrator.h"
+#include "ResetAzimuth.h"
+#include "ETZumoExit.h"
+#include "ETZumoFinish.h"
+#include "ProjectedDistanceCondition.h"
+#include "ETZumoExitCondition.h"
 #include "UltraSonicCondition.h"
-#include "ColorRegionCenterCondition.h"
-#include "./../common/ImageProcessingColor.h"
+#include "ImageProcessingColor.h"
 
 class MotionParser {
  public:
@@ -43,26 +47,28 @@ class MotionParser {
     STRAIGHT,
     LINETRACE,
     CAMERA_TRACKING,
-    ABSOLUTE_ROTATION,
     RELATIVE_ROTATION,
-    QR_TRACKING,
+    ABSOLUTE_ROTATION,
     CALIBRATOR,
-    SNAPSHOT,
+    RESET_AZIMUTH,
+    ET_ZUMO_EXIT,
+    ET_ZUMO_FINISH,
     NONE
   };
   // 条件コマンド名を持つ列挙型クラス
   enum class CONDITION_COMMAND {
     DISTANCE,
+    PROJECTED_DISTANCE,
     ABSOLUTE_ANGLE,
     RELATIVE_ANGLE,
     SENSOR_COLOR,
     RUNNING_TIME,
     MOTION_TIME,
-    REPEAT_COUNT,
     DISTANCE_AND_COLOR,
+    DISTANCE_OR_COLOR,
+    REPEAT_COUNT,
     ULTRA_SONIC,
-    COLOR_OR_COLOR,
-    COLOR_REGION_CENTER,
+    DISTANCE_OR_ULTRA_SONIC,
     NONE
   };
 
@@ -93,7 +99,8 @@ class MotionParser {
    * @return 条件インスタンス（未定義の場合は nullptr）
    */
   static std::unique_ptr<BaseContinuationCondition> createConditionInstance(
-      Robot& robot, const std::vector<std::string>& params);
+      Robot& robot, const std::vector<std::string>& params,
+      std::shared_ptr<ProjectedMileage> mileage = nullptr);
 
   /**
    * @brief パラメータから動作インスタンスを生成する
@@ -104,7 +111,9 @@ class MotionParser {
    */
   static BaseMotion* createMotionInstance(Robot& robot,
                                           const std::vector<std::string>& motionParams,
-                                          std::unique_ptr<BaseContinuationCondition> condition);
+                                          std::unique_ptr<BaseContinuationCondition> condition,
+                                          std::shared_ptr<ProjectedMileage> sharedMileage
+                                          = nullptr);
 
   /**
    * @brief 文字列を列挙型MOTION_COMMANDに変換する

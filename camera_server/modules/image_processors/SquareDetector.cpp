@@ -239,215 +239,102 @@ void SquareDetector::detect(
   // 輪郭検出
   // =====================================================
 
-  std::vector<std::vector<cv::Point>> contours;
+  // =====================================================
+// QRの特徴点検出（Shi-Tomasi）
+// =====================================================
 
-  cv::findContours(
-      morphFrame,
-      contours,
-      cv::RETR_EXTERNAL,
-      cv::CHAIN_APPROX_SIMPLE);
+std::vector<cv::Point2f> featurePoints;
+
+cv::goodFeaturesToTrack(
+    morphFrame,
+    featurePoints,
+    300,
+    0.01,
+    8);
+
+Logger::printfLog(
+    Logger::INFO,
+    "SquareDetector: feature count = %d",
+    static_cast<int>(featurePoints.size()));
+
+// 候補
+std::vector<SquareCandidate> candidates;
+
+constexpr float CLUSTER_RADIUS = 45.0f;
+constexpr int MIN_CLUSTER_POINTS = 25;
+
+std::vector<bool> used(featurePoints.size(), false);
+for(size_t i = 0; i < featurePoints.size(); i++) {
+
+  if(used[i]) {
+    continue;
+  }
+
+  std::vector<cv::Point2f> cluster;
+  cluster.push_back(featurePoints[i]);
+  used[i] = true;
+
+  bool expanded = true;
+
+  while(expanded) {
+
+    expanded = false;
+
+    for(size_t j = 0; j < featurePoints.size(); j++) {
+
+      if(used[j]) {
+        continue;
+      }
+
+      for(const auto& p : cluster) {
+
+        if(cv::norm(featurePoints[j]-p) <= CLUSTER_RADIUS) {
+
+          cluster.push_back(featurePoints[j]);
+          used[j] = true;
+          expanded = true;
+          break;
+        }
+      }
+    }
+  }
+
+  if(static_cast<int>(cluster.size()) < MIN_CLUSTER_POINTS) {
+    continue;
+  }
+
+  cv::RotatedRect rect = cv::minAreaRect(cluster);
+
+  const cv::Rect boundingRect = rect.boundingRect();
+
+const int globalLeft
+    = boundingRect.x + roiRect.x;
+const int globalTop
+    = boundingRect.y + roiRect.y;
+const int globalRight
+    = globalLeft + boundingRect.width;
+const int globalBottom
+    = globalTop + boundingRect.height;
+
+if(globalLeft <= BORDER_MARGIN
+   || globalTop <= BORDER_MARGIN
+   || globalRight >= frame.cols - BORDER_MARGIN
+   || globalBottom >= frame.rows - BORDER_MARGIN) {
+  continue;
+}
+
+  candidates.push_back({
+      rect,
+      static_cast<double>(cluster.size())
+  });
 
   Logger::printfLog(
       Logger::INFO,
-      "SquareDetector: contour count = %d",
-      static_cast<int>(contours.size()));
-
-  // 候補抽出
-  std::vector<SquareCandidate> candidates;
-
-  for(const auto& contour : contours) {
-    // 面積
-    const double area
-        = cv::contourArea(contour);
-
-    if(area < MIN_CONTOUR_AREA) {
-      Logger::printfLog(
-          Logger::DEBUG,
-          "SquareDetector: "
-          "small area rejected "
-          "area=%.2f minimum=%.2f",
-          area,
-          MIN_CONTOUR_AREA);
-
-      continue;
-    }
-
-    // 周長
-    const double perimeter
-        = cv::arcLength(
-            contour,
-            true);
-
-    if(perimeter <= 0.0) {
-      continue;
-    }
-
-    // 円形度
-    const double circularity
-        = 4.0
-          * CV_PI
-          * area
-          / (perimeter * perimeter);
-
-    if(circularity > MAX_CIRCULARITY) {
-      Logger::printfLog(
-          Logger::DEBUG,
-          "SquareDetector: "
-          "circle rejected "
-          "area=%.2f circularity=%.2f",
-          area,
-          circularity);
-
-      continue;
-    }
-
-    // 最小外接回転矩形
-    const cv::RotatedRect rect
-        = cv::minAreaRect(contour);
-
-    const double width
-        = rect.size.width;
-
-    const double height
-        = rect.size.height;
-
-    if(width <= 0.0
-       || height <= 0.0) {
-
-      continue;
-    }
-
-    // 中心位置
-    const double centerX
-        = rect.center.x
-          + static_cast<double>(
-              roiRect.x);
-
-    const double centerY
-        = rect.center.y
-          + static_cast<double>(
-              roiRect.y);
-
-    // 画像端判定
-    const cv::Rect boundingRect
-        = rect.boundingRect();
-
-    const int globalLeft
-        = boundingRect.x
-          + roiRect.x;
-
-    const int globalTop
-        = boundingRect.y
-          + roiRect.y;
-
-    const int globalRight
-        = globalLeft
-          + boundingRect.width;
-
-    const int globalBottom
-        = globalTop
-          + boundingRect.height;
-
-    if(globalLeft <= BORDER_MARGIN
-       || globalTop <= BORDER_MARGIN
-       || globalRight >= frame.cols - BORDER_MARGIN
-       || globalBottom >= frame.rows - BORDER_MARGIN) {
-
-      Logger::printfLog(
-          Logger::DEBUG,
-          "SquareDetector: "
-          "border rejected "
-          "area=%.2f "
-          "left=%d top=%d "
-          "right=%d bottom=%d",
-          area,
-          globalLeft,
-          globalTop,
-          globalRight,
-          globalBottom);
-
-      continue;
-    }
-
-    // ---------------------------------------------------
-    // 縦横比
-    // ---------------------------------------------------
-
-    const double ratio
-        = std::min(
-              width,
-              height)
-          / std::max(
-              width,
-              height);
-
-    if(ratio < MIN_RATIO) {
-      Logger::printfLog(
-          Logger::DEBUG,
-          "SquareDetector: "
-          "ratio rejected "
-          "area=%.2f "
-          "width=%.2f "
-          "height=%.2f "
-          "ratio=%.2f",
-          area,
-          width,
-          height,
-          ratio);
-
-      continue;
-    }
-
-    // 矩形面積
-    const double rectArea
-        = width * height;
-
-    if(rectArea <= 0.0) {
-      continue;
-    }
-
-    // 充填率
-    const double fillRatio
-        = area / rectArea;
-
-    if(fillRatio < MIN_FILL_RATIO) {
-      Logger::printfLog(
-          Logger::DEBUG,
-          "SquareDetector: "
-          "fill rejected "
-          "area=%.2f fill=%.2f",
-          area,
-          fillRatio);
-
-      continue;
-    }
-
-    // 有効候補
-    Logger::printfLog(
-        Logger::INFO,
-        "SquareDetector: candidate "
-        "area=%.2f "
-        "width=%.2f "
-        "height=%.2f "
-        "ratio=%.2f "
-        "fill=%.2f "
-        "circularity=%.2f "
-        "center=(%.1f,%.1f)",
-        area,
-        width,
-        height,
-        ratio,
-        fillRatio,
-        circularity,
-        centerX,
-        centerY);
-
-    candidates.push_back(
-        SquareCandidate{
-            rect,
-            area
-        });
-  }
+      "SquareDetector: feature cluster=%d center=(%.1f,%.1f)",
+      static_cast<int>(cluster.size()),
+      rect.center.x + roiRect.x,
+      rect.center.y + roiRect.y);
+}
 
   // =====================================================
   // 候補なし

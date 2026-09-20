@@ -1,14 +1,13 @@
 /**
- * @file   BaseContinuationCondition.h
- * @brief  動作を継続するかを判定するクラスの基底クラス
- * @author takuchi17
+ * @file   UltraSonicCondition.h
+ * @brief  超音波距離を基準に動作を継続すべきか判定するクラス
+ * @author migaku2645
  */
 
 #ifndef ULTRA_SONIC_CONDITION_H
 #define ULTRA_SONIC_CONDITION_H
 
 #include "BaseContinuationCondition.h"
-#include "Mileage.h"
 #include "Logger.h"
 
 class UltraSonicCondition : public BaseContinuationCondition {
@@ -17,19 +16,15 @@ class UltraSonicCondition : public BaseContinuationCondition {
    * コンストラクタ
    * @brief メンバ変数 robot を初期化する
    * @param _robot Robot クラスのインスタンスの参照
+   * @param _targetDistance 目標超音波距離
    */
   UltraSonicCondition(Robot& _robot, double _targetDistance);
 
   /**
    * デストラクタ
-   * @brief 基底クラス経由で派生クラスのインスタンスを安全に破棄できるようにする
+   * @brief
    */
   ~UltraSonicCondition();
-
-  /**
-   * @brief 継続条件の事前準備を行う (デフォルトは何もしない)
-   */
-  void prepare() override;
 
   /**
    * @brief 動作を継続するかを判定する
@@ -38,10 +33,9 @@ class UltraSonicCondition : public BaseContinuationCondition {
   bool shouldContinue() override;
 
  protected:
-  double targetDistance = 0;
-  double initDistance = 0;
-  double detectCount;
-  static constexpr int JUDGE_COUNT = 2;  // 継続条件を修了するために必要な連続取得回数
+  double targetDistance = 0.0;           // 目標超音波距離
+  int detectCount = 0;                   // 取得回数
+  static constexpr int JUDGE_COUNT = 2;  // 継続条件を終了するために必要な連続取得回数
 };
 
 #endif

@@ -18,3 +18,8 @@ CameraTracking,LTS003,Distance,060
 CameraTracking,LTS004,Distance,040
 
 CameraTracking,000,Distance,000
+#LineTrace,006,Distance,006
+#LineTrace,004,Distance,004
+#LineTrace,006,Distance,005
+#LineTrace,004,Distance,004
+#LineTrace,006,Distance,007

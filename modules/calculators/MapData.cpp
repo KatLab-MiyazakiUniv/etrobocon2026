@@ -59,12 +59,10 @@ std::vector<GatePass> MapData::getGatePasses(GoalColor color) const
   // 横向きゲート
   if(gate->start.y == gate->end.y) {
     int centerX = (gate->start.x + gate->end.x) / 2;
-
     int gateY = gate->start.y;
 
     // upからdown
     passes.push_back({ { centerX, gateY - 1 }, { centerX, gateY + 1 }, Direction::DOWN });
-
     // downからup
     passes.push_back({ { centerX, gateY + 1 }, { centerX, gateY - 1 }, Direction::UP });
 
@@ -74,12 +72,10 @@ std::vector<GatePass> MapData::getGatePasses(GoalColor color) const
   // 縦向きゲート
   if(gate->start.x == gate->end.x) {
     int centerY = (gate->start.y + gate->end.y) / 2;
-
     int gateX = gate->start.x;
 
     // leftからright
     passes.push_back({ { gateX + 1, centerY }, { gateX - 1, centerY }, Direction::RIGHT });
-
     // rightからleft
     passes.push_back({ { gateX - 1, centerY }, { gateX + 1, centerY }, Direction::LEFT });
   }

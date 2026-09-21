@@ -20,10 +20,10 @@ Snapshot,015,RepeatCount,001
 
 
 #QR1取得後の直線:回頭し110cmほど進む
-RelativeRotation,-040,RelativeAngle,-040
+RelativeRotation,-045,RelativeAngle,-045
 Snapshot,clearBuffer1,RepeatCount,001
-CameraTracking,LBS003,Distance,095
-CameraTracking,LBS008,DistanceOrColor,BLACK015
+CameraTracking,LBS003,Distance,080
+#CameraTracking,LBS008,DistanceOrColor,BLACK020
 
 #QR2取得前カーブ直前
-Straight,001,Distance,015
+#Straight,001,Distance,015

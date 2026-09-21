@@ -15,6 +15,7 @@
 #include <vector>
 #include "RouteTypes.h"
 #include "AngleNormalizer.h"
+#include "Logger.h"
 
 class DijkstraRoutePlanner {
  public:

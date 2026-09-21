@@ -60,13 +60,13 @@ class SquareDetectionActionHandler {
    */
   void initializeHomography();
 
-  /** 
-   * @brief 画像座標を校正用紙上の実座標へ変換する 
-   * 校正用紙左下を原点とし、 
-   * 右方向をXプラス、奥方向をYプラスとする。 * 
-   * @param pixelX 画像X座標[px] 
-   * @param pixelY 画像Y座標[px] 
-   * @return 校正用紙上の座標[mm] */ 
+  /**
+   * @brief 画像座標を校正用紙上の実座標へ変換する
+   * 校正用紙左下を原点とし、
+   * 右方向をXプラス、奥方向をYプラスとする。 *
+   * @param pixelX 画像X座標[px]
+   * @param pixelY 画像Y座標[px]
+   * @return 校正用紙上の座標[mm] */
   cv::Point2f pixelToWorld(double pixelX, double pixelY) const;
 };
 

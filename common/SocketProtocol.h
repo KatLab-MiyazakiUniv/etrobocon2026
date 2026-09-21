@@ -81,7 +81,7 @@ namespace CameraServer {
    * @brief バウンディングボックスを表す座標
    */
   struct BoundingBoxDetectionResult {
-    bool wasDetected = false;  // 正方形を検出できたか
+    bool wasDetected = false;  // 検出できたか
     PointData topLeft;         // 左上の座標
     PointData topRight;        // 右上の座標
     PointData bottomLeft;      // 左下の座標
@@ -152,7 +152,7 @@ namespace CameraServer {
    * @brief 正方形検出のレスポンス構造体
    */
   struct SquareDetectorResponse {
-    bool wasDetected = false;                     // 正方形を検出できたかどうか
+    bool wasDetected = false;                     // 検出できたかどうか
     PointData corners[SQUARE_CORNER_COUNT] = {};  // 正方形の各頂点の座標
     double centerX = 0.0;                         // 画像上の正方形中心X座標[px]
     double centerY = 0.0;                         // 画像上の正方形中心Y座標[px]

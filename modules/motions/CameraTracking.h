@@ -11,8 +11,6 @@
 #include "Pid.h"
 #include "SpeedCalculator.h"
 #include "SocketProtocol.h"
-#include <algorithm>
-#include <utility>
 
 class CameraTracking : public BaseMotion {
  public:
@@ -20,9 +18,8 @@ class CameraTracking : public BaseMotion {
    * @brief 検出方式の種類
    */
   enum class DetectionMode {
-    COLOR_REGION,     // 色領域検出
-    QR_CODE,          // QRコード検出
-    SQUARE_DETECTION  // 正方形検出
+    COLOR_REGION,  // 色領域検出
+    QR_CODE        // QRコード検出
   };
 
   /**
@@ -58,22 +55,6 @@ class CameraTracking : public BaseMotion {
                  bool _isStopMotorPower = true);
 
   /**
-   * コンストラクタ
-   * @brief カメラ画像(正方形検出)を使ったPID走行クラスを初期化する
-   * @param _robot ロボットインスタンス
-   * @param _continuationCondition 継続条件クラスのインスタンス
-   * @param _targetSpeed 目標速度
-   * @param _targetXCoordinate 目標x座標
-   * @param _pidGain カメラ制御用PIDゲイン
-   * @param _squareDetectionRequest 正方形検出リクエスト
-   * @param _isStopMotorPower モーターを停止するかどうか
-   */
-  CameraTracking(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                 double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
-                 const CameraServer::SquareDetectorRequest& _squareDetectionRequest,
-                 bool _isStopMotorPower = true);
-
-  /**
    * デストラクタ
    */
   ~CameraTracking();
@@ -101,12 +82,6 @@ class CameraTracking : public BaseMotion {
    * @return const CameraServer::QrCodeDetectorRequest& QRコード検出リクエストへの参照
    */
   const CameraServer::QrCodeDetectorRequest& getQrDetectionRequest() const;
-
-  /**
-   * @brief 正方形検出リクエストを取得する
-   * @return const CameraServer::SquareDetectorRequest& 正方形検出リクエストへの参照
-   */
-  const CameraServer::SquareDetectorRequest& getSquareDetectionRequest() const;
 
   /**
    * @brief 検出方式を取得する
@@ -153,7 +128,6 @@ class CameraTracking : public BaseMotion {
   DetectionMode detectionMode;                                     // 検出方式
   CameraServer::ColorRegionDetectorRequest colorDetectionRequest;  // 色領域検出リクエスト
   CameraServer::QrCodeDetectorRequest qrDetectionRequest;          // QRコード検出リクエスト
-  CameraServer::SquareDetectorRequest squareDetectionRequest;      // 正方形検出リクエスト
   bool isStopMotorPower;                                           // モーターを停止するかどうか
   SpeedCalculator speedCalculator;  // 目標速度に対するモータパワー計算
   Pid cameraPid;                    // カメラ画像x座標に対するPID制御

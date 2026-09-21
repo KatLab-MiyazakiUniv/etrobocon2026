@@ -3,7 +3,7 @@
 #Calibrator,001,RepeatCount,001
 #4色走行ボトルキャッチ前
 
-#Snapshot,clearBuffer1,RepeatCount,001
+Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,LTS001,Distance,060
 #ボトルキャッチ中(上半分roi)
 CameraTracking,LTS002,Distance,025

@@ -157,6 +157,7 @@ void CameraTracking::finish()
   if(isStopMotorPower) {
 
   ClockUtil::sleep(10);
+    robot.getWheelMotorControllerInstance().brakeBoth();
     robot.getWheelMotorControllerInstance().stopBoth();
   }
 }

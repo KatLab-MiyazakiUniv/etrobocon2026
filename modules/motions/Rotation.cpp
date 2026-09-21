@@ -48,6 +48,7 @@ void Rotation::executeStep()
 void Rotation::finish()
 {
   robot.getWheelMotorControllerInstance().stopBoth();
+  //回頭終了時に、急激に止まり?ボトルを離す原因?
   robot.getWheelMotorControllerInstance().resetBothPower();
 }
 

@@ -296,6 +296,23 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
                         targetDistance);
       return make_unique<UltraSonicCondition>(robot, targetDistance);
     }
+    case CONDITION_COMMAND::COLOR_OR_COLOR: {
+      std::string targetColorName1 = params[2];
+      std::string targetColorName2 = params[3];
+
+      auto targetColor1 = ColorSensorController::convertStringToColor(targetColorName1);
+      auto targetColor2 = ColorSensorController::convertStringToColor(targetColorName2);
+      
+      
+
+    
+      auto colorCondition1 = std::make_unique<SensorColorCondition>(robot, targetColor1);
+      auto colorCondition2 = std::make_unique<SensorColorCondition>(robot, targetColor2);
+
+      return std::make_unique<CompoundCondition>(robot, std::move(colorCondition1),
+                                                 std::move(colorCondition2),
+                                                 CompoundCondition::LogicalOperator::OR);
+    }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Condition %s は未実装です",
                         params[0].c_str());
@@ -594,7 +611,10 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
           { "DistanceAndColor", CONDITION_COMMAND::DISTANCE_AND_COLOR },
           { "DistanceOrColor", CONDITION_COMMAND::DISTANCE_OR_COLOR },
           { "DistanceOrUltraSonic", CONDITION_COMMAND::DISTANCE_OR_ULTRA_SONIC },
-          { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC } };
+          { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC },
+          { "ColorOrColor", CONDITION_COMMAND::COLOR_OR_COLOR }
+
+         };
 
   // 条件コマンド文字列に対応するCONDITION_COMMAND値をマップから取得。なければCONDITION_COMMAND::NONEを返す
   auto it = conditionMap.find(str);

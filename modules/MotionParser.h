@@ -70,6 +70,7 @@ class MotionParser {
     REPEAT_COUNT,
     ULTRA_SONIC,
     DISTANCE_OR_ULTRA_SONIC,
+    COLOR_OR_COLOR,
     NONE
   };
 

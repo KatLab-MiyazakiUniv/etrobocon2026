@@ -29,7 +29,7 @@ namespace {
    *
    * ロボット基準では正方形まで300mmとなる。
    */
-  constexpr double CAMERA_TO_ROBOT_OFFSET =0;
+  constexpr double CAMERA_TO_ROBOT_OFFSET = 0;
 
   /**
    * @brief ロボット基準で使用可能な最小前方距離[mm]
@@ -82,17 +82,15 @@ SquareAngleAdjustment::Result SquareAngleAdjustment::calculate(
   CameraServer::SquareDetectorResponse response{};
 
   // 正方形の検出結果を取得する。
-  const bool success
-      = client.executeSquareDetection(request, response);
+  const bool success = client.executeSquareDetection(request, response);
 
   // =========================================================
   // 通信失敗
   // =========================================================
 
   if(!success) {
-    Logger::warning(
-        "SquareAngleAdjustment: "
-        "正方形検出の通信に失敗しました");
+    Logger::warning("SquareAngleAdjustment: "
+                    "正方形検出の通信に失敗しました");
 
     return result;
   }
@@ -102,9 +100,8 @@ SquareAngleAdjustment::Result SquareAngleAdjustment::calculate(
   // =========================================================
 
   if(!response.wasDetected) {
-    Logger::warning(
-        "SquareAngleAdjustment: "
-        "正方形を検出できませんでした");
+    Logger::warning("SquareAngleAdjustment: "
+                    "正方形を検出できませんでした");
 
     return result;
   }
@@ -118,12 +115,10 @@ SquareAngleAdjustment::Result SquareAngleAdjustment::calculate(
   const double centerY = response.centerY;
 
   // カメラ基準の前方距離
-  const double cameraForwardDistance
-      = response.forwardDistance;
+  const double cameraForwardDistance = response.forwardDistance;
 
   // 横方向距離
-  const double lateralDistance
-      = response.lateralDistance;
+  const double lateralDistance = response.lateralDistance;
 
   // =========================================================
   // カメラ基準 → ロボット基準へ変換
@@ -141,9 +136,7 @@ SquareAngleAdjustment::Result SquareAngleAdjustment::calculate(
   // 距離と角度を計算する。
   // =========================================================
 
-  const double robotForwardDistance
-      = cameraForwardDistance
-        + CAMERA_TO_ROBOT_OFFSET;
+  const double robotForwardDistance = cameraForwardDistance + CAMERA_TO_ROBOT_OFFSET;
 
   // =========================================================
   // ロボット基準での有効範囲チェック
@@ -154,34 +147,31 @@ SquareAngleAdjustment::Result SquareAngleAdjustment::calculate(
   // =========================================================
 
   if(robotForwardDistance <= MIN_FORWARD_DISTANCE) {
-    Logger::printfLog(
-        Logger::WARNING,
-        "SquareAngleAdjustment: "
-        "前方距離が範囲外です "
-        "%.2f mm",
-        robotForwardDistance);
+    Logger::printfLog(Logger::WARNING,
+                      "SquareAngleAdjustment: "
+                      "前方距離が範囲外です "
+                      "%.2f mm",
+                      robotForwardDistance);
 
     return result;
   }
 
   if(robotForwardDistance > MAX_FORWARD_DISTANCE) {
-    Logger::printfLog(
-        Logger::WARNING,
-        "SquareAngleAdjustment: "
-        "前方距離が遠すぎます "
-        "%.2f mm",
-        robotForwardDistance);
+    Logger::printfLog(Logger::WARNING,
+                      "SquareAngleAdjustment: "
+                      "前方距離が遠すぎます "
+                      "%.2f mm",
+                      robotForwardDistance);
 
     return result;
   }
 
   if(std::abs(lateralDistance) > MAX_LATERAL_DISTANCE) {
-    Logger::printfLog(
-        Logger::WARNING,
-        "SquareAngleAdjustment: "
-        "横方向距離が範囲外です "
-        "%.2f mm",
-        lateralDistance);
+    Logger::printfLog(Logger::WARNING,
+                      "SquareAngleAdjustment: "
+                      "横方向距離が範囲外です "
+                      "%.2f mm",
+                      lateralDistance);
 
     return result;
   }
@@ -197,19 +187,13 @@ SquareAngleAdjustment::Result SquareAngleAdjustment::calculate(
   // lateral < 0 : 左
   // =========================================================
 
-  const double correctionAngle
-      = calculateCorrectionAngle(
-          robotForwardDistance,
-          lateralDistance);
+  const double correctionAngle = calculateCorrectionAngle(robotForwardDistance, lateralDistance);
 
   // =========================================================
   // ロボットから正方形までの直線距離
   // =========================================================
 
-  const double straightDistance
-      = std::hypot(
-          robotForwardDistance,
-          lateralDistance);
+  const double straightDistance = std::hypot(robotForwardDistance, lateralDistance);
 
   // =========================================================
   // 計算結果を格納
@@ -234,65 +218,55 @@ SquareAngleAdjustment::Result SquareAngleAdjustment::calculate(
   // ログ
   // =========================================================
 
-  Logger::printfLog(
-      Logger::INFO,
-      "SquareAngleAdjustment: "
-      "中心座標=(%.2f, %.2f)",
-      centerX,
-      centerY);
+  Logger::printfLog(Logger::INFO,
+                    "SquareAngleAdjustment: "
+                    "中心座標=(%.2f, %.2f)",
+                    centerX, centerY);
 
-  Logger::printfLog(
-      Logger::INFO,
-      "SquareAngleAdjustment: "
-      "カメラ基準前方距離=%.2f mm",
-      cameraForwardDistance);
+  Logger::printfLog(Logger::INFO,
+                    "SquareAngleAdjustment: "
+                    "カメラ基準前方距離=%.2f mm",
+                    cameraForwardDistance);
 
-  Logger::printfLog(
-      Logger::INFO,
-      "SquareAngleAdjustment: "
-      "カメラ→ロボット基準オフセット=%.2f mm",
-      CAMERA_TO_ROBOT_OFFSET);
+  Logger::printfLog(Logger::INFO,
+                    "SquareAngleAdjustment: "
+                    "カメラ→ロボット基準オフセット=%.2f mm",
+                    CAMERA_TO_ROBOT_OFFSET);
 
-  Logger::printfLog(
-      Logger::INFO,
-      "SquareAngleAdjustment: "
-      "ロボット基準前方距離=%.2f mm",
-      robotForwardDistance);
+  Logger::printfLog(Logger::INFO,
+                    "SquareAngleAdjustment: "
+                    "ロボット基準前方距離=%.2f mm",
+                    robotForwardDistance);
 
-  Logger::printfLog(
-      Logger::INFO,
-      "SquareAngleAdjustment: "
-      "横方向距離=%.2f mm",
-      lateralDistance);
+  Logger::printfLog(Logger::INFO,
+                    "SquareAngleAdjustment: "
+                    "横方向距離=%.2f mm",
+                    lateralDistance);
 
-  Logger::printfLog(
-      Logger::INFO,
-      "SquareAngleAdjustment: "
-      "補正角度=%.2f deg",
-      correctionAngle);
+  Logger::printfLog(Logger::INFO,
+                    "SquareAngleAdjustment: "
+                    "補正角度=%.2f deg",
+                    correctionAngle);
 
-  Logger::printfLog(
-      Logger::INFO,
-      "SquareAngleAdjustment: "
-      "ロボットから正方形までの距離=%.2f mm",
-      straightDistance);
+  Logger::printfLog(Logger::INFO,
+                    "SquareAngleAdjustment: "
+                    "ロボットから正方形までの距離=%.2f mm",
+                    straightDistance);
 
   return result;
 }
 
-double SquareAngleAdjustment::calculateCorrectionAngle(
-    double forwardDistance,
-    double lateralDistance) const
+double SquareAngleAdjustment::calculateCorrectionAngle(double forwardDistance,
+                                                       double lateralDistance) const
 {
   // =========================================================
   // 前方距離チェック
   // =========================================================
 
   if(forwardDistance <= 0.0) {
-    Logger::warning(
-        "SquareAngleAdjustment: "
-        "前方距離が不正なため"
-        "角度を計算できませんでした");
+    Logger::warning("SquareAngleAdjustment: "
+                    "前方距離が不正なため"
+                    "角度を計算できませんでした");
 
     return 0.0;
   }
@@ -307,8 +281,5 @@ double SquareAngleAdjustment::calculateCorrectionAngle(
   // atan2(横距離, 前方距離)
   // =========================================================
 
-  return std::atan2(
-             lateralDistance,
-             forwardDistance)
-         * SQUARE_RAD_TO_DEG;
+  return std::atan2(lateralDistance, forwardDistance) * SQUARE_RAD_TO_DEG;
 }

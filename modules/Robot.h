@@ -140,12 +140,11 @@ class Robot {
    */
   int getTargetBrightness() const;
 
-
   /**
- * @brief マップデータの参照を返す
- * @return MapDataの参照
- */
-MapData& getMapData();
+   * @brief マップデータの参照を返す
+   * @return MapDataの参照
+   */
+  MapData& getMapData();
 
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
@@ -163,6 +162,5 @@ MapData& getMapData();
   char decryptionKey[5] = { 0 };                // 復号キー
   int targetBrightness = 50;                    // 目標輝度
   MapData mapData;
-
 };
 #endif

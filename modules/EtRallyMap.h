@@ -76,16 +76,16 @@ class EtRallyMap {
    */
   void updateNodes();
 
- double firstXGridSize = SystemInfo::FIRST_X_GRID_SIZE;  // X方向の最初の区間
-double gridSizeX = SystemInfo::GRID_SIZE_X;             // X方向の通常区間
-double lastXGridSize = SystemInfo::LAST_X_GRID_SIZE;    // X方向の最後の区間
-double firstYGridSize = SystemInfo::FIRST_Y_GRID_SIZE;  // Y方向の最初の区間
-double gridSizeY = SystemInfo::GRID_SIZE_Y;             // Y方向の通常区間
-double lastYGridSize = SystemInfo::LAST_Y_GRID_SIZE;    // Y方向の最後の区間
-static constexpr int X_GRID_NUM = SystemInfo::X_GRID_NUM;  // X方向の区間数
-static constexpr int Y_GRID_NUM = SystemInfo::Y_GRID_NUM;  // Y方向の区間数
+  double firstXGridSize = SystemInfo::FIRST_X_GRID_SIZE;     // X方向の最初の区間
+  double gridSizeX = SystemInfo::GRID_SIZE_X;                // X方向の通常区間
+  double lastXGridSize = SystemInfo::LAST_X_GRID_SIZE;       // X方向の最後の区間
+  double firstYGridSize = SystemInfo::FIRST_Y_GRID_SIZE;     // Y方向の最初の区間
+  double gridSizeY = SystemInfo::GRID_SIZE_Y;                // Y方向の通常区間
+  double lastYGridSize = SystemInfo::LAST_Y_GRID_SIZE;       // Y方向の最後の区間
+  static constexpr int X_GRID_NUM = SystemInfo::X_GRID_NUM;  // X方向の区間数
+  static constexpr int Y_GRID_NUM = SystemInfo::Y_GRID_NUM;  // Y方向の区間数
 
-/// 交点情報の配列
+  /// 交点情報の配列
   Node nodes[X_GRID_NUM + 1][Y_GRID_NUM + 1];
 };
 

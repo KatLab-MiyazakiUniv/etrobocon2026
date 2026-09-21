@@ -1,6 +1,6 @@
 /**
  * @file   SquareDetector.h
- * @brief  正方形検出用の画像処理クラス
+ * @brief  ETラリー上のQRコードを点の集合から正方形領域として検出する画像処理クラス
  * @author okuyama0528 yutaro-1214
  */
 
@@ -8,14 +8,13 @@
 #define SQUARE_DETECTOR_H
 
 #include <opencv2/opencv.hpp>
-
 #include "CameraCapture.h"
 #include "ImageRecognitionResults.h"
 #include "Logger.h"
 #include "SocketProtocol.h"
 
 /**
- * @brief QRコード全体に近い矩形領域を検出するクラス
+ * @brief QRコードを点の集合から正方形領域として捉えるクラス
  */
 class SquareDetector {
  public:
@@ -31,59 +30,23 @@ class SquareDetector {
   ~SquareDetector();
 
   /**
-   * @brief QRコード全体に近い矩形領域を検出する
-   *
+   * @brief 正方形を検出する
    * @param frame 入力画像
    * @param result 検出結果
    */
   void detect(const cv::Mat& frame, BoundingBoxDetectionResult& result);
 
   /**
-   * @brief ROIを設定する
-   *
-   * @param _roi 新しいROI
+   * @brief ROIを検証したうえで設定する
+   * @param _roi 設定するROI
    */
   void setValidatedRoi(const cv::Rect& _roi);
 
  private:
-  /**
-   * @brief 検出対象ROI
-   */
-  cv::Rect roi;
+  cv::Rect roi;  // フレーム全体に対するROI
 
   /**
-   * @brief 最小輪郭面積
-   *
-   * QR内部のファインダーパターンや細かい模様を除外し、
-   * QR全体に近い大きな輪郭のみを候補にする。
-   */
-  static constexpr double MIN_CONTOUR_AREA = 9000.0;
-
-  /**
-   * @brief 最小縦横比
-   *
-   * 床面上のQRコードは透視変形によって横長に見えるため、
-   * 0.35まで許容する。
-   */
-  static constexpr double MIN_RATIO = 0.35;
-
-  /**
-   * @brief 最小充填率
-   *
-   * QRコード内部には多数の空白部分が存在するため、
-   * 0.40まで許容する。
-   */
-  static constexpr double MIN_FILL_RATIO = 0.40;
-
-  /**
-   * @brief 最大円形度
-   *
-   * 円形に近い輪郭を除外する。
-   */
-  static constexpr double MAX_CIRCULARITY = 0.82;
-
-  /**
-   * @brief ROIを画像範囲内に補正する
+   * @brief ROIがフレーム内に収まるように補正する
    */
   void validateParameters();
 };

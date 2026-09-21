@@ -1,7 +1,6 @@
 /**
  * @file   SquareDetectionActionHandler.h
- * @brief  正方形検出要求を処理し、
- *         画像座標を実距離へ変換するクラス
+ * @brief  正方形検出要求を処理し、検出結果を実距離へ変換するクラス
  * @author okuyama0528 yutaro-1214
  */
 
@@ -9,7 +8,6 @@
 #define SQUARE_DETECTION_ACTION_HANDLER_H
 
 #include <opencv2/opencv.hpp>
-
 #include "CameraCapture.h"
 #include "Logger.h"
 #include "SocketProtocol.h"
@@ -37,9 +35,8 @@ class SquareDetectionActionHandler {
    * @param request 正方形検出リクエスト
    * @param response 正方形検出レスポンス
    */
-  void execute(
-      const CameraServer::SquareDetectorRequest& request,
-      CameraServer::SquareDetectorResponse& response);
+  void execute(const CameraServer::SquareDetectorRequest& request,
+               CameraServer::SquareDetectorResponse& response);
 
  private:
   /**
@@ -63,19 +60,14 @@ class SquareDetectionActionHandler {
    */
   void initializeHomography();
 
-  /**
-   * @brief 画像座標を校正用紙上の実座標へ変換する
-   *
-   * 校正用紙左下を原点とし、
-   * 右方向をXプラス、奥方向をYプラスとする。
-   *
-   * @param pixelX 画像X座標[px]
-   * @param pixelY 画像Y座標[px]
-   * @return 校正用紙上の座標[mm]
-   */
-  cv::Point2f pixelToWorld(
-      double pixelX,
-      double pixelY) const;
+  /** 
+   * @brief 画像座標を校正用紙上の実座標へ変換する 
+   * 校正用紙左下を原点とし、 
+   * 右方向をXプラス、奥方向をYプラスとする。 * 
+   * @param pixelX 画像X座標[px] 
+   * @param pixelY 画像Y座標[px] 
+   * @return 校正用紙上の座標[mm] */ 
+  cv::Point2f pixelToWorld(double pixelX, double pixelY) const;
 };
 
 #endif  // SQUARE_DETECTION_ACTION_HANDLER_H

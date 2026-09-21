@@ -40,14 +40,11 @@ class RouteFollower {
    * @param _straightDeadbandRate 直進デッドバンド
 　 * @param _straightMaxoutRate 直進マックスアウト
    */
-RouteFollower(Robot& _robot, const EtRallyMap& _map, double _targetSpeed,
-              const Pid::PidGain& _rotationPid,
-              const Pid::PidGain& _squareRotationPid,
-              const Pid::PidGain& _rightPid,
-              const Pid::PidGain& _leftPid,
-              const Pid::PidGain& _straightAnglePid,
-              double _straightDeadbandRate,
-              double _straightMaxoutRate);
+  RouteFollower(Robot& _robot, const EtRallyMap& _map, double _targetSpeed,
+                const Pid::PidGain& _rotationPid, const Pid::PidGain& _squareRotationPid,
+                const Pid::PidGain& _rightPid, const Pid::PidGain& _leftPid,
+                const Pid::PidGain& _straightAnglePid, double _straightDeadbandRate,
+                double _straightMaxoutRate);
 
   /**
    * @brief 経路を走行する
@@ -62,9 +59,9 @@ RouteFollower(Robot& _robot, const EtRallyMap& _map, double _targetSpeed,
   Pid::PidGain squareRotationPid;  // 正方形補正用回頭PIDゲイン
   Pid::PidGain rightPid;           // 右モーター用PIDゲイン
   Pid::PidGain leftPid;            // 左モーター用PIDゲイン
-  Pid::PidGain straightAnglePid;  // 直進角度PIDゲイン
-  double straightDeadbandRate;        // 直進デッドバンド率
-double straightMaxoutRate;          // 直進マックスアウト率
+  Pid::PidGain straightAnglePid;   // 直進角度PIDゲイン
+  double straightDeadbandRate;     // 直進デッドバンド率
+  double straightMaxoutRate;       // 直進マックスアウト率
 
   /**
    * @brief Directionを角度へ変換する
@@ -112,7 +109,7 @@ double straightMaxoutRate;          // 直進マックスアウト率
   void runGateSegment(const RouteState& from, const RouteState& to, double distance,
                       bool rotatedAtSegmentStart);
 
-   /**
+  /**
    * @brief 区間に存在するゲートを取得する
    * @param from 区間の開始位置
    * @param to 区間の終了位置

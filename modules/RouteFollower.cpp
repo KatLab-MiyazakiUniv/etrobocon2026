@@ -50,10 +50,8 @@ namespace {
 
 RouteFollower::RouteFollower(Robot& _robot, const EtRallyMap& _map, double _targetSpeed,
                              const Pid::PidGain& _rotationPid,
-                             const Pid::PidGain& _squareRotationPid,
-                             const Pid::PidGain& _rightPid,
-                             const Pid::PidGain& _leftPid,
-                             const Pid::PidGain& _straightAnglePid,
+                             const Pid::PidGain& _squareRotationPid, const Pid::PidGain& _rightPid,
+                             const Pid::PidGain& _leftPid, const Pid::PidGain& _straightAnglePid,
                              double _straightDeadbandRate, double _straightMaxoutRate)
   : robot(_robot),
     map(_map),
@@ -465,8 +463,7 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
   // その場でQR①検出を行う。
   // =========================================================
 
-  const bool skipFirstCorrection
-      = distanceToFirstDetection < -FIRST_DETECTION_TOLERANCE;
+  const bool skipFirstCorrection = distanceToFirstDetection < -FIRST_DETECTION_TOLERANCE;
 
   Logger::printfLog(Logger::INFO,
                     "RouteFollower: "
@@ -474,10 +471,8 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
                     "最初の検出までの距離=%.2f "
                     "許容誤差=%.2f "
                     "最初の補正をスキップ=%d",
-                    rotatedAtSegmentStart ? 1 : 0,
-                    distanceToFirstDetection,
-                    FIRST_DETECTION_TOLERANCE,
-                    skipFirstCorrection ? 1 : 0);
+                    rotatedAtSegmentStart ? 1 : 0, distanceToFirstDetection,
+                    FIRST_DETECTION_TOLERANCE, skipFirstCorrection ? 1 : 0);
 
   // =========================================================
   // QR①補正
@@ -705,11 +700,9 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
     // この既知位置から区間終点までの距離を求める。
     // =====================================================
 
-    const double qr2PositionFromStart
-        = distanceToGate + QR_TO_GATE_DISTANCE;
+    const double qr2PositionFromStart = distanceToGate + QR_TO_GATE_DISTANCE;
 
-    remainingDistance
-        = distance - qr2PositionFromStart;
+    remainingDistance = distance - qr2PositionFromStart;
 
     Logger::printfLog(Logger::INFO,
                       "RouteFollower: "
@@ -717,9 +710,7 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
                       "区間距離=%.2f mm "
                       "QR②位置=%.2f mm "
                       "残り距離=%.2f mm",
-                      distance,
-                      qr2PositionFromStart,
-                      remainingDistance);
+                      distance, qr2PositionFromStart, remainingDistance);
   }
 
   else {
@@ -732,16 +723,14 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
     // 残り距離を求める。
     // =====================================================
 
-    remainingDistance
-        = distance - traveledDistance;
+    remainingDistance = distance - traveledDistance;
 
     Logger::printfLog(Logger::INFO,
                       "RouteFollower: "
                       "QR②補正なし "
                       "走行済み距離=%.2f mm "
                       "残り距離=%.2f mm",
-                      traveledDistance,
-                      remainingDistance);
+                      traveledDistance, remainingDistance);
   }
 
   if(remainingDistance < 0.0) {
@@ -783,14 +772,11 @@ const Gate* RouteFollower::findGate(const RouteState& from, const RouteState& to
       if(from.x == to.x && pass.entrance.x == from.x && pass.exit.x == from.x) {
         // Y増加
         if(to.y > from.y) {
-          const bool entranceInside
-              = pass.entrance.y >= from.y && pass.entrance.y <= to.y;
+          const bool entranceInside = pass.entrance.y >= from.y && pass.entrance.y <= to.y;
 
-          const bool exitInside
-              = pass.exit.y >= from.y && pass.exit.y <= to.y;
+          const bool exitInside = pass.exit.y >= from.y && pass.exit.y <= to.y;
 
-          const bool correctDirection
-              = pass.exit.y > pass.entrance.y;
+          const bool correctDirection = pass.exit.y > pass.entrance.y;
 
           if(entranceInside && exitInside && correctDirection) {
             return &gate;
@@ -799,14 +785,11 @@ const Gate* RouteFollower::findGate(const RouteState& from, const RouteState& to
 
         // Y減少
         if(to.y < from.y) {
-          const bool entranceInside
-              = pass.entrance.y <= from.y && pass.entrance.y >= to.y;
+          const bool entranceInside = pass.entrance.y <= from.y && pass.entrance.y >= to.y;
 
-          const bool exitInside
-              = pass.exit.y <= from.y && pass.exit.y >= to.y;
+          const bool exitInside = pass.exit.y <= from.y && pass.exit.y >= to.y;
 
-          const bool correctDirection
-              = pass.exit.y < pass.entrance.y;
+          const bool correctDirection = pass.exit.y < pass.entrance.y;
 
           if(entranceInside && exitInside && correctDirection) {
             return &gate;
@@ -821,14 +804,11 @@ const Gate* RouteFollower::findGate(const RouteState& from, const RouteState& to
       if(from.y == to.y && pass.entrance.y == from.y && pass.exit.y == from.y) {
         // X増加
         if(to.x > from.x) {
-          const bool entranceInside
-              = pass.entrance.x >= from.x && pass.entrance.x <= to.x;
+          const bool entranceInside = pass.entrance.x >= from.x && pass.entrance.x <= to.x;
 
-          const bool exitInside
-              = pass.exit.x >= from.x && pass.exit.x <= to.x;
+          const bool exitInside = pass.exit.x >= from.x && pass.exit.x <= to.x;
 
-          const bool correctDirection
-              = pass.exit.x > pass.entrance.x;
+          const bool correctDirection = pass.exit.x > pass.entrance.x;
 
           if(entranceInside && exitInside && correctDirection) {
             return &gate;
@@ -837,14 +817,11 @@ const Gate* RouteFollower::findGate(const RouteState& from, const RouteState& to
 
         // X減少
         if(to.x < from.x) {
-          const bool entranceInside
-              = pass.entrance.x <= from.x && pass.entrance.x >= to.x;
+          const bool entranceInside = pass.entrance.x <= from.x && pass.entrance.x >= to.x;
 
-          const bool exitInside
-              = pass.exit.x <= from.x && pass.exit.x >= to.x;
+          const bool exitInside = pass.exit.x <= from.x && pass.exit.x >= to.x;
 
-          const bool correctDirection
-              = pass.exit.x < pass.entrance.x;
+          const bool correctDirection = pass.exit.x < pass.entrance.x;
 
           if(entranceInside && exitInside && correctDirection) {
             return &gate;

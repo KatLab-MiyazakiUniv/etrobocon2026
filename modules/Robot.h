@@ -17,6 +17,7 @@
 #include "Button.h"
 #include "ForceSensor.h"
 #include "Display.h"
+#include "MapData.h"
 #include <cstring>
 
 class Robot {
@@ -151,6 +152,18 @@ class Robot {
    */
   int getIndexOfLabel();
 
+  /**
+   * @brief ゲート位置情報を取得する
+   * @return ゲート位置情報
+   */
+  MapData& getMapDataInstance();
+
+  /**
+   * @brief ゲート位置情報を取得する
+   * @return ゲート位置情報
+   */
+  const MapData& getMapDataInstance() const;
+
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
   ArmMotorController armMotorController;        // ArmMotorController インスタンス
@@ -167,5 +180,6 @@ class Robot {
   char decryptionKey[5] = { 0 };                // 復号キー
   int targetBrightness = 50;                    // 目標輝度
   int indexOfLabel = 0;                         // ボトルキャリーで取得した色範囲のインデックス
+  MapData mapData;                              // ゲート位置情報
 };
 #endif

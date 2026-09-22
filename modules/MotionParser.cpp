@@ -550,13 +550,10 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
     }
 
     case MOTION_COMMAND::SNAPSHOT: {
-      CameraServer::QrCodeDetectorRequest request;
-      request.roi = { fromString<int>(motionParams[3]), fromString<int>(motionParams[4]),
-                      fromString<int>(motionParams[5]), fromString<int>(motionParams[5]) };
 
       Logger::printfLog(Logger::DEBUG, "[MotionParser] Snapshotを生成しました");
 
-      return new Snapshot(robot, motionParams[2], request, std::move(condition));
+      return new Snapshot(robot, motionParams[2], std::move(condition));
     }
 
     case MOTION_COMMAND::RESET_AZIMUTH: {
@@ -597,7 +594,7 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "ResetAzimuth", MOTION_COMMAND::RESET_AZIMUTH },
           { "ETZumoExit", MOTION_COMMAND::ET_ZUMO_EXIT },
           { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH },
-          { "GatePositon", MOTION_COMMAND::GATE_POSITION }
+          { "GatePosition", MOTION_COMMAND::GATE_POSITION }
 
         };
 

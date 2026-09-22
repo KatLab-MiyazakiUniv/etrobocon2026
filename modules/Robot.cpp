@@ -124,3 +124,12 @@ int Robot::getIndexOfLabel()
 {
   return indexOfLabel;
 }
+
+MapData& Robot::getMapDataInstance()
+{
+  return mapData;
+}
+const MapData& Robot::getMapDataInstance() const
+{
+  return mapData;
+}

@@ -10,11 +10,12 @@ Straight,001,DistanceOrColor,BLUE023
 
 # QR1検出
 Snapshot,clearBuffer1,RepeatCount,001
-Snapshot,011,RepeatCount,001
-Snapshot,012,RepeatCount,001
-Snapshot,013,RepeatCount,001
-Snapshot,014,RepeatCount,001
-Snapshot,015,RepeatCount,001
+GatePosition,001,RepeatCount,001
+#Snapshot,011,RepeatCount,001
+#Snapshot,012,RepeatCount,001
+#Snapshot,013,RepeatCount,001
+#Snapshot,014,RepeatCount,001
+#Snapshot,015,RepeatCount,001
 
 
 #QR1取得後の直線:回頭し110cmほど進む
@@ -30,11 +31,13 @@ Straight,001,DistanceOrColor,BLACK055
 # QR2検出
 #RelativeRotation,-025,RelativeAngle,-025
 Snapshot,clearBuffer1,RepeatCount,001
-Snapshot,021,RepeatCount,001
-Snapshot,022,RepeatCount,001
-Snapshot,023,RepeatCount,001
-Snapshot,024,RepeatCount,001
-Snapshot,025,RepeatCount,001
+GatePosition,002,RepeatCount,001
+
+#Snapshot,021,RepeatCount,001
+#Snapshot,022,RepeatCount,001
+#Snapshot,023,RepeatCount,001
+#Snapshot,024,RepeatCount,001
+#Snapshot,025,RepeatCount,001
 
 #Straight,001,Distance,003
 

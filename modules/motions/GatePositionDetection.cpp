@@ -48,6 +48,8 @@ void GatePositionDetection::executeStep()
   if(!wasDetected || !success) {
     Logger::error("GatePositionDetection: QRコードの検出に失敗しました。");
     return;
+  }else{
+    Logger::error("GatePositionDetection: QRコードの検出に成功しました。");
   }
 
   // -----------------------------

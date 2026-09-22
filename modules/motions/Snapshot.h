@@ -24,7 +24,6 @@ class Snapshot : public BaseMotion {
    * @param continuationCondition 継続条件
    */
   Snapshot(Robot& _robot, const std::string& _fileName,
-           const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
            std::unique_ptr<BaseContinuationCondition> continuationCondition);
 
   /**
@@ -39,8 +38,7 @@ class Snapshot : public BaseMotion {
   void executeStep() override;
 
  private:
-  std::string fileName;                                    // 保存する画像ファイル名
-  CameraServer::QrCodeDetectorRequest qrDetectionRequest;  // QRコード検出リクエスト
+  std::string fileName;  // 保存する画像ファイル名
 };
 
 #endif

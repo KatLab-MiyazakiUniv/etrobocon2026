@@ -235,8 +235,8 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       qrRequest.roi.width = fromString<int32_t>(motionParams[6]);
       qrRequest.roi.height = fromString<int32_t>(motionParams[7]);
       return new GatePositionDetection(robot, motionParams[2], fromString<bool>(motionParams[3]),
-  qrRequest, std::move(condition));
-   }
+                                       qrRequest, std::move(condition));
+    }
     case MOTION_COMMAND::CALIBRATOR: {
       return new Calibrator(robot, std::move(condition));
     }
@@ -270,10 +270,9 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
 MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str)
 {
   // 条件コマンド文字列と、それに対応する列挙型CONDITION_COMMANDのマッピングを定義
-  static const unordered_map<string, CONDITION_COMMAND> conditionMap = {
-    { "Distance", CONDITION_COMMAND::DISTANCE },
-    { "RepeatCount", CONDITION_COMMAND::REPEATCOUNT }
-  };
+  static const unordered_map<string, CONDITION_COMMAND> conditionMap
+      = { { "Distance", CONDITION_COMMAND::DISTANCE },
+          { "RepeatCount", CONDITION_COMMAND::REPEATCOUNT } };
 
   // 条件コマンド文字列に対応するCONDITION_COMMAND値をマップから取得。なければCONDITION_COMMAND::NONEを返す
   auto it = conditionMap.find(str);

@@ -68,7 +68,7 @@ bool GatePositionParser::parseRedPosition()
     return false;
   }
 
-  robot.getMapDataInstance().setMapData(GateColor::RED, position[0], position[1]);
+  robot.getMapDataInstance().setGate(GoalColor::RED, position[0], position[1]);
 
   return true;
 }
@@ -97,9 +97,9 @@ bool GatePositionParser::parseBlueYellowPosition()
     return false;
   }
 
-  robot.getMapDataInstance().setMapData(GateColor::BLUE, bluePosition[0], bluePosition[1]);
+  robot.getMapDataInstance().setGate(GoalColor::BLUE, bluePosition[0], bluePosition[1]);
 
-  robot.getMapDataInstance().setMapData(GateColor::YELLOW, yellowPosition[0], yellowPosition[1]);
+  robot.getMapDataInstance().setGate(GoalColor::YELLOW, yellowPosition[0], yellowPosition[1]);
 
   return true;
 }

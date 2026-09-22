@@ -1,13 +1,10 @@
-
-
 #QR1検出位置まで直進
-RelativeRotation,-043,RelativeAngle,-043
-#Straight,001,Distance,068
-
+RelativeRotation,-045,RelativeAngle,-045
 Straight,001,Distance,028
-Snapshot,clearBuffer1,RepeatCount,001
 #青ラインとペットボトルの位置関係は一定
 #青ラインの奥のペットボトルをに角度を合わせるtargetXを小さくし左寄り走行
+
+Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,LBS009,Distance,015
 Straight,001,DistanceOrColor,BLUE023
 
@@ -15,7 +12,6 @@ Straight,001,DistanceOrColor,BLUE023
 Snapshot,clearBuffer1,RepeatCount,001
 Snapshot,011,RepeatCount,001
 Snapshot,012,RepeatCount,001
-
 Snapshot,013,RepeatCount,001
 Snapshot,014,RepeatCount,001
 Snapshot,015,RepeatCount,001
@@ -29,7 +25,7 @@ CameraTracking,LBS003,Distance,080
 
 #QR2取得前カーブ直前
 Straight,001,DistanceOrColor,BLACK055
-Straight,001,Distance,010
+
 
 # QR2検出
 #RelativeRotation,-025,RelativeAngle,-025
@@ -40,7 +36,7 @@ Snapshot,023,RepeatCount,001
 Snapshot,024,RepeatCount,001
 Snapshot,025,RepeatCount,001
 
-
+#Straight,001,Distance,003
 
 #赤色まで移動
 RelativeRotation,-080,RelativeAngle,-080

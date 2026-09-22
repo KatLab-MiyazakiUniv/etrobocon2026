@@ -115,11 +115,11 @@ int Robot::getTargetBrightness() const
   return targetBrightness;
 }
 
-GatePosition& Robot::getMapDataInstance()
+MapData& Robot::getMapDataInstance()
 {
   return mapData;
 }
-const GatePosition& Robot::getMapDataInstance() const
+const MapData& Robot::getMapDataInstance() const
 {
   return mapData;
 }

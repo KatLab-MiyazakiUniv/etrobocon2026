@@ -144,13 +144,13 @@ class Robot {
    * @brief ゲート位置情報を取得する
    * @return ゲート位置情報
    */
-  GatePosition& getMapDataInstance();
+  MapData& getMapDataInstance();
 
   /**
    * @brief ゲート位置情報を取得する
    * @return ゲート位置情報
    */
-  const GatePosition& getMapDataInstance() const;
+  const MapData& getMapDataInstance() const;
 
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス

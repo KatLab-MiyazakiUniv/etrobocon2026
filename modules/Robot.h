@@ -18,7 +18,7 @@
 #include "ForceSensor.h"
 #include "Display.h"
 #include <cstring>
-#include "GatePosition.h"
+#include "MapData.h"
 
 class Robot {
  public:
@@ -144,13 +144,13 @@ class Robot {
    * @brief ゲート位置情報を取得する
    * @return ゲート位置情報
    */
-  GatePosition& getGatePosition();
+  GatePosition& getMapDataInstance();
 
   /**
    * @brief ゲート位置情報を取得する
    * @return ゲート位置情報
    */
-  const GatePosition& getGatePosition() const;
+  const GatePosition& getMapDataInstance() const;
 
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
@@ -167,6 +167,6 @@ class Robot {
   spikeapi::Display display;                    // Displayインスタンス
   char decryptionKey[5] = { 0 };                // 復号キー
   int targetBrightness = 50;                    // 目標輝度
-  GatePosition gatePosition;                    // ゲート位置情報
+  MapData mapData;                              // ゲート位置情報
 };
 #endif

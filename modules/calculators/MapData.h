@@ -7,7 +7,9 @@
 #ifndef MAP_DATA_H
 #define MAP_DATA_H
 
+#include <string>
 #include <vector>
+#include <cstdio>
 #include "RouteTypes.h"
 
 class MapData {
@@ -26,6 +28,15 @@ class MapData {
   void setGate(GoalColor color, const Point& start, const Point& end);
 
   /**
+   * @brief 座標番号からゲート情報を登録・更新する
+   * @param color ゲートの色
+   * @param startNumber ゲートの始点を表す座標番号
+   * @param endNumber ゲートの終点を表す座標番号
+   * @return true/登録成功、false/登録失敗
+   */
+  bool setGate(GoalColor color, int startNumber, int endNumber);
+
+  /**
    * @brief 指定した色のゲート情報が存在するか確認する
    * @param color ゲートの色
    * @return true/ゲート情報が存在する、false/ゲート情報が存在しない
@@ -41,6 +52,7 @@ class MapData {
 
   /**
    * @brief 現在登録されている全ゲートを取得する
+   * @return 現在登録されている全ゲート
    */
   const std::vector<Gate>& getGates() const;
 

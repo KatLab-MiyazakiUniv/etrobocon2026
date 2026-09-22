@@ -6,6 +6,90 @@
 
 #include "MapData.h"
 
+namespace {
+
+  /**
+   * @brief 受信したX座標をマップ上のX座標へ変換する
+   * @param x 受信したX座標
+   * @return 変換後のX座標
+   */
+  int convertX(int x)
+  {
+    switch(x) {
+      case 1:
+        return 9;
+
+      case 2:
+        return 7;
+
+      case 3:
+        return 5;
+
+      case 4:
+        return 3;
+
+      case 5:
+        return 1;
+    }
+
+    return -1;
+  }
+
+  /**
+   * @brief 受信したY座標をマップ上のY座標へ変換する
+   * @param y 受信したY座標
+   * @return 変換後のY座標
+   */
+  int convertY(int y)
+  {
+    switch(y) {
+      case 1:
+        return 1;
+
+      case 2:
+        return 3;
+
+      case 3:
+        return 5;
+
+      case 4:
+        return 7;
+
+      case 5:
+        return 9;
+    }
+
+    return -1;
+  }
+
+  /**
+   * @brief 2桁の座標番号をマップ上の座標へ変換する
+   * @param pointNumber 2桁の座標番号
+   * @param point 変換後の座標
+   * @return true/変換成功、false/変換失敗
+   */
+  bool convertPointNumber(int pointNumber, Point& point)
+  {
+    // 10の位をX座標、1の位をY座標として取得
+    const int x = pointNumber / 10;
+    const int y = pointNumber % 10;
+
+    // 受信した座標をマップ上の座標へ変換
+    const int convertedX = convertX(x);
+    const int convertedY = convertY(y);
+
+    // 変換できない座標の場合
+    if(convertedX < 0 || convertedY < 0) {
+      return false;
+    }
+
+    point = { convertedX, convertedY };
+
+    return true;
+  }
+
+}  // namespace
+
 MapData::MapData() : gates() {}
 
 void MapData::setGate(GoalColor color, const Point& start, const Point& end)
@@ -22,6 +106,27 @@ void MapData::setGate(GoalColor color, const Point& start, const Point& end)
 
   // 存在しない場合は新しく追加
   gates.push_back({ color, start, end });
+}
+
+bool MapData::setGate(GoalColor color, int startNumber, int endNumber)
+{
+  Point start;
+  Point end;
+
+  // 始点の座標番号をマップ上の座標へ変換
+  if(!convertPointNumber(startNumber, start)) {
+    return false;
+  }
+
+  // 終点の座標番号をマップ上の座標へ変換
+  if(!convertPointNumber(endNumber, end)) {
+    return false;
+  }
+
+  // 変換した座標を使用してゲート情報を登録
+  setGate(color, start, end);
+
+  return true;
 }
 
 bool MapData::hasGate(GoalColor color) const

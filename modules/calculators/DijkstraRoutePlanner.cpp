@@ -8,7 +8,45 @@
 
 namespace {
 
+  /**
+   * @brief ラジアンから度へ変換する係数
+   */
   constexpr double RAD_TO_DEG = 180.0 / 3.14159265358979323846;
+
+  /**
+   * @brief ゲート攻略に必要なゲート数
+   */
+  constexpr int REQUIRED_GATE_COUNT = 3;
+
+  /**
+   * @brief ETラリー開始X座標
+   */
+  constexpr int DEFAULT_START_X = 0;
+
+  /**
+   * @brief ETラリー開始Y座標
+   */
+  constexpr int DEFAULT_START_Y = 4;
+
+  /**
+   * @brief ETラリー開始方向
+   */
+  constexpr Direction DEFAULT_START_DIRECTION = Direction::LEFT;
+
+  /**
+   * @brief ゲート情報が不足している場合のゴールX座標
+   */
+  constexpr int DEFAULT_GOAL_X = 8;
+
+  /**
+   * @brief ゲート情報が不足している場合のゴールY座標
+   */
+  constexpr int DEFAULT_GOAL_Y = 0;
+
+  /**
+   * @brief ゲート情報が不足している場合のゴール方向
+   */
+  constexpr Direction DEFAULT_GOAL_DIRECTION = Direction::LEFT;
 
   /**
    * @brief ダイクストラ法の優先度付きキューで使用するノード
@@ -22,6 +60,7 @@ namespace {
 
   /**
    * @brief ゲート付近で回頭した場合の追加コスト
+   *
    * ゲート足付近での通常の回頭を
    * 少し避けるためのペナルティ
    */
@@ -29,6 +68,7 @@ namespace {
 
   /**
    * @brief ゲート直前でゲート方向へ回頭する場合の追加コスト
+   *
    * QR①付近まで別方向から進み、
    * ゲート直前で回頭する経路を強く避ける。
    * 通行禁止にはしないため、
@@ -39,21 +79,13 @@ namespace {
 
   /**
    * @brief ゲート直前と判定する距離[マス]
+   *
    * ゲートまで1マス以内でゲート方向へ回頭すると、
    * QR①の助走距離が足りなくなる可能性があるため
    * ペナルティを与える。
    */
   constexpr int GATE_APPROACH_DISTANCE = 1;
 
-  /**
-   * @brief QR①付近からゲート方向を向くか判定する
-   * @param gates ゲート一覧
-   * @param currentX 現在X座標
-   * @param currentY 現在Y座標
-   * @param nextDirection 回頭後の方向
-   * @return true QR①付近からゲート方向を向く
-   * @return false それ以外
-   */
   bool isTurningTowardGateNearEntrance(const std::vector<Gate>& gates, int currentX, int currentY,
                                        Direction nextDirection)
   {
@@ -74,6 +106,7 @@ namespace {
             if(currentX > gateX && nextDirection == Direction::RIGHT) {
               return true;
             }
+
             // ゲートの左側からゲートへ向かう
             if(currentX < gateX && nextDirection == Direction::LEFT) {
               return true;
@@ -81,10 +114,10 @@ namespace {
           }
         }
       }
+
       // 横向きゲート
       if(gate.start.y == gate.end.y) {
         const int gateY = gate.start.y;
-
         const int minX = std::min(gate.start.x, gate.end.x);
         const int maxX = std::max(gate.start.x, gate.end.x);
 
@@ -98,6 +131,7 @@ namespace {
             if(currentY > gateY && nextDirection == Direction::UP) {
               return true;
             }
+
             // ゲートの上側からゲートへ向かう
             if(currentY < gateY && nextDirection == Direction::DOWN) {
               return true;
@@ -109,6 +143,7 @@ namespace {
 
     return false;
   }
+
 }  // namespace
 
 DijkstraRoutePlanner::DijkstraRoutePlanner(const std::vector<Gate>& gates) : gates(gates) {}
@@ -118,48 +153,90 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
 {
   RouteResult result;
 
+  /*
+   * ETラリー開始位置は
+   * デフォルトで(0, 4)、LEFTとする。
+   */
+  const int searchStartX = DEFAULT_START_X;
+  const int searchStartY = DEFAULT_START_Y;
+  const Direction searchStartDirection = DEFAULT_START_DIRECTION;
+
+  /*
+   * ゲート情報が3つ未満の場合は、
+   * ゲート攻略を行わずデフォルトゴールへ向かう。
+   */
+  Point searchGoal = goal;
+  Direction searchGoalDirection = goalDirection;
+
+  if(gates.size() < REQUIRED_GATE_COUNT) {
+    searchGoal = { DEFAULT_GOAL_X, DEFAULT_GOAL_Y };
+    searchGoalDirection = DEFAULT_GOAL_DIRECTION;
+  }
+
+  // 使用しない開始位置の引数
+  (void)startX;
+  (void)startY;
+  (void)startDirection;
+
   // 開始位置確認
-  if(!isValid(startX, startY)) {
+  if(!isValid(searchStartX, searchStartY)) {
     return result;
   }
 
   // ゴール位置確認
-  if(!isValid(goal.x, goal.y)) {
+  if(!isValid(searchGoal.x, searchGoal.y)) {
     return result;
   }
 
-  // 探索する状態の総数
-  // X座標、Y座標、向いている方向の組み合わせで状態を表す
+  /*
+   * 探索する状態の総数
+   *
+   * X座標、Y座標、向いている方向の組み合わせで
+   * 1つの状態を表す。
+   */
   constexpr int STATE_COUNT = GRID_SIZE * GRID_SIZE * DIRECTION_COUNT;
 
-  std::vector<int> distance(STATE_COUNT, INT_MAX);  // スタート地点から各状態までの最小コストを記録
-  std::vector<int> previous(STATE_COUNT, -1);       // 各状態に来る直前の状態を記録
+  std::vector<int> distance(STATE_COUNT, INT_MAX);  // スタート地点から各状態までの最小コスト
+  std::vector<int> previous(STATE_COUNT, -1);       // 各状態に来る直前の状態
+
   // 探索する状態をコストの小さい順に取り出すための優先度付きキュー
   std::priority_queue<QueueNode, std::vector<QueueNode>, std::greater<QueueNode>> queue;
-  const int startIndex = stateToIndex(
-      startX, startY, startDirection);  // 開始位置と開始方向を、配列で使うインデックスに変換
+
+  // 開始位置と開始方向を配列で使用するインデックスに変換
+  const int startIndex = stateToIndex(searchStartX, searchStartY, searchStartDirection);
 
   distance[startIndex] = 0;
   queue.push({ 0, startIndex });
 
+  /**
+   * @brief 各方向へ移動するときのX座標変化量
+   */
   constexpr int DX[DIRECTION_COUNT] = { 0, -MOVE_STEP, 0, MOVE_STEP };
+
+  /**
+   * @brief 各方向へ移動するときのY座標変化量
+   */
   constexpr int DY[DIRECTION_COUNT] = { -MOVE_STEP, 0, MOVE_STEP, 0 };
 
   // ダイクストラ法
   while(!queue.empty()) {
     const QueueNode currentNode = queue.top();
     queue.pop();
+
+    // すでにより低コストな経路が見つかっている場合は処理しない
     if(currentNode.cost != distance[currentNode.index]) {
       continue;
     }
 
     const RouteState current = indexToState(currentNode.index);
 
+    // 現在位置から4方向への移動を確認
     for(int directionValue = 0; directionValue < DIRECTION_COUNT; ++directionValue) {
       const Direction nextDirection = static_cast<Direction>(directionValue);
       const int nextX = current.x + DX[directionValue];
       const int nextY = current.y + DY[directionValue];
 
+      // マップ範囲外への移動は禁止
       if(!isValid(nextX, nextY)) {
         continue;
       }
@@ -169,16 +246,17 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
         continue;
       }
 
-      // 移動コスト
+      // 移動コストを計算
       const int moveCost
           = calculateMoveCost(current.x, current.y, current.direction, nextDirection);
       const int nextCost = currentNode.cost + moveCost;
       const int nextIndex = stateToIndex(nextX, nextY, nextDirection);
 
-      // より低コストなら更新
+      // より低コストな経路の場合は更新
       if(nextCost < distance[nextIndex]) {
         distance[nextIndex] = nextCost;
         previous[nextIndex] = currentNode.index;
+
         queue.push({ nextCost, nextIndex });
       }
     }
@@ -190,37 +268,45 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
 
   for(int directionValue = 0; directionValue < DIRECTION_COUNT; ++directionValue) {
     const Direction arrivalDirection = static_cast<Direction>(directionValue);
-    const int index = stateToIndex(goal.x, goal.y, arrivalDirection);
+
+    const int index = stateToIndex(searchGoal.x, searchGoal.y, arrivalDirection);
+
+    // ゴールへ到達できない方向は使用しない
     if(distance[index] == INT_MAX) {
       continue;
     }
 
-    int finalTurnCost = calculateTurnCost(arrivalDirection, goalDirection);
+    // ゴール到着後に必要な最終回頭コスト
+    int finalTurnCost = calculateTurnCost(arrivalDirection, searchGoalDirection);
 
-    // ゴール位置で最終回頭するときの接触判定
-    if(arrivalDirection != goalDirection && !isOuterArea(goal.x, goal.y)
-       && isTurnBlockedByGatePost(goal.x, goal.y, arrivalDirection, goalDirection)) {
+    // ゴール位置で最終回頭するときのゲート足との接触判定
+    if(arrivalDirection != searchGoalDirection && !isOuterArea(searchGoal.x, searchGoal.y)
+       && isTurnBlockedByGatePost(searchGoal.x, searchGoal.y, arrivalDirection,
+                                  searchGoalDirection)) {
       finalTurnCost = NEAR_GATE_TURN_COST;
     }
 
-    // ゴール位置がゲート付近の場合
-    if(arrivalDirection != goalDirection && !isOuterArea(goal.x, goal.y)
-       && isNearGatePost(goal.x, goal.y)) {
+    // ゴール位置がゲート足付近の場合は回頭コストを追加
+    if(arrivalDirection != searchGoalDirection && !isOuterArea(searchGoal.x, searchGoal.y)
+       && isNearGatePost(searchGoal.x, searchGoal.y)) {
       finalTurnCost += GATE_NEAR_TURN_PENALTY;
     }
 
-    if(arrivalDirection != goalDirection
-       && isTurningTowardGateNearEntrance(gates, goal.x, goal.y, goalDirection)) {
+    // QR①付近でゲート方向へ回頭する場合は追加コストを与える
+    if(arrivalDirection != searchGoalDirection
+       && isTurningTowardGateNearEntrance(gates, searchGoal.x, searchGoal.y, searchGoalDirection)) {
       finalTurnCost += GATE_APPROACH_TURN_PENALTY;
     }
 
     const int finalCost = distance[index] + finalTurnCost;
 
+    // より低コストな到着方法を保存
     if(finalCost < bestCost) {
       bestCost = finalCost;
       bestIndex = index;
     }
   }
+
   // 経路なし
   if(bestIndex == -1) {
     return result;
@@ -233,11 +319,12 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
     route.push_back(indexToState(index));
   }
 
+  // ゴールからスタートの順で格納されているため反転
   std::reverse(route.begin(), route.end());
 
   // ゴール地点で最終回頭
-  if(route.back().direction != goalDirection) {
-    route.push_back({ goal.x, goal.y, goalDirection });
+  if(route.back().direction != searchGoalDirection) {
+    route.push_back({ searchGoal.x, searchGoal.y, searchGoalDirection });
   }
 
   result.found = true;
@@ -311,17 +398,17 @@ bool DijkstraRoutePlanner::isTurnBlockedByGatePost(int x, int y, Direction curre
   const Point currentForward = directionToVector(currentDirection);
   const Point nextForward = directionToVector(nextDirection);
 
-  // 後方向
+  // 回頭前・回頭後の後方向
   const double currentRearX = -static_cast<double>(currentForward.x);
   const double currentRearY = -static_cast<double>(currentForward.y);
   const double nextRearX = -static_cast<double>(nextForward.x);
   const double nextRearY = -static_cast<double>(nextForward.y);
 
-  // 後方向の角度
+  // 回頭前・回頭後の後方向の角度
   const double currentRearAngle = std::atan2(currentRearY, currentRearX) * RAD_TO_DEG;
   const double nextRearAngle = std::atan2(nextRearY, nextRearX) * RAD_TO_DEG;
 
-  // 回頭方向
+  // 回頭方向と回頭角度
   const double totalTurn = AngleNormalizer::normalizeAngle(nextRearAngle - currentRearAngle);
 
   // 各ゲート足を確認
@@ -333,31 +420,32 @@ bool DijkstraRoutePlanner::isTurnBlockedByGatePost(int x, int y, Direction curre
       const double dy = static_cast<double>(post.y - y);
       const double postDistance = std::hypot(dx, dy);
 
-      // 後部の旋回範囲より外なら安全
+      // 後部の旋回範囲より外側の場合は接触しない
       if(postDistance > TURN_SWEEP_RADIUS + TURN_SWEEP_MARGIN) {
         continue;
       }
 
-      // ゲート足のすぐ近くは危険
+      // ゲート足のすぐ近くは接触すると判定
       if(postDistance <= TURN_SWEEP_MARGIN) {
         return true;
       }
 
       // ゲート足の角度
       const double postAngle = std::atan2(dy, dx) * RAD_TO_DEG;
+
+      // 回頭開始位置から見たゲート足の角度
       const double postTurn = AngleNormalizer::normalizeAngle(postAngle - currentRearAngle);
 
-      // 180度回頭
+      // 180度回頭の場合は旋回範囲内にあるゲート足と接触すると判定
       if(std::abs(std::abs(totalTurn) - 180.0) < 0.01) {
         return true;
       }
 
-      // 90度回頭
+      // 90度回頭の場合の旋回範囲判定
       bool insideSweep = false;
 
       if(totalTurn > 0.0) {
         insideSweep = postTurn >= 0.0 && postTurn <= totalTurn;
-
       } else {
         insideSweep = postTurn <= 0.0 && postTurn >= totalTurn;
       }
@@ -379,7 +467,6 @@ Point DijkstraRoutePlanner::directionToVector(Direction direction) const
    * DOWN  : Y +
    * LEFT  : X +
    */
-
   switch(direction) {
     case Direction::UP:
       return { 0, -1 };
@@ -399,6 +486,7 @@ Point DijkstraRoutePlanner::directionToVector(Direction direction) const
 
 bool DijkstraRoutePlanner::isNearGatePost(int x, int y) const
 {
+  // 各ゲート足を確認
   for(const Gate& gate : gates) {
     const Point posts[] = { gate.start, gate.end };
 
@@ -406,10 +494,7 @@ bool DijkstraRoutePlanner::isNearGatePost(int x, int y) const
       const int dx = std::abs(x - post.x);
       const int dy = std::abs(y - post.y);
 
-      /*
-       * ゲート足からMOVE_STEP以内を
-       * ゲート付近と判定する
-       */
+      // ゲート足からMOVE_STEP以内をゲート付近と判定
       if(dx <= MOVE_STEP && dy <= MOVE_STEP) {
         return true;
       }
@@ -421,15 +506,18 @@ bool DijkstraRoutePlanner::isNearGatePost(int x, int y) const
 
 bool DijkstraRoutePlanner::isOuterArea(int x, int y) const
 {
+  // マップ外周上に存在するか判定
   return x == MAP_MIN || x == MAP_MAX || y == MAP_MIN || y == MAP_MAX;
 }
 
 bool DijkstraRoutePlanner::isValid(int x, int y) const
 {
+  // マップ範囲外の場合
   if(x < MAP_MIN || x > MAP_MAX || y < MAP_MIN || y > MAP_MAX) {
     return false;
   }
 
+  // MOVE_STEP単位の座標でない場合
   if(x % MOVE_STEP != 0 || y % MOVE_STEP != 0) {
     return false;
   }
@@ -439,6 +527,7 @@ bool DijkstraRoutePlanner::isValid(int x, int y) const
 
 bool DijkstraRoutePlanner::isBlockedMove(int currentX, int currentY, int nextX, int nextY) const
 {
+  // 各ゲートとの交差を確認
   for(const Gate& gate : gates) {
     // 上下移動
     if(currentX == nextX) {
@@ -447,9 +536,9 @@ bool DijkstraRoutePlanner::isBlockedMove(int currentX, int currentY, int nextX, 
       // 横向きゲート
       if(gate.start.y == gate.end.y) {
         const int minX = std::min(gate.start.x, gate.end.x);
-
         const int maxX = std::max(gate.start.x, gate.end.x);
 
+        // 移動経路がゲートを横切る場合
         if(middleY == gate.start.y && currentX >= minX && currentX <= maxX) {
           return true;
         }
@@ -464,6 +553,8 @@ bool DijkstraRoutePlanner::isBlockedMove(int currentX, int currentY, int nextX, 
       if(gate.start.x == gate.end.x) {
         const int minY = std::min(gate.start.y, gate.end.y);
         const int maxY = std::max(gate.start.y, gate.end.y);
+
+        // 移動経路がゲートを横切る場合
         if(middleX == gate.start.x && currentY >= minY && currentY <= maxY) {
           return true;
         }
@@ -476,18 +567,25 @@ bool DijkstraRoutePlanner::isBlockedMove(int currentX, int currentY, int nextX, 
 
 int DijkstraRoutePlanner::stateToIndex(int x, int y, Direction direction) const
 {
+  // 座標をグリッド番号へ変換
   const int gridX = x / MOVE_STEP;
   const int gridY = y / MOVE_STEP;
 
+  // X座標、Y座標、方向を1つのインデックスへ変換
   return ((gridY * GRID_SIZE + gridX) * DIRECTION_COUNT) + static_cast<int>(direction);
 }
 
 RouteState DijkstraRoutePlanner::indexToState(int index) const
 {
+  // インデックスから方向を取得
   const int directionValue = index % DIRECTION_COUNT;
+
   index /= DIRECTION_COUNT;
+
+  // インデックスからグリッド座標を取得
   const int gridX = index % GRID_SIZE;
   const int gridY = index / GRID_SIZE;
 
+  // グリッド座標を実際の座標へ変換
   return { gridX * MOVE_STEP, gridY * MOVE_STEP, static_cast<Direction>(directionValue) };
 }

@@ -562,6 +562,20 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
     case MOTION_COMMAND::RESET_AZIMUTH: {
       return new ResetAzimuth(robot, std::move(condition));
     }
+    case MOTION_COMMAND::GATE_POSITION: {
+      // QRTracking: motionParams[2]=speed(double)
+      //                 motionParams[3]=targetXCoordinate(int)
+      //                 motionParams[4..6]=cameraPid(kp,ki,kd)
+      //                 motionParams[7]=isStopMotorPower(string: "true"/"false")
+      //                 motionParams[8..11]=roi(x,y,width,height)
+      CameraServer::QrCodeDetectorRequest qrRequest;
+      qrRequest.roi.x = fromString<int32_t>(motionParams[4]);
+      qrRequest.roi.y = fromString<int32_t>(motionParams[5]);
+      qrRequest.roi.width = fromString<int32_t>(motionParams[6]);
+      qrRequest.roi.height = fromString<int32_t>(motionParams[7]);
+      return new GatePositionDetection(robot, motionParams[2], fromString<bool>(motionParams[3]),
+                                       qrRequest, std::move(condition));
+    }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
                         motionParams[0].c_str());
@@ -582,7 +596,8 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "Snapshot", MOTION_COMMAND::SNAPSHOT },
           { "ResetAzimuth", MOTION_COMMAND::RESET_AZIMUTH },
           { "ETZumoExit", MOTION_COMMAND::ET_ZUMO_EXIT },
-          { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH }
+          { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH },
+          { "GatePositon", MOTION_COMMAND::GATE_POSITION }
 
         };
 

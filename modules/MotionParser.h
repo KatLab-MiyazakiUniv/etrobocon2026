@@ -38,6 +38,7 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "ETZumoExitCondition.h"
 #include "UltraSonicCondition.h"
 #include "ImageProcessingColor.h"
+#include "GatePositionDetection.h"
 
 class MotionParser {
  public:
@@ -54,6 +55,7 @@ class MotionParser {
     RESET_AZIMUTH,
     ET_ZUMO_EXIT,
     ET_ZUMO_FINISH,
+    GATE_POSITION,
     NONE
   };
   // 条件コマンド名を持つ列挙型クラス

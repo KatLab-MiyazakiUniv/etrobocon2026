@@ -13,7 +13,7 @@ APPL_CXXOBJS += $(OBJS)
 
 SRCLANG := c++
 
-APPL_LIBS += -lm
+APPL_LIBS += -lm -lcrypto
 
 APPL_DIRS += \
   $(mkfile_path)modules \

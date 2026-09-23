@@ -12,6 +12,5 @@ void main_task(intptr_t unused)
 {
   std::cout << "Hello ETROBO!" << std::endl;
   EtRobocon2026::start();
-  EtRobocon2026::runLineTrace();
   ext_tsk();
 }

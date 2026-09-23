@@ -10,8 +10,6 @@
 
 namespace {
 
-  constexpr double RAD_TO_DEG = 180.0 / 3.14159265358979323846;
-
   /**
    * @brief ダイクストラ法の優先度付きキューで使用するノード
    */

@@ -18,18 +18,15 @@ namespace etrobocon2026_test {
     Robot robot(mockSocketClient);
 
     EtRallyMap map;
-    Pid::PidGain gain{1.0, 0.0, 0.0};
+    Pid::PidGain gain{ 1.0, 0.0, 0.0 };
 
-    RouteFollower follower(robot, map, 400,
-                         gain, gain, gain, gain, gain,
-                         0.0, 1.0);
+    RouteFollower follower(robot, map, 400, gain, gain, gain, gain, gain, 0.0, 1.0);
 
-   std::vector<RouteState> route = {
-      {2, 8, Direction::LEFT},
-      {2, 8, Direction::LEFT}   // 同じ向きなので回頭不要
-  };
+    std::vector<RouteState> route = {
+      { 2, 8, Direction::LEFT }, { 2, 8, Direction::LEFT }  // 同じ向きなので回頭不要
+    };
 
     EXPECT_NO_THROW(follower.run(route));
   }
-}
-  // namespace etrobocon2026_test
+}  // namespace etrobocon2026_test
+   // namespace etrobocon2026_test

@@ -15,42 +15,21 @@ namespace {
 
   /**
    * @brief カメラ位置からロボット基準位置までの前後方向オフセット[mm]
-   *
-   * カメラがロボット基準位置より前方に100mmあるものとして、
-   * カメラ基準で取得した前方距離に100mmを加える。
-   *
-   * 例：
-   *
-   * カメラから正方形まで200mmの場合、
-   *
-   *   ロボット基準位置
-   *        ↓
-   *   [Robot] ----100mm---- [Camera] ----200mm---- [Square]
-   *
-   * ロボット基準では正方形まで300mmとなる。
    */
-  constexpr double CAMERA_TO_ROBOT_OFFSET = 0;
+  constexpr double CAMERA_TO_ROBOT_OFFSET = 0.0;
 
   /**
-   * @brief ロボット基準で使用可能な最小前方距離[mm]
-   *
-   * 負の距離や極端に近い異常値を除外する。
+   * @brief 使用可能な最小前方距離[mm]
    */
   constexpr double MIN_FORWARD_DISTANCE = 0.0;
 
   /**
-   * @brief ロボット基準で使用可能な最大前方距離[mm]
-   *
-   * 正方形補正で現実的に使用する最大距離。
-   * 必要に応じて実機に合わせて変更する。
+   * @brief 使用可能な最大前方距離[mm]
    */
   constexpr double MAX_FORWARD_DISTANCE = 700.0;
 
   /**
    * @brief 使用可能な横方向距離の最大絶対値[mm]
-   *
-   * 左右300mmを超える値は、
-   * 誤検出または座標変換異常の可能性が高いとして除外する。
    */
   constexpr double MAX_LATERAL_DISTANCE = 300.0;
 
@@ -73,20 +52,12 @@ SquareAngleAdjustment::Result SquareAngleAdjustment::calculate(
 
   Logger::info("SquareAngleAdjustment: 計算を開始しました");
 
-  // =========================================================
-  // カメラサーバーとの通信
-  // =========================================================
-
   SocketClient& client = robot.getCameraSocketClientInstance();
 
   CameraServer::SquareDetectorResponse response{};
 
-  // 正方形の検出結果を取得する。
+  // カメラサーバーから正方形の検出結果を取得する
   const bool success = client.executeSquareDetection(request, response);
-
-  // =========================================================
-  // 通信失敗
-  // =========================================================
 
   if(!success) {
     Logger::warning("SquareAngleAdjustment: "
@@ -95,10 +66,7 @@ SquareAngleAdjustment::Result SquareAngleAdjustment::calculate(
     return result;
   }
 
-  // =========================================================
-  // 正方形未検出
-  // =========================================================
-
+  // 正方形を検出できなかった場合は計算を終了する
   if(!response.wasDetected) {
     Logger::warning("SquareAngleAdjustment: "
                     "正方形を検出できませんでした");
@@ -106,46 +74,16 @@ SquareAngleAdjustment::Result SquareAngleAdjustment::calculate(
     return result;
   }
 
-  // =========================================================
-  // カメラサーバー側で計算済みの値を取得
-  // =========================================================
-
+  // カメラサーバーで計算された正方形の位置情報を取得する
   const double centerX = response.centerX;
-
   const double centerY = response.centerY;
-
-  // カメラ基準の前方距離
   const double cameraForwardDistance = response.forwardDistance;
-
-  // 横方向距離
   const double lateralDistance = response.lateralDistance;
 
-  // =========================================================
-  // カメラ基準 → ロボット基準へ変換
-  // =========================================================
-  //
-  // カメラがロボット基準位置より100mm前にあるため、
-  // カメラから正方形までの前方距離に100mm加える。
-  //
-  // 以前は
-  //
-  //   hypot(forward, lateral) + 100
-  //
-  // としていたが、
-  // 今回は座標そのものをロボット基準へ変換してから
-  // 距離と角度を計算する。
-  // =========================================================
-
+  // カメラ基準の前方距離をロボット基準の前方距離へ変換する
   const double robotForwardDistance = cameraForwardDistance + CAMERA_TO_ROBOT_OFFSET;
 
-  // =========================================================
-  // ロボット基準での有効範囲チェック
-  // =========================================================
-  //
-  // 「用紙の範囲内か」ではなく、
-  // ロボットから見て現実的な距離かどうかを確認する。
-  // =========================================================
-
+  // 前方距離が使用可能な範囲内か確認する
   if(robotForwardDistance <= MIN_FORWARD_DISTANCE) {
     Logger::printfLog(Logger::WARNING,
                       "SquareAngleAdjustment: "
@@ -166,6 +104,7 @@ SquareAngleAdjustment::Result SquareAngleAdjustment::calculate(
     return result;
   }
 
+  // 横方向距離が使用可能な範囲内か確認する
   if(std::abs(lateralDistance) > MAX_LATERAL_DISTANCE) {
     Logger::printfLog(Logger::WARNING,
                       "SquareAngleAdjustment: "
@@ -176,47 +115,20 @@ SquareAngleAdjustment::Result SquareAngleAdjustment::calculate(
     return result;
   }
 
-  // =========================================================
-  // 補正角度を計算
-  // =========================================================
-  //
-  // ロボット基準に変換した前方距離と
-  // 横方向距離から正方形方向への角度を計算する。
-  //
-  // lateral > 0 : 右
-  // lateral < 0 : 左
-  // =========================================================
-
+  // ロボットから見た正方形方向への補正角度を計算する
   const double correctionAngle = calculateCorrectionAngle(robotForwardDistance, lateralDistance);
 
-  // =========================================================
-  // ロボットから正方形までの直線距離
-  // =========================================================
-
+  // ロボットから正方形までの直線距離を計算する
   const double straightDistance = std::hypot(robotForwardDistance, lateralDistance);
 
-  // =========================================================
-  // 計算結果を格納
-  // =========================================================
-
+  // 計算結果を格納する
   result.wasDetected = true;
-
   result.centerX = centerX;
-
   result.centerY = centerY;
-
-  // Result側にはロボット基準の距離を格納する。
   result.forwardDistance = robotForwardDistance;
-
   result.lateralDistance = lateralDistance;
-
   result.correctionAngle = correctionAngle;
-
   result.straightDistance = straightDistance;
-
-  // =========================================================
-  // ログ
-  // =========================================================
 
   Logger::printfLog(Logger::INFO,
                     "SquareAngleAdjustment: "
@@ -259,10 +171,7 @@ SquareAngleAdjustment::Result SquareAngleAdjustment::calculate(
 double SquareAngleAdjustment::calculateCorrectionAngle(double forwardDistance,
                                                        double lateralDistance) const
 {
-  // =========================================================
-  // 前方距離チェック
-  // =========================================================
-
+  // 前方距離が不正な場合は角度を計算しない
   if(forwardDistance <= 0.0) {
     Logger::warning("SquareAngleAdjustment: "
                     "前方距離が不正なため"
@@ -271,15 +180,6 @@ double SquareAngleAdjustment::calculateCorrectionAngle(double forwardDistance,
     return 0.0;
   }
 
-  // =========================================================
-  // 補正角度
-  // =========================================================
-  //
-  // lateral > 0 : 右側
-  // lateral < 0 : 左側
-  //
-  // atan2(横距離, 前方距離)
-  // =========================================================
-
+  // 前方距離と横方向距離から正方形方向への補正角度を計算する
   return std::atan2(lateralDistance, forwardDistance) * SQUARE_RAD_TO_DEG;
 }

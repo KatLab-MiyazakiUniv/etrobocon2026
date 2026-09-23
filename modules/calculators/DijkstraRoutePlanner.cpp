@@ -46,6 +46,22 @@ namespace {
   constexpr int GATE_APPROACH_DISTANCE = 1;
 
   /**
+   * @brief 回頭禁止地点か判定する
+   * @param x X座標
+   * @param y Y座標
+   * @return true 回頭禁止地点
+   * @return false 回頭可能地点
+   */
+  bool isTurnForbiddenPoint(int x, int y)
+  {
+    if(x != 0) {
+      return false;
+    }
+
+    return y == 2 || y == 6 || y == 10;
+  }
+
+  /**
    * @brief QR①付近からゲート方向を向くか判定する
    * @param gates ゲート一覧
    * @param currentX 現在X座標
@@ -164,6 +180,11 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
         continue;
       }
 
+      // 回頭禁止地点では現在方向と異なる方向への移動は禁止
+      if(isTurnForbiddenPoint(current.x, current.y) && current.direction != nextDirection) {
+        continue;
+      }
+
       // ゲートを横切る移動は禁止
       if(isBlockedMove(current.x, current.y, nextX, nextY)) {
         continue;
@@ -221,6 +242,7 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
       bestIndex = index;
     }
   }
+
   // 経路なし
   if(bestIndex == -1) {
     return result;

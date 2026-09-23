@@ -274,9 +274,7 @@ int main(int argc, char* argv[])
   try {
     writeSvg(loadRows(inputPath.string()), outputPath.string());
 
-    std::cout << "グラフを出力しました: "
-              << outputPath.string()
-              << std::endl;
+    std::cout << "グラフを出力しました: " << outputPath.string() << std::endl;
 
     return 0;
   } catch(const std::exception& error) {

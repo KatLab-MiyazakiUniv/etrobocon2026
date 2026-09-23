@@ -100,8 +100,7 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
     string conditionId = params[3];
 
     // 動作パラメータを取得する
-    vector<string> motionParams
-        = extractParamsFromID(MOTIONS_PATH + motionName + ".csv", motionId);
+    vector<string> motionParams = extractParamsFromID(MOTIONS_PATH + motionName + ".csv", motionId);
 
     if(motionParams.empty()) {
       Logger::printfLog(Logger::ERROR, "Motions: %s ID=%s が見つかりませんでした",
@@ -132,19 +131,17 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
     }
 
     // 動作インスタンスを生成してリストに追加する
-    BaseMotion* motion
-        = createMotionInstance(robot, motionParams, std::move(condition));
+    BaseMotion* motion = createMotionInstance(robot, motionParams, std::move(condition));
 
     if(motion) {
       motionList.push_back(motion);
 
-      Logger::printfLog(Logger::INFO,
-                        "[MotionParser] motionList[%zu]: %s ID=%s (条件: %s ID=%s)",
+      Logger::printfLog(Logger::INFO, "[MotionParser] motionList[%zu]: %s ID=%s (条件: %s ID=%s)",
                         motionList.size() - 1, motionName.c_str(), motionId.c_str(),
                         conditionName.c_str(), conditionId.c_str());
     } else {
-      Logger::printfLog(Logger::ERROR, "%s:%d Command %s は未定義です",
-                        commandFilePath.c_str(), lineNum, motionName.c_str());
+      Logger::printfLog(Logger::ERROR, "%s:%d Command %s は未定義です", commandFilePath.c_str(),
+                        lineNum, motionName.c_str());
     }
 
     lineNum++;
@@ -158,8 +155,7 @@ vector<string> MotionParser::extractParamsFromID(const string& filePath, const s
   ifstream file(filePath);
 
   if(!file) {
-    Logger::printfLog(Logger::ERROR, "ファイルを開けませんでした: %s",
-                      filePath.c_str());
+    Logger::printfLog(Logger::ERROR, "ファイルを開けませんでした: %s", filePath.c_str());
     return {};
   }
 
@@ -182,9 +178,7 @@ vector<string> MotionParser::extractParamsFromID(const string& filePath, const s
 
     if(row.size() >= 2 && row[1] == id) {
       if(!result.empty()) {
-        Logger::printfLog(Logger::ERROR,
-                          "%s に ID=%s が重複しています",
-                          filePath.c_str(),
+        Logger::printfLog(Logger::ERROR, "%s に ID=%s が重複しています", filePath.c_str(),
                           id.c_str());
         return {};
       }
@@ -197,19 +191,16 @@ vector<string> MotionParser::extractParamsFromID(const string& filePath, const s
 }
 
 unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
-    Robot& robot,
-    const vector<string>& params)
+    Robot& robot, const vector<string>& params)
 {
   if(params.empty()) {
-    Logger::printfLog(Logger::ERROR,
-                      "[MotionParser] 条件パラメータが空です");
+    Logger::printfLog(Logger::ERROR, "[MotionParser] 条件パラメータが空です");
     return nullptr;
   }
 
   CONDITION_COMMAND cond = convertCondition(params[0]);
 
   switch(cond) {
-
     case CONDITION_COMMAND::DISTANCE: {
       /**
        * Distance.csv
@@ -220,89 +211,73 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
        */
 
       if(params.size() < 3) {
-        Logger::printfLog(
-            Logger::ERROR,
-            "[MotionParser] Distanceのパラメータ数が不足しています");
+        Logger::printfLog(Logger::ERROR, "[MotionParser] Distanceのパラメータ数が不足しています");
         return nullptr;
       }
 
-      double targetDistance
-          = fromString<double>(params[2]);
+      double targetDistance = fromString<double>(params[2]);
 
-      return make_unique<DistanceCondition>(
-          robot,
-          targetDistance);
+      return make_unique<DistanceCondition>(robot, targetDistance);
     }
 
     case CONDITION_COMMAND::RELATIVE_ANGLE: {
-  /**
-   * RelativeAngle.csv
-   *
-   * params[0] = "RelativeAngle"
-   * params[1] = ID
-   * params[2] = relativeAngle
-   * params[3] = tolerance
-   */
+      /**
+       * RelativeAngle.csv
+       *
+       * params[0] = "RelativeAngle"
+       * params[1] = ID
+       * params[2] = relativeAngle
+       * params[3] = tolerance
+       */
 
-  if(params.size() < 4) {
-    Logger::printfLog(
-        Logger::ERROR,
-        "[MotionParser] RelativeAngleのパラメータ数が不足しています");
-    return nullptr;
-  }
+      if(params.size() < 4) {
+        Logger::printfLog(Logger::ERROR,
+                          "[MotionParser] RelativeAngleのパラメータ数が不足しています");
+        return nullptr;
+      }
 
-  return make_unique<RelativeAngleCondition>(
-      robot,
-      fromString<double>(params[2]),
-      fromString<double>(params[3]));
-}
+      return make_unique<RelativeAngleCondition>(robot, fromString<double>(params[2]),
+                                                 fromString<double>(params[3]));
+    }
 
-case CONDITION_COMMAND::REPEAT_COUNT: {
-  /**
-   * RepeatCount.csv
-   *
-   * params[0] = "RepeatCount"
-   * params[1] = ID
-   * params[2] = targetRepeats
-   */
+    case CONDITION_COMMAND::REPEAT_COUNT: {
+      /**
+       * RepeatCount.csv
+       *
+       * params[0] = "RepeatCount"
+       * params[1] = ID
+       * params[2] = targetRepeats
+       */
 
-  if(params.size() < 3) {
-    Logger::printfLog(
-        Logger::ERROR,
-        "[MotionParser] RepeatCountのパラメータ数が不足しています");
-    return nullptr;
-  }
+      if(params.size() < 3) {
+        Logger::printfLog(Logger::ERROR,
+                          "[MotionParser] RepeatCountのパラメータ数が不足しています");
+        return nullptr;
+      }
 
-  return make_unique<RepeatCountCondition>(
-      robot,
-      fromString<int>(params[2]));
-}
-    // ↓ 他の条件コマンドはここに追加していく
+      return make_unique<RepeatCountCondition>(robot, fromString<int>(params[2]));
+    }
+      // ↓ 他の条件コマンドはここに追加していく
 
     default:
-      Logger::printfLog(Logger::WARNING,
-                        "[MotionParser] Condition %s は未実装です",
+      Logger::printfLog(Logger::WARNING, "[MotionParser] Condition %s は未実装です",
                         params[0].c_str());
 
       return nullptr;
   }
 }
 
-BaseMotion* MotionParser::createMotionInstance(
-    Robot& robot,
-    const vector<string>& motionParams,
-    unique_ptr<BaseContinuationCondition> condition)
+BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string>& motionParams,
+                                               unique_ptr<BaseContinuationCondition> condition)
 {
   if(motionParams.empty()) {
-    Logger::printfLog(Logger::ERROR,
-                      "[MotionParser] 動作パラメータが空です");
+    Logger::printfLog(Logger::ERROR, "[MotionParser] 動作パラメータが空です");
     return nullptr;
   }
 
   MOTION_COMMAND command = convertCommand(motionParams[0]);
 
   switch(command) {
-
     case MOTION_COMMAND::STRAIGHT: {
       /**
        * Straight.csv
@@ -331,52 +306,32 @@ BaseMotion* MotionParser::createMotionInstance(
        */
 
       if(motionParams.size() < 15) {
-        Logger::printfLog(
-            Logger::ERROR,
-            "[MotionParser] Straightのパラメータ数が不足しています");
+        Logger::printfLog(Logger::ERROR, "[MotionParser] Straightのパラメータ数が不足しています");
         return nullptr;
       }
 
-      double targetSpeed
-          = fromString<double>(motionParams[2]);
+      double targetSpeed = fromString<double>(motionParams[2]);
 
-      Pid::PidGain rightPid{
-        fromString<double>(motionParams[3]),
-        fromString<double>(motionParams[4]),
-        fromString<double>(motionParams[5])
-      };
+      Pid::PidGain rightPid{ fromString<double>(motionParams[3]),
+                             fromString<double>(motionParams[4]),
+                             fromString<double>(motionParams[5]) };
 
-      Pid::PidGain leftPid{
-        fromString<double>(motionParams[6]),
-        fromString<double>(motionParams[7]),
-        fromString<double>(motionParams[8])
-      };
+      Pid::PidGain leftPid{ fromString<double>(motionParams[6]),
+                            fromString<double>(motionParams[7]),
+                            fromString<double>(motionParams[8]) };
 
-      Pid::PidGain anglePid{
-        fromString<double>(motionParams[9]),
-        fromString<double>(motionParams[10]),
-        fromString<double>(motionParams[11])
-      };
+      Pid::PidGain anglePid{ fromString<double>(motionParams[9]),
+                             fromString<double>(motionParams[10]),
+                             fromString<double>(motionParams[11]) };
 
-      bool shouldUseIMU
-          = motionParams[12] == "true";
+      bool shouldUseIMU = motionParams[12] == "true";
 
-      double deadbandRate
-          = fromString<double>(motionParams[13]);
+      double deadbandRate = fromString<double>(motionParams[13]);
 
-      double maxoutRate
-          = fromString<double>(motionParams[14]);
+      double maxoutRate = fromString<double>(motionParams[14]);
 
-      return new Straight(
-          robot,
-          std::move(condition),
-          targetSpeed,
-          rightPid,
-          leftPid,
-          anglePid,
-          shouldUseIMU,
-          deadbandRate,
-          maxoutRate);
+      return new Straight(robot, std::move(condition), targetSpeed, rightPid, leftPid, anglePid,
+                          shouldUseIMU, deadbandRate, maxoutRate);
     }
 
     case MOTION_COMMAND::QR_TRACKING: {
@@ -402,43 +357,29 @@ BaseMotion* MotionParser::createMotionInstance(
        */
 
       if(motionParams.size() < 12) {
-        Logger::printfLog(
-            Logger::ERROR,
-            "[MotionParser] QRTrackingのパラメータ数が不足しています");
+        Logger::printfLog(Logger::ERROR, "[MotionParser] QRTrackingのパラメータ数が不足しています");
         return nullptr;
       }
 
       CameraServer::QrCodeDetectorRequest qrRequest;
 
-      qrRequest.roi.x
-          = fromString<int32_t>(motionParams[8]);
+      qrRequest.roi.x = fromString<int32_t>(motionParams[8]);
 
-      qrRequest.roi.y
-          = fromString<int32_t>(motionParams[9]);
+      qrRequest.roi.y = fromString<int32_t>(motionParams[9]);
 
-      qrRequest.roi.width
-          = fromString<int32_t>(motionParams[10]);
+      qrRequest.roi.width = fromString<int32_t>(motionParams[10]);
 
-      qrRequest.roi.height
-          = fromString<int32_t>(motionParams[11]);
+      qrRequest.roi.height = fromString<int32_t>(motionParams[11]);
 
-      Pid::PidGain cameraPid{
-        fromString<double>(motionParams[4]),
-        fromString<double>(motionParams[5]),
-        fromString<double>(motionParams[6])
-      };
+      Pid::PidGain cameraPid{ fromString<double>(motionParams[4]),
+                              fromString<double>(motionParams[5]),
+                              fromString<double>(motionParams[6]) };
 
-      bool isStopMotorPower
-          = motionParams[7] == "true";
+      bool isStopMotorPower = motionParams[7] == "true";
 
-      return new CameraTracking(
-          robot,
-          std::move(condition),
-          fromString<double>(motionParams[2]),
-          fromString<int>(motionParams[3]),
-          cameraPid,
-          qrRequest,
-          isStopMotorPower);
+      return new CameraTracking(robot, std::move(condition), fromString<double>(motionParams[2]),
+                                fromString<int>(motionParams[3]), cameraPid, qrRequest,
+                                isStopMotorPower);
     }
 
     case MOTION_COMMAND::LINETRACE: {
@@ -460,102 +401,72 @@ BaseMotion* MotionParser::createMotionInstance(
        */
 
       if(motionParams.size() < 9) {
-        Logger::printfLog(
-            Logger::ERROR,
-            "[MotionParser] LineTraceのパラメータ数が不足しています");
+        Logger::printfLog(Logger::ERROR, "[MotionParser] LineTraceのパラメータ数が不足しています");
         return nullptr;
       }
 
-      int calibratedBrightness
-          = robot.getTargetBrightness();
+      int calibratedBrightness = robot.getTargetBrightness();
 
-      int targetBrightnessOffset
-          = fromString<int>(motionParams[3]);
+      int targetBrightnessOffset = fromString<int>(motionParams[3]);
 
-      int targetBrightness
-          = std::clamp(
-              calibratedBrightness + targetBrightnessOffset,
-              0,
-              100);
+      int targetBrightness = std::clamp(calibratedBrightness + targetBrightnessOffset, 0, 100);
 
-      Pid::PidGain brightnessPid{
-        fromString<double>(motionParams[4]),
-        fromString<double>(motionParams[5]),
-        fromString<double>(motionParams[6])
-      };
+      Pid::PidGain brightnessPid{ fromString<double>(motionParams[4]),
+                                  fromString<double>(motionParams[5]),
+                                  fromString<double>(motionParams[6]) };
 
-      return new LineTrace(
-          robot,
-          std::move(condition),
-          fromString<double>(motionParams[2]),
-          targetBrightness,
-          brightnessPid,
-          fromString<double>(motionParams[7]),
-          fromString<double>(motionParams[8]),
-          motionParams[1]);
+      return new LineTrace(robot, std::move(condition), fromString<double>(motionParams[2]),
+                           targetBrightness, brightnessPid, fromString<double>(motionParams[7]),
+                           fromString<double>(motionParams[8]), motionParams[1]);
     }
 
-    // ↓ 他のコマンドはここに追加していく
-case MOTION_COMMAND::RELATIVE_ROTATION: {
-  /**
-   * RelativeRotation.csv
-   *
-   * motionParams[0] = "RelativeRotation"
-   * motionParams[1] = ID
-   * motionParams[2] = relativeAngle
-   * motionParams[3] = angleKp
-   * motionParams[4] = angleKi
-   * motionParams[5] = angleKd
-   */
+      // ↓ 他のコマンドはここに追加していく
+    case MOTION_COMMAND::RELATIVE_ROTATION: {
+      /**
+       * RelativeRotation.csv
+       *
+       * motionParams[0] = "RelativeRotation"
+       * motionParams[1] = ID
+       * motionParams[2] = relativeAngle
+       * motionParams[3] = angleKp
+       * motionParams[4] = angleKi
+       * motionParams[5] = angleKd
+       */
 
-  if(motionParams.size() < 6) {
-    Logger::printfLog(
-        Logger::ERROR,
-        "[MotionParser] RelativeRotationのパラメータ数が不足しています");
-    return nullptr;
-  }
+      if(motionParams.size() < 6) {
+        Logger::printfLog(Logger::ERROR,
+                          "[MotionParser] RelativeRotationのパラメータ数が不足しています");
+        return nullptr;
+      }
 
-  Pid::PidGain anglePid{
-    fromString<double>(motionParams[3]),
-    fromString<double>(motionParams[4]),
-    fromString<double>(motionParams[5])
-  };
+      Pid::PidGain anglePid{ fromString<double>(motionParams[3]),
+                             fromString<double>(motionParams[4]),
+                             fromString<double>(motionParams[5]) };
 
-  return new RelativeRotation(
-      robot,
-      std::move(condition),
-      anglePid,
-      fromString<double>(motionParams[2]));
-}
+      return new RelativeRotation(robot, std::move(condition), anglePid,
+                                  fromString<double>(motionParams[2]));
+    }
 
-case MOTION_COMMAND::SNAPSHOT: {
-  /**
-   * Snapshot.csv
-   *
-   * motionParams[0] = "Snapshot"
-   * motionParams[1] = ID
-   * motionParams[2] = fileName
-   */
+    case MOTION_COMMAND::SNAPSHOT: {
+      /**
+       * Snapshot.csv
+       *
+       * motionParams[0] = "Snapshot"
+       * motionParams[1] = ID
+       * motionParams[2] = fileName
+       */
 
-  if(motionParams.size() < 3) {
-    Logger::printfLog(
-        Logger::ERROR,
-        "[MotionParser] Snapshotのパラメータ数が不足しています");
-    return nullptr;
-  }
+      if(motionParams.size() < 3) {
+        Logger::printfLog(Logger::ERROR, "[MotionParser] Snapshotのパラメータ数が不足しています");
+        return nullptr;
+      }
 
-  return new Snapshot(
-      robot,
-      motionParams[2],
-      std::move(condition));
-}
-
+      return new Snapshot(robot, motionParams[2], std::move(condition));
+    }
 
     default:
-      Logger::printfLog(
-          Logger::WARNING,
-          "[MotionParser] Command %s は未実装です",
-          motionParams[0].c_str());
+      Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
+                        motionParams[0].c_str());
 
       return nullptr;
   }

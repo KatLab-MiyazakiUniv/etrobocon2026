@@ -8,7 +8,8 @@
 
 Straight::Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                    double _targetSpeed, const Pid::PidGain& _rightPid, const Pid::PidGain& _leftPid,
-                   const Pid::PidGain& _anglePidGain, bool _shouldUseIMU,double _deadbandRate, double _maxoutRate)
+                   const Pid::PidGain& _anglePidGain, bool _shouldUseIMU, double _deadbandRate,
+                   double _maxoutRate)
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
     speedCalculator(_robot, _rightPid, _leftPid, _targetSpeed),
@@ -32,7 +33,7 @@ bool Straight::canStart()
   if(targetSpeed == 0.0) {
     return false;
   }
-    // マックスアウトの割合が0.0〜1.0の範囲外の場合は開始しない
+  // マックスアウトの割合が0.0〜1.0の範囲外の場合は開始しない
   if(maxoutRate < 0.0 || maxoutRate > 1.0) {
     Logger::warning("マックスアウトの割合は0.0〜1.0の範囲で設定してください");
     return false;
@@ -84,17 +85,14 @@ void Straight::executeStep()
       turningPower = 0.0;
     } else {
       // マックスアウト
-      turningPower
-          = std::min(std::max(turningPower, -maxoutPower), maxoutPower);
+      turningPower = std::min(std::max(turningPower, -maxoutPower), maxoutPower);
     }
   }
 
   // モーターにPower値をセット
-  robot.getWheelMotorControllerInstance().setRightPower(
-      requiredRightPower + turningPower);
+  robot.getWheelMotorControllerInstance().setRightPower(requiredRightPower + turningPower);
 
-  robot.getWheelMotorControllerInstance().setLeftPower(
-      requiredLeftPower - turningPower);
+  robot.getWheelMotorControllerInstance().setLeftPower(requiredLeftPower - turningPower);
 }
 void Straight::finish()
 {

@@ -122,3 +122,30 @@ bool CameraCapture::getFrame(cv::Mat& outFrame)
   Logger::error("フレームの取得に失敗しました。");
   return false;
 }
+
+bool CameraCapture::getFrames(vector<cv::Mat>& frames, int numFrames, int millisecondInterval)
+{
+  if(numFrames <= 0) {
+    Logger::printfLog(Logger::ERROR, "フレーム数が無効です。動作を終了します。: %d", numFrames);
+    return false;
+  }
+  if(millisecondInterval <= 0) {
+    Logger::printfLog(Logger::ERROR, "インターバルが無効です。動作を終了します。: %d ms",
+                      millisecondInterval);
+    return false;
+  }
+
+  frames.resize(numFrames);
+  bool allSuccess = true;
+  for(int i = 0; i < numFrames; ++i) {
+    if(!getFrame(frames[i])) {
+      Logger::printfLog(Logger::ERROR, "フレーム %d の取得に失敗しました。", i);
+      allSuccess = false;
+    }
+    if(i < numFrames - 1) {
+      // 最後の1回以外は、milliseconds ミリ秒だけ待機
+      this_thread::sleep_for(chrono::milliseconds(millisecondInterval));
+    }
+  }
+  return allSuccess;
+}

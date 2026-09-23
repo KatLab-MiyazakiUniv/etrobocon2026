@@ -1,5 +1,6 @@
 #QR1検出位置まで直進
-RelativeRotation,-045,RelativeAngle,-045
+ResetAzimuth,001,RepeatCount,001
+AbsoluteRotation,-040,AbsoluteAngle,-040
 Straight,001,Distance,028
 #青ラインとペットボトルの位置関係は一定
 #青ラインの奥のペットボトルをに角度を合わせるtargetXを小さくし左寄り走行
@@ -10,7 +11,7 @@ Straight,001,DistanceOrColor,BLUE023
 
 # QR1検出
 Snapshot,clearBuffer1,RepeatCount,001
-GatePosition,001,RepeatCount,001
+GatePosition,1-1,RepeatCount,001
 #Snapshot,011,RepeatCount,001
 #Snapshot,012,RepeatCount,001
 #Snapshot,013,RepeatCount,001
@@ -19,19 +20,19 @@ GatePosition,001,RepeatCount,001
 
 
 #QR1取得後の直線:回頭し110cmほど進む
-RelativeRotation,-050,RelativeAngle,-050
+AbsoluteRotation,-090,AbsoluteAngle,-090
 Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,LBS003,Distance,080
 #CameraTracking,LBS008,DistanceOrColor,BLACK040
 
 #QR2取得前カーブ直前
-Straight,001,DistanceOrColor,BLACK055
+Straight,001,DistanceOrColor,BLACK070
 
 
 # QR2検出
-#RelativeRotation,-025,RelativeAngle,-025
+#AbsoluteRotation,-025,AbsoluteAngle,-025
 Snapshot,clearBuffer1,RepeatCount,001
-GatePosition,002,RepeatCount,001
+GatePosition,2-1,RepeatCount,001
 
 #Snapshot,021,RepeatCount,001
 #Snapshot,022,RepeatCount,001
@@ -42,25 +43,29 @@ GatePosition,002,RepeatCount,001
 #Straight,001,Distance,003
 
 #赤色まで移動
-RelativeRotation,-080,RelativeAngle,-080
+AbsoluteRotation,-165,AbsoluteAngle,-0165
 #赤色が写る範囲まで移動
 Straight,001,DistanceOrColor,RED063
 #赤色がフレームに写る状態で赤色検知カメラ走行
+Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,LBS010,DistanceOrColor,RED025
 
 
 
 #Straight,001,SensorColor,001
 #ボトルを離す
-Straight,005,Distance,005
+#Straight,005,Distance,005
 
-RelativeRotation,005,RelativeAngle,005
+#AbsoluteRotation,005,AbsoluteAngle,005
 
-Straight,-001,Distance,040
+Straight,-001,Distance,010
+AbsoluteRotation,-255,AbsoluteAngle,-255
 
-Straight,-001,ColorOrColor,001
-RelativeRotation,-040,RelativeAngle,-040
+Straight,001,ColorOrColor,001
+#AbsoluteRotation,-025,AbsoluteAngle,-025
 
 #ETラリーにつなげる
-CameraTracking,LBS007,DistanceAndColor,003
-RelativeRotation,-090,RelativeAngle,-090
+#Snapshot,clearBuffer1,RepeatCount,001
+#LineTrace,010,SensorColor,BLUE
+#CameraTracking,LBS007,DistanceAndColor,003
+#AbsoluteRotation,-090,AbsoluteAngle,-090

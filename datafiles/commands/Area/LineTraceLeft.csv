@@ -1,19 +1,14 @@
 #動作コマンド名,動作ID,条件コマンド名,条件ID
+# キャリブレーション
+#Calibrator,001,RepeatCount,001
+#4色走行ボトルキャッチ前
 
-CameraTracking,S001,Distance,035
-CameraTracking,R001,Distance,040
-CameraTracking,S001,Distance,035
-CameraTracking,R001,Distance,040
-CameraTracking,S001,Distance,033
-CameraTracking,L001,Distance,025
-CameraTracking,L002,Distance,095
-CameraTracking,S001,Distance,015
+Snapshot,clearBuffer1,RepeatCount,001
+CameraTracking,LTS001,Distance,060
+#ボトルキャッチ中(上半分roi)
+CameraTracking,LTS002,Distance,035
+CameraTracking,LTS008,Distance,018
 
-CameraTracking,R001,Distance,035
-CameraTracking,S001,Distance,015
-CameraTracking,L002,Distance,030
-CameraTracking,S001,Distance,095
 
-CameraTracking,000,Distance,000
-CameraTracking,BC,Distance,020
+CameraTracking,000,RepeatCount,001
 

@@ -387,7 +387,6 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
        * LineTrace.csv
        *
        * motionParams[0] = "LineTrace"
-       * motionParams[1] = ID
        *
        * motionParams[2] = speed
        * motionParams[3] = targetBrightnessOffset
@@ -417,7 +416,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
 
       return new LineTrace(robot, std::move(condition), fromString<double>(motionParams[2]),
                            targetBrightness, brightnessPid, fromString<double>(motionParams[7]),
-                           fromString<double>(motionParams[8]), motionParams[1]);
+                           fromString<double>(motionParams[8]));
     }
 
       // ↓ 他のコマンドはここに追加していく
@@ -426,7 +425,6 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
        * RelativeRotation.csv
        *
        * motionParams[0] = "RelativeRotation"
-       * motionParams[1] = ID
        * motionParams[2] = relativeAngle
        * motionParams[3] = angleKp
        * motionParams[4] = angleKi

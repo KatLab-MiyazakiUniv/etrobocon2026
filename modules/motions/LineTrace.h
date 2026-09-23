@@ -30,7 +30,7 @@ class LineTrace : public BaseMotion {
    */
   LineTrace(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
             double _targetSpeed, int _targetBrightness, const Pid::PidGain& _brightnessPidGain,
-            double _deadbandRate, double _maxoutRate, const std::string& _commandId = "");
+            double _deadbandRate, double _maxoutRate);
 
   /**
    * デストラクタ
@@ -68,7 +68,6 @@ class LineTrace : public BaseMotion {
   double deadbandRate;              // turningPowerに適用するデッドバンドの割合(0.0〜1.0)
   double maxoutRate;                // turningPowerに適用するマックスアウトの割合(0.0〜1.0)
   Pid::PidGain brightnessPidGain;   // ログ出力用のPIDゲイン
-  std::string commandId;            // ログ上で区間を識別するコマンドID
 };
 
 #endif

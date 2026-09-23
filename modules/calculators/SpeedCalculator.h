@@ -31,15 +31,20 @@ class SpeedCalculator {
                   double _targetSpeed);
 
   /**
-   * @brief 目標とする走行速度に相当する右車輪のPower値を算出する
-   * @return 走行速度に相当する右タイヤのPower値
-   */
+   * @brief 計算状態およびベースパワーを初期化する
+   */
+  void prepare();
+
+  /**
+   * @brief 目標とする走行速度に相当する右車輪のPower値を算出する
+   * @return 走行速度に相当する右タイヤのPower値
+   */
   double calculateRightMotorPower();
 
   /**
    * @brief 目標とする走行速度に相当する左車輪のPower値を算出する
    * @return 走行速度に相当する左タイヤのPower値
-   */
+   */
   double calculateLeftMotorPower();
 
  private:
@@ -48,6 +53,7 @@ class SpeedCalculator {
   Pid leftPid;               // 目標速度に対する左車輪のPID制御を行うクラスのインスタンス
   double rightMotorPower;    // 右車輪のPower値
   double leftMotorPower;     // 左車輪のPower値
+  bool isInitialized;        // 初期化フラグ
   Robot& robot;              // Robotクラスのインスタンスの参照
   static const Pid::PidGain DEFAULT_RIGHT_PID;  // 右車輪用のデフォルトPIDゲイン
   static const Pid::PidGain DEFAULT_LEFT_PID;   // 左車輪用のデフォルトPIDゲイン

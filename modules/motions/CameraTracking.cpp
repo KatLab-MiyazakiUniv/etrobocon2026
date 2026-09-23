@@ -59,6 +59,7 @@ bool CameraTracking::canStart()
 void CameraTracking::prepare()
 {
   cameraPid.prepare();
+  speedCalculator.prepare();
 }
 
 void CameraTracking::executeStep()

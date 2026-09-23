@@ -1,6 +1,5 @@
 #QR1検出位置まで直進
-ResetAzimuth,001,RepeatCount,001
-AbsoluteRotation,-040,AbsoluteAngle,-040
+RelativeRotation,-040,RelativeAngle,-040
 Straight,001,Distance,028
 #青ラインとペットボトルの位置関係は一定
 #青ラインの奥のペットボトルをに角度を合わせるtargetXを小さくし左寄り走行
@@ -12,15 +11,10 @@ Straight,001,DistanceOrColor,BLUE023
 # QR1検出
 Snapshot,clearBuffer1,RepeatCount,001
 GatePosition,1-1,RepeatCount,001
-#Snapshot,011,RepeatCount,001
-#Snapshot,012,RepeatCount,001
-#Snapshot,013,RepeatCount,001
-#Snapshot,014,RepeatCount,001
-#Snapshot,015,RepeatCount,001
 
 
 #QR1取得後の直線:回頭し110cmほど進む
-AbsoluteRotation,-090,AbsoluteAngle,-090
+RelativeRotation,-050,RelativeAngle,-050
 Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,LBS003,Distance,080
 #CameraTracking,LBS008,DistanceOrColor,BLACK040
@@ -28,22 +22,11 @@ CameraTracking,LBS003,Distance,080
 #QR2取得前カーブ直前
 Straight,001,DistanceOrColor,BLACK070
 
-
 # QR2検出
-#AbsoluteRotation,-025,AbsoluteAngle,-025
 Snapshot,clearBuffer1,RepeatCount,001
 GatePosition,2-1,RepeatCount,001
-
-#Snapshot,021,RepeatCount,001
-#Snapshot,022,RepeatCount,001
-#Snapshot,023,RepeatCount,001
-#Snapshot,024,RepeatCount,001
-#Snapshot,025,RepeatCount,001
-
-#Straight,001,Distance,003
-
 #赤色まで移動
-AbsoluteRotation,-165,AbsoluteAngle,-0165
+RelativeRotation,-075,RelativeAngle,-075
 #赤色が写る範囲まで移動
 Straight,001,DistanceOrColor,RED063
 #赤色がフレームに写る状態で赤色検知カメラ走行
@@ -56,16 +39,15 @@ CameraTracking,LBS010,DistanceOrColor,RED025
 #ボトルを離す
 #Straight,005,Distance,005
 
-#AbsoluteRotation,005,AbsoluteAngle,005
-
 Straight,-001,Distance,010
-AbsoluteRotation,-255,AbsoluteAngle,-255
+
+RelativeRotation,-110,RelativeAngle,-110
+#RelativeRotation,-090,RelativeAngle,-090
 
 Straight,001,ColorOrColor,001
-#AbsoluteRotation,-025,AbsoluteAngle,-025
 
 #ETラリーにつなげる
 #Snapshot,clearBuffer1,RepeatCount,001
 #LineTrace,010,SensorColor,BLUE
 #CameraTracking,LBS007,DistanceAndColor,003
-#AbsoluteRotation,-090,AbsoluteAngle,-090
+#RelativeRotation,-090,RelativeAngle,-090

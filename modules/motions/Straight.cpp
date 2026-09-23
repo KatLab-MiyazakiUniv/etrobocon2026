@@ -76,9 +76,12 @@ void Straight::executeStep()
     // PID制御で旋回量を計算
     turningPower = anglePid.calculatePid(angleDeviation);
 
+    double basepower=
+    (std::abs(requiredRightPower)+std::abs(requiredLeftPower))/2.0;
+
     // デッドバンドとマックスアウトを計算
-    double deadbandPower = deadbandRate * std::abs(targetSpeed);
-    double maxoutPower = maxoutRate * std::abs(targetSpeed);
+    double deadbandPower = deadbandRate * basepower;
+    double maxoutPower = maxoutRate * basepower;
 
     // デッドバンド
     if(std::abs(turningPower) < deadbandPower) {
@@ -88,10 +91,8 @@ void Straight::executeStep()
       turningPower = std::min(std::max(turningPower, -maxoutPower), maxoutPower);
     }
   }
-
   // モーターにPower値をセット
   robot.getWheelMotorControllerInstance().setRightPower(requiredRightPower + turningPower);
-
   robot.getWheelMotorControllerInstance().setLeftPower(requiredLeftPower - turningPower);
 }
 void Straight::finish()

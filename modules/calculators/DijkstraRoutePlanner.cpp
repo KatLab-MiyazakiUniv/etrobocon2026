@@ -6,6 +6,8 @@
 
 #include "DijkstraRoutePlanner.h"
 
+#include "SystemInfo.h"
+
 namespace {
 
   constexpr double RAD_TO_DEG = 180.0 / 3.14159265358979323846;
@@ -46,11 +48,11 @@ namespace {
   constexpr int GATE_APPROACH_DISTANCE = 1;
 
   /**
-   * @brief 回頭禁止地点か判定する
+   * @brief LEFTを向く回頭を禁止する地点か判定する
    * @param x X座標
    * @param y Y座標
-   * @return true 回頭禁止地点
-   * @return false 回頭可能地点
+   * @return true LEFTを向く回頭を禁止する地点
+   * @return false LEFTを向く回頭が可能な地点
    */
   bool isTurnForbiddenPoint(int x, int y)
   {
@@ -59,6 +61,99 @@ namespace {
     }
 
     return y == 2 || y == 6 || y == 10;
+  }
+
+  /**
+   * @brief 外周ゲートの外側にある入口か判定する
+   * @param gates ゲート一覧
+   * @param goal 入口候補座標
+   * @param goalDirection ゲート通過方向
+   * @return true 外周ゲートの外側にある入口
+   * @return false それ以外
+   *
+   * 外周ゲートではマップ内側からのみ進入するため、
+   * 外側から内側へ通過する入口候補を無効にする。
+   */
+  bool isOuterGateOutsideEntrance(const std::vector<Gate>& gates, const Point& goal,
+                                  Direction goalDirection)
+  {
+    for(const Gate& gate : gates) {
+      // 縦向きゲート
+      if(gate.start.x == gate.end.x) {
+        const int gateX = gate.start.x;
+        const int centerY = (gate.start.y + gate.end.y) / 2;
+
+        // 左外周ゲート
+        if(gateX == 1) {
+          /*
+           * 外側入口
+           *
+           * (0, centerY)
+           *      ↓
+           * LEFT方向へ進むとマップ内側へ入る。
+           *
+           * LEFT : X+
+           */
+          if(goal.x == 0 && goal.y == centerY && goalDirection == Direction::LEFT) {
+            return true;
+          }
+        }
+
+        // 右外周ゲート
+        if(gateX == SystemInfo::X_GRID_NUM - 1) {
+          /*
+           * 外側入口
+           *
+           * (X_GRID_NUM, centerY)
+           *      ↓
+           * RIGHT方向へ進むとマップ内側へ入る。
+           *
+           * RIGHT : X-
+           */
+          if(goal.x == SystemInfo::X_GRID_NUM && goal.y == centerY
+             && goalDirection == Direction::RIGHT) {
+            return true;
+          }
+        }
+      }
+
+      // 横向きゲート
+      if(gate.start.y == gate.end.y) {
+        const int centerX = (gate.start.x + gate.end.x) / 2;
+        const int gateY = gate.start.y;
+
+        // 上外周ゲート
+        if(gateY == 1) {
+          /*
+           * 外側入口
+           *
+           * (centerX, 0)
+           *      ↓
+           * DOWN方向へ進むとマップ内側へ入る。
+           */
+          if(goal.x == centerX && goal.y == 0 && goalDirection == Direction::DOWN) {
+            return true;
+          }
+        }
+
+        // 下外周ゲート
+        if(gateY == SystemInfo::Y_GRID_NUM - 1) {
+          /*
+           * 外側入口
+           *
+           * (centerX, Y_GRID_NUM)
+           *      ↓
+           * UP方向へ進むとマップ内側へ入る。
+           */
+          if(goal.x == centerX && goal.y == SystemInfo::Y_GRID_NUM
+             && goalDirection == Direction::UP) {
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
   }
 
   /**
@@ -90,6 +185,7 @@ namespace {
             if(currentX > gateX && nextDirection == Direction::RIGHT) {
               return true;
             }
+
             // ゲートの左側からゲートへ向かう
             if(currentX < gateX && nextDirection == Direction::LEFT) {
               return true;
@@ -97,6 +193,7 @@ namespace {
           }
         }
       }
+
       // 横向きゲート
       if(gate.start.y == gate.end.y) {
         const int gateY = gate.start.y;
@@ -114,6 +211,7 @@ namespace {
             if(currentY > gateY && nextDirection == Direction::UP) {
               return true;
             }
+
             // ゲートの上側からゲートへ向かう
             if(currentY < gateY && nextDirection == Direction::DOWN) {
               return true;
@@ -125,6 +223,7 @@ namespace {
 
     return false;
   }
+
 }  // namespace
 
 DijkstraRoutePlanner::DijkstraRoutePlanner(const std::vector<Gate>& gates) : gates(gates) {}
@@ -144,16 +243,29 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
     return result;
   }
 
+  /*
+   * 外周ゲートではマップ内側からのみ進入する。
+   *
+   * 外側から内側へ通過するGatePassが
+   * ゴールとして指定された場合は、
+   * この入口候補を使用しない。
+   */
+  if(isOuterGateOutsideEntrance(gates, goal, goalDirection)) {
+    return result;
+  }
+
   // 探索する状態の総数
   // X座標、Y座標、向いている方向の組み合わせで状態を表す
   constexpr int STATE_COUNT = GRID_SIZE * GRID_SIZE * DIRECTION_COUNT;
 
   std::vector<int> distance(STATE_COUNT, INT_MAX);  // スタート地点から各状態までの最小コストを記録
   std::vector<int> previous(STATE_COUNT, -1);       // 各状態に来る直前の状態を記録
+
   // 探索する状態をコストの小さい順に取り出すための優先度付きキュー
   std::priority_queue<QueueNode, std::vector<QueueNode>, std::greater<QueueNode>> queue;
-  const int startIndex = stateToIndex(
-      startX, startY, startDirection);  // 開始位置と開始方向を、配列で使うインデックスに変換
+
+  // 開始位置と開始方向を、配列で使うインデックスに変換
+  const int startIndex = stateToIndex(startX, startY, startDirection);
 
   distance[startIndex] = 0;
   queue.push({ 0, startIndex });
@@ -165,6 +277,7 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
   while(!queue.empty()) {
     const QueueNode currentNode = queue.top();
     queue.pop();
+
     if(currentNode.cost != distance[currentNode.index]) {
       continue;
     }
@@ -180,8 +293,15 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
         continue;
       }
 
-      // 回頭禁止地点では現在方向と異なる方向への移動は禁止
-      if(isTurnForbiddenPoint(current.x, current.y) && current.direction != nextDirection) {
+      /*
+       * (0,2)、(0,6)、(0,10)では、
+       * 回頭してLEFTを向く動作を禁止する。
+       *
+       * すでにLEFTを向いている状態での
+       * LEFT方向への直進は許可する。
+       */
+      if(isTurnForbiddenPoint(current.x, current.y) && current.direction != nextDirection
+         && nextDirection == Direction::LEFT) {
         continue;
       }
 
@@ -193,6 +313,7 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
       // 移動コスト
       const int moveCost
           = calculateMoveCost(current.x, current.y, current.direction, nextDirection);
+
       const int nextCost = currentNode.cost + moveCost;
       const int nextIndex = stateToIndex(nextX, nextY, nextDirection);
 
@@ -200,6 +321,7 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
       if(nextCost < distance[nextIndex]) {
         distance[nextIndex] = nextCost;
         previous[nextIndex] = currentNode.index;
+
         queue.push({ nextCost, nextIndex });
       }
     }
@@ -212,7 +334,21 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
   for(int directionValue = 0; directionValue < DIRECTION_COUNT; ++directionValue) {
     const Direction arrivalDirection = static_cast<Direction>(directionValue);
     const int index = stateToIndex(goal.x, goal.y, arrivalDirection);
+
     if(distance[index] == INT_MAX) {
+      continue;
+    }
+
+    /*
+     * (0,2)、(0,6)、(0,10)では、
+     * ゴール地点に到着してから
+     * LEFTへ回頭する動作も禁止する。
+     *
+     * LEFTを向いた状態で到着している場合は
+     * 回頭が発生しないため許可する。
+     */
+    if(isTurnForbiddenPoint(goal.x, goal.y) && arrivalDirection != goalDirection
+       && goalDirection == Direction::LEFT) {
       continue;
     }
 
@@ -230,6 +366,7 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
       finalTurnCost += GATE_NEAR_TURN_PENALTY;
     }
 
+    // QR①付近でゲート方向へ回頭する場合
     if(arrivalDirection != goalDirection
        && isTurningTowardGateNearEntrance(gates, goal.x, goal.y, goalDirection)) {
       finalTurnCost += GATE_APPROACH_TURN_PENALTY;
@@ -401,7 +538,6 @@ Point DijkstraRoutePlanner::directionToVector(Direction direction) const
    * DOWN  : Y +
    * LEFT  : X +
    */
-
   switch(direction) {
     case Direction::UP:
       return { 0, -1 };
@@ -469,7 +605,6 @@ bool DijkstraRoutePlanner::isBlockedMove(int currentX, int currentY, int nextX, 
       // 横向きゲート
       if(gate.start.y == gate.end.y) {
         const int minX = std::min(gate.start.x, gate.end.x);
-
         const int maxX = std::max(gate.start.x, gate.end.x);
 
         if(middleY == gate.start.y && currentX >= minX && currentX <= maxX) {
@@ -486,6 +621,7 @@ bool DijkstraRoutePlanner::isBlockedMove(int currentX, int currentY, int nextX, 
       if(gate.start.x == gate.end.x) {
         const int minY = std::min(gate.start.y, gate.end.y);
         const int maxY = std::max(gate.start.y, gate.end.y);
+
         if(middleX == gate.start.x && currentY >= minY && currentY <= maxY) {
           return true;
         }
@@ -507,7 +643,9 @@ int DijkstraRoutePlanner::stateToIndex(int x, int y, Direction direction) const
 RouteState DijkstraRoutePlanner::indexToState(int index) const
 {
   const int directionValue = index % DIRECTION_COUNT;
+
   index /= DIRECTION_COUNT;
+
   const int gridX = index % GRID_SIZE;
   const int gridY = index / GRID_SIZE;
 

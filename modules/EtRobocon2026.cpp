@@ -19,6 +19,7 @@
 #include "RouteFollower.h"
 #include "RouteTypes.h"
 #include "SocketClient.h"
+#include "SystemInfo.h"
 
 namespace {
 
@@ -51,6 +52,8 @@ namespace {
 
   /**
    * @brief Lコース座標を現在コース用へ変換
+   * @param point Lコース座標
+   * @return 現在コース用へ変換した座標
    */
   Point convertPoint(const Point& point)
   {
@@ -63,6 +66,8 @@ namespace {
 
   /**
    * @brief Lコース方向を現在コース用へ変換
+   * @param direction Lコース方向
+   * @return 現在コース用へ変換した方向
    */
   Direction convertDirection(Direction direction)
   {
@@ -75,6 +80,8 @@ namespace {
 
   /**
    * @brief Directionを文字列へ変換
+   * @param direction 変換する方向
+   * @return Directionを表す文字列
    */
   const char* directionToString(Direction direction)
   {
@@ -97,6 +104,8 @@ namespace {
 
   /**
    * @brief GoalColorを文字列へ変換
+   * @param color 変換するゲート色
+   * @return GoalColorを表す文字列
    */
   const char* colorToString(GoalColor color)
   {
@@ -112,6 +121,59 @@ namespace {
     }
 
     return "UNKNOWN";
+  }
+
+  /**
+   * @brief 外周ゲートか判定する
+   * @param gate 判定するゲート
+   * @return true 外周ゲート
+   * @return false 内側ゲート
+   */
+  bool isOuterGate(const Gate& gate)
+  {
+    // 横向きゲート
+    if(gate.start.y == gate.end.y) {
+      const int gateY = gate.start.y;
+
+      /*
+       * 走行可能なグリッド座標は偶数で、
+       * ゲートはその間の奇数座標に存在するため、
+       * 外周ゲートは1または最大値-1になる。
+       */
+      return gateY == 1 || gateY == SystemInfo::Y_GRID_NUM - 1;
+    }
+
+    // 縦向きゲート
+    if(gate.start.x == gate.end.x) {
+      const int gateX = gate.start.x;
+
+      /*
+       * 走行可能なグリッド座標は偶数で、
+       * ゲートはその間の奇数座標に存在するため、
+       * 外周ゲートは1または最大値-1になる。
+       */
+      return gateX == 1 || gateX == SystemInfo::X_GRID_NUM - 1;
+    }
+
+    return false;
+  }
+
+  /**
+   * @brief 指定した色のゲートを取得する
+   * @param mapData マップ情報
+   * @param color 取得するゲート色
+   * @return 指定色のゲートへのポインタ
+   * @return nullptr 指定色のゲートが存在しない場合
+   */
+  const Gate* findGate(const MapData& mapData, GoalColor color)
+  {
+    for(const Gate& gate : mapData.getGates()) {
+      if(gate.color == color) {
+        return &gate;
+      }
+    }
+
+    return nullptr;
   }
 
 }  // namespace
@@ -178,6 +240,11 @@ void EtRobocon2026::start()
 
   Direction currentDirection = convertDirection(Direction::LEFT);
 
+  Logger::printfLog(Logger::INFO,
+                    "Start grid: "
+                    "(%d,%d) %s",
+                    currentGridX, currentGridY, directionToString(currentDirection));
+
   // =========================================================
   // 6. ゲート順
   // =========================================================
@@ -189,33 +256,33 @@ void EtRobocon2026::start()
   // =========================================================
 
   /**
-   * 通常回頭用PID
+   * @brief 通常回頭用PID
    *
-   * 90度回頭などに使用。
+   * 90度回頭などに使用する。
    */
-  const Pid::PidGain rotationPid = {1.4,0.0,0.1};
+  const Pid::PidGain rotationPid = { 1.4, 0.0, 0.1 };
 
   /**
-   * 正方形補正回頭用PID
+   * @brief 正方形補正回頭用PID
    *
    * QR①への微調整、
    * QR①後の-α、
    * QR②への微調整に使用する。
    */
-  const Pid::PidGain squareRotationPid = {4.9,0.0,0.12 };
+  const Pid::PidGain squareRotationPid = { 4.9, 0.0, 0.12 };
 
   /**
-   * 右モータ速度PID
+   * @brief 右モータ速度PID
    */
-  const Pid::PidGain rightPid = { 0.014849,0.004863,0.0015 };
+  const Pid::PidGain rightPid = { 0.014849, 0.004863, 0.0015 };
 
   /**
-   * 左モータ速度PID
+   * @brief 左モータ速度PID
    */
-  const Pid::PidGain leftPid = { 0.01574,0.0045,0.0015 };
+  const Pid::PidGain leftPid = { 0.01574, 0.0045, 0.0015 };
 
   /**
-   * 直進角度PID
+   * @brief 直進角度PID
    */
   const Pid::PidGain straightAnglePid = { 0.033, 0.003, 0.03 };
 
@@ -250,6 +317,11 @@ void EtRobocon2026::start()
     for(const GoalColor targetColor : TARGET_COLORS) {
       Logger::printfLog(Logger::INFO, "Lap %d Target=%s", lap, colorToString(targetColor));
 
+      Logger::printfLog(Logger::INFO,
+                        "Current grid: "
+                        "(%d,%d) %s",
+                        currentGridX, currentGridY, directionToString(currentDirection));
+
       // ===================================================
       // 経路探索
       // ===================================================
@@ -269,6 +341,40 @@ void EtRobocon2026::start()
         return;
       }
 
+      Logger::printfLog(Logger::INFO,
+                        "Gate entrance: "
+                        "(%d,%d)",
+                        routeResult.entrance.x, routeResult.entrance.y);
+
+      Logger::printfLog(Logger::INFO,
+                        "Gate exit: "
+                        "(%d,%d)",
+                        routeResult.exit.x, routeResult.exit.y);
+
+      Logger::printfLog(Logger::INFO, "Gate direction: %s",
+                        directionToString(routeResult.exitDirection));
+
+      // ===================================================
+      // 対象ゲート取得
+      // ===================================================
+
+      const Gate* targetGate = findGate(mapData, targetColor);
+
+      if(targetGate == nullptr) {
+        Logger::printfLog(Logger::ERROR,
+                          "EtRobocon2026: "
+                          "%s gate not found",
+                          colorToString(targetColor));
+
+        robot.getWheelMotorControllerInstance().stopBoth();
+
+        return;
+      }
+
+      const bool outerGate = isOuterGate(*targetGate);
+
+      Logger::printfLog(Logger::INFO, "Target gate type: %s", outerGate ? "OUTER" : "INNER");
+
       // ===================================================
       // 走行
       // ===================================================
@@ -279,17 +385,62 @@ void EtRobocon2026::start()
       // 現在状態更新
       // ===================================================
 
-      currentGridX = routeResult.exit.x;
+      if(outerGate) {
+        /*
+         * 外周ゲートでは、
+         *
+         * QR①補正
+         *     ↓
+         * QR①位置から400mm前進
+         *     ↓
+         * ゲート通過
+         *     ↓
+         * 400mm後退
+         *     ↓
+         * QR①位置
+         *
+         * という動作を行う。
+         *
+         * そのため次回探索では、
+         * ゲート通過前のentranceを
+         * 現在位置として使用する。
+         */
+        currentGridX = routeResult.entrance.x;
 
-      currentGridY = routeResult.exit.y;
+        currentGridY = routeResult.entrance.y;
 
-      currentDirection = routeResult.exitDirection;
+        /*
+         * 後退時は回頭を行わないため、
+         * ロボットが向いている方向は
+         * ゲート通過時の方向を維持する。
+         */
+        currentDirection = routeResult.exitDirection;
 
-      Logger::printfLog(Logger::INFO,
-                        "%s gate passed: "
-                        "(%d,%d) %s",
-                        colorToString(targetColor), currentGridX, currentGridY,
-                        directionToString(currentDirection));
+        Logger::printfLog(Logger::INFO,
+                          "%s outer gate passed and returned: "
+                          "(%d,%d) %s",
+                          colorToString(targetColor), currentGridX, currentGridY,
+                          directionToString(currentDirection));
+      }
+
+      else {
+        /*
+         * 内側ゲートでは通常通り
+         * ゲート通過後のexitを
+         * 次回探索開始位置として使用する。
+         */
+        currentGridX = routeResult.exit.x;
+
+        currentGridY = routeResult.exit.y;
+
+        currentDirection = routeResult.exitDirection;
+
+        Logger::printfLog(Logger::INFO,
+                          "%s gate passed: "
+                          "(%d,%d) %s",
+                          colorToString(targetColor), currentGridX, currentGridY,
+                          directionToString(currentDirection));
+      }
 
       // ===================================================
       // YELLOW通過後のみ時間確認

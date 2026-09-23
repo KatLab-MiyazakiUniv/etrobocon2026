@@ -34,6 +34,11 @@ namespace {
   constexpr double FIRST_DETECTION_TOLERANCE = 10.0;
 
   /**
+   * @brief 外周ゲートでQR①位置から前進する距離[mm]
+   */
+  constexpr double OUTER_GATE_FORWARD_DISTANCE = 400.0;
+
+  /**
    * @brief 動作切り替え待機時間[ms]
    */
   constexpr int MOTION_SWITCH_WAIT = 200;
@@ -272,6 +277,35 @@ void RouteFollower::straight(double distance)
                     distance);
 }
 
+void RouteFollower::backward(double distance)
+{
+  if(distance <= 0.0) {
+    return;
+  }
+
+  robot.getWheelMotorControllerInstance().stopBoth();
+
+  ClockUtil::sleep(MOTION_SWITCH_WAIT);
+
+  auto condition = std::make_unique<DistanceCondition>(robot, distance);
+
+  // 目標速度を負にすることで後退する。
+  Straight straightMotion(robot, std::move(condition), -std::abs(targetSpeed), rightPid, leftPid,
+                          straightAnglePid, true, straightDeadbandRate, straightMaxoutRate);
+
+  Logger::printfLog(Logger::INFO,
+                    "RouteFollower: "
+                    "後退開始 %.2f mm",
+                    distance);
+
+  straightMotion.run();
+
+  Logger::printfLog(Logger::INFO,
+                    "RouteFollower: "
+                    "後退完了 %.2f mm",
+                    distance);
+}
+
 bool RouteFollower::detectSquare(SquareAngleAdjustment::Result& result)
 {
   Logger::info("RouteFollower: "
@@ -334,24 +368,211 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
     return;
   }
 
+  // =========================================================
+  // 外周ゲート
+  // =========================================================
+
   if(isOuterGate(*gate)) {
-    Logger::info("RouteFollower: 外側ゲート");
+    Logger::info("RouteFollower: 外周ゲート");
 
-    straight(distance);
+    // ゲート中心までの距離
+    const double distanceToGate = calculateDistanceToGate(from, *gate);
 
+    Logger::printfLog(Logger::INFO,
+                      "RouteFollower: "
+                      "外周ゲートまでの距離=%.2f mm",
+                      distanceToGate);
+
+    if(distanceToGate < 0.0 || distanceToGate > distance) {
+      Logger::warning("RouteFollower: "
+                      "外周ゲート位置が不正です");
+
+      straight(distance);
+
+      return;
+    }
+
+    // QR①の位置
+    double distanceToQr1 = distanceToGate - QR_TO_GATE_DISTANCE;
+
+    if(distanceToQr1 < 0.0) {
+      distanceToQr1 = 0.0;
+    }
+
+    // QR①の250mm手前で検出する。
+    const double distanceToFirstDetection = distanceToQr1 - SQUARE_DETECTION_DISTANCE;
+
+    // QR①補正スキップ判定
+    const bool skipFirstCorrection = distanceToFirstDetection < -FIRST_DETECTION_TOLERANCE;
+
+    Logger::printfLog(Logger::INFO,
+                      "RouteFollower: "
+                      "外周ゲート "
+                      "区間開始時に回頭=%d "
+                      "最初の検出までの距離=%.2f "
+                      "許容誤差=%.2f "
+                      "最初の補正をスキップ=%d",
+                      rotatedAtSegmentStart ? 1 : 0, distanceToFirstDetection,
+                      FIRST_DETECTION_TOLERANCE, skipFirstCorrection ? 1 : 0);
+
+    // =========================================================
+    // 外周ゲート QR①補正
+    // =========================================================
+
+    if(!skipFirstCorrection) {
+      double firstMoveDistance = distanceToFirstDetection;
+
+      // 少し通り過ぎているだけなら、
+      // 後退せずその場でQR①を検出する。
+      if(firstMoveDistance < 0.0) {
+        Logger::printfLog(Logger::INFO,
+                          "RouteFollower: "
+                          "QR①検出予定位置を %.2f mm "
+                          "通過していますが"
+                          "許容範囲内なのでその場で検出します",
+                          -firstMoveDistance);
+
+        firstMoveDistance = 0.0;
+      }
+
+      Logger::printfLog(Logger::INFO,
+                        "RouteFollower: "
+                        "外周ゲート "
+                        "QR①検出位置まで移動 %.2f mm",
+                        firstMoveDistance);
+
+      straight(firstMoveDistance);
+
+      // QR①検出
+      Logger::info("RouteFollower: "
+                   "外周ゲート QR①");
+
+      SquareAngleAdjustment::Result firstResult{};
+
+      const bool firstDetected = detectSquare(firstResult);
+
+      // QR①検出成功
+      if(firstDetected) {
+        const double firstAngle = firstResult.correctionAngle;
+
+        Logger::printfLog(Logger::INFO,
+                          "RouteFollower: "
+                          "外周ゲート "
+                          "QR①補正角度=%.2f 度",
+                          firstAngle);
+
+        // QR①方向へ回頭
+        rotateForSquare(firstAngle);
+
+        Logger::printfLog(Logger::INFO,
+                          "RouteFollower: "
+                          "外周ゲート "
+                          "QR①まで移動 %.2f mm",
+                          firstResult.straightDistance);
+
+        // QR①まで進む
+        straight(firstResult.straightDistance);
+
+        Logger::printfLog(Logger::INFO,
+                          "RouteFollower: "
+                          "外周ゲート "
+                          "QR①補正角度を戻す %.2f 度",
+                          -firstAngle);
+
+        // 元の進行方向へ戻す
+        rotateForSquare(-firstAngle);
+      }
+
+      // QR①検出失敗
+      else {
+        Logger::warning("RouteFollower: "
+                        "外周ゲート "
+                        "QR①の検出に失敗しました "
+                        "→ 250mm直進");
+
+        // QR①の想定位置まで進む
+        straight(SQUARE_DETECTION_DISTANCE);
+      }
+    }
+
+    // =========================================================
+    // QR①補正をスキップする場合
+    // =========================================================
+
+    else {
+      Logger::warning("RouteFollower: "
+                      "外周ゲート "
+                      "QR①補正をスキップ");
+
+      /*
+       * QR①補正を行えない場合でも、
+       * QR①の想定位置まで移動して
+       * そこを外周ゲート走行の基準位置とする。
+       */
+      if(distanceToQr1 > 0.0) {
+        Logger::printfLog(Logger::INFO,
+                          "RouteFollower: "
+                          "外周ゲート "
+                          "QR①想定位置まで移動 %.2f mm",
+                          distanceToQr1);
+
+        straight(distanceToQr1);
+      }
+    }
+
+    // =========================================================
+    // 外周ゲート通過
+    // =========================================================
+
+    Logger::printfLog(Logger::INFO,
+                      "RouteFollower: "
+                      "QR①位置から %.2f mm 前進",
+                      OUTER_GATE_FORWARD_DISTANCE);
+
+    /*
+     * QR①位置から400mm前進する。
+     *
+     * QR①はゲート中央の125mm手前にあるため、
+     * 400mm前進することでゲートを通過する。
+     */
+    straight(OUTER_GATE_FORWARD_DISTANCE);
+
+    Logger::printfLog(Logger::INFO,
+                      "RouteFollower: "
+                      "ゲート通過後 %.2f mm 後退",
+                      OUTER_GATE_FORWARD_DISTANCE);
+
+    /*
+     * 向きを変えずに同じ距離を後退し、
+     * QR①位置まで戻る。
+     */
+    backward(OUTER_GATE_FORWARD_DISTANCE);
+
+    Logger::info("RouteFollower: "
+                 "外周ゲート区間走行完了");
+
+    /*
+     * 外周ゲートではQR②補正を行わないため、
+     * ここで処理を終了する。
+     */
     return;
   }
 
+  // =========================================================
   // 内側ゲート
+  // =========================================================
+
   Logger::info("RouteFollower: 内側ゲート");
 
   /**
+   * @brief この区間ですでに走行した距離[mm]
+   *
    * この値を使用して残り距離を求める。
    */
   double traveledDistance = 0.0;
 
   /**
-   * QR②補正が成功したかどうか。
+   * @brief QR②補正が成功したかどうか
    */
   bool secondCorrectionSucceeded = false;
 
@@ -373,7 +594,7 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
 
     double actualDistance = requestedDistance;
 
-    // 要求距離が区間残距離を超える場合は制限する
+    // 要求距離が区間残距離を超える場合は制限する。
     if(actualDistance > remaining) {
       Logger::printfLog(Logger::WARNING,
                         "RouteFollower: "
@@ -385,7 +606,9 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
     }
 
     straight(actualDistance);
+
     traveledDistance += actualDistance;
+
     Logger::printfLog(Logger::INFO,
                       "RouteFollower: "
                       "区間走行済み=%.2f / %.2f mm",
@@ -399,6 +622,7 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
                     "RouteFollower: "
                     "ゲートまでの距離=%.2f mm",
                     distanceToGate);
+
   if(distanceToGate < 0.0 || distanceToGate > distance) {
     Logger::warning("RouteFollower: "
                     "ゲート位置が不正です");
@@ -430,7 +654,10 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
                     rotatedAtSegmentStart ? 1 : 0, distanceToFirstDetection,
                     FIRST_DETECTION_TOLERANCE, skipFirstCorrection ? 1 : 0);
 
+  // =========================================================
   // QR①補正
+  // =========================================================
+
   if(!skipFirstCorrection) {
     double firstMoveDistance = distanceToFirstDetection;
 
@@ -456,6 +683,7 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
 
     // QR①検出
     Logger::info("RouteFollower: QR①");
+
     SquareAngleAdjustment::Result firstResult{};
 
     const bool firstDetected = detectSquare(firstResult);
@@ -489,6 +717,7 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
       rotateForSquare(-firstAngle);
     }
 
+    // QR①検出失敗
     else {
       Logger::warning("RouteFollower: "
                       "QR①の検出に失敗しました "
@@ -502,11 +731,15 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
                  "→ 追加直進をスキップ");
   }
 
+  // =========================================================
+  // QR①補正をスキップする場合
+  // =========================================================
+
   else {
     Logger::warning("RouteFollower: "
                     "QR①補正をスキップ");
 
-    // 区間開始位置からQR②検出位置までの距離を求める
+    // 区間開始位置からQR②検出位置までの距離を求める。
     double distanceToSecondDetection
         = distanceToGate + QR_TO_GATE_DISTANCE - SQUARE_DETECTION_DISTANCE;
 
@@ -524,7 +757,10 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
     }
   }
 
+  // =========================================================
   // QR②補正
+  // =========================================================
+
   Logger::info("RouteFollower: QR②");
 
   SquareAngleAdjustment::Result secondResult{};
@@ -540,7 +776,7 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
                       "QR②補正角度=%.2f 度",
                       secondAngle);
 
-    // QR②方向へ回頭。
+    // QR②方向へ回頭
     rotateForSquare(secondAngle);
 
     Logger::printfLog(Logger::INFO,
@@ -548,23 +784,26 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
                       "QR②まで移動 %.2f mm",
                       secondResult.straightDistance);
 
-    // QR②まで進む。
+    // QR②まで進む
     straightWithinSegment(secondResult.straightDistance);
 
-    // QR②位置まで補正成功
-    // QR②の既知位置から残り距離を計算する
+    /*
+     * QR②位置まで補正できたため、
+     * QR②の既知位置から残り距離を計算する。
+     */
     secondCorrectionSucceeded = true;
 
     Logger::info("RouteFollower: "
                  "QR②補正成功 "
                  "→ 以降はQR②位置を基準に残距離を計算");
-
   }
 
+  // QR②検出失敗
   else {
     Logger::warning("RouteFollower: "
                     "QR②の検出に失敗しました "
                     "→ 回頭なし");
+
     Logger::printfLog(Logger::INFO,
                       "RouteFollower: "
                       "QR②検出失敗時の直進 %.2f mm",
@@ -572,7 +811,11 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
 
     straightWithinSegment(SQUARE_DETECTION_DISTANCE);
   }
+
+  // =========================================================
   // 区間終端まで残りを走行
+  // =========================================================
+
   double remainingDistance = 0.0;
 
   if(secondCorrectionSucceeded) {
@@ -627,12 +870,17 @@ const Gate* RouteFollower::findGate(const RouteState& from, const RouteState& to
     const std::vector<GatePass> passes = robot.getMapData().getGatePasses(gate.color);
 
     for(const GatePass& pass : passes) {
+      // =====================================================
       // Y方向
+      // =====================================================
+
       if(from.x == to.x && pass.entrance.x == from.x && pass.exit.x == from.x) {
         // Y増加
         if(to.y > from.y) {
           const bool entranceInside = pass.entrance.y >= from.y && pass.entrance.y <= to.y;
+
           const bool exitInside = pass.exit.y >= from.y && pass.exit.y <= to.y;
+
           const bool correctDirection = pass.exit.y > pass.entrance.y;
 
           if(entranceInside && exitInside && correctDirection) {
@@ -643,7 +891,9 @@ const Gate* RouteFollower::findGate(const RouteState& from, const RouteState& to
         // Y減少
         if(to.y < from.y) {
           const bool entranceInside = pass.entrance.y <= from.y && pass.entrance.y >= to.y;
+
           const bool exitInside = pass.exit.y <= from.y && pass.exit.y >= to.y;
+
           const bool correctDirection = pass.exit.y < pass.entrance.y;
 
           if(entranceInside && exitInside && correctDirection) {
@@ -652,12 +902,17 @@ const Gate* RouteFollower::findGate(const RouteState& from, const RouteState& to
         }
       }
 
+      // =====================================================
       // X方向
+      // =====================================================
+
       if(from.y == to.y && pass.entrance.y == from.y && pass.exit.y == from.y) {
         // X増加
         if(to.x > from.x) {
           const bool entranceInside = pass.entrance.x >= from.x && pass.entrance.x <= to.x;
+
           const bool exitInside = pass.exit.x >= from.x && pass.exit.x <= to.x;
+
           const bool correctDirection = pass.exit.x > pass.entrance.x;
 
           if(entranceInside && exitInside && correctDirection) {
@@ -690,14 +945,28 @@ bool RouteFollower::isOuterGate(const Gate& gate) const
   if(gate.start.y == gate.end.y) {
     const int gateY = gate.start.y;
 
-    return gateY == 0 || gateY == SystemInfo::Y_GRID_NUM;
+    /*
+     * 上端または下端の外周ゲート。
+     *
+     * 走行可能なグリッド座標は偶数で、
+     * ゲートはその間の奇数座標に存在するため、
+     * 外周ゲートは1または最大値-1になる。
+     */
+    return gateY == 1 || gateY == SystemInfo::Y_GRID_NUM - 1;
   }
 
   // 縦向きゲート
   if(gate.start.x == gate.end.x) {
     const int gateX = gate.start.x;
 
-    return gateX == 0 || gateX == SystemInfo::X_GRID_NUM;
+    /*
+     * 左端または右端の外周ゲート。
+     *
+     * 走行可能なグリッド座標は偶数で、
+     * ゲートはその間の奇数座標に存在するため、
+     * 外周ゲートは1または最大値-1になる。
+     */
+    return gateX == 1 || gateX == SystemInfo::X_GRID_NUM - 1;
   }
 
   return false;
@@ -707,25 +976,42 @@ double RouteFollower::calculateDistanceToGate(const RouteState& from, const Gate
 {
   const EtRallyMap::Node fromNode = map.getNode(from.x, from.y);
 
+  // =========================================================
   // 横向きゲート
+  // =========================================================
+
   if(gate.start.y == gate.end.y) {
     const int centerX = (gate.start.x + gate.end.x) / 2;
     const int gateY = gate.start.y;
+
     const EtRallyMap::Node gateNode = map.getNode(centerX, gateY);
 
+    /*
+     * 横向きゲートはY方向に通過するため、
+     * Y座標差を距離として使用する。
+     */
     return std::abs(gateNode.y - fromNode.y);
   }
 
+  // =========================================================
   // 縦向きゲート
+  // =========================================================
+
   if(gate.start.x == gate.end.x) {
     const int gateX = gate.start.x;
     const int centerY = (gate.start.y + gate.end.y) / 2;
+
     const EtRallyMap::Node gateNode = map.getNode(gateX, centerY);
 
+    /*
+     * 縦向きゲートはX方向に通過するため、
+     * X座標差を距離として使用する。
+     */
     return std::abs(gateNode.x - fromNode.x);
   }
 
-  Logger::error("RouteFollower: ""不正なゲート");
+  Logger::error("RouteFollower: "
+                "不正なゲート");
 
   return -1.0;
 }

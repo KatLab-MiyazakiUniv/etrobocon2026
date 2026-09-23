@@ -7,9 +7,10 @@
 #ifndef ROUTE_FOLLOWER_H
 #define ROUTE_FOLLOWER_H
 
-#include <vector>
 #include <cmath>
 #include <memory>
+#include <vector>
+
 #include "AngleNormalizer.h"
 #include "ClockUtil.h"
 #include "DistanceCondition.h"
@@ -25,6 +26,9 @@
 #include "Straight.h"
 #include "SystemInfo.h"
 
+/**
+ * @brief 経路探索結果に従って走行するクラス
+ */
 class RouteFollower {
  public:
   /**
@@ -37,8 +41,8 @@ class RouteFollower {
    * @param _rightPid 右モーターPID
    * @param _leftPid 左モーターPID
    * @param _straightAnglePid 直進角度PID
-   * @param _straightDeadbandRate 直進デッドバンド
-　 * @param _straightMaxoutRate 直進マックスアウト
+   * @param _straightDeadbandRate 直進デッドバンド率
+   * @param _straightMaxoutRate 直進マックスアウト率
    */
   RouteFollower(Robot& _robot, const EtRallyMap& _map, double _targetSpeed,
                 const Pid::PidGain& _rotationPid, const Pid::PidGain& _squareRotationPid,
@@ -47,7 +51,8 @@ class RouteFollower {
                 double _straightMaxoutRate);
 
   /**
-   * @brief 経路を走行する
+   * @brief 経路探索結果に従って走行する
+   * @param route 走行する経路
    */
   void run(const std::vector<RouteState>& route);
 
@@ -55,8 +60,8 @@ class RouteFollower {
   Robot& robot;                    // ロボット本体
   const EtRallyMap& map;           // ETラリーのマップ情報
   double targetSpeed;              // 目標走行速度
-  Pid::PidGain rotationPid;        // 回頭用PIDゲイン
-  Pid::PidGain squareRotationPid;  // 正方形補正用回頭PIDゲイン
+  Pid::PidGain rotationPid;        // 通常回頭用PIDゲイン
+  Pid::PidGain squareRotationPid;  // 正方形補正回頭用PIDゲイン
   Pid::PidGain rightPid;           // 右モーター用PIDゲイン
   Pid::PidGain leftPid;            // 左モーター用PIDゲイン
   Pid::PidGain straightAnglePid;   // 直進角度PIDゲイン
@@ -65,68 +70,89 @@ class RouteFollower {
 
   /**
    * @brief Directionを角度へ変換する
+   * @param direction 変換する方向
+   * @return Directionに対応する角度[deg]
    */
   double directionToHeading(Direction direction) const;
 
   /**
-   * @brief 必要な回頭角度を計算する
+   * @brief 2方向間で必要な回頭角度を計算する
+   * @param from 現在方向
+   * @param to 目標方向
+   * @return 必要な回頭角度[deg]
    */
   double calculateRotationAngle(Direction from, Direction to) const;
 
   /**
    * @brief 2地点間の距離を計算する
+   * @param from 区間開始状態
+   * @param to 区間終了状態
+   * @return 2地点間の距離[mm]
    */
   double calculateDistance(const RouteState& from, const RouteState& to) const;
 
   /**
-   * @brief 通常回頭
+   * @brief 通常回頭を行う
+   * @param angle 回頭角度[deg]
    */
   void rotate(double angle);
 
   /**
-   * @brief 正方形補正用回頭
+   * @brief 正方形補正用の回頭を行う
+   * @param angle 回頭角度[deg]
    */
   void rotateForSquare(double angle);
 
   /**
-   * @brief 直進
+   * @brief 指定距離を直進する
+   * @param distance 直進距離[mm]
    */
   void straight(double distance);
 
   /**
-   * @brief 正方形を検出し補正情報を取得する
+   * @brief 指定距離を後退する
+   * @param distance 後退距離[mm]
+   */
+  void backward(double distance);
+
+  /**
+   * @brief 正方形を検出して補正情報を取得する
+   * @param result 正方形補正結果
+   * @return true 正方形検出成功
+   * @return false 正方形検出失敗
    */
   bool detectSquare(SquareAngleAdjustment::Result& result);
 
   /**
    * @brief ゲートを含む区間を走行する
-   * @param from 区間開始
-   * @param to 区間終了
-   * @param distance 区間距離
-   * @param rotatedAtSegmentStart
-   *        この区間開始時に回頭したか
+   * @param from 区間開始状態
+   * @param to 区間終了状態
+   * @param distance 区間距離[mm]
+   * @param rotatedAtSegmentStart 区間開始時に回頭した場合はtrue
    */
   void runGateSegment(const RouteState& from, const RouteState& to, double distance,
                       bool rotatedAtSegmentStart);
 
   /**
    * @brief 区間に存在するゲートを取得する
-   * @param from 区間の開始位置
-   * @param to 区間の終了位置
-   * @return 区間内に存在するゲートへのポインタ。存在しない場合はnullptr
+   * @param from 区間開始状態
+   * @param to 区間終了状態
+   * @return 区間内に存在するゲートへのポインタ
+   * @return nullptr ゲートが存在しない場合
    */
   const Gate* findGate(const RouteState& from, const RouteState& to) const;
 
   /**
    * @brief 外周ゲートか判定する
    * @param gate 判定するゲート
-   * @return 外周ゲートの場合はtrue、それ以外はfalse
+   * @return true 外周ゲート
+   * @return false 内側ゲート
    */
   bool isOuterGate(const Gate& gate) const;
 
   /**
    * @brief 区間開始位置からゲート中央までの距離を計算する
-   * @param from 区間の開始位置
+   * @param from 区間開始状態
    * @param gate 距離を計算するゲート
    * @return 区間開始位置からゲート中央までの距離[mm]
    */

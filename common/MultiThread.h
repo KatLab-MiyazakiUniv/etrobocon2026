@@ -1,7 +1,7 @@
 /**
  * @file MultiThread.h
  * @brief メンバ関数をマルチスレッドで実行するラッパークラス
- * @author
+ * @author  sadomiya-sousi
  */
 #ifndef MULTI_THREAD_H
 #define MULTI_THREAD_H

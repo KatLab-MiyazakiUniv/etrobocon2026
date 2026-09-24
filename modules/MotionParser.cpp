@@ -548,8 +548,6 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
         }
       }
       request.hsvRangeCount = count;
-      // request.hsvRanges[3]
-      //     = ImageProcessingColor::getHSVRangeFromColor(ImageProcessingColor::BLACK);
 
       request.roi = { fromString<int>(motionParams[8]), fromString<int>(motionParams[9]),
                       fromString<int>(motionParams[10]), fromString<int>(motionParams[11]) };

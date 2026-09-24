@@ -34,8 +34,6 @@ void AreaMaster::run()
   Logger::printfLog(Logger::INFO, "AreaMaster:パス[ %s ]を作成", commandFilePath.c_str());
   // 動作インスタンスのリストを生成する
   motionList = MotionParser::createMotionList(robot, commandFilePath);
-  // // 動作インスタンスのリストを生成する
-  // motionList = MotionParser::createMotionList(robot, commandFilePath);
 
   // 各動作を実行し、動作し終えたらメモリを開放する
   executeMotions(motionList);

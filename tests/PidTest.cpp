@@ -173,7 +173,6 @@ namespace etrobocon2026_test {
      * prePID = 0 + 0 + 1.0 * 800 = 800
      */
     double expected = 800.0;
-
     EXPECT_DOUBLE_EQ(expected, pid.calculatePid(currentValue));
   }
 

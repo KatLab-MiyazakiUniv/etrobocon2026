@@ -17,21 +17,27 @@ static const string CONDITIONS_PATH = "etrobocon2026/datafiles/commands/Conditio
 static void trim(std::string& s)
 {
   size_t start = s.find_first_not_of(" \t");
+
   if(start == std::string::npos) {
     s.clear();
     return;
   }
+
   size_t end = s.find_last_not_of(" \t");
   s = s.substr(start, end - start + 1);
 }
 
-// stringを指定した型に変換する関数(stoi,stodの代わり)
+// stringを指定した型に変換する関数(stoi, stodの代わり)
 template <typename T>
 T fromString(const std::string& s)
 {
   std::istringstream iss(s);
   T val;
-  if(!(iss >> val)) throw std::invalid_argument("conversion failed");
+
+  if(!(iss >> val)) {
+    throw std::invalid_argument("conversion failed");
+  }
+
   return val;
 }
 
@@ -42,6 +48,7 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
 
   // Area CSVを開き、開けなければ空のリストを返す
   ifstream file(commandFilePath);
+
   if(!file) {
     Logger::printfLog(Logger::ERROR, "Areaのコマンドファイルを開けませんでした: %s",
                       commandFilePath.c_str());
@@ -51,15 +58,21 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
   string line;
 
   // ヘッダ行をスキップ
-  if(!getline(file, line)) return motionList;
+  if(!getline(file, line)) {
+    return motionList;
+  }
+
   lineNum++;
 
-  // fileから1行ずつ文字列として line に読み込む
+  // fileから1行ずつ文字列としてlineに読み込む
   while(getline(file, line)) {
     stringstream ss(line);
 
-    // カンマ区切りで (動作コマンド名, 動作ID, 条件コマンド名, 条件ID) を取り出す
+    // カンマ区切りで
+    // (動作コマンド名, 動作ID, 条件コマンド名, 条件ID)
+    // を取り出す
     vector<string> params;
+
     for(string token; getline(ss, token, SEPARATOR);) {
       trim(token);
       params.push_back(move(token));
@@ -79,6 +92,7 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
 
     // 動作パラメータを取得する
     vector<string> motionParams = extractParamsFromID(MOTIONS_PATH + motionName + ".csv", motionId);
+
     if(motionParams.empty()) {
       Logger::printfLog(Logger::ERROR, "Motions: %s ID=%s が見つかりませんでした",
                         motionName.c_str(), motionId.c_str());
@@ -89,14 +103,17 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
     // 条件パラメータを取得する
     vector<string> conditionParams
         = extractParamsFromID(CONDITIONS_PATH + conditionName + ".csv", conditionId);
+
     if(conditionParams.empty()) {
       Logger::printfLog(Logger::ERROR, "Conditions: %s ID=%s が見つかりませんでした",
                         conditionName.c_str(), conditionId.c_str());
       lineNum++;
       continue;
     }
+
     // 条件インスタンスを生成する
     auto condition = createConditionInstance(robot, conditionParams);
+
     if(!condition) {
       Logger::printfLog(Logger::ERROR, "条件インスタンスの生成に失敗しました: %s %s",
                         conditionName.c_str(), conditionId.c_str());
@@ -106,8 +123,10 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
 
     // 動作インスタンスを生成してリストに追加する
     BaseMotion* motion = createMotionInstance(robot, motionParams, std::move(condition));
+
     if(motion) {
       motionList.push_back(motion);
+
       Logger::printfLog(Logger::INFO, "[MotionParser] motionList[%zu]: %s ID=%s (条件: %s ID=%s)",
                         motionList.size() - 1, motionName.c_str(), motionId.c_str(),
                         conditionName.c_str(), conditionId.c_str());
@@ -130,6 +149,7 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
 vector<string> MotionParser::extractParamsFromID(const string& filePath, const string& id)
 {
   ifstream file(filePath);
+
   if(!file) {
     Logger::printfLog(Logger::ERROR, "ファイルを開けませんでした: %s", filePath.c_str());
     return {};
@@ -142,19 +162,23 @@ vector<string> MotionParser::extractParamsFromID(const string& filePath, const s
 
   string line;
   vector<string> result;
+
   while(getline(file, line)) {
     stringstream ss(line);
     vector<string> row;
+
     for(string token; getline(ss, token, SEPARATOR);) {
       trim(token);
       row.push_back(move(token));
     }
+
     if(row.size() >= 2 && row[1] == id) {
       if(!result.empty()) {
         Logger::printfLog(Logger::ERROR, "%s に ID=%s が重複しています", filePath.c_str(),
                           id.c_str());
         return {};
       }
+
       result = move(row);
     }
   }
@@ -167,6 +191,7 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
 {
   if(params.empty()) return nullptr;
   CONDITION_COMMAND cond = convertCondition(params[0]);
+
   switch(cond) {
     case CONDITION_COMMAND::PROJECTED_DISTANCE: {
       if(!mileage || params.size() != 4 || (params[2] != "X" && params[2] != "Y")) {
@@ -185,7 +210,21 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
       return make_unique<ProjectedDistanceCondition>(robot, mileage, axis, target);
     }
     case CONDITION_COMMAND::DISTANCE: {
+      /**
+       * Distance.csv
+       *
+       * params[0] = "Distance"
+       * params[1] = ID
+       * params[2] = targetDistance
+       */
+
+      if(params.size() < 3) {
+        Logger::printfLog(Logger::ERROR, "[MotionParser] Distanceのパラメータ数が不足しています");
+        return nullptr;
+      }
+
       double targetDistance = fromString<double>(params[2]);
+
       return make_unique<DistanceCondition>(robot, targetDistance);
     }
     case CONDITION_COMMAND::ABSOLUTE_ANGLE: {
@@ -313,6 +352,7 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Condition %s は未実装です",
                         params[0].c_str());
+
       return nullptr;
   }
 }
@@ -321,8 +361,13 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                                                unique_ptr<BaseContinuationCondition> condition,
                                                shared_ptr<ProjectedMileage> sharedMileage)
 {
-  // TODO: 各動作クラスが完成したら、以下のコメントを外してswitch-caseを実装する
+  if(motionParams.empty()) {
+    Logger::printfLog(Logger::ERROR, "[MotionParser] 動作パラメータが空です");
+    return nullptr;
+  }
+
   MOTION_COMMAND command = convertCommand(motionParams[0]);
+
   switch(command) {
     case MOTION_COMMAND::ET_ZUMO_FINISH: {
       // 2列目以降は動作名・動作ID・条件名・条件IDの組。
@@ -454,24 +499,41 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       return new ETZumoExit(robot, std::move(condition), mileage, std::move(motions));
     }
     case MOTION_COMMAND::STRAIGHT: {
-      // Straight: motionParams[2]=speed(double)
-      //           motionParams[9..11]=anglePid(kp,ki,kd)
-      //           motionParams[12]=useIMU(string: "true"/"false")
+      if(motionParams.size() < 9) {
+        Logger::printfLog(Logger::ERROR, "[MotionParser] Straightのパラメータ数が不足しています");
+        return nullptr;
+      }
+
+      Pid::PidGain anglePid{ fromString<double>(motionParams[3]),
+                             fromString<double>(motionParams[4]),
+                             fromString<double>(motionParams[5]) };
+
+      bool shouldUseIMU = motionParams[6] == "true";
+
+      double deadbandRate = fromString<double>(motionParams[7]);
+      double maxoutRate = fromString<double>(motionParams[8]);
+
       return new Straight(robot, std::move(condition), fromString<double>(motionParams[2]),
-                          Pid::PidGain{ fromString<double>(motionParams[3]),
-                                        fromString<double>(motionParams[4]),
-                                        fromString<double>(motionParams[5]) },
-                          motionParams[6] == "true");
+                          anglePid, shouldUseIMU, deadbandRate, maxoutRate);
     }
     case MOTION_COMMAND::LINETRACE: {
-      // LineTrace: motionParams[2]=speed(double)
-      //           motionParams[3]=brightness(int)
-      //           motionParams[4..6]=brightnessPid(kp,ki,kd)
+      if(motionParams.size() < 9) {
+        Logger::printfLog(Logger::ERROR, "[MotionParser] LineTraceのパラメータ数が不足しています");
+        return nullptr;
+      }
+
+      int calibratedBrightness = robot.getTargetBrightness();
+
+      int targetBrightness
+          = std::clamp(calibratedBrightness + fromString<int>(motionParams[3]), 0, 100);
+
+      Pid::PidGain brightnessPid{ fromString<double>(motionParams[4]),
+                                  fromString<double>(motionParams[5]),
+                                  fromString<double>(motionParams[6]) };
+
       return new LineTrace(robot, std::move(condition), fromString<double>(motionParams[2]),
-                           fromString<int>(motionParams[3]),
-                           Pid::PidGain{ fromString<double>(motionParams[4]),
-                                         fromString<double>(motionParams[5]),
-                                         fromString<double>(motionParams[6]) });
+                           targetBrightness, brightnessPid, fromString<double>(motionParams[7]),
+                           fromString<double>(motionParams[8]));
     }
 
     case MOTION_COMMAND::CAMERA_TRACKING: {
@@ -571,143 +633,178 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       qrRequest.roi.height = fromString<int32_t>(motionParams[7]);
       return new GatePositionDetection(robot, motionParams[2], fromString<bool>(motionParams[3]),
                                        qrRequest, std::move(condition));
+      case MOTION_COMMAND::SNAPSHOT: {
+        return new Snapshot(robot, "snapshot", std::move(condition));
+      }
+      default:
+        Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
+                          motionParams[0].c_str());
+
+        return nullptr;
     }
-    default:
-      Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
-                        motionParams[0].c_str());
-      return nullptr;
   }
-}
 
-MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
-{
-  // コマンド文字列(string)と、それに対応する列挙型MOTION_COMMANDのマッピングを定義
-  static const unordered_map<string, MOTION_COMMAND> commandMap
-      = { { "Straight", MOTION_COMMAND::STRAIGHT },
-          { "LineTrace", MOTION_COMMAND::LINETRACE },
-          { "AbsoluteRotation", MOTION_COMMAND::ABSOLUTE_ROTATION },
-          { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
-          { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING },
-          { "Calibrator", MOTION_COMMAND::CALIBRATOR },
-          { "Snapshot", MOTION_COMMAND::SNAPSHOT },
-          { "ResetAzimuth", MOTION_COMMAND::RESET_AZIMUTH },
-          { "ETZumoExit", MOTION_COMMAND::ET_ZUMO_EXIT },
-          { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH },
-          { "GatePosition", MOTION_COMMAND::GATE_POSITION }
+  MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
+  {
+    // コマンド文字列(string)と、それに対応する列挙型MOTION_COMMANDのマッピングを定義
+    static const unordered_map<string, MOTION_COMMAND> commandMap
+        = { { "Straight", MOTION_COMMAND::STRAIGHT },
+            { "LineTrace", MOTION_COMMAND::LINETRACE },
+            { "AbsoluteRotation", MOTION_COMMAND::ABSOLUTE_ROTATION },
+            { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
+            { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING },
+            { "Calibrator", MOTION_COMMAND::CALIBRATOR },
+            { "Snapshot", MOTION_COMMAND::SNAPSHOT },
+            { "ResetAzimuth", MOTION_COMMAND::RESET_AZIMUTH },
+            { "Snapshot", MOTION_COMMAND::SNAPSHOT },
+            { "ETZumoExit", MOTION_COMMAND::ET_ZUMO_EXIT },
+            { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH },
+            { "GatePosition", MOTION_COMMAND::GATE_POSITION }
 
-        };
+          };
 
-  // コマンド文字列に対応するMOTION_COMMAND値をマップから取得。なければMOTION_COMMAND::NONEを返す
-  auto it = commandMap.find(str);
-  if(it != commandMap.end()) {
-    return it->second;
-  } else {
+    auto it = commandMap.find(str);
+
+    if(it != commandMap.end()) {
+      return it->second;
+    }
+
     return MOTION_COMMAND::NONE;
   }
-}
 
-MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str)
-{
-  // 条件コマンド文字列と、それに対応する列挙型CONDITION_COMMANDのマッピングを定義
-  static const unordered_map<string, CONDITION_COMMAND> conditionMap
-      = { { "Distance", CONDITION_COMMAND::DISTANCE },
-          { "ProjectedDistance", CONDITION_COMMAND::PROJECTED_DISTANCE },
-          { "AbsoluteAngle", CONDITION_COMMAND::ABSOLUTE_ANGLE },
-          { "RelativeAngle", CONDITION_COMMAND::RELATIVE_ANGLE },
-          { "SensorColor", CONDITION_COMMAND::SENSOR_COLOR },
-          { "RunningTime", CONDITION_COMMAND::RUNNING_TIME },
-          { "MotionTime", CONDITION_COMMAND::MOTION_TIME },
-          { "RepeatCount", CONDITION_COMMAND::REPEAT_COUNT },
-          { "DistanceAndColor", CONDITION_COMMAND::DISTANCE_AND_COLOR },
-          { "DistanceOrColor", CONDITION_COMMAND::DISTANCE_OR_COLOR },
-          { "DistanceOrUltraSonic", CONDITION_COMMAND::DISTANCE_OR_ULTRA_SONIC },
-          { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC },
-          { "ColorOrColor", CONDITION_COMMAND::COLOR_OR_COLOR }
+  MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str)
+  {
+    // 条件コマンド文字列と、それに対応する列挙型CONDITION_COMMANDのマッピングを定義
+    static const unordered_map<string, CONDITION_COMMAND> conditionMap
+        = { { "Distance", CONDITION_COMMAND::DISTANCE },
+            { "ProjectedDistance", CONDITION_COMMAND::PROJECTED_DISTANCE },
+            { "AbsoluteAngle", CONDITION_COMMAND::ABSOLUTE_ANGLE },
+            { "RelativeAngle", CONDITION_COMMAND::RELATIVE_ANGLE },
+            { "SensorColor", CONDITION_COMMAND::SENSOR_COLOR },
+            { "RunningTime", CONDITION_COMMAND::RUNNING_TIME },
+            { "MotionTime", CONDITION_COMMAND::MOTION_TIME },
+            { "RepeatCount", CONDITION_COMMAND::REPEAT_COUNT },
+            { "DistanceAndColor", CONDITION_COMMAND::DISTANCE_AND_COLOR },
+            { "DistanceOrColor", CONDITION_COMMAND::DISTANCE_OR_COLOR },
+            { "DistanceOrUltraSonic", CONDITION_COMMAND::DISTANCE_OR_ULTRA_SONIC },
+            { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC },
+            { "ColorOrColor", CONDITION_COMMAND::COLOR_OR_COLOR }
 
-        };
+          };
 
-  // 条件コマンド文字列に対応するCONDITION_COMMAND値をマップから取得。なければCONDITION_COMMAND::NONEを返す
-  auto it = conditionMap.find(str);
-  if(it != conditionMap.end()) {
-    return it->second;
-  } else {
+    auto it = conditionMap.find(str);
+
+    if(it != conditionMap.end()) {
+      return it->second;
+    }
+
     return CONDITION_COMMAND::NONE;
   }
-}
 
-// bool MotionParser::convertBool(const string& command, const string& stringParameter)
-// {
-//   // 末尾の改行を削除
-//   string param = StringOperator::removeEOL(stringParameter);
+  // bool MotionParser::convertBool(
+  //     const string& command,
+  //     const string& stringParameter)
+  // {
+  //   // 末尾の改行を削除
+  //   string param = StringOperator::removeEOL(stringParameter);
 
-//   // カメラPIDトラッキング系の停止制御（continueなら継続、stopなら停止）
-//   if(command == "DCL" || command == "CDCL" || command == "UDCL" || command == "DTCCL"
-//      || command == "CDTCCL") {
-//     if(param == "continue") {
-//       return false;
-//     } else if(param == "stop") {
-//       return true;
-//     } else {
-//       cout << "'continue' か 'stop'を入力してください" << endl;
-//       return true;
-//     }
-//   }
+  //   // カメラPIDトラッキング系の停止制御
+  //   // continueなら継続、stopなら停止
+  //   if(command == "DCL"
+  //      || command == "CDCL"
+  //      || command == "UDCL"
+  //      || command == "DTCCL"
+  //      || command == "CDTCCL") {
+  //
+  //     if(param == "continue") {
+  //       return false;
+  //     } else if(param == "stop") {
+  //       return true;
+  //     } else {
+  //       cout << "'continue' か 'stop'を入力してください"
+  //            << endl;
+  //
+  //       return true;
+  //     }
+  //   }
 
-//   //
-//   回転動作(AR,IMUR,MCA,BCA)の場合、"clockwise"ならtrue（時計回り）、"anticlockwise"ならfalse（反時計回り）に変換
-//   if(command == "AR" || command == "IMUR" || command == "MCA" || command == "BCA"
-//      || command == "CRA") {
-//     if(param == "clockwise") {
-//       return true;
-//     } else if(param == "anticlockwise") {
-//       return false;
-//     } else {
-//       cout << "'clockwise' か 'anticlockwise'を入力してください" << endl;
-//       return true;
-//     }
-//   }
+  //   // 回転動作の場合
+  //   // clockwiseなら時計回り
+  //   // anticlockwiseなら反時計回り
+  //   if(command == "AR"
+  //      || command == "IMUR"
+  //      || command == "MCA"
+  //      || command == "BCA"
+  //      || command == "CRA") {
+  //
+  //     if(param == "clockwise") {
+  //       return true;
+  //     } else if(param == "anticlockwise") {
+  //       return false;
+  //     } else {
+  //       cout << "'clockwise' か 'anticlockwise'を入力してください"
+  //            << endl;
+  //
+  //       return true;
+  //     }
+  //   }
 
-//   // エッジ切り替え(EC)の場合、"left"ならtrue（左エッジ）、"right"ならfalse（右エッジ)に変換
-//   if(command == "EC") {
-//     if(param == "left") {
-//       return true;
-//     } else if(param == "right") {
-//       return false;
-//     } else {
-//       cout << "'left' か 'right'を入力してください" << endl;
-//       return true;
-//     }
-//   }
+  //   // エッジ切り替え
+  //   if(command == "EC") {
+  //
+  //     if(param == "left") {
+  //       return true;
+  //     } else if(param == "right") {
+  //       return false;
+  //     } else {
+  //       cout << "'left' か 'right'を入力してください"
+  //            << endl;
+  //
+  //       return true;
+  //     }
+  //   }
 
-//   // IMU設定(IS)の場合、"start"ならtrue（開始）、"stop"ならfalse（停止)に変換
-//   if(command == "IS") {
-//     if(param == "start") {
-//       return true;
-//     } else if(param == "stop") {
-//       return false;
-//     } else {
-//       cout << "'start' か 'stop'を入力してください" << endl;
-//       return false;
-//     }
-//   }
+  //   // IMU設定
+  //   if(command == "IS") {
+  //
+  //     if(param == "start") {
+  //       return true;
+  //     } else if(param == "stop") {
+  //       return false;
+  //     } else {
+  //       cout << "'start' か 'stop'を入力してください"
+  //            << endl;
+  //
+  //       return false;
+  //     }
+  //   }
 
-//   // ここまでに条件を満たしていなかった場合は、デフォルト値としてtrueを返す
-//   cout << "convertBool関数の処理の対象外です: '" << command << endl;
-//   return true;
-// }
+  //   cout << "convertBool関数の処理の対象外です: '"
+  //        << command
+  //        << endl;
+  //
+  //   return true;
+  // }
 
-// bool MotionParser::convertRotationModeToBool(const string& stringParameter)
-// {
-//   // 末尾の改行を削除
-//   string param = StringOperator::removeEOL(stringParameter);
+  // bool MotionParser::convertRotationModeToBool(
+  //     const string& stringParameter)
+  // {
+  //   string param
+  //       = StringOperator::removeEOL(stringParameter);
 
-//   // "relative"ならfalse（相対角度回頭）、"absolute"ならtrue（絶対角度回頭）に変換
-//   if(param == "relative") {
-//     return false;
-//   } else if(param == "absolute") {
-//     return true;
-//   } else {
-//     cout << "'relative' か 'absolute'を入力してください (入力値: " << param << ")" << endl;
-//     return false;  // デフォルトは相対角度回頭
-//   }
-// }
+  //   // relativeなら相対角度
+  //   // absoluteなら絶対角度
+  //   if(param == "relative") {
+  //     return false;
+  //   } else if(param == "absolute") {
+  //     return true;
+  //   } else {
+  //     cout
+  //         << "'relative' か 'absolute'を入力してください (入力値: "
+  //         << param
+  //         << ")"
+  //         << endl;
+  //
+  //     return false;
+  //   }
+  // }

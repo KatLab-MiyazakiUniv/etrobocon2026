@@ -32,6 +32,7 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "CameraTracking.h"
 #include "Calibrator.h"
 #include "ResetAzimuth.h"
+#include "Snapshot.h"
 #include "ETZumoExit.h"
 #include "ETZumoFinish.h"
 #include "ProjectedDistanceCondition.h"
@@ -53,6 +54,7 @@ class MotionParser {
     CALIBRATOR,
     SNAPSHOT,
     RESET_AZIMUTH,
+    SNAPSHOT,
     ET_ZUMO_EXIT,
     ET_ZUMO_FINISH,
     GATE_POSITION,

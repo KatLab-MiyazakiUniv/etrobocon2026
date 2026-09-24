@@ -30,6 +30,7 @@ void LineTrace::prepare()
   edgeSign = (robot.getEdge() == Edge::LeftEdge) ? -1 : 1;
 
   brightnessPid.prepare();
+  speedCalculator.prepare();
 }
 
 void LineTrace::executeStep()

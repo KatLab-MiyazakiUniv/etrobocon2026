@@ -40,6 +40,7 @@ void Straight::prepare()
   }
 
   anglePid.prepare();
+  speedCalculator.prepare();
 }
 
 void Straight::executeStep()

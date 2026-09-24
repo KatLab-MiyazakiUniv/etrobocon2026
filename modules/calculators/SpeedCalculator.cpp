@@ -19,15 +19,32 @@ SpeedCalculator::SpeedCalculator(Robot& _robot, const Pid::PidGain& _rightPid,
   : targetSpeed(_targetSpeed),
     rightPid(_rightPid.kp, _rightPid.ki, _rightPid.kd, _targetSpeed),
     leftPid(_leftPid.kp, _leftPid.ki, _leftPid.kd, _targetSpeed),
+    rightMotorPower(0.0),
+    leftMotorPower(0.0),
+    isInitialized(false),
     robot(_robot)
-
 {
+}
+
+void SpeedCalculator::prepare()
+{
+  rightPid.prepare();
+  leftPid.prepare();
+
+  // モータの現在のパワーの平均値をベース初期値とする（左右偏差をリセット）
+  double avgPower = (robot.getWheelMotorControllerInstance().getRightPower()
+                     + robot.getWheelMotorControllerInstance().getLeftPower())
+                    / 2.0;
+  rightMotorPower = avgPower;
+  leftMotorPower = avgPower;
+  isInitialized = true;
 }
 
 double SpeedCalculator::calculateRightMotorPower()
 {
-  rightMotorPower
-      = robot.getWheelMotorControllerInstance().getRightPower();  // rightMotorPowerの初期化
+  if(!isInitialized) {
+    prepare();
+  }
   // 右タイヤの走行速度を算出
   double currentRightSpeed = robot.getWheelMotorControllerInstance().getRightSpeed();
   // 走行速度に相当する右タイヤのPower値を算出
@@ -38,8 +55,9 @@ double SpeedCalculator::calculateRightMotorPower()
 
 double SpeedCalculator::calculateLeftMotorPower()
 {
-  leftMotorPower
-      = robot.getWheelMotorControllerInstance().getLeftPower();  // leftMotorPowerの初期化
+  if(!isInitialized) {
+    prepare();
+  }
   // 左タイヤの走行速度を算出
   double currentLeftSpeed = robot.getWheelMotorControllerInstance().getLeftSpeed();
   // 走行速度に相当する左タイヤのPower値を算出

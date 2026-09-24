@@ -53,7 +53,7 @@ class ProjectedDistanceCondition : public BaseContinuationCondition {
   bool shouldContinue() override;
 
  private:
-  std::shared_ptr<ProjectedMileage> mileage;         // 共通座標の距離計測インスタンス
+  std::shared_ptr<ProjectedMileage> mileage;  // 共通座標の距離計測インスタンス
   std::unique_ptr<BaseContinuationCondition> child;  // 動作の継続を判定する子条件
   Axis axis = Axis::HORIZONTAL;                      // 判定に使用する軸
   double target = 0.0;                               // 符号付きの目標座標(mm)

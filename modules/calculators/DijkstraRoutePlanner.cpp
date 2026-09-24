@@ -22,6 +22,7 @@ namespace {
 
   /**
    * @brief ゲート付近で回頭した場合の追加コスト
+   *
    * ゲート足付近での通常の回頭を
    * 少し避けるためのペナルティ
    */
@@ -29,8 +30,10 @@ namespace {
 
   /**
    * @brief ゲート直前でゲート方向へ回頭する場合の追加コスト
+   *
    * QR①付近まで別方向から進み、
    * ゲート直前で回頭する経路を強く避ける。
+   *
    * 通行禁止にはしないため、
    * 他に経路が存在しない場合は
    * この経路を選択することができる。
@@ -39,6 +42,7 @@ namespace {
 
   /**
    * @brief ゲート直前と判定する距離[マス]
+   *
    * ゲートまで1マス以内でゲート方向へ回頭すると、
    * QR①の助走距離が足りなくなる可能性があるため
    * ペナルティを与える。
@@ -303,6 +307,19 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
         continue;
       }
 
+      /*
+       * 回頭時にロボット後部がゲート足へ
+       * 接触する可能性がある場合は、
+       * その回頭を含む経路を使用しない。
+       *
+       * 外周上の座標も判定対象とする。
+       */
+      if(current.direction != nextDirection
+         && isTurnBlockedByGatePost(
+             current.x, current.y, current.direction, nextDirection)) {
+        continue;
+      }
+
       // ゲートを横切る移動は禁止
       if(isBlockedMove(current.x, current.y, nextX, nextY)) {
         continue;
@@ -350,23 +367,30 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
       continue;
     }
 
-    int finalTurnCost = calculateTurnCost(arrivalDirection, goalDirection);
-
-    // ゴール位置で最終回頭するときの接触判定
-    if(arrivalDirection != goalDirection && !isOuterArea(goal.x, goal.y)
-       && isTurnBlockedByGatePost(goal.x, goal.y, arrivalDirection, goalDirection)) {
-      finalTurnCost = NEAR_GATE_TURN_COST;
+    /*
+     * ゴール地点で最終回頭するときに、
+     * ロボット後部がゲート足へ接触する場合は、
+     * その到着方向を候補から除外する。
+     *
+     * 外周上のゴール地点も判定対象とする。
+     */
+    if(arrivalDirection != goalDirection
+       && isTurnBlockedByGatePost(
+           goal.x, goal.y, arrivalDirection, goalDirection)) {
+      continue;
     }
 
-    // ゴール位置がゲート付近の場合
-    if(arrivalDirection != goalDirection && !isOuterArea(goal.x, goal.y)
-       && isNearGatePost(goal.x, goal.y)) {
+    int finalTurnCost = calculateTurnCost(arrivalDirection, goalDirection);
+
+    // ゴール位置がゲート足付近の場合
+    if(arrivalDirection != goalDirection && isNearGatePost(goal.x, goal.y)) {
       finalTurnCost += GATE_NEAR_TURN_PENALTY;
     }
 
     // QR①付近でゲート方向へ回頭する場合
     if(arrivalDirection != goalDirection
-       && isTurningTowardGateNearEntrance(gates, goal.x, goal.y, goalDirection)) {
+       && isTurningTowardGateNearEntrance(
+           gates, goal.x, goal.y, goalDirection)) {
       finalTurnCost += GATE_APPROACH_TURN_PENALTY;
     }
 
@@ -427,7 +451,8 @@ int DijkstraRoutePlanner::calculateTurnCost(Direction currentDirection,
   return TURN_180_COST;
 }
 
-int DijkstraRoutePlanner::calculateMoveCost(int currentX, int currentY, Direction currentDirection,
+int DijkstraRoutePlanner::calculateMoveCost(int currentX, int currentY,
+                                            Direction currentDirection,
                                             Direction nextDirection) const
 {
   int turnCost = calculateTurnCost(currentDirection, nextDirection);
@@ -437,27 +462,33 @@ int DijkstraRoutePlanner::calculateMoveCost(int currentX, int currentY, Directio
     return STRAIGHT_COST;
   }
 
-  // 回頭時にロボット後部がゲート足へ接触する可能性がある場合
-  if(!isOuterArea(currentX, currentY)
-     && isTurnBlockedByGatePost(currentX, currentY, currentDirection, nextDirection)) {
-    turnCost = NEAR_GATE_TURN_COST;
-  }
+  /*
+   * ゲート足に接触する回頭はsearch()側で
+   * 経路候補から除外している。
+   *
+   * ここでは安全に実行できる回頭について
+   * コストのみ計算する。
+   */
 
   // ゲート足付近での回頭ペナルティ
-  if(!isOuterArea(currentX, currentY) && isNearGatePost(currentX, currentY)) {
+  // 外周上も含めて判定する
+  if(isNearGatePost(currentX, currentY)) {
     turnCost += GATE_NEAR_TURN_PENALTY;
   }
 
   // QR①付近でゲート方向へ回頭する経路を避ける
-  if(isTurningTowardGateNearEntrance(gates, currentX, currentY, nextDirection)) {
+  if(isTurningTowardGateNearEntrance(
+         gates, currentX, currentY, nextDirection)) {
     turnCost += GATE_APPROACH_TURN_PENALTY;
   }
 
   return turnCost + STRAIGHT_COST;
 }
 
-bool DijkstraRoutePlanner::isTurnBlockedByGatePost(int x, int y, Direction currentDirection,
-                                                   Direction nextDirection) const
+bool DijkstraRoutePlanner::isTurnBlockedByGatePost(
+    int x, int y,
+    Direction currentDirection,
+    Direction nextDirection) const
 {
   // 回頭しない場合
   if(currentDirection == nextDirection) {
@@ -469,26 +500,44 @@ bool DijkstraRoutePlanner::isTurnBlockedByGatePost(int x, int y, Direction curre
   const Point nextForward = directionToVector(nextDirection);
 
   // 後方向
-  const double currentRearX = -static_cast<double>(currentForward.x);
-  const double currentRearY = -static_cast<double>(currentForward.y);
-  const double nextRearX = -static_cast<double>(nextForward.x);
-  const double nextRearY = -static_cast<double>(nextForward.y);
+  const double currentRearX
+      = -static_cast<double>(currentForward.x);
+  const double currentRearY
+      = -static_cast<double>(currentForward.y);
+
+  const double nextRearX
+      = -static_cast<double>(nextForward.x);
+  const double nextRearY
+      = -static_cast<double>(nextForward.y);
 
   // 後方向の角度
-  const double currentRearAngle = std::atan2(currentRearY, currentRearX) * RAD_TO_DEG;
-  const double nextRearAngle = std::atan2(nextRearY, nextRearX) * RAD_TO_DEG;
+  const double currentRearAngle
+      = std::atan2(currentRearY, currentRearX) * RAD_TO_DEG;
+
+  const double nextRearAngle
+      = std::atan2(nextRearY, nextRearX) * RAD_TO_DEG;
 
   // 回頭方向
-  const double totalTurn = AngleNormalizer::normalizeAngle(nextRearAngle - currentRearAngle);
+  const double totalTurn
+      = AngleNormalizer::normalizeAngle(
+          nextRearAngle - currentRearAngle);
 
   // 各ゲート足を確認
   for(const Gate& gate : gates) {
-    const Point posts[] = { gate.start, gate.end };
+    const Point posts[] = {
+      gate.start,
+      gate.end
+    };
 
     for(const Point& post : posts) {
-      const double dx = static_cast<double>(post.x - x);
-      const double dy = static_cast<double>(post.y - y);
-      const double postDistance = std::hypot(dx, dy);
+      const double dx
+          = static_cast<double>(post.x - x);
+
+      const double dy
+          = static_cast<double>(post.y - y);
+
+      const double postDistance
+          = std::hypot(dx, dy);
 
       // 後部の旋回範囲より外なら安全
       if(postDistance > TURN_SWEEP_RADIUS + TURN_SWEEP_MARGIN) {
@@ -501,10 +550,19 @@ bool DijkstraRoutePlanner::isTurnBlockedByGatePost(int x, int y, Direction curre
       }
 
       // ゲート足の角度
-      const double postAngle = std::atan2(dy, dx) * RAD_TO_DEG;
-      const double postTurn = AngleNormalizer::normalizeAngle(postAngle - currentRearAngle);
+      const double postAngle
+          = std::atan2(dy, dx) * RAD_TO_DEG;
 
-      // 180度回頭
+      const double postTurn
+          = AngleNormalizer::normalizeAngle(
+              postAngle - currentRearAngle);
+
+      /*
+       * 180度回頭ではロボット後部の
+       * 旋回範囲が大きいため、
+       * 半径内にゲート足が存在する場合は
+       * 危険な回頭として扱う。
+       */
       if(std::abs(std::abs(totalTurn) - 180.0) < 0.01) {
         return true;
       }
@@ -513,10 +571,14 @@ bool DijkstraRoutePlanner::isTurnBlockedByGatePost(int x, int y, Direction curre
       bool insideSweep = false;
 
       if(totalTurn > 0.0) {
-        insideSweep = postTurn >= 0.0 && postTurn <= totalTurn;
-
-      } else {
-        insideSweep = postTurn <= 0.0 && postTurn >= totalTurn;
+        insideSweep
+            = postTurn >= 0.0
+              && postTurn <= totalTurn;
+      }
+      else {
+        insideSweep
+            = postTurn <= 0.0
+              && postTurn >= totalTurn;
       }
 
       if(insideSweep) {
@@ -528,7 +590,8 @@ bool DijkstraRoutePlanner::isTurnBlockedByGatePost(int x, int y, Direction curre
   return false;
 }
 
-Point DijkstraRoutePlanner::directionToVector(Direction direction) const
+Point DijkstraRoutePlanner::directionToVector(
+    Direction direction) const
 {
   /*
    * UP    : Y -
@@ -556,7 +619,10 @@ Point DijkstraRoutePlanner::directionToVector(Direction direction) const
 bool DijkstraRoutePlanner::isNearGatePost(int x, int y) const
 {
   for(const Gate& gate : gates) {
-    const Point posts[] = { gate.start, gate.end };
+    const Point posts[] = {
+      gate.start,
+      gate.end
+    };
 
     for(const Point& post : posts) {
       const int dx = std::abs(x - post.x);
@@ -577,35 +643,48 @@ bool DijkstraRoutePlanner::isNearGatePost(int x, int y) const
 
 bool DijkstraRoutePlanner::isOuterArea(int x, int y) const
 {
-  return x == MAP_MIN || x == MAP_MAX || y == MAP_MIN || y == MAP_MAX;
+  return x == MAP_MIN
+         || x == MAP_MAX
+         || y == MAP_MIN
+         || y == MAP_MAX;
 }
 
 bool DijkstraRoutePlanner::isValid(int x, int y) const
 {
-  if(x < MAP_MIN || x > MAP_MAX || y < MAP_MIN || y > MAP_MAX) {
+  if(x < MAP_MIN || x > MAP_MAX
+     || y < MAP_MIN || y > MAP_MAX) {
     return false;
   }
 
-  if(x % MOVE_STEP != 0 || y % MOVE_STEP != 0) {
+  if(x % MOVE_STEP != 0
+     || y % MOVE_STEP != 0) {
     return false;
   }
 
   return true;
 }
 
-bool DijkstraRoutePlanner::isBlockedMove(int currentX, int currentY, int nextX, int nextY) const
+bool DijkstraRoutePlanner::isBlockedMove(
+    int currentX, int currentY,
+    int nextX, int nextY) const
 {
   for(const Gate& gate : gates) {
     // 上下移動
     if(currentX == nextX) {
-      const int middleY = (currentY + nextY) / 2;
+      const int middleY
+          = (currentY + nextY) / 2;
 
       // 横向きゲート
       if(gate.start.y == gate.end.y) {
-        const int minX = std::min(gate.start.x, gate.end.x);
-        const int maxX = std::max(gate.start.x, gate.end.x);
+        const int minX
+            = std::min(gate.start.x, gate.end.x);
 
-        if(middleY == gate.start.y && currentX >= minX && currentX <= maxX) {
+        const int maxX
+            = std::max(gate.start.x, gate.end.x);
+
+        if(middleY == gate.start.y
+           && currentX >= minX
+           && currentX <= maxX) {
           return true;
         }
       }
@@ -613,14 +692,20 @@ bool DijkstraRoutePlanner::isBlockedMove(int currentX, int currentY, int nextX, 
 
     // 左右移動
     if(currentY == nextY) {
-      const int middleX = (currentX + nextX) / 2;
+      const int middleX
+          = (currentX + nextX) / 2;
 
       // 縦向きゲート
       if(gate.start.x == gate.end.x) {
-        const int minY = std::min(gate.start.y, gate.end.y);
-        const int maxY = std::max(gate.start.y, gate.end.y);
+        const int minY
+            = std::min(gate.start.y, gate.end.y);
 
-        if(middleX == gate.start.x && currentY >= minY && currentY <= maxY) {
+        const int maxY
+            = std::max(gate.start.y, gate.end.y);
+
+        if(middleX == gate.start.x
+           && currentY >= minY
+           && currentY <= maxY) {
           return true;
         }
       }
@@ -630,22 +715,35 @@ bool DijkstraRoutePlanner::isBlockedMove(int currentX, int currentY, int nextX, 
   return false;
 }
 
-int DijkstraRoutePlanner::stateToIndex(int x, int y, Direction direction) const
+int DijkstraRoutePlanner::stateToIndex(
+    int x, int y,
+    Direction direction) const
 {
   const int gridX = x / MOVE_STEP;
   const int gridY = y / MOVE_STEP;
 
-  return ((gridY * GRID_SIZE + gridX) * DIRECTION_COUNT) + static_cast<int>(direction);
+  return ((gridY * GRID_SIZE + gridX)
+          * DIRECTION_COUNT)
+         + static_cast<int>(direction);
 }
 
-RouteState DijkstraRoutePlanner::indexToState(int index) const
+RouteState DijkstraRoutePlanner::indexToState(
+    int index) const
 {
-  const int directionValue = index % DIRECTION_COUNT;
+  const int directionValue
+      = index % DIRECTION_COUNT;
 
   index /= DIRECTION_COUNT;
 
-  const int gridX = index % GRID_SIZE;
-  const int gridY = index / GRID_SIZE;
+  const int gridX
+      = index % GRID_SIZE;
 
-  return { gridX * MOVE_STEP, gridY * MOVE_STEP, static_cast<Direction>(directionValue) };
+  const int gridY
+      = index / GRID_SIZE;
+
+  return {
+    gridX * MOVE_STEP,
+    gridY * MOVE_STEP,
+    static_cast<Direction>(directionValue)
+  };
 }

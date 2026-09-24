@@ -550,7 +550,6 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
     }
 
     case MOTION_COMMAND::SNAPSHOT: {
-
       Logger::printfLog(Logger::DEBUG, "[MotionParser] Snapshotを生成しました");
 
       return new Snapshot(robot, motionParams[2], std::move(condition));

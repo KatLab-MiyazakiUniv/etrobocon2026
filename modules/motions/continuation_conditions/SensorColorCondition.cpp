@@ -31,14 +31,13 @@ bool SensorColorCondition::shouldContinue()
   // HSV値を取得
   ColorSensorController::HSV hsv;
   robot.getColorSensorControllerInstance().getRawHSV(hsv, true);
-  Logger::printfLog(Logger::DEBUG, "h:%ds:%dv:%d",hsv.h, hsv.s,hsv.v);
+  Logger::printfLog(Logger::DEBUG, "h:%ds:%dv:%d", hsv.h, hsv.s, hsv.v);
 
   ColorSensorController::COLOR CurrentColor
       = robot.getColorSensorControllerInstance().convertHsvToColor(hsv);
 
   Logger::printfLog(Logger::DEBUG, "カラーセンサーの判定は%sです",
-      ColorSensorController::convertColorToString(CurrentColor));
-
+                    ColorSensorController::convertColorToString(CurrentColor));
 
   if(CurrentColor == targetColor) {
     colorCount++;

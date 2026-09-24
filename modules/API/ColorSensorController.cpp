@@ -42,7 +42,6 @@ const char* ColorSensorController::convertColorToString(const COLOR& color)
   }
 }
 
-
 ColorSensorController::COLOR ColorSensorController::convertHsvToColor(HSV& hsv)
 {
   // 明度が極端に低ければ、黒を返す

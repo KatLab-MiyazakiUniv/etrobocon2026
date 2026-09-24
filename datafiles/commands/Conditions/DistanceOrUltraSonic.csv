@@ -1,6 +1,8 @@
 コマンド名,ID,targetDistance,targetSonicDistance
 DistanceOrUltraSonic,ID,double,double
 #ウルトラソニック距離10mm
+
+DistanceOrUltraSonic,001,10,10
 DistanceOrUltraSonic,001001,10,10
 DistanceOrUltraSonic,002001,20,10
 DistanceOrUltraSonic,003001,30,10

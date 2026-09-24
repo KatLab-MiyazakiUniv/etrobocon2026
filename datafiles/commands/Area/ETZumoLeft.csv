@@ -1,2 +1,2 @@
 動作コマンド名,動作ID,条件コマンド名,条件ID
-ETZumoFinish,001,RepeatCount,001
+ETZumoFinish,001,Distance,010,Distance,010

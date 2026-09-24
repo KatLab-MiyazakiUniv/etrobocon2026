@@ -54,7 +54,6 @@ class MotionParser {
     CALIBRATOR,
     SNAPSHOT,
     RESET_AZIMUTH,
-    SNAPSHOT,
     ET_ZUMO_EXIT,
     ET_ZUMO_FINISH,
     GATE_POSITION,

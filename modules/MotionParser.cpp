@@ -633,178 +633,175 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       qrRequest.roi.height = fromString<int32_t>(motionParams[7]);
       return new GatePositionDetection(robot, motionParams[2], fromString<bool>(motionParams[3]),
                                        qrRequest, std::move(condition));
-      case MOTION_COMMAND::SNAPSHOT: {
-        return new Snapshot(robot, "snapshot", std::move(condition));
-      }
-      default:
-        Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
-                          motionParams[0].c_str());
-
-        return nullptr;
     }
+    default:
+      Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
+                        motionParams[0].c_str());
+
+      return nullptr;
+  }
+}
+
+MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
+{
+  // コマンド文字列(string)と、それに対応する列挙型MOTION_COMMANDのマッピングを定義
+  static const unordered_map<string, MOTION_COMMAND> commandMap
+      = { { "Straight", MOTION_COMMAND::STRAIGHT },
+          { "LineTrace", MOTION_COMMAND::LINETRACE },
+          { "AbsoluteRotation", MOTION_COMMAND::ABSOLUTE_ROTATION },
+          { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
+          { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING },
+          { "Calibrator", MOTION_COMMAND::CALIBRATOR },
+          { "Snapshot", MOTION_COMMAND::SNAPSHOT },
+          { "ResetAzimuth", MOTION_COMMAND::RESET_AZIMUTH },
+          { "ETZumoExit", MOTION_COMMAND::ET_ZUMO_EXIT },
+          { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH },
+          { "GatePosition", MOTION_COMMAND::GATE_POSITION }
+
+        };
+
+  auto it = commandMap.find(str);
+
+  if(it != commandMap.end()) {
+    return it->second;
   }
 
-  MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
-  {
-    // コマンド文字列(string)と、それに対応する列挙型MOTION_COMMANDのマッピングを定義
-    static const unordered_map<string, MOTION_COMMAND> commandMap
-        = { { "Straight", MOTION_COMMAND::STRAIGHT },
-            { "LineTrace", MOTION_COMMAND::LINETRACE },
-            { "AbsoluteRotation", MOTION_COMMAND::ABSOLUTE_ROTATION },
-            { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
-            { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING },
-            { "Calibrator", MOTION_COMMAND::CALIBRATOR },
-            { "Snapshot", MOTION_COMMAND::SNAPSHOT },
-            { "ResetAzimuth", MOTION_COMMAND::RESET_AZIMUTH },
-            { "Snapshot", MOTION_COMMAND::SNAPSHOT },
-            { "ETZumoExit", MOTION_COMMAND::ET_ZUMO_EXIT },
-            { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH },
-            { "GatePosition", MOTION_COMMAND::GATE_POSITION }
+  return MOTION_COMMAND::NONE;
+}
 
-          };
+MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str)
+{
+  // 条件コマンド文字列と、それに対応する列挙型CONDITION_COMMANDのマッピングを定義
+  static const unordered_map<string, CONDITION_COMMAND> conditionMap
+      = { { "Distance", CONDITION_COMMAND::DISTANCE },
+          { "ProjectedDistance", CONDITION_COMMAND::PROJECTED_DISTANCE },
+          { "AbsoluteAngle", CONDITION_COMMAND::ABSOLUTE_ANGLE },
+          { "RelativeAngle", CONDITION_COMMAND::RELATIVE_ANGLE },
+          { "SensorColor", CONDITION_COMMAND::SENSOR_COLOR },
+          { "RunningTime", CONDITION_COMMAND::RUNNING_TIME },
+          { "MotionTime", CONDITION_COMMAND::MOTION_TIME },
+          { "RepeatCount", CONDITION_COMMAND::REPEAT_COUNT },
+          { "DistanceAndColor", CONDITION_COMMAND::DISTANCE_AND_COLOR },
+          { "DistanceOrColor", CONDITION_COMMAND::DISTANCE_OR_COLOR },
+          { "DistanceOrUltraSonic", CONDITION_COMMAND::DISTANCE_OR_ULTRA_SONIC },
+          { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC },
+          { "ColorOrColor", CONDITION_COMMAND::COLOR_OR_COLOR }
 
-    auto it = commandMap.find(str);
+        };
 
-    if(it != commandMap.end()) {
-      return it->second;
-    }
+  auto it = conditionMap.find(str);
 
-    return MOTION_COMMAND::NONE;
+  if(it != conditionMap.end()) {
+    return it->second;
   }
 
-  MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str)
-  {
-    // 条件コマンド文字列と、それに対応する列挙型CONDITION_COMMANDのマッピングを定義
-    static const unordered_map<string, CONDITION_COMMAND> conditionMap
-        = { { "Distance", CONDITION_COMMAND::DISTANCE },
-            { "ProjectedDistance", CONDITION_COMMAND::PROJECTED_DISTANCE },
-            { "AbsoluteAngle", CONDITION_COMMAND::ABSOLUTE_ANGLE },
-            { "RelativeAngle", CONDITION_COMMAND::RELATIVE_ANGLE },
-            { "SensorColor", CONDITION_COMMAND::SENSOR_COLOR },
-            { "RunningTime", CONDITION_COMMAND::RUNNING_TIME },
-            { "MotionTime", CONDITION_COMMAND::MOTION_TIME },
-            { "RepeatCount", CONDITION_COMMAND::REPEAT_COUNT },
-            { "DistanceAndColor", CONDITION_COMMAND::DISTANCE_AND_COLOR },
-            { "DistanceOrColor", CONDITION_COMMAND::DISTANCE_OR_COLOR },
-            { "DistanceOrUltraSonic", CONDITION_COMMAND::DISTANCE_OR_ULTRA_SONIC },
-            { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC },
-            { "ColorOrColor", CONDITION_COMMAND::COLOR_OR_COLOR }
+  return CONDITION_COMMAND::NONE;
+}
 
-          };
+// bool MotionParser::convertBool(
+//     const string& command,
+//     const string& stringParameter)
+// {
+//   // 末尾の改行を削除
+//   string param = StringOperator::removeEOL(stringParameter);
 
-    auto it = conditionMap.find(str);
+//   // カメラPIDトラッキング系の停止制御
+//   // continueなら継続、stopなら停止
+//   if(command == "DCL"
+//      || command == "CDCL"
+//      || command == "UDCL"
+//      || command == "DTCCL"
+//      || command == "CDTCCL") {
+//
+//     if(param == "continue") {
+//       return false;
+//     } else if(param == "stop") {
+//       return true;
+//     } else {
+//       cout << "'continue' か 'stop'を入力してください"
+//            << endl;
+//
+//       return true;
+//     }
+//   }
 
-    if(it != conditionMap.end()) {
-      return it->second;
-    }
+//   // 回転動作の場合
+//   // clockwiseなら時計回り
+//   // anticlockwiseなら反時計回り
+//   if(command == "AR"
+//      || command == "IMUR"
+//      || command == "MCA"
+//      || command == "BCA"
+//      || command == "CRA") {
+//
+//     if(param == "clockwise") {
+//       return true;
+//     } else if(param == "anticlockwise") {
+//       return false;
+//     } else {
+//       cout << "'clockwise' か 'anticlockwise'を入力してください"
+//            << endl;
+//
+//       return true;
+//     }
+//   }
 
-    return CONDITION_COMMAND::NONE;
-  }
+//   // エッジ切り替え
+//   if(command == "EC") {
+//
+//     if(param == "left") {
+//       return true;
+//     } else if(param == "right") {
+//       return false;
+//     } else {
+//       cout << "'left' か 'right'を入力してください"
+//            << endl;
+//
+//       return true;
+//     }
+//   }
 
-  // bool MotionParser::convertBool(
-  //     const string& command,
-  //     const string& stringParameter)
-  // {
-  //   // 末尾の改行を削除
-  //   string param = StringOperator::removeEOL(stringParameter);
+//   // IMU設定
+//   if(command == "IS") {
+//
+//     if(param == "start") {
+//       return true;
+//     } else if(param == "stop") {
+//       return false;
+//     } else {
+//       cout << "'start' か 'stop'を入力してください"
+//            << endl;
+//
+//       return false;
+//     }
+//   }
 
-  //   // カメラPIDトラッキング系の停止制御
-  //   // continueなら継続、stopなら停止
-  //   if(command == "DCL"
-  //      || command == "CDCL"
-  //      || command == "UDCL"
-  //      || command == "DTCCL"
-  //      || command == "CDTCCL") {
-  //
-  //     if(param == "continue") {
-  //       return false;
-  //     } else if(param == "stop") {
-  //       return true;
-  //     } else {
-  //       cout << "'continue' か 'stop'を入力してください"
-  //            << endl;
-  //
-  //       return true;
-  //     }
-  //   }
+//   cout << "convertBool関数の処理の対象外です: '"
+//        << command
+//        << endl;
+//
+//   return true;
+// }
 
-  //   // 回転動作の場合
-  //   // clockwiseなら時計回り
-  //   // anticlockwiseなら反時計回り
-  //   if(command == "AR"
-  //      || command == "IMUR"
-  //      || command == "MCA"
-  //      || command == "BCA"
-  //      || command == "CRA") {
-  //
-  //     if(param == "clockwise") {
-  //       return true;
-  //     } else if(param == "anticlockwise") {
-  //       return false;
-  //     } else {
-  //       cout << "'clockwise' か 'anticlockwise'を入力してください"
-  //            << endl;
-  //
-  //       return true;
-  //     }
-  //   }
+// bool MotionParser::convertRotationModeToBool(
+//     const string& stringParameter)
+// {
+//   string param
+//       = StringOperator::removeEOL(stringParameter);
 
-  //   // エッジ切り替え
-  //   if(command == "EC") {
-  //
-  //     if(param == "left") {
-  //       return true;
-  //     } else if(param == "right") {
-  //       return false;
-  //     } else {
-  //       cout << "'left' か 'right'を入力してください"
-  //            << endl;
-  //
-  //       return true;
-  //     }
-  //   }
-
-  //   // IMU設定
-  //   if(command == "IS") {
-  //
-  //     if(param == "start") {
-  //       return true;
-  //     } else if(param == "stop") {
-  //       return false;
-  //     } else {
-  //       cout << "'start' か 'stop'を入力してください"
-  //            << endl;
-  //
-  //       return false;
-  //     }
-  //   }
-
-  //   cout << "convertBool関数の処理の対象外です: '"
-  //        << command
-  //        << endl;
-  //
-  //   return true;
-  // }
-
-  // bool MotionParser::convertRotationModeToBool(
-  //     const string& stringParameter)
-  // {
-  //   string param
-  //       = StringOperator::removeEOL(stringParameter);
-
-  //   // relativeなら相対角度
-  //   // absoluteなら絶対角度
-  //   if(param == "relative") {
-  //     return false;
-  //   } else if(param == "absolute") {
-  //     return true;
-  //   } else {
-  //     cout
-  //         << "'relative' か 'absolute'を入力してください (入力値: "
-  //         << param
-  //         << ")"
-  //         << endl;
-  //
-  //     return false;
-  //   }
-  // }
+//   // relativeなら相対角度
+//   // absoluteなら絶対角度
+//   if(param == "relative") {
+//     return false;
+//   } else if(param == "absolute") {
+//     return true;
+//   } else {
+//     cout
+//         << "'relative' か 'absolute'を入力してください (入力値: "
+//         << param
+//         << ")"
+//         << endl;
+//
+//     return false;
+//   }
+// }

@@ -26,7 +26,7 @@ namespace etrobocon2026_test {
     MockNetworkSystem mockNetworkSystem;
     SocketClient mockSocketClient(mockNetworkSystem);
     Robot robot(mockSocketClient);
-    double targetSpeed = 200.0;    // 目標速度
+    double targetSpeed = 100.0;    // 目標速度
     double targetDistance = 10.0;  // 目標距離
 
     // 直進前の走行距離を計算
@@ -143,7 +143,7 @@ namespace etrobocon2026_test {
     MockNetworkSystem mockNetworkSystem;
     SocketClient mockSocketClient(mockNetworkSystem);
     Robot robot(mockSocketClient);
-    double targetSpeed = 200.0;    // 目標速度
+    double targetSpeed = 100.0;    // 目標速度
     double targetDistance = 10.0;  // 目標距離
 
     // 直進前の走行距離を計算

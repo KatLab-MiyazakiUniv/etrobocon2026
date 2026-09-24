@@ -588,6 +588,9 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
     case MOTION_COMMAND::RESET_AZIMUTH: {
       return new ResetAzimuth(robot, std::move(condition));
     }
+   case MOTION_COMMAND::SNAPSHOT: {
+  return new Snapshot(robot, "snapshot", std::move(condition));
+}
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
                         motionParams[0].c_str());
@@ -607,6 +610,7 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING },
           { "Calibrator", MOTION_COMMAND::CALIBRATOR },
           { "ResetAzimuth", MOTION_COMMAND::RESET_AZIMUTH },
+          { "Snapshot", MOTION_COMMAND::SNAPSHOT },
           { "ETZumoExit", MOTION_COMMAND::ET_ZUMO_EXIT },
           { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH }
 

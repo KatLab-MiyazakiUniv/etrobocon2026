@@ -7,7 +7,8 @@
 #include "ClockUtil.h"
 
 const Pid::PidGain SpeedCalculator::DEFAULT_RIGHT_PID
-    = { 0.014849, 0.004863, 0.0015 } const Pid::PidGain SpeedCalculator::DEFAULT_LEFT_PID
+    = { 0.014849, 0.004863, 0.0015 };
+     const Pid::PidGain SpeedCalculator::DEFAULT_LEFT_PID
     = { 0.01574, 0.0045, 0.0015 };
 
 SpeedCalculator::SpeedCalculator(Robot& _robot, double _targetSpeed)

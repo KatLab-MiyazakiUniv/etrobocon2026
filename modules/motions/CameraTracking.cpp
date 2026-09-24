@@ -141,18 +141,13 @@ void CameraTracking::executeStep()
   robot.getWheelMotorControllerInstance().setLeftPower(leftPower);
 }
 
-void CameraTracking::wait()
-{
-  // ClockUtil::sleep(0);
-}
+void CameraTracking::wait() {}
 
 void CameraTracking::finish()
 {
   if(isStopMotorPower) {
     ClockUtil::sleep(10);
     robot.getWheelMotorControllerInstance().brakeBoth();
-    ClockUtil::sleep(10);
-    robot.getWheelMotorControllerInstance().stopBoth();
   }
 }
 

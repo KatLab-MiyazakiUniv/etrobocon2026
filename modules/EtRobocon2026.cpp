@@ -268,11 +268,7 @@ void EtRobocon2026::start()
   // 6. ゲート順
   // =========================================================
 
-  constexpr GoalColor TARGET_COLORS[] = {
-    GoalColor::RED,
-    GoalColor::BLUE,
-    GoalColor::YELLOW
-  };
+  constexpr GoalColor TARGET_COLORS[] = { GoalColor::RED, GoalColor::BLUE, GoalColor::YELLOW };
 
   // =========================================================
   // 7. PID設定
@@ -310,18 +306,14 @@ void EtRobocon2026::start()
   const Pid::PidGain straightAnglePid = { 0.033, 0.003, 0.03 };
 
   const double straightDeadbandRate = 0.25;
-const double straightMaxoutRate = 0.54;
+  const double straightMaxoutRate = 0.54;
 
   // =========================================================
   // 8. RouteFollower
   // =========================================================
 
-RouteFollower routeFollower(robot, etRallyMap, TARGET_SPEED,
-                            rotationPid,
-                            squareRotationPid,
-                            straightAnglePid,
-                            straightDeadbandRate,
-                            straightMaxoutRate);
+  RouteFollower routeFollower(robot, etRallyMap, TARGET_SPEED, rotationPid, squareRotationPid,
+                              straightAnglePid, straightDeadbandRate, straightMaxoutRate);
   // =========================================================
   // 9. 開始時刻
   // =========================================================
@@ -344,30 +336,21 @@ RouteFollower routeFollower(robot, etRallyMap, TARGET_SPEED,
     // =====================================================
 
     for(const GoalColor targetColor : TARGET_COLORS) {
-      Logger::printfLog(Logger::INFO, "Lap %d Target=%s", lap,
-                        colorToString(targetColor));
+      Logger::printfLog(Logger::INFO, "Lap %d Target=%s", lap, colorToString(targetColor));
 
       Logger::printfLog(Logger::INFO,
                         "Current grid: "
                         "(%d,%d) %s",
-                        currentGridX,
-                        currentGridY,
-                        directionToString(currentDirection));
+                        currentGridX, currentGridY, directionToString(currentDirection));
 
       // ===================================================
       // 経路探索
       // ===================================================
 
       GateRouteResult routeResult
-          = routePlanner.search(
-              currentGridX,
-              currentGridY,
-              currentDirection,
-              targetColor);
+          = routePlanner.search(currentGridX, currentGridY, currentDirection, targetColor);
 
-      Logger::printfLog(Logger::INFO,
-                        "Route cost=%d size=%d",
-                        routeResult.cost,
+      Logger::printfLog(Logger::INFO, "Route cost=%d size=%d", routeResult.cost,
                         static_cast<int>(routeResult.route.size()));
 
       if(routeResult.route.size() < 2) {
@@ -382,17 +365,14 @@ RouteFollower routeFollower(robot, etRallyMap, TARGET_SPEED,
       Logger::printfLog(Logger::INFO,
                         "Gate entrance: "
                         "(%d,%d)",
-                        routeResult.entrance.x,
-                        routeResult.entrance.y);
+                        routeResult.entrance.x, routeResult.entrance.y);
 
       Logger::printfLog(Logger::INFO,
                         "Gate exit: "
                         "(%d,%d)",
-                        routeResult.exit.x,
-                        routeResult.exit.y);
+                        routeResult.exit.x, routeResult.exit.y);
 
-      Logger::printfLog(Logger::INFO,
-                        "Gate direction: %s",
+      Logger::printfLog(Logger::INFO, "Gate direction: %s",
                         directionToString(routeResult.exitDirection));
 
       // ===================================================
@@ -414,10 +394,7 @@ RouteFollower routeFollower(robot, etRallyMap, TARGET_SPEED,
 
       const bool outerGate = isOuterGate(*targetGate);
 
-      Logger::printfLog(
-          Logger::INFO,
-          "Target gate type: %s",
-          outerGate ? "OUTER" : "INNER");
+      Logger::printfLog(Logger::INFO, "Target gate type: %s", outerGate ? "OUTER" : "INNER");
 
       // ===================================================
       // 走行
@@ -460,16 +437,12 @@ RouteFollower routeFollower(robot, etRallyMap, TARGET_SPEED,
          */
         currentDirection = routeResult.exitDirection;
 
-        Logger::printfLog(
-            Logger::INFO,
-            "%s outer gate passed and returned: "
-            "(%d,%d) %s",
-            colorToString(targetColor),
-            currentGridX,
-            currentGridY,
-            directionToString(currentDirection));
-      }
-      else {
+        Logger::printfLog(Logger::INFO,
+                          "%s outer gate passed and returned: "
+                          "(%d,%d) %s",
+                          colorToString(targetColor), currentGridX, currentGridY,
+                          directionToString(currentDirection));
+      } else {
         /*
          * 内側ゲートでは通常通り
          * ゲート通過後のexitを
@@ -481,14 +454,11 @@ RouteFollower routeFollower(robot, etRallyMap, TARGET_SPEED,
 
         currentDirection = routeResult.exitDirection;
 
-        Logger::printfLog(
-            Logger::INFO,
-            "%s gate passed: "
-            "(%d,%d) %s",
-            colorToString(targetColor),
-            currentGridX,
-            currentGridY,
-            directionToString(currentDirection));
+        Logger::printfLog(Logger::INFO,
+                          "%s gate passed: "
+                          "(%d,%d) %s",
+                          colorToString(targetColor), currentGridX, currentGridY,
+                          directionToString(currentDirection));
       }
 
       // ===================================================
@@ -501,8 +471,7 @@ RouteFollower routeFollower(robot, etRallyMap, TARGET_SPEED,
         Logger::printfLog(Logger::INFO,
                           "Elapsed time=%d ms "
                           "(%.2f sec)",
-                          elapsedTime,
-                          elapsedTime / 1000.0);
+                          elapsedTime, elapsedTime / 1000.0);
 
         // 3周終了
         if(lap >= LAP_COUNT) {
@@ -536,15 +505,10 @@ RouteFollower routeFollower(robot, etRallyMap, TARGET_SPEED,
 
   const Point finalPoint = convertPoint({ 8, 0 });
 
-  const Direction finalDirection
-      = convertDirection(Direction::LEFT);
+  const Direction finalDirection = convertDirection(Direction::LEFT);
 
-  Logger::printfLog(
-      Logger::INFO,
-      "Final target=(%d,%d) %s",
-      finalPoint.x,
-      finalPoint.y,
-      directionToString(finalDirection));
+  Logger::printfLog(Logger::INFO, "Final target=(%d,%d) %s", finalPoint.x, finalPoint.y,
+                    directionToString(finalDirection));
 
   // =========================================================
   // 12. 最終地点への経路探索
@@ -552,13 +516,8 @@ RouteFollower routeFollower(robot, etRallyMap, TARGET_SPEED,
 
   DijkstraRoutePlanner finalRoutePlanner(mapData.getGates());
 
-  RouteResult finalRoute
-      = finalRoutePlanner.search(
-          currentGridX,
-          currentGridY,
-          currentDirection,
-          finalPoint,
-          finalDirection);
+  RouteResult finalRoute = finalRoutePlanner.search(currentGridX, currentGridY, currentDirection,
+                                                    finalPoint, finalDirection);
 
   if(finalRoute.route.size() < 2) {
     Logger::error("EtRobocon2026: "
@@ -569,11 +528,8 @@ RouteFollower routeFollower(robot, etRallyMap, TARGET_SPEED,
     return;
   }
 
-  Logger::printfLog(
-      Logger::INFO,
-      "Final route cost=%d size=%d",
-      finalRoute.cost,
-      static_cast<int>(finalRoute.route.size()));
+  Logger::printfLog(Logger::INFO, "Final route cost=%d size=%d", finalRoute.cost,
+                    static_cast<int>(finalRoute.route.size()));
 
   // =========================================================
   // 13. 最終地点まで走行
@@ -585,29 +541,17 @@ RouteFollower routeFollower(robot, etRallyMap, TARGET_SPEED,
   // 14. 最終地点到着後に100mm直進
   // =========================================================
 
-  Logger::printfLog(
-      Logger::INFO,
-      "Final point reached -> straight %.1f mm",
-      FINAL_STRAIGHT_DISTANCE);
+  Logger::printfLog(Logger::INFO, "Final point reached -> straight %.1f mm",
+                    FINAL_STRAIGHT_DISTANCE);
 
-  auto finalStraightCondition
-      = std::make_unique<DistanceCondition>(
-          robot,
-          FINAL_STRAIGHT_DISTANCE);
+  auto finalStraightCondition = std::make_unique<DistanceCondition>(robot, FINAL_STRAIGHT_DISTANCE);
 
-Straight finalStraight(robot, std::move(finalStraightCondition),
-                       TARGET_SPEED,
-                       straightAnglePid,
-                       true,
-                       straightDeadbandRate,
-                       straightMaxoutRate);
+  Straight finalStraight(robot, std::move(finalStraightCondition), TARGET_SPEED, straightAnglePid,
+                         true, straightDeadbandRate, straightMaxoutRate);
 
-finalStraight.run();
+  finalStraight.run();
 
-  Logger::printfLog(
-      Logger::INFO,
-      "Final straight %.1f mm completed",
-      FINAL_STRAIGHT_DISTANCE);
+  Logger::printfLog(Logger::INFO, "Final straight %.1f mm completed", FINAL_STRAIGHT_DISTANCE);
 
   // =========================================================
   // 15. 停止
@@ -617,12 +561,10 @@ finalStraight.run();
 
   const int totalTime = ClockUtil::now() - startTime;
 
-  Logger::printfLog(
-      Logger::INFO,
-      "Total time=%d ms "
-      "(%.2f sec)",
-      totalTime,
-      totalTime / 1000.0);
+  Logger::printfLog(Logger::INFO,
+                    "Total time=%d ms "
+                    "(%.2f sec)",
+                    totalTime, totalTime / 1000.0);
 
   Logger::info("Timed ET Rally finished");
 }

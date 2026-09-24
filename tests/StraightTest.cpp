@@ -26,11 +26,9 @@ namespace etrobocon2026_test {
     MockNetworkSystem mockNetworkSystem;
     SocketClient mockSocketClient(mockNetworkSystem);
     Robot robot(mockSocketClient);
-       double targetSpeed = 1000.0;   // 目標速度
+    double targetSpeed = 1000.0;   // 目標速度
     double targetDistance = 10.0;  // 目標距離
-    auto condition = std::make_unique<DistanceCondition>(
-        robot,
-        targetDistance);
+    auto condition = std::make_unique<DistanceCondition>(robot, targetDistance);
 
     // 直進前の走行距離を計算
     int32_t rightCount = robot.getWheelMotorControllerInstance().getRightCount();
@@ -38,13 +36,7 @@ namespace etrobocon2026_test {
     double startMileage = Mileage::calculateMileage(rightCount, leftCount);
 
     // 直進動作を実行
-    Straight straight(robot,
-                  std::move(condition),
-                  targetSpeed,
-                  anglePid,
-                  false,
-                  0.0,
-                  1.0);
+    Straight straight(robot, std::move(condition), targetSpeed, anglePid, false, 0.0, 1.0);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -67,9 +59,7 @@ namespace etrobocon2026_test {
     Robot robot(mockSocketClient);
     double targetSpeed = 50.0;    // 目標速度
     double targetDistance = 0.0;  // 目標距離
-    auto condition = std::make_unique<DistanceCondition>(
-    robot,
-    targetDistance);
+    auto condition = std::make_unique<DistanceCondition>(robot, targetDistance);
 
     // 直進前の走行距離を計算
     int32_t rightCount = robot.getWheelMotorControllerInstance().getRightCount();
@@ -77,13 +67,7 @@ namespace etrobocon2026_test {
     double startMileage = Mileage::calculateMileage(rightCount, leftCount);
 
     // 直進動作を実行
-    Straight straight(robot,
-                  std::move(condition),
-                  targetSpeed,
-                  anglePid,
-                  false,
-                  0.0,
-                  1.0);
+    Straight straight(robot, std::move(condition), targetSpeed, anglePid, false, 0.0, 1.0);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -103,9 +87,7 @@ namespace etrobocon2026_test {
     Robot robot(mockSocketClient);
     double targetSpeed = 50.0;       // 目標速度
     double targetDistance = -100.0;  // 目標距離
-    auto condition = std::make_unique<DistanceCondition>(
-    robot,
-    targetDistance);
+    auto condition = std::make_unique<DistanceCondition>(robot, targetDistance);
 
     // 直進前の走行距離を計算
     int32_t rightCount = robot.getWheelMotorControllerInstance().getRightCount();
@@ -113,13 +95,7 @@ namespace etrobocon2026_test {
     double startMileage = Mileage::calculateMileage(rightCount, leftCount);
 
     // 直進動作を実行
-    Straight straight(robot,
-                  std::move(condition),
-                  targetSpeed,
-                  anglePid,
-                  false,
-                  0.0,
-                  1.0);
+    Straight straight(robot, std::move(condition), targetSpeed, anglePid, false, 0.0, 1.0);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -140,9 +116,7 @@ namespace etrobocon2026_test {
     Robot robot(mockSocketClient);
     double targetSpeed = 0.0;      // 目標速度
     double targetDistance = 10.0;  // 目標距離
-    auto condition = std::make_unique<DistanceCondition>(
-    robot,
-    targetDistance);
+    auto condition = std::make_unique<DistanceCondition>(robot, targetDistance);
 
     // 直進前の走行距離を計算
     int32_t rightCount = robot.getWheelMotorControllerInstance().getRightCount();
@@ -150,13 +124,7 @@ namespace etrobocon2026_test {
     double startMileage = Mileage::calculateMileage(rightCount, leftCount);
 
     // 直進動作を実行
-    Straight straight(robot,
-                  std::move(condition),
-                  targetSpeed,
-                  anglePid,
-                  false,
-                  0.0,
-                  1.0);
+    Straight straight(robot, std::move(condition), targetSpeed, anglePid, false, 0.0, 1.0);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -177,9 +145,7 @@ namespace etrobocon2026_test {
     Robot robot(mockSocketClient);
     double targetSpeed = 1000.0;   // 目標速度
     double targetDistance = 10.0;  // 目標距離
-    auto condition = std::make_unique<DistanceCondition>(
-    robot,
-    targetDistance);
+    auto condition = std::make_unique<DistanceCondition>(robot, targetDistance);
 
     // 直進前の走行距離を計算
     int32_t rightCount = robot.getWheelMotorControllerInstance().getRightCount();
@@ -187,13 +153,7 @@ namespace etrobocon2026_test {
     double startMileage = Mileage::calculateMileage(rightCount, leftCount);
 
     // 直進動作を実行
-    Straight straight(robot,
-                  std::move(condition),
-                  targetSpeed,
-                  anglePid,
-                  true,
-                  0.0,
-                  1.0);
+    Straight straight(robot, std::move(condition), targetSpeed, anglePid, true, 0.0, 1.0);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -216,9 +176,7 @@ namespace etrobocon2026_test {
     Robot robot(mockSocketClient);
     double targetSpeed = 50.0;    // 目標速度
     double targetDistance = 0.0;  // 目標距離
-    auto condition = std::make_unique<DistanceCondition>(
-    robot,
-    targetDistance);
+    auto condition = std::make_unique<DistanceCondition>(robot, targetDistance);
 
     // 直進前の走行距離を計算
     int32_t rightCount = robot.getWheelMotorControllerInstance().getRightCount();
@@ -226,13 +184,7 @@ namespace etrobocon2026_test {
     double startMileage = Mileage::calculateMileage(rightCount, leftCount);
 
     // 直進動作を実行
-   Straight straight(robot,
-                  std::move(condition),
-                  targetSpeed,
-                  anglePid,
-                  true,
-                  0.0,
-                  1.0);
+    Straight straight(robot, std::move(condition), targetSpeed, anglePid, true, 0.0, 1.0);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -252,9 +204,7 @@ namespace etrobocon2026_test {
     Robot robot(mockSocketClient);
     double targetSpeed = 50.0;       // 目標速度
     double targetDistance = -100.0;  // 目標距離
-    auto condition = std::make_unique<DistanceCondition>(
-    robot,
-    targetDistance);
+    auto condition = std::make_unique<DistanceCondition>(robot, targetDistance);
 
     // 直進前の走行距離を計算
     int32_t rightCount = robot.getWheelMotorControllerInstance().getRightCount();
@@ -262,13 +212,7 @@ namespace etrobocon2026_test {
     double startMileage = Mileage::calculateMileage(rightCount, leftCount);
 
     // 直進動作を実行
-   Straight straight(robot,
-                  std::move(condition),
-                  targetSpeed,
-                  anglePid,
-                  true,
-                  0.0,
-                  1.0);
+    Straight straight(robot, std::move(condition), targetSpeed, anglePid, true, 0.0, 1.0);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -289,9 +233,7 @@ namespace etrobocon2026_test {
     Robot robot(mockSocketClient);
     double targetSpeed = 0.0;      // 目標速度
     double targetDistance = 10.0;  // 目標距離
-    auto condition = std::make_unique<DistanceCondition>(
-    robot,
-    targetDistance);
+    auto condition = std::make_unique<DistanceCondition>(robot, targetDistance);
 
     // 直進前の走行距離を計算
     int32_t rightCount = robot.getWheelMotorControllerInstance().getRightCount();
@@ -299,13 +241,7 @@ namespace etrobocon2026_test {
     double startMileage = Mileage::calculateMileage(rightCount, leftCount);
 
     // 直進動作を実行
-   Straight straight(robot,
-                  std::move(condition),
-                  targetSpeed,
-                  anglePid,
-                  true,
-                  0.0,
-                  1.0);
+    Straight straight(robot, std::move(condition), targetSpeed, anglePid, true, 0.0, 1.0);
     straight.run();
 
     // 直進後の走行距離を計算

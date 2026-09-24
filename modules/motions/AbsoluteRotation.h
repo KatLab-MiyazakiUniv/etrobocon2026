@@ -38,7 +38,7 @@ class AbsoluteRotation : public Rotation {
   void executeStep() override;
 
  private:
-  static constexpr double MIN_TURN_POWER = 18.0;  // 実機で静止摩擦に合わせて調整
+  static constexpr double MIN_TURN_POWER = 25.0;  // 実機で静止摩擦に合わせて調整
   static constexpr double MAX_TURN_POWER = 60.0;
   Pid::PidGain anglePidGain;
   double targetAbsAngle;  // 目標となる絶対角度(°)

@@ -23,7 +23,7 @@ class AbsoluteAngleCondition : public AngleCondition {
    * @param _targetAbsAngle 目標となる絶対角度(°)
    * @param _tolerance      角度判定の許容誤差(°)
    */
-  AbsoluteAngleCondition(Robot& robot, double _targetAbsAngle, double _tolerance = 2.0);
+  AbsoluteAngleCondition(Robot& robot, double _targetAbsAngle, double _tolerance = 3.0);
 
   /**
    * デストラクタ

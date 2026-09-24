@@ -366,10 +366,7 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
     return;
   }
 
-  // =========================================================
   // 外周ゲート
-  // =========================================================
-
   if(isOuterGate(*gate)) {
     Logger::info("RouteFollower: 外周ゲート");
 
@@ -413,10 +410,7 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
                       rotatedAtSegmentStart ? 1 : 0, distanceToFirstDetection,
                       FIRST_DETECTION_TOLERANCE, skipFirstCorrection ? 1 : 0);
 
-    // =========================================================
     // 外周ゲート QR①補正
-    // =========================================================
-
     if(!skipFirstCorrection) {
       double firstMoveDistance = distanceToFirstDetection;
 
@@ -518,10 +512,7 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
       }
     }
 
-    // =========================================================
     // 外周ゲート通過
-    // =========================================================
-
     Logger::printfLog(Logger::INFO,
                       "RouteFollower: "
                       "QR①位置から %.2f mm 前進",
@@ -529,7 +520,6 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
 
     /*
      * QR①位置から400mm前進する。
-     *
      * QR①はゲート中央の125mm手前にあるため、
      * 400mm前進することでゲートを通過する。
      */
@@ -556,10 +546,7 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
     return;
   }
 
-  // =========================================================
   // 内側ゲート
-  // =========================================================
-
   Logger::info("RouteFollower: 内側ゲート");
 
   /**
@@ -652,10 +639,7 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
                     rotatedAtSegmentStart ? 1 : 0, distanceToFirstDetection,
                     FIRST_DETECTION_TOLERANCE, skipFirstCorrection ? 1 : 0);
 
-  // =========================================================
   // QR①補正
-  // =========================================================
-
   if(!skipFirstCorrection) {
     double firstMoveDistance = distanceToFirstDetection;
 
@@ -755,10 +739,7 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
     }
   }
 
-  // =========================================================
   // QR②補正
-  // =========================================================
-
   Logger::info("RouteFollower: QR②");
 
   SquareAngleAdjustment::Result secondResult{};
@@ -810,10 +791,7 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
     straightWithinSegment(SQUARE_DETECTION_DISTANCE);
   }
 
-  // =========================================================
   // 区間終端まで残りを走行
-  // =========================================================
-
   double remainingDistance = 0.0;
 
   if(secondCorrectionSucceeded) {
@@ -868,17 +846,12 @@ const Gate* RouteFollower::findGate(const RouteState& from, const RouteState& to
     const std::vector<GatePass> passes = robot.getMapData().getGatePasses(gate.color);
 
     for(const GatePass& pass : passes) {
-      // =====================================================
       // Y方向
-      // =====================================================
-
       if(from.x == to.x && pass.entrance.x == from.x && pass.exit.x == from.x) {
         // Y増加
         if(to.y > from.y) {
           const bool entranceInside = pass.entrance.y >= from.y && pass.entrance.y <= to.y;
-
           const bool exitInside = pass.exit.y >= from.y && pass.exit.y <= to.y;
-
           const bool correctDirection = pass.exit.y > pass.entrance.y;
 
           if(entranceInside && exitInside && correctDirection) {
@@ -889,9 +862,7 @@ const Gate* RouteFollower::findGate(const RouteState& from, const RouteState& to
         // Y減少
         if(to.y < from.y) {
           const bool entranceInside = pass.entrance.y <= from.y && pass.entrance.y >= to.y;
-
           const bool exitInside = pass.exit.y <= from.y && pass.exit.y >= to.y;
-
           const bool correctDirection = pass.exit.y < pass.entrance.y;
 
           if(entranceInside && exitInside && correctDirection) {
@@ -900,17 +871,12 @@ const Gate* RouteFollower::findGate(const RouteState& from, const RouteState& to
         }
       }
 
-      // =====================================================
       // X方向
-      // =====================================================
-
       if(from.y == to.y && pass.entrance.y == from.y && pass.exit.y == from.y) {
         // X増加
         if(to.x > from.x) {
           const bool entranceInside = pass.entrance.x >= from.x && pass.entrance.x <= to.x;
-
           const bool exitInside = pass.exit.x >= from.x && pass.exit.x <= to.x;
-
           const bool correctDirection = pass.exit.x > pass.entrance.x;
 
           if(entranceInside && exitInside && correctDirection) {
@@ -921,9 +887,7 @@ const Gate* RouteFollower::findGate(const RouteState& from, const RouteState& to
         // X減少
         if(to.x < from.x) {
           const bool entranceInside = pass.entrance.x <= from.x && pass.entrance.x >= to.x;
-
           const bool exitInside = pass.exit.x <= from.x && pass.exit.x >= to.x;
-
           const bool correctDirection = pass.exit.x < pass.entrance.x;
 
           if(entranceInside && exitInside && correctDirection) {
@@ -945,7 +909,6 @@ bool RouteFollower::isOuterGate(const Gate& gate) const
 
     /*
      * 上端または下端の外周ゲート。
-     *
      * 走行可能なグリッド座標は偶数で、
      * ゲートはその間の奇数座標に存在するため、
      * 外周ゲートは1または最大値-1になる。
@@ -959,7 +922,6 @@ bool RouteFollower::isOuterGate(const Gate& gate) const
 
     /*
      * 左端または右端の外周ゲート。
-     *
      * 走行可能なグリッド座標は偶数で、
      * ゲートはその間の奇数座標に存在するため、
      * 外周ゲートは1または最大値-1になる。
@@ -974,14 +936,10 @@ double RouteFollower::calculateDistanceToGate(const RouteState& from, const Gate
 {
   const EtRallyMap::Node fromNode = map.getNode(from.x, from.y);
 
-  // =========================================================
   // 横向きゲート
-  // =========================================================
-
   if(gate.start.y == gate.end.y) {
     const int centerX = (gate.start.x + gate.end.x) / 2;
     const int gateY = gate.start.y;
-
     const EtRallyMap::Node gateNode = map.getNode(centerX, gateY);
 
     /*
@@ -991,14 +949,10 @@ double RouteFollower::calculateDistanceToGate(const RouteState& from, const Gate
     return std::abs(gateNode.y - fromNode.y);
   }
 
-  // =========================================================
   // 縦向きゲート
-  // =========================================================
-
   if(gate.start.x == gate.end.x) {
     const int gateX = gate.start.x;
     const int centerY = (gate.start.y + gate.end.y) / 2;
-
     const EtRallyMap::Node gateNode = map.getNode(gateX, centerY);
 
     /*

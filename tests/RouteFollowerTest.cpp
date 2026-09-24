@@ -29,4 +29,3 @@ namespace etrobocon2026_test {
     EXPECT_NO_THROW(routeFollower.run(route));
   }
 }  // namespace etrobocon2026_test
-   // namespace etrobocon2026_test

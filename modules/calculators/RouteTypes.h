@@ -14,7 +14,7 @@
  * @param up    : Yが減る方向
  * @param right : Xが減る方向
  * @param down  : Yが増える方向
- * @param left  : Xが増え方向
+ * @param left  : Xが増える方向
  */
 enum class Direction { UP = 0, RIGHT, DOWN, LEFT };
 

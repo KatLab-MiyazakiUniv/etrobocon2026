@@ -228,13 +228,13 @@ void EtRobocon2026::start()
   MapData& mapData = robot.getMapData();
 
   // RED
-  mapData.setGate(GoalColor::RED, convertPoint({ 1, 1 }), convertPoint({ 3, 1 }));
+  mapData.setGatePoint(GoalColor::RED, convertPoint({ 1, 1 }), convertPoint({ 3, 1 }));
 
   // BLUE
-  mapData.setGate(GoalColor::BLUE, convertPoint({ 9, 1 }), convertPoint({ 9, 3 }));
+  mapData.setGatePoint(GoalColor::BLUE, convertPoint({ 9, 1 }), convertPoint({ 9, 3 }));
 
   // YELLOW
-  mapData.setGate(GoalColor::YELLOW, convertPoint({ 5, 9 }), convertPoint({ 7, 9 }));
+  mapData.setGatePoint(GoalColor::YELLOW, convertPoint({ 5, 9 }), convertPoint({ 7, 9 }));
 
   Logger::printfLog(Logger::INFO, "registered gates=%d",
                     static_cast<int>(mapData.getGates().size()));

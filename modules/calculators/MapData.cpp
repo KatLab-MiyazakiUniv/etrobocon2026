@@ -92,7 +92,7 @@ namespace {
 
 MapData::MapData() : gates() {}
 
-void MapData::setGate(GoalColor color, const Point& start, const Point& end)
+void MapData::setGatePoint(GoalColor color, const Point& start, const Point& end)
 {
   // 同じ色のゲートがすでに存在する場合は更新
   for(Gate& gate : gates) {
@@ -124,7 +124,7 @@ bool MapData::setGate(GoalColor color, int startNumber, int endNumber)
   }
 
   // 変換した座標を使用してゲート情報を登録
-  setGate(color, start, end);
+  setGatePoint(color, start, end);
 
   return true;
 }

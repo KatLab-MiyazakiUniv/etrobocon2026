@@ -47,16 +47,14 @@ namespace {
 
 RouteFollower::RouteFollower(Robot& _robot, const EtRallyMap& _map, double _targetSpeed,
                              const Pid::PidGain& _rotationPid,
-                             const Pid::PidGain& _squareRotationPid, const Pid::PidGain& _rightPid,
-                             const Pid::PidGain& _leftPid, const Pid::PidGain& _straightAnglePid,
-                             double _straightDeadbandRate, double _straightMaxoutRate)
+                             const Pid::PidGain& _squareRotationPid,
+                             const Pid::PidGain& _straightAnglePid, double _straightDeadbandRate,
+                             double _straightMaxoutRate)
   : robot(_robot),
     map(_map),
     targetSpeed(_targetSpeed),
     rotationPid(_rotationPid),
     squareRotationPid(_squareRotationPid),
-    rightPid(_rightPid),
-    leftPid(_leftPid),
     straightAnglePid(_straightAnglePid),
     straightDeadbandRate(_straightDeadbandRate),
     straightMaxoutRate(_straightMaxoutRate)
@@ -261,8 +259,8 @@ void RouteFollower::straight(double distance)
 
   auto condition = std::make_unique<DistanceCondition>(robot, distance);
 
-  Straight straightMotion(robot, std::move(condition), targetSpeed, rightPid, leftPid,
-                          straightAnglePid, true, straightDeadbandRate, straightMaxoutRate);
+  Straight straightMotion(robot, std::move(condition), targetSpeed, straightAnglePid, true,
+                          straightDeadbandRate, straightMaxoutRate);
 
   Logger::printfLog(Logger::INFO,
                     "RouteFollower: "
@@ -290,8 +288,8 @@ void RouteFollower::backward(double distance)
   auto condition = std::make_unique<DistanceCondition>(robot, distance);
 
   // 目標速度を負にすることで後退する。
-  Straight straightMotion(robot, std::move(condition), -std::abs(targetSpeed), rightPid, leftPid,
-                          straightAnglePid, true, straightDeadbandRate, straightMaxoutRate);
+  Straight straightMotion(robot, std::move(condition), -std::abs(targetSpeed), straightAnglePid,
+                          true, straightDeadbandRate, straightMaxoutRate);
 
   Logger::printfLog(Logger::INFO,
                     "RouteFollower: "

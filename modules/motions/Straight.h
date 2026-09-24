@@ -21,14 +21,15 @@ class Straight : public BaseMotion {
    * @param _robot ロボットクラスのインスタンス
    * @param _continuationCondition 動作を継続する条件を判定するクラスのインスタンス
    * @param _targetSpeed 目標速度(mm/秒)
-   * @param _rightPid 右タイヤのPIDゲイン
-   * @param _leftPid 左タイヤのPIDゲイン
    * @param _anglePidGain 角度制御用PIDゲイン
    * @param _shouldUseIMU IMUを使用するかどうか
+   * @param _deadbandRate turningPowerに適用するデッドバンドの割合(0.0〜1.0、basePowerに対する割合)
+   * @param _maxoutRate turningPowerに適用するマックスアウトの割合(0.0〜1.0、basePowerに対する割合)
    */
 
   Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-           double _targetSpeed, const Pid::PidGain& _anglePidGain, bool _shouldUseIMU);
+           double _targetSpeed, const Pid::PidGain& _anglePidGain, bool _shouldUseIMU,
+           double _deadbandRate, double _maxoutRate);
   /**
    * デストラクタ
    */
@@ -61,6 +62,8 @@ class Straight : public BaseMotion {
   SpeedCalculator speedCalculator;  // SpeedCalculatorクラスのインスタンス
   Pid anglePid;                     // 角度制御用PID
   bool shouldUseIMU;                // IMUを使用するかどうか
+  double deadbandRate;              // turningPowerに適用するデッドバンドの割合(0.0〜1.0)
+  double maxoutRate;                // turningPowerに適用するマックスアウトの割合(0.0〜1.0)
 };
 
 #endif

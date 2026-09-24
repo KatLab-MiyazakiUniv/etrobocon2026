@@ -45,7 +45,7 @@ namespace etrobocon2026_test {
     using RelativeRotation::RelativeRotation;
   };
 
-  TEST(ETZumoControlTest, RelativeRotationKeepsSmallPidOutput)
+  TEST(ETZumoControlTest, RelativeRotationOvercomesSmallPidOutputInBothDirections)
   {
     MockNetworkSystem network;
     SocketClient client(network);
@@ -58,8 +58,8 @@ namespace etrobocon2026_test {
       // ダミーIMUは読み取りごとに1度進むため、準備時と同じ方位に戻す。
       robot.getIMUControllerInstance().resetAzimuth();
       rotation.executeStep();
-      EXPECT_EQ(-angle, robot.getWheelMotorControllerInstance().getRightPower());
-      EXPECT_EQ(angle, robot.getWheelMotorControllerInstance().getLeftPower());
+      EXPECT_EQ(angle > 0 ? -50 : 50, robot.getWheelMotorControllerInstance().getRightPower());
+      EXPECT_EQ(angle > 0 ? 50 : -50, robot.getWheelMotorControllerInstance().getLeftPower());
     }
   }
 

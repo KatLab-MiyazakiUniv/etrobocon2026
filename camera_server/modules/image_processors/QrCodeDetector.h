@@ -86,8 +86,7 @@ class QrCodeDetector : public CodeDetector<QrCodeDetectionResult> {
    * @param stepName 検出に成功した前処理ステップ名
    * @return 生成されたQrCodeDetectionResult
    */
-  QrCodeDetectionResult createResult(const ZXing::Result& barcode, const cv::Rect& roiRect,
-                                     const std::string& stepName = "");
+  QrCodeDetectionResult createResult(const ZXing::Result& barcode, const cv::Rect& roiRect);
 };
 
 #endif  // QR_CODE_DETECTOR_H

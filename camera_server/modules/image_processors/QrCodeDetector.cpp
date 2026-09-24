@@ -83,13 +83,12 @@ cv::Mat QrCodeDetector::applyBilateral(const cv::Mat& src, int d, double sigmaCo
 }
 
 QrCodeDetectionResult QrCodeDetector::createResult(const ZXing::Result& barcode,
-                                                   const cv::Rect& roiRect,
-                                                   const std::string& stepName)
+                                                   const cv::Rect& roiRect)
 {
   QrCodeDetectionResult result;
   result.wasDetected = true;
   result.content = barcode.text();
-  result.detectedStep = stepName;
+  // result.detectedStep = stepName;
 
   auto position = barcode.position();
   result.corners[0]
@@ -127,7 +126,8 @@ QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
                          static_cast<int>(roiFrame.step));
   auto qrCode = ZXing::ReadBarcode(ivRaw, options);
   if(qrCode.isValid()) {
-    return createResult(qrCode, roiRect, "Raw");
+    // return createResult(qrCode, roiRect, "Raw");
+    return createResult(qrCode, roiRect);
   }
 
   // --- Step 2: シャープ化 + CLAHE (コントラスト強調 & 輪郭強調) でデコード試行 ---
@@ -136,25 +136,8 @@ QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
                            static_cast<int>(imgStep2.step));
   qrCode = ZXing::ReadBarcode(ivStep2, options);
   if(qrCode.isValid()) {
-    return createResult(qrCode, roiRect, "Sharpen+CLAHE");
-  }
-
-  // --- Step 3: バイラテラル + CLAHE (エッジ保持ノイズ除去 & コントラスト強調) でデコード試行 ---
-  cv::Mat imgStep3 = applyCLAHE(applyBilateral(roiFrame, 5, 50.0, 50.0));
-  ZXing::ImageView ivStep3(imgStep3.data, imgStep3.cols, imgStep3.rows, ZXing::ImageFormat::BGR,
-                           static_cast<int>(imgStep3.step));
-  qrCode = ZXing::ReadBarcode(ivStep3, options);
-  if(qrCode.isValid()) {
-    return createResult(qrCode, roiRect, "Bilateral+CLAHE");
-  }
-
-  // --- Step 4: 複合処理 (バイラテラル + CLAHE + シャープ化) でデコード試行 ---
-  cv::Mat imgStep4 = applySharpen(imgStep3, 1.5);
-  ZXing::ImageView ivStep4(imgStep4.data, imgStep4.cols, imgStep4.rows, ZXing::ImageFormat::BGR,
-                           static_cast<int>(imgStep4.step));
-  qrCode = ZXing::ReadBarcode(ivStep4, options);
-  if(qrCode.isValid()) {
-    return createResult(qrCode, roiRect, "Bilateral+CLAHE+Sharpen");
+    // return createResult(qrCode, roiRect, "Sharpen+CLAHE");
+    return createResult(qrCode, roiRect);
   }
 
   // 検出は成功したが、デコード（復号）フェーズで失敗した場合のログ

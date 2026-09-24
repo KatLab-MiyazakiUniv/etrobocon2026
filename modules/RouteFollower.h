@@ -38,15 +38,12 @@ class RouteFollower {
    * @param _targetSpeed 直進速度
    * @param _rotationPid 通常回頭PID
    * @param _squareRotationPid 正方形補正回頭PID
-   * @param _rightPid 右モーターPID
-   * @param _leftPid 左モーターPID
    * @param _straightAnglePid 直進角度PID
    * @param _straightDeadbandRate 直進デッドバンド率
    * @param _straightMaxoutRate 直進マックスアウト率
    */
   RouteFollower(Robot& _robot, const EtRallyMap& _map, double _targetSpeed,
                 const Pid::PidGain& _rotationPid, const Pid::PidGain& _squareRotationPid,
-                const Pid::PidGain& _rightPid, const Pid::PidGain& _leftPid,
                 const Pid::PidGain& _straightAnglePid, double _straightDeadbandRate,
                 double _straightMaxoutRate);
 
@@ -62,8 +59,6 @@ class RouteFollower {
   double targetSpeed;              // 目標走行速度
   Pid::PidGain rotationPid;        // 通常回頭用PIDゲイン
   Pid::PidGain squareRotationPid;  // 正方形補正回頭用PIDゲイン
-  Pid::PidGain rightPid;           // 右モーター用PIDゲイン
-  Pid::PidGain leftPid;            // 左モーター用PIDゲイン
   Pid::PidGain straightAnglePid;   // 直進角度PIDゲイン
   double straightDeadbandRate;     // 直進デッドバンド率
   double straightMaxoutRate;       // 直進マックスアウト率

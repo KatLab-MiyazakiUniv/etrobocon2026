@@ -309,22 +309,19 @@ void EtRobocon2026::start()
    */
   const Pid::PidGain straightAnglePid = { 0.033, 0.003, 0.03 };
 
+  const double straightDeadbandRate = 0.25;
+const double straightMaxoutRate = 0.54;
+
   // =========================================================
   // 8. RouteFollower
   // =========================================================
 
-  RouteFollower routeFollower(
-      robot,
-      etRallyMap,
-      TARGET_SPEED,
-      rotationPid,
-      squareRotationPid,
-      rightPid,
-      leftPid,
-      straightAnglePid,
-      STRAIGHT_DEADBAND_RATE,
-      STRAIGHT_MAXOUT_RATE);
-
+RouteFollower routeFollower(robot, etRallyMap, TARGET_SPEED,
+                            rotationPid,
+                            squareRotationPid,
+                            straightAnglePid,
+                            straightDeadbandRate,
+                            straightMaxoutRate);
   // =========================================================
   // 9. 開始時刻
   // =========================================================
@@ -598,18 +595,14 @@ void EtRobocon2026::start()
           robot,
           FINAL_STRAIGHT_DISTANCE);
 
-  Straight finalStraight(
-      robot,
-      std::move(finalStraightCondition),
-      TARGET_SPEED,
-      rightPid,
-      leftPid,
-      straightAnglePid,
-      true,
-      STRAIGHT_DEADBAND_RATE,
-      STRAIGHT_MAXOUT_RATE);
+Straight finalStraight(robot, std::move(finalStraightCondition),
+                       TARGET_SPEED,
+                       straightAnglePid,
+                       true,
+                       straightDeadbandRate,
+                       straightMaxoutRate);
 
-  finalStraight.run();
+finalStraight.run();
 
   Logger::printfLog(
       Logger::INFO,

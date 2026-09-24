@@ -1,13 +1,17 @@
-コマンド名,ID,speed,targetBrightnessOffset,kp,ki,kd,deadbandRate,maxoutRate
-LineTrace,ID,double,int,double,double,double,double,double
-#直線系
-LineTrace,S001,500.0,0,0.03,0.001,0.008,0.015,0.015
-LineTrace,S002,400.0,0,0.04,0.001,0.020,0.166,1.0
-LineTrace,S003,500.0,0,0.04,0.001,0.01,0.1,1.0
+コマンド名,ID,speed,brightness,brightness_kp,brightness_ki,brightness_kd
+LineTrace,ID,double,int,double,double,double
+# 直線
+LineTrace,001,400,50,0.0025,0.0,0.008 
+LineTrace,002,500,50,0.035,0.0,0.018
+LineTrace,006,500,50,0.037,0.0,0.01
+LineTrace,007,400,50,0.06,0.0,0.03
+LineTrace,008,400,50,0.025,0.00,0.015
+# カーブ
+# 右エッジ
+LineTrace,003,350,50,0.07,0.03,0.01
+# 左エッジ
+LineTrace,004,400,50,0.06,0.03,0.013
 
-#カーブ系
-LineTrace,C001,420.0,0,0.080,0.0045,0.0115,0.0,1.0
-LineTrace,C002,420.0,0,0.1,0.00455,0.0115,0.0,1.0
-LineTrace,C003,420.0,0,0.075,0.005,0.011,0.0,1.0
-LineTrace,C004,420.0,0,0.027,0.0045,0.011,0.01,1.0
-LineTrace,C005,420.0,0,0.045,0.0045,0.011,0.01,1.0
+#くねくね
+LineTrace
+LineTrace,005

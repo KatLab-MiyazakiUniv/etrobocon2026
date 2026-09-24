@@ -1,5 +1,6 @@
 コマンド名,ID,距離
 Distance,ID,double
+# 第一、二直線
 Distance,000,00
 Distance,001,10
 Distance,002,20

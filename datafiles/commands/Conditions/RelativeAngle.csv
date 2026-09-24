@@ -1,5 +1,4 @@
-Command,ID,relativeAngle,tolerance
-説明,説明,説明,説明
-RelativeAngle,1,90,2
-RelativeAngle,2,-90,2
-RelativeAngle,3,180,3
+コマンド名,ID,targetAngle
+RelativeAngle,ID,double
+RelativeAngle,001,90
+RelativeAngle,002,-90

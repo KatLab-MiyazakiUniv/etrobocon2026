@@ -25,7 +25,7 @@ class MapData {
    * @param start ゲートの始点
    * @param end ゲートの終点
    */
-  void setGate(GoalColor color, const Point& start, const Point& end);
+  void setGatePoint(GoalColor color, const Point& start, const Point& end);
 
   /**
    * @brief 座標番号からゲート情報を登録・更新する

@@ -302,10 +302,7 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
 
       auto targetColor1 = ColorSensorController::convertStringToColor(targetColorName1);
       auto targetColor2 = ColorSensorController::convertStringToColor(targetColorName2);
-      
-      
 
-    
       auto colorCondition1 = std::make_unique<SensorColorCondition>(robot, targetColor1);
       auto colorCondition2 = std::make_unique<SensorColorCondition>(robot, targetColor2);
 
@@ -509,8 +506,6 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       // ここでCameraTrackigのメンバ変数のdetectorのメンバ変数のhsvRangesをセットする
     }
 
-
-
     case MOTION_COMMAND::ABSOLUTE_ROTATION: {
       // AbsoluteRotation:
       // motionParams[2]=anglePid.kp
@@ -580,7 +575,7 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
           { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING },
           { "Calibrator", MOTION_COMMAND::CALIBRATOR },
-           { "Snapshot", MOTION_COMMAND::SNAPSHOT },
+          { "Snapshot", MOTION_COMMAND::SNAPSHOT },
           { "ResetAzimuth", MOTION_COMMAND::RESET_AZIMUTH },
           { "ETZumoExit", MOTION_COMMAND::ET_ZUMO_EXIT },
           { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH }
@@ -614,7 +609,7 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
           { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC },
           { "ColorOrColor", CONDITION_COMMAND::COLOR_OR_COLOR }
 
-         };
+        };
 
   // 条件コマンド文字列に対応するCONDITION_COMMAND値をマップから取得。なければCONDITION_COMMAND::NONEを返す
   auto it = conditionMap.find(str);

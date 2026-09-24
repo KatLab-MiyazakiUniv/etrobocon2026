@@ -73,8 +73,6 @@ void CameraTracking::executeStep()
   bool wasDetected = false;
   double currentX = 0.0;
 
-
-
   if(detectionMode == DetectionMode::COLOR_REGION) {
     CameraServer::ColorRegionDetectorResponse response;
     success = client.executeColorRegionDetection(colorDetectionRequest, response);
@@ -88,7 +86,6 @@ void CameraTracking::executeStep()
     }
 
     // 黒を除く最大面積の色範囲取得>
-
     if(response.largestColorIndex != -1) {
       Logger::printfLog(Logger::DEBUG, "CameraTracking:最大色の検知失敗");
     }
@@ -103,10 +100,6 @@ void CameraTracking::executeStep()
     // バウンディングボックスの中心X座標を計算
     currentX = (response.result.topLeft.x + response.result.bottomRight.x) / 2.0;
   }
-
-
-
-
 
   else if(detectionMode == DetectionMode::QR_CODE) {
     CameraServer::QrCodeDetectorResponse response;
@@ -155,11 +148,10 @@ void CameraTracking::wait()
 void CameraTracking::finish()
 {
   if(isStopMotorPower) {
-
-  ClockUtil::sleep(10);
-  robot.getWheelMotorControllerInstance().brakeBoth();
-  ClockUtil::sleep(10);
-  robot.getWheelMotorControllerInstance().stopBoth();
+    ClockUtil::sleep(10);
+    robot.getWheelMotorControllerInstance().brakeBoth();
+    ClockUtil::sleep(10);
+    robot.getWheelMotorControllerInstance().stopBoth();
   }
 }
 

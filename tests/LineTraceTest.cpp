@@ -174,11 +174,11 @@ namespace etrobocon2026_test {
     RealNetworkSystem netSys;
     SocketClient socketClient(netSys);
     Robot robot(socketClient);
-    double targetSpeed = 100.0;     // 目標速度
-    double targetDistance = 100.0;  // 目標距離
-    int targetBrightness = 50;      // 目標とする明るさの値(%)
+    double targetSpeed = 100.0;      // 目標速度
+    double targetDistance = 100.0;   // 目標距離
+    int targetBrightness = 50;       // 目標とする明るさの値(%)
     double largeDeadbandRate = 0.5;  // マックスアウトの割合を上回るデッドバンドの割合
-    double smallMaxoutRate = 0.3;  // デッドバンドの割合を下回るマックスアウトの割合
+    double smallMaxoutRate = 0.3;    // デッドバンドの割合を下回るマックスアウトの割合
 
     // ライントレース前の走行距離を計算
     double startMileage

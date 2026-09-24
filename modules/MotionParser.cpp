@@ -588,9 +588,9 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
     case MOTION_COMMAND::RESET_AZIMUTH: {
       return new ResetAzimuth(robot, std::move(condition));
     }
-   case MOTION_COMMAND::SNAPSHOT: {
-  return new Snapshot(robot, "snapshot", std::move(condition));
-}
+    case MOTION_COMMAND::SNAPSHOT: {
+      return new Snapshot(robot, "snapshot", std::move(condition));
+    }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
                         motionParams[0].c_str());

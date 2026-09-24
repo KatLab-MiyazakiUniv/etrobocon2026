@@ -41,7 +41,7 @@ class ProjectedMileage {
   bool isValid() const;
 
  private:
-  bool valid = false;  // reset後は計測可能、入力異常時は次のresetまで無効
+  bool valid = false;             // reset後は計測可能、入力異常時は次のresetまで無効
   double previousMileage = 0.0;   // 前回の累計走行距離[mm]
   double previousAngle = 0.0;     // 前回の方位[deg]
   double verticalDistance = 0.0;  // 基準方向と直交する方向への累積移動距離[mm]

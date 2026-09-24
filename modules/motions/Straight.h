@@ -62,8 +62,8 @@ class Straight : public BaseMotion {
   SpeedCalculator speedCalculator;  // SpeedCalculatorクラスのインスタンス
   Pid anglePid;                     // 角度制御用PID
   bool shouldUseIMU;                // IMUを使用するかどうか
-  double deadbandRate;  // turningPowerに適用するデッドバンドの割合(0.0〜1.0)
-  double maxoutRate;    // turningPowerに適用するマックスアウトの割合(0.0〜1.0)
+  double deadbandRate;              // turningPowerに適用するデッドバンドの割合(0.0〜1.0)
+  double maxoutRate;                // turningPowerに適用するマックスアウトの割合(0.0〜1.0)
 };
 
 #endif

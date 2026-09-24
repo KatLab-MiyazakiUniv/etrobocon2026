@@ -27,9 +27,9 @@ void EtRobocon2026::start()
   robot.setCourse(Course::Left);
   robot.setEdge(Edge::RightEdge);
   // LineTrace走行
-  Area lineTraceArea = Area::LineTrace;
-  AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
-  lineTraceAreaMaster.run();
+  // Area lineTraceArea = Area::LineTrace;
+  // AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
+  // lineTraceAreaMaster.run();
 
   // BotlleDelivery走行
   Area bottleDeliveryArea = Area::BottleDelivery;

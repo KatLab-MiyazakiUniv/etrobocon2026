@@ -25,7 +25,7 @@ namespace etrobocon2026_test {
     RealNetworkSystem netSys;
     SocketClient socketClient(netSys);
     Robot robot(socketClient);
-    double targetSpeed = 1000.0;   // 目標速度
+    double targetSpeed = 500.0;    // 目標速度
     double targetDistance = 10.0;  // 目標距離
     int targetBrightness = 50;     // 目標とする明るさの値(%)
 

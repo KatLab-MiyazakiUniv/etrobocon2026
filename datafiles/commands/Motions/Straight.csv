@@ -1,4 +1,4 @@
-Command,ID,Speed,RightKp,RightKi,RightKd,LeftKp,LeftKi,LeftKd,AngleKp,AngleKi,AngleKd,UseIMU,DeadbandRate,MaxoutRate
-コマンド名,動作ID,走行速度,右モータP,右モータI,右モータD,左モータP,左モータI,左モータD,角度P,角度I,角度D,IMUを使うか,小さい誤差を無視する割合,出力を制限する割合
-Straight,001,300,0.01477,0.00448,0.0015,0.016,0.0045,0.0015,0.033,0.003,0.03,true,0.24,0.54
-Straight,002,300,0.016,0.0045,0.0015,0.016,0.0045,0.0015,0.033,0.003,0.03,true,0.03,1.0
+Command,ID,Speed,AngleKp,AngleKi,AngleKd,UseIMU,DeadbandRate,MaxoutRate
+コマンド名,動作ID,走行速度,角度P,角度I,角度D,IMUを使うか,デッドバンド,マックスアウト
+Straight,001,300,0.033,0.003,0.03,true,0.24,0.54
+Straight,002,300,0.033,0.003,0.03,true,0.03,1.0

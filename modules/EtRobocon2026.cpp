@@ -205,21 +205,19 @@ void EtRobocon2026::start()
 
   Point startPoint;
 
-switch (robot.getIndexOfLabel()) {
-case 0:
-    startPoint = convertPoint({0,4});
-    break;
+  switch(robot.getIndexOfLabel()) {
+    case 0:
+      startPoint = convertPoint({ 0, 4 });
+      break;
 
-case 1:
-    startPoint = convertPoint({0,6});
-    break;
+    case 1:
+      startPoint = convertPoint({ 0, 6 });
+      break;
 
-case 2:
-    startPoint = convertPoint({0,8});
-    break;
-}
-
-
+    case 2:
+      startPoint = convertPoint({ 0, 8 });
+      break;
+  }
 
   int currentGridX = startPoint.x;
   int currentGridY = startPoint.y;

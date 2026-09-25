@@ -9,7 +9,7 @@
 ColorRegionDetectionActionHandler::ColorRegionDetectionActionHandler(CameraCapture& _camera)
   : camera(_camera),
     detector({ { cv::Scalar(0, 0, 0, 0), cv::Scalar(180, 255, 30, 0) } },
-             cv::Rect(0, 0, 1920, 1080))
+             cv::Rect(0, 0, CAM_MAX_WIDTH, CAM_MAX_HEIGHT))
 {
   LOG_CREATE("ColorRegionDetectionActionHandler");
 }
@@ -23,6 +23,8 @@ void ColorRegionDetectionActionHandler::execute(
     const CameraServer::ColorRegionDetectorRequest& request,
     CameraServer::ColorRegionDetectorResponse& response)
 {
+  int totalStartTime = ClockUtil::now();
+
   cv::Mat frame;
   if(!camera.getFrame(frame)) {
     Logger::error("ColorRegionDetectionActionHandler:フレームの取得に失敗しました");
@@ -45,8 +47,9 @@ void ColorRegionDetectionActionHandler::execute(
 
   detector.setHsvRanges(localHsvRanges);
   detector.setValidatedRoi(localRoi);
-  BoundingBoxDetectionResult localResult;
 
+  // 色領域検出
+  BoundingBoxDetectionResult localResult;
   if(request.requireLargestColorIndex) {
     detector.detect(frame, localResult, response.largestColorIndex);
   } else {
@@ -69,4 +72,11 @@ void ColorRegionDetectionActionHandler::execute(
   } else {
     Logger::error("ColorRegionDetectionActionHandler:色領域が検出されませんでした");
   }
+
+  std::string directoryPath = "datafiles/line_trace";
+  MultiThread::wrap(
+      [=]() mutable { FrameSave::save(frame, directoryPath, localResult, localRoi); });
+  int totalEndTime = ClockUtil::now();
+  Logger::printfLog(Logger::INFO, "[Perf] execute全体処理時間: %d ms",
+                    totalEndTime - totalStartTime);
 }

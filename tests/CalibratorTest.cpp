@@ -12,7 +12,7 @@
 
 using namespace std;
 
-namespace etrobocon2025_test {
+namespace etrobocon2026_test {
   // waitForStart()において期待した出力がされており，WarningやErrorが出ていないかテスト
   TEST(CalibratorTest, WaitForStart)
   {
@@ -100,4 +100,4 @@ namespace etrobocon2025_test {
     std::remove("etrobocon2026/key.txt");
     std::filesystem::remove("etrobocon2026");
   }
-}  // namespace etrobocon2025_test
+}  // namespace etrobocon2026_test

@@ -10,6 +10,7 @@ ColorSensorController::ColorSensorController() : colorSensor(EPort::PORT_E) {}
 
 ColorSensorController::COLOR ColorSensorController::convertStringToColor(std::string_view str)
 {
+  if(str == "GRAY") return COLOR::GRAY;
   if(str == "BLACK") return COLOR::BLACK;
   if(str == "WHITE") return COLOR::WHITE;
   if(str == "BLUE") return COLOR::BLUE;
@@ -22,6 +23,8 @@ ColorSensorController::COLOR ColorSensorController::convertStringToColor(std::st
 const char* ColorSensorController::convertColorToString(const COLOR& color)
 {
   switch(color) {
+    case COLOR::GRAY:
+      return "GRAY";
     case COLOR::BLACK:
       return "BLACK";
     case COLOR::WHITE:
@@ -49,9 +52,13 @@ ColorSensorController::COLOR ColorSensorController::convertHsvToColor(HSV& hsv)
   if(hsv.s < SATURATION_BORDER) {
     // 明度が低ければ、黒を返す
     if(hsv.v < BLACK_BORDER) return COLOR::BLACK;
+    // 黒より明るく白より暗い無彩色は、灰色として区別する。
+    if(hsv.v < GRAY_VALUE_BORDER) return COLOR::GRAY;
     // 明度が高ければ、白を返す
     return COLOR::WHITE;
   }
+  // この判定保留はSATURATION_BORDER以上の暗色だけに適用する。
+  if(hsv.v < CHROMATIC_VALUE_BORDER) return COLOR::NONE;
   // 各色相の境界によって、色を判別する
   if(hsv.h < RED_BORDER) return COLOR::RED;
   if(hsv.h < YELLOW_BORDER) return COLOR::YELLOW;

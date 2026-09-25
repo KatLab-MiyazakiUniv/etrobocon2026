@@ -63,7 +63,8 @@ bool CameraCapture::openCamera()
     Logger::error("カメラを開くことができませんでした。");
     return false;
   }
-
+  // バッファサイズを1に設定
+  cap.set(cv::CAP_PROP_BUFFERSIZE, 1);
   // MJPEG形式に設定
   if(!cap.set(cv::CAP_PROP_FOURCC, cv::VideoWriter::fourcc('M', 'J', 'P', 'G'))) {
     Logger::error("MJPEG形式の設定に失敗しました。");

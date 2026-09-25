@@ -11,7 +11,9 @@
 using namespace std;
 const string AreaMaster::basePath
     = "etrobocon2026/datafiles/commands/Area/";  // エリアコマンドCSVファイルを置いているディレクトリのパス
-const array<string, 2> AreaMaster::areaCommandNames = { "LineTrace", "Area2" };  // エリア名の配列
+const array<string, 5> AreaMaster::areaCommandNames = {
+  "LineTrace", "ETZumo", "RedBottleDelivery", "BlueBottleDelivery", "YellowBottleDelivery",
+};  // エリア名の配列
 
 AreaMaster::AreaMaster(Robot& _robot, Area _area) : robot(_robot), area(_area) {}
 
@@ -21,9 +23,19 @@ void AreaMaster::run()
   vector<BaseMotion*> motionList;
 
   // コマンドファイルパスを作成する
-  string commandFilePath = basePath + areaCommandNames[static_cast<int>(area)]
-                           + (robot.getCourse() == Course::Left ? "Left" : "Right") + ".csv";
+  if(area == Area::BottleDelivery) {
+    commandFilePath = basePath + areaCommandNames[static_cast<int>(area) + robot.getIndexOfLabel()]
+                      + (robot.getCourse() == Course::Left ? "Left" : "Right") + ".csv";
 
+  } else if(area == Area::ETZumo) {
+    commandFilePath = basePath + areaCommandNames[1]
+                      + (robot.getCourse() == Course::Left ? "Left" : "Right") + ".csv";
+
+  } else {
+    commandFilePath = basePath + areaCommandNames[static_cast<int>(area)]
+                      + (robot.getCourse() == Course::Left ? "Left" : "Right") + ".csv";
+  }
+  Logger::printfLog(Logger::INFO, "AreaMaster:パス[ %s ]を作成", commandFilePath.c_str());
   // 動作インスタンスのリストを生成する
   motionList = MotionParser::createMotionList(robot, commandFilePath);
 

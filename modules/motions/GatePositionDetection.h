@@ -41,7 +41,7 @@ class GatePositionDetection : public BaseMotion {
 
  private:
   CameraServer::QrCodeDetectorRequest qrDetectionRequest;  // QRコード検出リクエスト
-  bool decryptRequired;
+  bool decryptRequired = false;
 };
 
 #endif

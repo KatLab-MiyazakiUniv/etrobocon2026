@@ -23,6 +23,17 @@ GatePositionDetection::~GatePositionDetection()
 
 void GatePositionDetection::executeStep()
 {
+  // QR検出済みならreturn
+  if(decryptRequired) {
+    if(getHaveQR2contents()) {
+      return;
+    }
+  } else {
+    if(getHaveQR1contents()) {
+      return;
+    }
+  }
+
   // QRコードを検出
 
   SocketClient& client = robot.getCameraSocketClientInstance();
@@ -38,6 +49,13 @@ void GatePositionDetection::executeStep()
     return;
   } else {
     Logger::error("GatePositionDetection: QRコードの検出に成功しました。");
+
+    // QR検出成功ならフラグを更新
+    if(decryptRequired) {
+      setHaveQR2contents()
+    } else {
+      setHaveQR1contents()
+    }
   }
 
   //  QRコードの暗号文を復号
@@ -58,10 +76,7 @@ void GatePositionDetection::executeStep()
     gatePositionData = qrResponse.content;
   }
 
-  // -----------------------------
-  // 4. 平文を解析して
-  //    ゲート位置情報をRobotに設定
-  // -----------------------------
+  //  平文を解析して,ゲート位置情報をRobotに設定
 
   GatePositionParser parser(gatePositionData, robot);
 

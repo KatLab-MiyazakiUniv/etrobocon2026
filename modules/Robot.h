@@ -150,7 +150,7 @@ class Robot {
    * @brief ボトルキャリーで取得した色領域のインデックスを取得する
    * @return indexOfLabel ボトルキャリーで取得した色範囲のインデックス
    */
-  int getIndexOfLabel();
+  int getIndexOfLabel() const;
 
   /**
    * @brief ゲート位置情報を取得する
@@ -162,13 +162,23 @@ class Robot {
    * @brief QR1検出済みかのフラグを取得する
    * @return  QR1検出済みかのフラグ
    */
-  int haveQR1contents();
+  bool getHaveQR1contents();
 
   /**
    * @brief QR2検出済みかのフラグを取得する
    * @return  QR2検出済みかのフラグ
    */
-  int haveQR2contents();
+  bool getHaveQR2contents();
+
+  /**
+   * @brief QR1検出済みのフラグをセットする
+   */
+  void setHaveQR1contents();
+
+  /**
+   * @brief QR2検出済みのフラグをセットする
+   */
+  void setHaveQR2contents();
 
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス

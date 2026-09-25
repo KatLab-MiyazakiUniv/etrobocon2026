@@ -29,7 +29,6 @@ class SystemInfo {
   static constexpr double GRID_SIZE_Y = 122.5;        // Y方向の区間(mm)
   static constexpr double LAST_X_GRID_SIZE = 230.5;   // X方向の最後の区間(mm)
   static constexpr double LAST_Y_GRID_SIZE = 140.5;   // y方向の最後の区間(mm)
-  
 
   static constexpr int X_GRID_NUM = 10;  // X方向の区間数
   static constexpr int Y_GRID_NUM = 10;  // Y方向の区間数

@@ -59,17 +59,6 @@ class QrCodeDetector : public CodeDetector<QrCodeDetectionResult> {
   static cv::Mat applyCLAHE(const cv::Mat& src, double clipLimit = 3.0,
                             const cv::Size& tileGridSize = cv::Size(8, 8));
 
-  /**
-   * @brief バイラテラルフィルタによるエッジ保持平滑化
-   * @param src 入力画像
-   * @param d ピクセル近傍の直径
-   * @param sigmaColor 色空間のシグマ値
-   * @param sigmaSpace 座標空間のシグマ値
-   * @return 処理後画像
-   */
-  static cv::Mat applyBilateral(const cv::Mat& src, int d = 5, double sigmaColor = 50.0,
-                                double sigmaSpace = 50.0);
-
  private:
   ZXing::ReaderOptions options;  // ZXingのデコードオプション
   cv::Rect roi;                  // フレーム全体に対するROI

@@ -74,14 +74,6 @@ cv::Mat QrCodeDetector::applyCLAHE(const cv::Mat& src, double clipLimit,
   return result;
 }
 
-cv::Mat QrCodeDetector::applyBilateral(const cv::Mat& src, int d, double sigmaColor,
-                                       double sigmaSpace)
-{
-  cv::Mat filtered;
-  cv::bilateralFilter(src, filtered, d, sigmaColor, sigmaSpace);
-  return filtered;
-}
-
 QrCodeDetectionResult QrCodeDetector::createResult(const ZXing::Result& barcode,
                                                    const cv::Rect& roiRect)
 {

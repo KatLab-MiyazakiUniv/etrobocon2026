@@ -158,6 +158,18 @@ class Robot {
    */
   MapData& getMapDataInstance();
 
+  /**
+   * @brief QR1検出済みかのフラグを取得する
+   * @return  QR1検出済みかのフラグ
+   */
+  int haveQR1contents();
+
+  /**
+   * @brief QR2検出済みかのフラグを取得する
+   * @return  QR2検出済みかのフラグ
+   */
+  int haveQR2contents();
+
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
   ArmMotorController armMotorController;        // ArmMotorController インスタンス
@@ -175,5 +187,7 @@ class Robot {
   int targetBrightness = 50;                    // 目標輝度
   int indexOfLabel = 0;                         // ボトルキャリーで取得した色範囲のインデックス
   MapData mapData;                              // ゲート位置情報
+  bool haveQR1contents = false;                 // QR1を検出済みかのフラグ
+  bool haveQR2contents = false;                 // QR2を検出済みかのフラグ
 };
 #endif

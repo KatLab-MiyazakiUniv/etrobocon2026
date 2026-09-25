@@ -21,7 +21,7 @@ namespace {
   /**
    * @brief 最大周回数
    */
-  constexpr int LAP_COUNT = 3;
+  constexpr int LAP_COUNT = 2;
 
   /**
    * @brief 最終地点へ向かう時間閾値[ms]
@@ -142,6 +142,19 @@ namespace {
     return nullptr;
   }
 
+  /**
+   * @brief 必要な3色のゲート情報がすべて存在するか判定する
+   * @param mapData マップ情報
+   * @return true RED、BLUE、YELLOWがすべて存在する
+   * @return false 1つ以上のゲート情報が存在しない
+   */
+  bool hasAllGates(const MapData& mapData)
+  {
+    return findGate(mapData, GoalColor::RED) != nullptr
+           && findGate(mapData, GoalColor::BLUE) != nullptr
+           && findGate(mapData, GoalColor::YELLOW) != nullptr;
+  }
+
 }  // namespace
 
 void EtRobocon2026::start()
@@ -206,98 +219,102 @@ void EtRobocon2026::start()
 
   bool shouldGoFinal = false;
 
-  for(int lap = 1; lap <= LAP_COUNT && !shouldGoFinal; ++lap) {
-    for(const GoalColor targetColor : TARGET_COLORS) {
-      Logger::printfLog(Logger::INFO, "Lap %d Target=%s", lap, colorToString(targetColor));
+  if(!hasAllGates(mapData)) {
+    Logger::info("Gate information is incomplete -> go final");
+    shouldGoFinal = true;
+  }
 
-      GateRouteResult routeResult
-          = routePlanner.search(currentGridX, currentGridY, currentDirection, targetColor);
+  if(!shouldGoFinal) {
+    for(int lap = 1; lap <= LAP_COUNT && !shouldGoFinal; ++lap) {
+      for(const GoalColor targetColor : TARGET_COLORS) {
+        Logger::printfLog(Logger::INFO, "Lap %d Target=%s", lap, colorToString(targetColor));
 
-      if(routeResult.route.size() < 2) {
-        Logger::error("EtRobocon2026: route search failed");
+        GateRouteResult routeResult
+            = routePlanner.search(currentGridX, currentGridY, currentDirection, targetColor);
 
-        robot.getWheelMotorControllerInstance().stopBoth();
+        if(routeResult.route.size() < 2) {
+          Logger::error("EtRobocon2026: route search failed");
 
-        return;
-      }
+          robot.getWheelMotorControllerInstance().stopBoth();
 
-      const Gate* targetGate = findGate(mapData, targetColor);
+          return;
+        }
 
-      if(targetGate == nullptr) {
-        Logger::printfLog(Logger::ERROR, "EtRobocon2026: %s gate not found",
-                          colorToString(targetColor));
+        const Gate* targetGate = findGate(mapData, targetColor);
 
-        robot.getWheelMotorControllerInstance().stopBoth();
-
-        return;
-      }
-
-      const bool outerGate = isOuterGate(*targetGate);
-
-      routeFollower.run(routeResult.route);
-
-      if(outerGate) {
-        currentGridX = routeResult.entrance.x;
-        currentGridY = routeResult.entrance.y;
-
-        currentDirection = routeResult.exitDirection;
-
-      } else {
-        currentGridX = routeResult.exit.x;
-        currentGridY = routeResult.exit.y;
-        currentDirection = routeResult.exitDirection;
-      }
-
-      if(targetColor == GoalColor::YELLOW) {
-        const int elapsedTime = ClockUtil::now() - startTime;
-
-        // 最大周回数に到達した場合は最終地点へ向かう
-        if(lap >= LAP_COUNT) {
-          Logger::info("Lap limit reached -> go final");
+        if(targetGate == nullptr) {
+          Logger::printfLog(Logger::ERROR, "EtRobocon2026: %s gate not found",
+                            colorToString(targetColor));
 
           shouldGoFinal = true;
 
           break;
         }
 
-        // 制限時間を超えた場合は最終地点へ向かう
-        if(elapsedTime >= FINAL_ROUTE_SWITCH_TIME_MS) {
-          Logger::info("Time threshold reached -> go final");
+        const bool outerGate = isOuterGate(*targetGate);
 
-          shouldGoFinal = true;
+        routeFollower.run(routeResult.route);
 
-          break;
+        if(outerGate) {
+          currentGridX = routeResult.entrance.x;
+          currentGridY = routeResult.entrance.y;
+          currentDirection = routeResult.exitDirection;
+
+        } else {
+          currentGridX = routeResult.exit.x;
+          currentGridY = routeResult.exit.y;
+          currentDirection = routeResult.exitDirection;
+        }
+
+        if(targetColor == GoalColor::YELLOW) {
+          const int elapsedTime = ClockUtil::now() - startTime;
+
+          if(lap >= LAP_COUNT) {
+            Logger::info("Lap limit reached -> go final");
+
+            shouldGoFinal = true;
+
+            break;
+          }
+
+          if(elapsedTime >= FINAL_ROUTE_SWITCH_TIME_MS) {
+            Logger::info("Time threshold reached -> go final");
+
+            shouldGoFinal = true;
+
+            break;
+          }
         }
       }
     }
+  }
 
-    const Point finalPoint = convertPoint({ 8, 0 });
-    const Direction finalDirection = convertDirection(Direction::LEFT);
+  const Point finalPoint = convertPoint({ 8, 0 });
+  const Direction finalDirection = convertDirection(Direction::LEFT);
 
-    DijkstraRoutePlanner finalRoutePlanner(mapData.getGates());
+  DijkstraRoutePlanner finalRoutePlanner(mapData.getGates());
 
-    RouteResult finalRoute = finalRoutePlanner.search(currentGridX, currentGridY, currentDirection,
-                                                      finalPoint, finalDirection);
+  RouteResult finalRoute = finalRoutePlanner.search(currentGridX, currentGridY, currentDirection,
+                                                    finalPoint, finalDirection);
 
-    if(finalRoute.route.size() < 2) {
-      Logger::error("EtRobocon2026: final route search failed");
-
-      robot.getWheelMotorControllerInstance().stopBoth();
-
-      return;
-    }
-
-    routeFollower.run(finalRoute.route);
-
-    auto finalStraightCondition
-        = std::make_unique<DistanceCondition>(robot, FINAL_STRAIGHT_DISTANCE);
-
-    Straight finalStraight(robot, std::move(finalStraightCondition), TARGET_SPEED, straightAnglePid,
-                           true, STRAIGHT_DEADBAND_RATE, STRAIGHT_MAXOUT_RATE);
-
-    finalStraight.run();
+  if(finalRoute.route.size() < 2) {
+    Logger::error("EtRobocon2026: final route search failed");
 
     robot.getWheelMotorControllerInstance().stopBoth();
 
-    Logger::info("Timed ET Rally finished");
+    return;
   }
+
+  routeFollower.run(finalRoute.route);
+
+  auto finalStraightCondition = std::make_unique<DistanceCondition>(robot, FINAL_STRAIGHT_DISTANCE);
+
+  Straight finalStraight(robot, std::move(finalStraightCondition), TARGET_SPEED, straightAnglePid,
+                         true, STRAIGHT_DEADBAND_RATE, STRAIGHT_MAXOUT_RATE);
+
+  finalStraight.run();
+
+  robot.getWheelMotorControllerInstance().stopBoth();
+
+  Logger::info("Timed ET Rally finished");
+}

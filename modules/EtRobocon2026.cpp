@@ -161,6 +161,7 @@ namespace {
 
 void EtRobocon2026::start()
 {
+  Logger::info("Hello KATLAB");
   Logger::info("Timed ET Rally start");
 
   RealNetworkSystem networkSystem;

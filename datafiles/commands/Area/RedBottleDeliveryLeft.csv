@@ -1,20 +1,37 @@
 #QR1検出位置まで直進
-RelativeRotation,-045,RelativeAngle,-045
-Straight,001,Distance,030
-#青ラインとペットボトルの位置関係は一定
-#青ラインの奥のペットボトルをに角度を合わせるtargetXを小さくし左寄り走行
+#RelativeRotation,-060,RelativeAngle,-060
+#Straight,001,ColorOrColor,002
+#RelativeRotation,060,RelativeAngle,060
+#Straight,005,Distance,020
+#CameraTracking,000,Distance,000
 
-Snapshot,clearBuffer1,RepeatCount,001
-CameraTracking,LBS009,Distance,015
-Straight,001,DistanceOrColor,BLUE023
+RelativeRotation,-090,RelativeAngle,-090
+Straight,001,ColorOrColor,003
+RelativeRotation,090,RelativeAngle,090
+Straight,005,DistanceOrColor,GREEN100
+Straight,005,DistanceOrColor,BLUE032
+Snapshot,011,RepeatCount,001
+GatePosition,1-1,RepeatCount,001
+Straight,005,DistanceOrColor,BLUE015
+
+#CameraTracking,000,Distance,000
+
+
+
 
 # QR1検出
-Snapshot,clearBuffer1,RepeatCount,001
-GatePosition,1-1,RepeatCount,001
+#Snapshot,clearBuffer1,RepeatCount,001
+#GatePosition,1-1,RepeatCount,001
+#Straight,005,DistanceOrColor,BLUE002
+#GatePosition,1-2,RepeatCount,001
+#Straight,005,DistanceOrColor,BLUE002
+#GatePosition,1-3,RepeatCount,001
+#Straight,005,DistanceOrColor,BLUE002
+#GatePosition,1-4,RepeatCount,001
+#Straight,005,DistanceOrColor,BLUE002
+#GatePosition,1-5,RepeatCount,001
 
-
-#QR1取得後の直線:回頭し110cmほど進む
-RelativeRotation,-050,RelativeAngle,-050
+RelativeRotation,-090,RelativeAngle,-090
 Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,LBS003,Distance,080
 #CameraTracking,LBS008,DistanceOrColor,BLACK040
@@ -38,11 +55,9 @@ CameraTracking,RED,DistanceOrColor,RED025
 
 
 
-Straight,-001,Distance,010
+Straight,-001,Distance,005
 
 RelativeRotation,-110,RelativeAngle,-110
 
 
 Straight,001,ColorOrColor,001
-
-

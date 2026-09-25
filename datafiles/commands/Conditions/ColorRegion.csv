@@ -1,0 +1,4 @@
+コマンド名,ID,targetY,consecutiveCount,roi.x,roi.y,width,height,red,blue,yellow,black
+コマンド名,ID,double,int,int,int,int,int,bool,bool,bool,bool
+ColorRegion,001,640,2,0,0,1920,1080,0,1,0,0
+ColorRegion,002,740,2,480,0,960,1080,0,1,0,0

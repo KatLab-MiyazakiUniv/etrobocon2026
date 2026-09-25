@@ -113,7 +113,7 @@ class ColorSensorController {
   static constexpr int RED_BORDER = 25;              // 赤の色相の境界
   static constexpr int YELLOW_BORDER = 50;           // 黄の色相の境界
   static constexpr int GREEN_BORDER = 170;           // 緑の色相の境界
-  static constexpr int BLUE_BORDER = 300;            // 元の青の色相の境界
+  static constexpr int BLUE_BORDER = 300;            // 青の色相の境界
 
   spikeapi::ColorSensor colorSensor;  // カラーセンサインスタンス
 };

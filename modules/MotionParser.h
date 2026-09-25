@@ -74,6 +74,7 @@ class MotionParser {
     ULTRA_SONIC,
     DISTANCE_OR_ULTRA_SONIC,
     COLOR_OR_COLOR,
+    DISTANCE_AND_COLOR_OR_COLOR,
     NONE
   };
 

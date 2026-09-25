@@ -30,7 +30,6 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "AbsoluteRotation.h"
 #include "RelativeRotation.h"
 #include "CameraTracking.h"
-<<<<<<< HEAD
 #include "Calibrator.h"
 #include "ResetAzimuth.h"
 #include "Snapshot.h"
@@ -41,12 +40,10 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "UltraSonicCondition.h"
 #include "ImageProcessingColor.h"
 #include "GatePositionDetection.h"
-    =======
 #include "ColorRegionCenterCondition.h"
 #include "./../common/ImageProcessingColor.h"
-    >>>>>>> origin/colorRegion
 
-    class MotionParser {
+class MotionParser {
  public:
   // 動作コマンド名を持つ列挙型クラス
   enum class MOTION_COMMAND {

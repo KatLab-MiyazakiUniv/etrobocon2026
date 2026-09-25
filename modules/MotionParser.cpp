@@ -370,514 +370,511 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
       return std::make_unique<CompoundCondition>(robot, std::move(colorOrColorCondition),
                                                  std::move(distanceCondition),
                                                  CompoundCondition::LogicalOperator::AND);
-      case CONDITION_COMMAND::COLOR_REGION_CENTER_CONDITION: {
-        CameraServer::ColorRegionDetectorRequest request;
-        // request.hsvRanges = ImageProcessingColor::BottleColors;
-        int count = 0;
-        for(int i = 0; i < ImageProcessingColor::BottleColors.size(); i++) {
-          if(fromString<bool>(params[8 + i])) {
-            request.hsvRanges[count] = ImageProcessingColor::BottleColors[i];
-            count++;
-          }
-        }
-        request.hsvRangeCount = count;
-
-        request.roi = { fromString<int>(params[4]), fromString<int>(params[5]),
-                        fromString<int>(params[6]), fromString<int>(params[7]) };
-
-        double targetCenterY = fromString<double>(params[2]);
-        int consecutiveCountThreshold = fromString<int>(params[3]);
-
-        return std::make_unique<ColorRegionCenterCondition>(robot, request, targetCenterY,
-                                                            consecutiveCountThreshold);
-      }
-
-      default:
-        Logger::printfLog(Logger::WARNING, "[MotionParser] Condition %s は未実装です",
-                          params[0].c_str());
-
-        return nullptr;
     }
+    case CONDITION_COMMAND::COLOR_REGION_CENTER_CONDITION: {
+      CameraServer::ColorRegionDetectorRequest request;
+      // request.hsvRanges = ImageProcessingColor::BottleColors;
+      int count = 0;
+      for(int i = 0; i < ImageProcessingColor::BottleColors.size(); i++) {
+        if(fromString<bool>(params[8 + i])) {
+          request.hsvRanges[count] = ImageProcessingColor::BottleColors[i];
+          count++;
+        }
+      }
+      request.hsvRangeCount = count;
+
+      request.roi = { fromString<int>(params[4]), fromString<int>(params[5]),
+                      fromString<int>(params[6]), fromString<int>(params[7]) };
+
+      double targetCenterY = fromString<double>(params[2]);
+      int consecutiveCountThreshold = fromString<int>(params[3]);
+
+      return std::make_unique<ColorRegionCenterCondition>(robot, request, targetCenterY,
+                                                          consecutiveCountThreshold);
+    }
+
+    default:
+      Logger::printfLog(Logger::WARNING, "[MotionParser] Condition %s は未実装です",
+                        params[0].c_str());
+
+      return nullptr;
+  }
+}
+
+BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string>& motionParams,
+                                               unique_ptr<BaseContinuationCondition> condition,
+                                               shared_ptr<ProjectedMileage> sharedMileage)
+{
+  if(motionParams.empty()) {
+    Logger::printfLog(Logger::ERROR, "[MotionParser] 動作パラメータが空です");
+    return nullptr;
   }
 
-  BaseMotion* MotionParser::createMotionInstance(Robot & robot, const vector<string>& motionParams,
-                                                 unique_ptr<BaseContinuationCondition> condition,
-                                                 shared_ptr<ProjectedMileage> sharedMileage)
-  {
-    if(motionParams.empty()) {
-      Logger::printfLog(Logger::ERROR, "[MotionParser] 動作パラメータが空です");
-      return nullptr;
-    }
+  MOTION_COMMAND command = convertCommand(motionParams[0]);
 
-    MOTION_COMMAND command = convertCommand(motionParams[0]);
-
-    switch(command) {
-      case MOTION_COMMAND::ET_ZUMO_FINISH: {
-        // 2列目以降は動作名・動作ID・条件名・条件IDの組。
-        if(motionParams.size() < 6 || (motionParams.size() - 2) % 4 != 0) return nullptr;
-        auto mileage = make_shared<ProjectedMileage>();
-        vector<unique_ptr<BaseMotion>> children;
-        for(size_t i = 2; i < motionParams.size(); i += 4) {
-          // 複合動作自身の参照による再帰を禁止する。
-          if(motionParams[i] == "ETZumoFinish" || motionParams[i] == "ResetAzimuth") return nullptr;
-          // 基準を設定するETZumoExitは先頭にのみ置ける。
-          if(motionParams[i] == "ETZumoExit" && i != 2) return nullptr;
-          auto params
-              = extractParamsFromID(MOTIONS_PATH + motionParams[i] + ".csv", motionParams[i + 1]);
-          auto conditionParams = extractParamsFromID(CONDITIONS_PATH + motionParams[i + 2] + ".csv",
-                                                     motionParams[i + 3]);
-          if(params.empty() || conditionParams.empty()) return nullptr;
-          auto childCondition = createConditionInstance(robot, conditionParams, mileage);
-          if(!childCondition) return nullptr;
-          if(motionParams[i] != "ETZumoExit" && conditionParams[0] != "ProjectedDistance") {
-            childCondition = make_unique<ProjectedDistanceCondition>(robot, mileage,
-                                                                     std::move(childCondition));
-          }
-          unique_ptr<BaseMotion> child(
-              createMotionInstance(robot, params, std::move(childCondition), mileage));
-          if(!child) return nullptr;
-          children.push_back(std::move(child));
+  switch(command) {
+    case MOTION_COMMAND::ET_ZUMO_FINISH: {
+      // 2列目以降は動作名・動作ID・条件名・条件IDの組。
+      if(motionParams.size() < 6 || (motionParams.size() - 2) % 4 != 0) return nullptr;
+      auto mileage = make_shared<ProjectedMileage>();
+      vector<unique_ptr<BaseMotion>> children;
+      for(size_t i = 2; i < motionParams.size(); i += 4) {
+        // 複合動作自身の参照による再帰を禁止する。
+        if(motionParams[i] == "ETZumoFinish" || motionParams[i] == "ResetAzimuth") return nullptr;
+        // 基準を設定するETZumoExitは先頭にのみ置ける。
+        if(motionParams[i] == "ETZumoExit" && i != 2) return nullptr;
+        auto params
+            = extractParamsFromID(MOTIONS_PATH + motionParams[i] + ".csv", motionParams[i + 1]);
+        auto conditionParams = extractParamsFromID(CONDITIONS_PATH + motionParams[i + 2] + ".csv",
+                                                   motionParams[i + 3]);
+        if(params.empty() || conditionParams.empty()) return nullptr;
+        auto childCondition = createConditionInstance(robot, conditionParams, mileage);
+        if(!childCondition) return nullptr;
+        if(motionParams[i] != "ETZumoExit" && conditionParams[0] != "ProjectedDistance") {
+          childCondition
+              = make_unique<ProjectedDistanceCondition>(robot, mileage, std::move(childCondition));
         }
-        return new ETZumoFinish(robot, std::move(condition), std::move(children), mileage);
+        unique_ptr<BaseMotion> child(
+            createMotionInstance(robot, params, std::move(childCondition), mileage));
+        if(!child) return nullptr;
+        children.push_back(std::move(child));
       }
-      case MOTION_COMMAND::ET_ZUMO_EXIT: {
-        // ETZumoExit: motionParams[0]=コマンド名
-        //             motionParams[1]=動作ID
-        //             motionParams[2]=0度方向への目標移動距離[mm]
-        //             motionParams[3]=CameraTrackingの動作ID
-        //             motionParams[4]=DistanceOrUltraSonicの条件ID
-        //             motionParams[5]=AbsoluteRotationの動作ID
-        //             motionParams[6]=AbsoluteAngleの条件ID
-        //             motionParams[7]=Straightの動作ID
+      return new ETZumoFinish(robot, std::move(condition), std::move(children), mileage);
+    }
+    case MOTION_COMMAND::ET_ZUMO_EXIT: {
+      // ETZumoExit: motionParams[0]=コマンド名
+      //             motionParams[1]=動作ID
+      //             motionParams[2]=0度方向への目標移動距離[mm]
+      //             motionParams[3]=CameraTrackingの動作ID
+      //             motionParams[4]=DistanceOrUltraSonicの条件ID
+      //             motionParams[5]=AbsoluteRotationの動作ID
+      //             motionParams[6]=AbsoluteAngleの条件ID
+      //             motionParams[7]=Straightの動作ID
 
-        // 必要な列数と目標距離を確認する。距離は有限の正の値のみ受け付ける。
-        if(motionParams.size() != 8 && motionParams.size() != 9) {
+      // 必要な列数と目標距離を確認する。距離は有限の正の値のみ受け付ける。
+      if(motionParams.size() != 8 && motionParams.size() != 9) {
+        Logger::printfLog(Logger::ERROR,
+                          "[MotionParser] ETZumoExit: "
+                          "動作パラメータは8列（任意の到着色を含む場合9列）必要です（実際: %zu列）",
+                          motionParams.size());
+        return nullptr;
+      }
+      double targetDistance;
+      try {
+        targetDistance = fromString<double>(motionParams[2]);
+      } catch(const std::invalid_argument&) {
+        Logger::printfLog(Logger::ERROR,
+                          "[MotionParser] ETZumoExit ID=%s: 目標距離を数値に変換できません: %s",
+                          motionParams[1].c_str(), motionParams[2].c_str());
+        return nullptr;
+      }
+      if(!std::isfinite(targetDistance) || targetDistance <= 0.0) {
+        Logger::printfLog(Logger::ERROR,
+                          "[MotionParser] ETZumoExit ID=%s: 目標距離は有限の正の値が必要です: %s",
+                          motionParams[1].c_str(), motionParams[2].c_str());
+        return nullptr;
+      }
+
+      // 全ての子動作で同じ距離計測を共有し、動作が切り替わっても積算値を引き継ぐ。
+      auto mileage = sharedMileage ? sharedMileage : make_shared<ProjectedMileage>();
+      vector<unique_ptr<BaseMotion>> motions;
+
+      const string names[] = { "CameraTracking", "AbsoluteRotation", "Straight" };
+      const string ids[] = { motionParams[3], motionParams[5], motionParams[7] };
+      const string conditionNames[] = { "DistanceOrUltraSonic", "AbsoluteAngle" };
+      const string conditionIds[] = { motionParams[4], motionParams[6] };
+
+      for(int i = 0; i < 3; ++i) {
+        // 速度やPIDゲインなどを、対応する動作CSVから取得する。
+        auto params = extractParamsFromID(MOTIONS_PATH + names[i] + ".csv", ids[i]);
+        if(params.empty()) {
           Logger::printfLog(
               Logger::ERROR,
-              "[MotionParser] ETZumoExit: "
-              "動作パラメータは8列（任意の到着色を含む場合9列）必要です（実際: %zu列）",
-              motionParams.size());
-          return nullptr;
-        }
-        double targetDistance;
-        try {
-          targetDistance = fromString<double>(motionParams[2]);
-        } catch(const std::invalid_argument&) {
-          Logger::printfLog(Logger::ERROR,
-                            "[MotionParser] ETZumoExit ID=%s: 目標距離を数値に変換できません: %s",
-                            motionParams[1].c_str(), motionParams[2].c_str());
-          return nullptr;
-        }
-        if(!std::isfinite(targetDistance) || targetDistance <= 0.0) {
-          Logger::printfLog(Logger::ERROR,
-                            "[MotionParser] ETZumoExit ID=%s: 目標距離は有限の正の値が必要です: %s",
-                            motionParams[1].c_str(), motionParams[2].c_str());
+              "[MotionParser] ETZumoExit ID=%s: 子動作の設定を取得できません: %s ID=%s",
+              motionParams[1].c_str(), names[i].c_str(), ids[i].c_str());
           return nullptr;
         }
 
-        // 全ての子動作で同じ距離計測を共有し、動作が切り替わっても積算値を引き継ぐ。
-        auto mileage = sharedMileage ? sharedMileage : make_shared<ProjectedMileage>();
-        vector<unique_ptr<BaseMotion>> motions;
-
-        const string names[] = { "CameraTracking", "AbsoluteRotation", "Straight" };
-        const string ids[] = { motionParams[3], motionParams[5], motionParams[7] };
-        const string conditionNames[] = { "DistanceOrUltraSonic", "AbsoluteAngle" };
-        const string conditionIds[] = { motionParams[4], motionParams[6] };
-
-        for(int i = 0; i < 3; ++i) {
-          // 速度やPIDゲインなどを、対応する動作CSVから取得する。
-          auto params = extractParamsFromID(MOTIONS_PATH + names[i] + ".csv", ids[i]);
-          if(params.empty()) {
+        // 追尾は実走行距離または超音波検知、回頭は目標角度を個別の終了条件にする。
+        unique_ptr<BaseContinuationCondition> continuationCondition;
+        if(i < 2) {
+          auto conditionParams
+              = extractParamsFromID(CONDITIONS_PATH + conditionNames[i] + ".csv", conditionIds[i]);
+          if(conditionParams.empty()) {
             Logger::printfLog(
                 Logger::ERROR,
-                "[MotionParser] ETZumoExit ID=%s: 子動作の設定を取得できません: %s ID=%s",
-                motionParams[1].c_str(), names[i].c_str(), ids[i].c_str());
+                "[MotionParser] ETZumoExit ID=%s: 子動作の条件設定を取得できません: %s ID=%s",
+                motionParams[1].c_str(), conditionNames[i].c_str(), conditionIds[i].c_str());
             return nullptr;
           }
-
-          // 追尾は実走行距離または超音波検知、回頭は目標角度を個別の終了条件にする。
-          unique_ptr<BaseContinuationCondition> continuationCondition;
-          if(i < 2) {
-            auto conditionParams = extractParamsFromID(CONDITIONS_PATH + conditionNames[i] + ".csv",
-                                                       conditionIds[i]);
-            if(conditionParams.empty()) {
-              Logger::printfLog(
-                  Logger::ERROR,
-                  "[MotionParser] ETZumoExit ID=%s: 子動作の条件設定を取得できません: %s ID=%s",
-                  motionParams[1].c_str(), conditionNames[i].c_str(), conditionIds[i].c_str());
-              return nullptr;
-            }
-            continuationCondition = createConditionInstance(robot, conditionParams);
-            if(!continuationCondition) {
-              Logger::printfLog(
-                  Logger::ERROR,
-                  "[MotionParser] ETZumoExit ID=%s: 継続条件の生成に失敗しました: %s ID=%s",
-                  motionParams[1].c_str(), conditionNames[i].c_str(), conditionIds[i].c_str());
-              return nullptr;
-            }
-          }
-
-          const bool requireColor = i == 2 && motionParams.size() == 9;
-          if(requireColor) {
-            auto color = ColorSensorController::convertStringToColor(motionParams[8]);
-            if(color == ColorSensorController::COLOR::NONE) return nullptr;
-            continuationCondition = make_unique<SensorColorCondition>(robot, color);
-          }
-          // 0度方向への積算距離が目標に達した場合は、個別の条件に関係なく終了する。
-          auto projectedCondition = make_unique<ETZumoExitCondition>(
-              robot, mileage, targetDistance, std::move(continuationCondition), requireColor);
-
-          // 途中で生成に失敗しても、生成済みの子動作はunique_ptrによって解放される。
-          unique_ptr<BaseMotion> motion(
-              createMotionInstance(robot, params, std::move(projectedCondition)));
-          if(!motion) {
+          continuationCondition = createConditionInstance(robot, conditionParams);
+          if(!continuationCondition) {
             Logger::printfLog(
                 Logger::ERROR,
-                "[MotionParser] ETZumoExit ID=%s: 子動作の生成に失敗しました: %s ID=%s",
-                motionParams[1].c_str(), names[i].c_str(), ids[i].c_str());
+                "[MotionParser] ETZumoExit ID=%s: 継続条件の生成に失敗しました: %s ID=%s",
+                motionParams[1].c_str(), conditionNames[i].c_str(), conditionIds[i].c_str());
             return nullptr;
           }
-          motions.push_back(std::move(motion));
         }
 
-        // 子動作リストを複合動作へ渡す。
-        return new ETZumoExit(robot, std::move(condition), mileage, std::move(motions));
-      }
-      case MOTION_COMMAND::STRAIGHT: {
-        if(motionParams.size() < 9) {
-          Logger::printfLog(Logger::ERROR, "[MotionParser] Straightのパラメータ数が不足しています");
-          return nullptr;
+        const bool requireColor = i == 2 && motionParams.size() == 9;
+        if(requireColor) {
+          auto color = ColorSensorController::convertStringToColor(motionParams[8]);
+          if(color == ColorSensorController::COLOR::NONE) return nullptr;
+          continuationCondition = make_unique<SensorColorCondition>(robot, color);
         }
+        // 0度方向への積算距離が目標に達した場合は、個別の条件に関係なく終了する。
+        auto projectedCondition = make_unique<ETZumoExitCondition>(
+            robot, mileage, targetDistance, std::move(continuationCondition), requireColor);
 
-        Pid::PidGain anglePid{ fromString<double>(motionParams[3]),
-                               fromString<double>(motionParams[4]),
-                               fromString<double>(motionParams[5]) };
-
-        bool shouldUseIMU = motionParams[6] == "true";
-
-        double deadbandRate = fromString<double>(motionParams[7]);
-        double maxoutRate = fromString<double>(motionParams[8]);
-
-        return new Straight(robot, std::move(condition), fromString<double>(motionParams[2]),
-                            anglePid, shouldUseIMU, deadbandRate, maxoutRate);
-      }
-      case MOTION_COMMAND::LINETRACE: {
-        if(motionParams.size() < 9) {
+        // 途中で生成に失敗しても、生成済みの子動作はunique_ptrによって解放される。
+        unique_ptr<BaseMotion> motion(
+            createMotionInstance(robot, params, std::move(projectedCondition)));
+        if(!motion) {
           Logger::printfLog(Logger::ERROR,
-                            "[MotionParser] LineTraceのパラメータ数が不足しています");
+                            "[MotionParser] ETZumoExit ID=%s: 子動作の生成に失敗しました: %s ID=%s",
+                            motionParams[1].c_str(), names[i].c_str(), ids[i].c_str());
           return nullptr;
         }
-
-        int calibratedBrightness = robot.getTargetBrightness();
-
-        int targetBrightness
-            = std::clamp(calibratedBrightness + fromString<int>(motionParams[3]), 0, 100);
-
-        Pid::PidGain brightnessPid{ fromString<double>(motionParams[4]),
-                                    fromString<double>(motionParams[5]),
-                                    fromString<double>(motionParams[6]) };
-
-        return new LineTrace(robot, std::move(condition), fromString<double>(motionParams[2]),
-                             targetBrightness, brightnessPid, fromString<double>(motionParams[7]),
-                             fromString<double>(motionParams[8]));
+        motions.push_back(std::move(motion));
       }
 
-      case MOTION_COMMAND::CAMERA_TRACKING: {
-        CameraServer::ColorRegionDetectorRequest request;
-        request.requireLargestColorIndex = fromString<bool>(motionParams[12]);
-        // request.hsvRanges = ImageProcessingColor::BottleColors;
-        int count = 0;
-        for(int i = 0; i < ImageProcessingColor::BottleColors.size(); i++) {
-          if(fromString<bool>(motionParams[13 + i])) {
-            request.hsvRanges[count] = ImageProcessingColor::BottleColors[i];
-            count++;
-          }
-        }
-        request.hsvRangeCount = count;
-
-        request.roi = { fromString<int>(motionParams[8]), fromString<int>(motionParams[9]),
-                        fromString<int>(motionParams[10]), fromString<int>(motionParams[11]) };
-
-        int targetXCoordinate = fromString<int>(motionParams[3]);
-
-        Logger::printfLog(Logger::DEBUG,
-                          "[MotionParser] CameraTracking: targetXCoorddinate=%.d を生成しました",
-                          targetXCoordinate);
-
-        return new CameraTracking(
-            robot, std::move(condition), fromString<double>(motionParams[2]), targetXCoordinate,
-            Pid::PidGain(fromString<double>(motionParams[4]), fromString<double>(motionParams[5]),
-                         fromString<double>(motionParams[6])),
-            request, fromString<bool>(motionParams[7]));
-        // ここでCameraTrackigのメンバ変数のdetectorのメンバ変数のhsvRangesをセットする
-      }
-
-      case MOTION_COMMAND::ABSOLUTE_ROTATION: {
-        // AbsoluteRotation:
-        // motionParams[2]=anglePid.kp
-        // motionParams[3]=anglePid.ki
-        // motionParams[4]=anglePid.kd
-        // motionParams[5]=targetAbsAngle
-
-        Pid::PidGain anglePidGain{ fromString<double>(motionParams[2]),
-                                   fromString<double>(motionParams[3]),
-                                   fromString<double>(motionParams[4]) };
-
-        double targetAbsAngle = fromString<double>(motionParams[5]);
-
-        Logger::printfLog(Logger::DEBUG,
-                          "[MotionParser] AbsoluteRotation: targetAbsAngle=%.1f を生成しました",
-                          targetAbsAngle);
-
-        return new AbsoluteRotation(robot, std::move(condition), anglePidGain, targetAbsAngle);
-      }
-
-      case MOTION_COMMAND::RELATIVE_ROTATION: {
-        // RelativeRotation:
-        // motionParams[2]=anglePid.kp
-        // motionParams[3]=anglePid.ki
-        // motionParams[4]=anglePid.kd
-        // motionParams[5]=relativeTargetAngle
-
-        Pid::PidGain anglePidGain{ fromString<double>(motionParams[2]),
-                                   fromString<double>(motionParams[3]),
-                                   fromString<double>(motionParams[4]) };
-
-        double relativeTargetAngle = fromString<double>(motionParams[5]);
-
-        Logger::printfLog(
-            Logger::DEBUG,
-            "[MotionParser] RelativeRotation: relativeTargetAngle=%.1f を生成しました",
-            relativeTargetAngle);
-
-        return new RelativeRotation(robot, std::move(condition), anglePidGain, relativeTargetAngle);
-      }
-      case MOTION_COMMAND::CALIBRATOR: {
-        return new Calibrator(robot, std::move(condition));
-      }
-
-      case MOTION_COMMAND::SNAPSHOT: {
-        Logger::printfLog(Logger::DEBUG, "[MotionParser] Snapshotを生成しました");
-
-        return new Snapshot(robot, motionParams[2], std::move(condition));
-      }
-
-      case MOTION_COMMAND::RESET_AZIMUTH: {
-        return new ResetAzimuth(robot, std::move(condition));
-      }
-        // case MOTION_COMMAND::GATE_POSITION: {
-        //   CameraServer::QrCodeDetectorRequest qrRequest;
-        //   qrRequest.roi.x = fromString<int32_t>(motionParams[4]);
-        //   qrRequest.roi.y = fromString<int32_t>(motionParams[5]);
-        //   qrRequest.roi.width = fromString<int32_t>(motionParams[6]);
-        //   qrRequest.roi.height = fromString<int32_t>(motionParams[7]);
-        //   return new GatePositionDetection(robot, motionParams[2],
-        //   fromString<bool>(motionParams[3]),
-        //                                    qrRequest, std::move(condition));
-        // }
-
-      case MOTION_COMMAND::GATE_POSITION: {
-        CameraServer::QrCodeDetectorRequest qrRequest;
-        qrRequest.roi.x = fromString<int32_t>(motionParams[3]);
-        qrRequest.roi.y = fromString<int32_t>(motionParams[4]);
-        qrRequest.roi.width = fromString<int32_t>(motionParams[5]);
-        qrRequest.roi.height = fromString<int32_t>(motionParams[6]);
-        return new GatePositionDetection(robot, std::move(condition), qrRequest,
-                                         fromString<bool>(motionParams[2]));
-      }
-
-      default:
-        Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
-                          motionParams[0].c_str());
-
+      // 子動作リストを複合動作へ渡す。
+      return new ETZumoExit(robot, std::move(condition), mileage, std::move(motions));
+    }
+    case MOTION_COMMAND::STRAIGHT: {
+      if(motionParams.size() < 9) {
+        Logger::printfLog(Logger::ERROR, "[MotionParser] Straightのパラメータ数が不足しています");
         return nullptr;
-    }
-  }
-
-  MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
-  {
-    // コマンド文字列(string)と、それに対応する列挙型MOTION_COMMANDのマッピングを定義
-    static const unordered_map<string, MOTION_COMMAND> commandMap
-        = { { "Straight", MOTION_COMMAND::STRAIGHT },
-            { "LineTrace", MOTION_COMMAND::LINETRACE },
-            { "AbsoluteRotation", MOTION_COMMAND::ABSOLUTE_ROTATION },
-            { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
-            { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING },
-            { "Calibrator", MOTION_COMMAND::CALIBRATOR },
-            { "Snapshot", MOTION_COMMAND::SNAPSHOT },
-            { "ResetAzimuth", MOTION_COMMAND::RESET_AZIMUTH },
-            { "ETZumoExit", MOTION_COMMAND::ET_ZUMO_EXIT },
-            { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH },
-            { "GatePosition", MOTION_COMMAND::GATE_POSITION }
-
-          };
-
-    auto it = commandMap.find(str);
-
-    if(it != commandMap.end()) {
-      return it->second;
-    }
-
-    return MOTION_COMMAND::NONE;
-  }
-
-  case CONDITION_COMMAND::COLOR_REGION_CENTER_CONDITION: {
-    CameraServer::ColorRegionDetectorRequest request;
-    // request.hsvRanges = ImageProcessingColor::BottleColors;
-    int count = 0;
-    for(int i = 0; i < ImageProcessingColor::BottleColors.size(); i++) {
-      if(fromString<bool>(params[8 + i])) {
-        request.hsvRanges[count] = ImageProcessingColor::BottleColors[i];
-        count++;
-      }
-    }
-    request.hsvRangeCount = count;
-
-    request.roi = { fromString<int>(params[4]), fromString<int>(params[5]),
-                    fromString<int>(params[6]), fromString<int>(params[7]) };
-
-    double targetCenterY = fromString<double>(params[2]);
-    int consecutiveCountThreshold = fromString<int>(params[3]);
-
-    return std::make_unique<ColorRegionCenterCondition>(robot, request, targetCenterY,
-                                                        consecutiveCountThreshold);
-  }
-
-    MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str)
-    {
-      // 条件コマンド文字列と、それに対応する列挙型CONDITION_COMMANDのマッピングを定義
-      static const unordered_map<string, CONDITION_COMMAND> conditionMap = {
-        { "Distance", CONDITION_COMMAND::DISTANCE },
-        { "ProjectedDistance", CONDITION_COMMAND::PROJECTED_DISTANCE },
-        { "AbsoluteAngle", CONDITION_COMMAND::ABSOLUTE_ANGLE },
-        { "RelativeAngle", CONDITION_COMMAND::RELATIVE_ANGLE },
-        { "SensorColor", CONDITION_COMMAND::SENSOR_COLOR },
-        { "RunningTime", CONDITION_COMMAND::RUNNING_TIME },
-        { "MotionTime", CONDITION_COMMAND::MOTION_TIME },
-        { "RepeatCount", CONDITION_COMMAND::REPEAT_COUNT },
-        { "ColorRegion", CONDITION_COMMAND::COLOR_REGION_CENTER_CONDITION },
-        { "DistanceAndColor", CONDITION_COMMAND::DISTANCE_AND_COLOR },
-        { "DistanceOrColor", CONDITION_COMMAND::DISTANCE_OR_COLOR },
-        { "DistanceOrUltraSonic", CONDITION_COMMAND::DISTANCE_OR_ULTRA_SONIC },
-        { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC },
-        { "ColorOrColor", CONDITION_COMMAND::COLOR_OR_COLOR },
-        { "ColorOrColor", CONDITION_COMMAND::DISTANCE_AND_COLOR_OR_COLOR },
-
-      };
-
-      auto it = conditionMap.find(str);
-
-      if(it != conditionMap.end()) {
-        return it->second;
       }
 
-      return CONDITION_COMMAND::NONE;
+      Pid::PidGain anglePid{ fromString<double>(motionParams[3]),
+                             fromString<double>(motionParams[4]),
+                             fromString<double>(motionParams[5]) };
+
+      bool shouldUseIMU = motionParams[6] == "true";
+
+      double deadbandRate = fromString<double>(motionParams[7]);
+      double maxoutRate = fromString<double>(motionParams[8]);
+
+      return new Straight(robot, std::move(condition), fromString<double>(motionParams[2]),
+                          anglePid, shouldUseIMU, deadbandRate, maxoutRate);
+    }
+    case MOTION_COMMAND::LINETRACE: {
+      if(motionParams.size() < 9) {
+        Logger::printfLog(Logger::ERROR, "[MotionParser] LineTraceのパラメータ数が不足しています");
+        return nullptr;
+      }
+
+      int calibratedBrightness = robot.getTargetBrightness();
+
+      int targetBrightness
+          = std::clamp(calibratedBrightness + fromString<int>(motionParams[3]), 0, 100);
+
+      Pid::PidGain brightnessPid{ fromString<double>(motionParams[4]),
+                                  fromString<double>(motionParams[5]),
+                                  fromString<double>(motionParams[6]) };
+
+      return new LineTrace(robot, std::move(condition), fromString<double>(motionParams[2]),
+                           targetBrightness, brightnessPid, fromString<double>(motionParams[7]),
+                           fromString<double>(motionParams[8]));
     }
 
-    // bool MotionParser::convertBool(
-    //     const string& command,
-    //     const string& stringParameter)
-    // {
-    //   // 末尾の改行を削除
-    //   string param = StringOperator::removeEOL(stringParameter);
+    case MOTION_COMMAND::CAMERA_TRACKING: {
+      CameraServer::ColorRegionDetectorRequest request;
+      request.requireLargestColorIndex = fromString<bool>(motionParams[12]);
+      // request.hsvRanges = ImageProcessingColor::BottleColors;
+      int count = 0;
+      for(int i = 0; i < ImageProcessingColor::BottleColors.size(); i++) {
+        if(fromString<bool>(motionParams[13 + i])) {
+          request.hsvRanges[count] = ImageProcessingColor::BottleColors[i];
+          count++;
+        }
+      }
+      request.hsvRangeCount = count;
 
-    //   // カメラPIDトラッキング系の停止制御
-    //   // continueなら継続、stopなら停止
-    //   if(command == "DCL"
-    //      || command == "CDCL"
-    //      || command == "UDCL"
-    //      || command == "DTCCL"
-    //      || command == "CDTCCL") {
-    //
-    //     if(param == "continue") {
-    //       return false;
-    //     } else if(param == "stop") {
-    //       return true;
-    //     } else {
-    //       cout << "'continue' か 'stop'を入力してください"
-    //            << endl;
-    //
-    //       return true;
-    //     }
-    //   }
+      request.roi = { fromString<int>(motionParams[8]), fromString<int>(motionParams[9]),
+                      fromString<int>(motionParams[10]), fromString<int>(motionParams[11]) };
 
-    //   // 回転動作の場合
-    //   // clockwiseなら時計回り
-    //   // anticlockwiseなら反時計回り
-    //   if(command == "AR"
-    //      || command == "IMUR"
-    //      || command == "MCA"
-    //      || command == "BCA"
-    //      || command == "CRA") {
-    //
-    //     if(param == "clockwise") {
-    //       return true;
-    //     } else if(param == "anticlockwise") {
-    //       return false;
-    //     } else {
-    //       cout << "'clockwise' か 'anticlockwise'を入力してください"
-    //            << endl;
-    //
-    //       return true;
-    //     }
-    //   }
+      int targetXCoordinate = fromString<int>(motionParams[3]);
 
-    //   // エッジ切り替え
-    //   if(command == "EC") {
-    //
-    //     if(param == "left") {
-    //       return true;
-    //     } else if(param == "right") {
-    //       return false;
-    //     } else {
-    //       cout << "'left' か 'right'を入力してください"
-    //            << endl;
-    //
-    //       return true;
-    //     }
-    //   }
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] CameraTracking: targetXCoorddinate=%.d を生成しました",
+                        targetXCoordinate);
 
-    //   // IMU設定
-    //   if(command == "IS") {
-    //
-    //     if(param == "start") {
-    //       return true;
-    //     } else if(param == "stop") {
-    //       return false;
-    //     } else {
-    //       cout << "'start' か 'stop'を入力してください"
-    //            << endl;
-    //
-    //       return false;
-    //     }
-    //   }
+      return new CameraTracking(
+          robot, std::move(condition), fromString<double>(motionParams[2]), targetXCoordinate,
+          Pid::PidGain(fromString<double>(motionParams[4]), fromString<double>(motionParams[5]),
+                       fromString<double>(motionParams[6])),
+          request, fromString<bool>(motionParams[7]));
+      // ここでCameraTrackigのメンバ変数のdetectorのメンバ変数のhsvRangesをセットする
+    }
 
-    //   cout << "convertBool関数の処理の対象外です: '"
-    //        << command
-    //        << endl;
-    //
-    //   return true;
-    // }
+    case MOTION_COMMAND::ABSOLUTE_ROTATION: {
+      // AbsoluteRotation:
+      // motionParams[2]=anglePid.kp
+      // motionParams[3]=anglePid.ki
+      // motionParams[4]=anglePid.kd
+      // motionParams[5]=targetAbsAngle
 
-    // bool MotionParser::convertRotationModeToBool(
-    //     const string& stringParameter)
-    // {
-    //   string param
-    //       = StringOperator::removeEOL(stringParameter);
+      Pid::PidGain anglePidGain{ fromString<double>(motionParams[2]),
+                                 fromString<double>(motionParams[3]),
+                                 fromString<double>(motionParams[4]) };
 
-    //   // relativeなら相対角度
-    //   // absoluteなら絶対角度
-    //   if(param == "relative") {
-    //     return false;
-    //   } else if(param == "absolute") {
-    //     return true;
-    //   } else {
-    //     cout
-    //         << "'relative' か 'absolute'を入力してください (入力値: "
-    //         << param
-    //         << ")"
-    //         << endl;
-    //
-    //     return false;
-    //   }
-    // }
+      double targetAbsAngle = fromString<double>(motionParams[5]);
+
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] AbsoluteRotation: targetAbsAngle=%.1f を生成しました",
+                        targetAbsAngle);
+
+      return new AbsoluteRotation(robot, std::move(condition), anglePidGain, targetAbsAngle);
+    }
+
+    case MOTION_COMMAND::RELATIVE_ROTATION: {
+      // RelativeRotation:
+      // motionParams[2]=anglePid.kp
+      // motionParams[3]=anglePid.ki
+      // motionParams[4]=anglePid.kd
+      // motionParams[5]=relativeTargetAngle
+
+      Pid::PidGain anglePidGain{ fromString<double>(motionParams[2]),
+                                 fromString<double>(motionParams[3]),
+                                 fromString<double>(motionParams[4]) };
+
+      double relativeTargetAngle = fromString<double>(motionParams[5]);
+
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] RelativeRotation: relativeTargetAngle=%.1f を生成しました",
+                        relativeTargetAngle);
+
+      return new RelativeRotation(robot, std::move(condition), anglePidGain, relativeTargetAngle);
+    }
+    case MOTION_COMMAND::CALIBRATOR: {
+      return new Calibrator(robot, std::move(condition));
+    }
+
+    case MOTION_COMMAND::SNAPSHOT: {
+      Logger::printfLog(Logger::DEBUG, "[MotionParser] Snapshotを生成しました");
+
+      return new Snapshot(robot, motionParams[2], std::move(condition));
+    }
+
+    case MOTION_COMMAND::RESET_AZIMUTH: {
+      return new ResetAzimuth(robot, std::move(condition));
+    }
+      // case MOTION_COMMAND::GATE_POSITION: {
+      //   CameraServer::QrCodeDetectorRequest qrRequest;
+      //   qrRequest.roi.x = fromString<int32_t>(motionParams[4]);
+      //   qrRequest.roi.y = fromString<int32_t>(motionParams[5]);
+      //   qrRequest.roi.width = fromString<int32_t>(motionParams[6]);
+      //   qrRequest.roi.height = fromString<int32_t>(motionParams[7]);
+      //   return new GatePositionDetection(robot, motionParams[2],
+      //   fromString<bool>(motionParams[3]),
+      //                                    qrRequest, std::move(condition));
+      // }
+
+    case MOTION_COMMAND::GATE_POSITION: {
+      CameraServer::QrCodeDetectorRequest qrRequest;
+      qrRequest.roi.x = fromString<int32_t>(motionParams[3]);
+      qrRequest.roi.y = fromString<int32_t>(motionParams[4]);
+      qrRequest.roi.width = fromString<int32_t>(motionParams[5]);
+      qrRequest.roi.height = fromString<int32_t>(motionParams[6]);
+      return new GatePositionDetection(robot, std::move(condition), qrRequest,
+                                       fromString<bool>(motionParams[2]));
+    }
+
+      // case CONDITION_COMMAND::COLOR_REGION_CENTER_CONDITION: {
+      //   CameraServer::ColorRegionDetectorRequest request;
+      //   // request.hsvRanges = ImageProcessingColor::BottleColors;
+      //   int count = 0;
+      //   for(int i = 0; i < ImageProcessingColor::BottleColors.size(); i++) {
+      //     if(fromString<bool>(params[8 + i])) {
+      //       request.hsvRanges[count] = ImageProcessingColor::BottleColors[i];
+      //       count++;
+      //     }
+      //   }
+      //   request.hsvRangeCount = count;
+
+      //   request.roi = { fromString<int>(params[4]), fromString<int>(params[5]),
+      //                   fromString<int>(params[6]), fromString<int>(params[7]) };
+
+      //   double targetCenterY = fromString<double>(params[2]);
+      //   int consecutiveCountThreshold = fromString<int>(params[3]);
+
+      //   return std::make_unique<ColorRegionCenterCondition>(robot, request, targetCenterY,
+      //                                                       consecutiveCountThreshold);
+      // }
+
+    default:
+      Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
+                        motionParams[0].c_str());
+
+      return nullptr;
+  }
+}
+
+MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
+{
+  // コマンド文字列(string)と、それに対応する列挙型MOTION_COMMANDのマッピングを定義
+  static const unordered_map<string, MOTION_COMMAND> commandMap
+      = { { "Straight", MOTION_COMMAND::STRAIGHT },
+          { "LineTrace", MOTION_COMMAND::LINETRACE },
+          { "AbsoluteRotation", MOTION_COMMAND::ABSOLUTE_ROTATION },
+          { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
+          { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING },
+          { "Calibrator", MOTION_COMMAND::CALIBRATOR },
+          { "Snapshot", MOTION_COMMAND::SNAPSHOT },
+          { "ResetAzimuth", MOTION_COMMAND::RESET_AZIMUTH },
+          { "ETZumoExit", MOTION_COMMAND::ET_ZUMO_EXIT },
+          { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH },
+          { "GatePosition", MOTION_COMMAND::GATE_POSITION }
+
+        };
+
+  auto it = commandMap.find(str);
+
+  if(it != commandMap.end()) {
+    return it->second;
+  }
+
+  return MOTION_COMMAND::NONE;
+}
+
+MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str)
+{
+  // 条件コマンド文字列と、それに対応する列挙型CONDITION_COMMANDのマッピングを定義
+  static const unordered_map<string, CONDITION_COMMAND> conditionMap = {
+    { "Distance", CONDITION_COMMAND::DISTANCE },
+    { "ProjectedDistance", CONDITION_COMMAND::PROJECTED_DISTANCE },
+    { "AbsoluteAngle", CONDITION_COMMAND::ABSOLUTE_ANGLE },
+    { "RelativeAngle", CONDITION_COMMAND::RELATIVE_ANGLE },
+    { "SensorColor", CONDITION_COMMAND::SENSOR_COLOR },
+    { "RunningTime", CONDITION_COMMAND::RUNNING_TIME },
+    { "MotionTime", CONDITION_COMMAND::MOTION_TIME },
+    { "RepeatCount", CONDITION_COMMAND::REPEAT_COUNT },
+    { "ColorRegion", CONDITION_COMMAND::COLOR_REGION_CENTER_CONDITION },
+    { "DistanceAndColor", CONDITION_COMMAND::DISTANCE_AND_COLOR },
+    { "DistanceOrColor", CONDITION_COMMAND::DISTANCE_OR_COLOR },
+    { "DistanceOrUltraSonic", CONDITION_COMMAND::DISTANCE_OR_ULTRA_SONIC },
+    { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC },
+    { "ColorOrColor", CONDITION_COMMAND::COLOR_OR_COLOR },
+    { "ColorOrColor", CONDITION_COMMAND::DISTANCE_AND_COLOR_OR_COLOR },
+
+  };
+
+  auto it = conditionMap.find(str);
+
+  if(it != conditionMap.end()) {
+    return it->second;
+  }
+
+  return CONDITION_COMMAND::NONE;
+}
+
+// bool MotionParser::convertBool(
+//     const string& command,
+//     const string& stringParameter)
+// {
+//   // 末尾の改行を削除
+//   string param = StringOperator::removeEOL(stringParameter);
+
+//   // カメラPIDトラッキング系の停止制御
+//   // continueなら継続、stopなら停止
+//   if(command == "DCL"
+//      || command == "CDCL"
+//      || command == "UDCL"
+//      || command == "DTCCL"
+//      || command == "CDTCCL") {
+//
+//     if(param == "continue") {
+//       return false;
+//     } else if(param == "stop") {
+//       return true;
+//     } else {
+//       cout << "'continue' か 'stop'を入力してください"
+//            << endl;
+//
+//       return true;
+//     }
+//   }
+
+//   // 回転動作の場合
+//   // clockwiseなら時計回り
+//   // anticlockwiseなら反時計回り
+//   if(command == "AR"
+//      || command == "IMUR"
+//      || command == "MCA"
+//      || command == "BCA"
+//      || command == "CRA") {
+//
+//     if(param == "clockwise") {
+//       return true;
+//     } else if(param == "anticlockwise") {
+//       return false;
+//     } else {
+//       cout << "'clockwise' か 'anticlockwise'を入力してください"
+//            << endl;
+//
+//       return true;
+//     }
+//   }
+
+//   // エッジ切り替え
+//   if(command == "EC") {
+//
+//     if(param == "left") {
+//       return true;
+//     } else if(param == "right") {
+//       return false;
+//     } else {
+//       cout << "'left' か 'right'を入力してください"
+//            << endl;
+//
+//       return true;
+//     }
+//   }
+
+//   // IMU設定
+//   if(command == "IS") {
+//
+//     if(param == "start") {
+//       return true;
+//     } else if(param == "stop") {
+//       return false;
+//     } else {
+//       cout << "'start' か 'stop'を入力してください"
+//            << endl;
+//
+//       return false;
+//     }
+//   }
+
+//   cout << "convertBool関数の処理の対象外です: '"
+//        << command
+//        << endl;
+//
+//   return true;
+// }
+
+// bool MotionParser::convertRotationModeToBool(
+//     const string& stringParameter)
+// {
+//   string param
+//       = StringOperator::removeEOL(stringParameter);
+
+//   // relativeなら相対角度
+//   // absoluteなら絶対角度
+//   if(param == "relative") {
+//     return false;
+//   } else if(param == "absolute") {
+//     return true;
+//   } else {
+//     cout
+//         << "'relative' か 'absolute'を入力してください (入力値: "
+//         << param
+//         << ")"
+//         << endl;
+//
+//     return false;
+//   }
+// }

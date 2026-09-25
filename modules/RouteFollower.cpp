@@ -864,8 +864,8 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
 
 const Gate* RouteFollower::findGate(const RouteState& from, const RouteState& to) const
 {
-  for(const Gate& gate : robot.getMapData().getGates()) {
-    const std::vector<GatePass> passes = robot.getMapData().getGatePasses(gate.color);
+  for(const Gate& gate : robot.getMapDataInstance().getGates()) {
+    const std::vector<GatePass> passes = robot.getMapDataInstance().getGatePasses(gate.color);
 
     for(const GatePass& pass : passes) {
       // =====================================================

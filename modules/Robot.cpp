@@ -115,7 +115,7 @@ int Robot::getTargetBrightness() const
   return targetBrightness;
 }
 
-MapData& Robot::getMapData()
+MapData& Robot::getMapDataInstance()
 {
   return mapData;
 }

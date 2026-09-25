@@ -170,16 +170,7 @@ void EtRobocon2026::start()
   robot.getCameraSocketClientInstance().connectToServer();
 
   // Robotが保持しているMapDataを使用する
-  MapData& mapData = robot.getMapData();
-
-  // RED
-  mapData.setGatePoint(GoalColor::RED, convertPoint({ 1, 1 }), convertPoint({ 3, 1 }));
-
-  // BLUE
-  mapData.setGatePoint(GoalColor::BLUE, convertPoint({ 9, 1 }), convertPoint({ 9, 3 }));
-
-  // YELLOW
-  mapData.setGatePoint(GoalColor::YELLOW, convertPoint({ 5, 9 }), convertPoint({ 7, 9 }));
+  MapData& mapData = robot.getMapDataInstance();
 
   GateRoutePlanner routePlanner(mapData);
   EtRallyMap etRallyMap;

@@ -144,7 +144,7 @@ class Robot {
    * @brief マップデータの参照を返す
    * @return MapDataの参照
    */
-  MapData& getMapData();
+  MapData& getMapDataInstance();
 
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス

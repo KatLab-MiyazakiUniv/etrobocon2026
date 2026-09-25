@@ -7,11 +7,10 @@
 
 ColorRegionCenterCondition::ColorRegionCenterCondition(
     Robot& _robot, const CameraServer::ColorRegionDetectorRequest& _colorDetectionRequest,
-    double _targetCenterX, double _toleranceX, int _consecutiveCountThreshold)
+    double _targetCenterY, int _consecutiveCountThreshold)
   : BaseContinuationCondition(_robot),
     colorDetectionRequest(_colorDetectionRequest),
-    targetCenterX(_targetCenterX),
-    toleranceX(std::abs(_toleranceX)),
+    targetCenterY(_targetCenterY),
     consecutiveCountThreshold(_consecutiveCountThreshold),
     inRangeCount(0)
 {
@@ -41,19 +40,22 @@ bool ColorRegionCenterCondition::shouldContinue()
     return true;
   }
 
-  // バウンディングボックスの中心X座標を計算
-  double currentCenterX = (response.result.topLeft.x + response.result.bottomRight.x) / 2.0;
-  double diff = std::abs(currentCenterX - targetCenterX);
+  // バウンディングボックスの中心Y座標を計算
+  double currentCenterY = (response.result.topLeft.y + response.result.bottomRight.y) / 2.0;
 
-  // 目標値 ± toleranceX の範囲内か判定
-  if(diff <= toleranceX) {
+  // 目標値 ± toleranceY の範囲内か判定
+  if(currentCenterY > targetCenterY) {
     inRangeCount++;
     Logger::printfLog(
         Logger::DEBUG,
-        "ColorRegionCenterCondition: 範囲内検出 (%d/%d) [CenterX: %.1f, Target: %.1f, Diff: %.1f]",
-        inRangeCount, consecutiveCountThreshold, currentCenterX, targetCenterX, diff);
+        "ColorRegionCenterCondition: 範囲内検出 (%d/%d) [CenterX: %.1f, Target: %.1f]",
+        inRangeCount, consecutiveCountThreshold, currentCenterY, targetCenterY);
   } else {
     inRangeCount = 0;
+    Logger::printfLog(
+        Logger::DEBUG,
+        "ColorRegionCenterCondition: 失敗");
+    
   }
 
   // 規定回数連続で範囲内に入ったら終了 (shouldContinue = false)
@@ -65,12 +67,9 @@ bool ColorRegionCenterCondition::shouldContinue()
   return true;
 }
 
-double ColorRegionCenterCondition::getTargetCenterX() const
+double ColorRegionCenterCondition::getTargetCenterY() const
 {
-  return targetCenterX;
+  return targetCenterY;
 }
 
-double ColorRegionCenterCondition::getToleranceX() const
-{
-  return toleranceX;
-}
+

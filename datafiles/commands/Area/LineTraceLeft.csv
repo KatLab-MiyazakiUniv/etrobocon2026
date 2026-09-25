@@ -1,20 +1,25 @@
 #動作コマンド名,動作ID,条件コマンド名,条件ID
+#Calibrator,001,RepeatCount,001
 
 CameraTracking,S001,Distance,035
 CameraTracking,R001,Distance,040
 CameraTracking,S001,Distance,035
 CameraTracking,R001,Distance,040
 CameraTracking,S001,Distance,033
+#急カーブ
 CameraTracking,L001,Distance,025
 CameraTracking,L002,Distance,095
+#くねくね
 CameraTracking,S001,Distance,015
-
 CameraTracking,R001,Distance,035
 CameraTracking,S001,Distance,015
 CameraTracking,L002,Distance,030
-CameraTracking,S001,Distance,095
-CameraTracking,BC,Distance,015
 
+#直線からボトルキャッチ
 
+CameraTracking,S001,ColorRegion,001
+CameraTracking,000,Distance,000
+
+CameraTracking,BC,Distance,030
 
 CameraTracking,000,Distance,000

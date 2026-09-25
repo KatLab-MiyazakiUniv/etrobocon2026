@@ -75,14 +75,32 @@ void CameraTracking::executeStep()
 
   if(detectionMode == DetectionMode::COLOR_REGION) {
     CameraServer::ColorRegionDetectorResponse response;
-    // run()の中でColorRegionDetectorインスタンスが繰り返し生死。インスタンスの生死のlogが重い処理
     success = client.executeColorRegionDetection(colorDetectionRequest, response);
     wasDetected = response.result.wasDetected;
-    if(success && wasDetected) {
-      // バウンディングボックスの中心X座標を計算
-      currentX = (response.result.topLeft.x + response.result.bottomRight.x) / 2.0;
+
+    if(!success || !wasDetected) {
+      Logger::printfLog(Logger::WARNING,
+                        "CameraTracking:色領域が検出されませんでした。success:%d wasDetected:%d",
+                        success, wasDetected);
+      return;
     }
-  } else if(detectionMode == DetectionMode::QR_CODE) {
+    // 黒を除く最大面積の色範囲取得>
+    if(response.largestColorIndex != -1) {
+      Logger::printfLog(Logger::DEBUG, "CameraTracking:最大色の検知失敗");
+    }
+
+    if(colorDetectionRequest.requireLargestColorIndex != -1 && response.largestColorIndex != 3
+       && response.largestColorIndex != -1) {
+      Logger::printfLog(Logger::DEBUG, "CameraTracking:検知した最大色の添字は[%d]",
+                        response.largestColorIndex);
+      robot.setIndexOfLabel(response.largestColorIndex);
+    }
+
+    // バウンディングボックスの中心X座標を計算
+    currentX = (response.result.topLeft.x + response.result.bottomRight.x) / 2.0;
+  }
+
+  else if(detectionMode == DetectionMode::QR_CODE) {
     CameraServer::QrCodeDetectorResponse response;
     success = client.executeQrCodeDetection(qrDetectionRequest, response);
     wasDetected = response.wasDetected;
@@ -121,14 +139,13 @@ void CameraTracking::executeStep()
   robot.getWheelMotorControllerInstance().setLeftPower(leftPower);
 }
 
-void CameraTracking::wait()
-{
-  ClockUtil::sleep(0);
-}
+void CameraTracking::wait() {}
 
 void CameraTracking::finish()
 {
   if(isStopMotorPower) {
+    ClockUtil::sleep(10);
+    // robot.getWheelMotorControllerInstance().brakeBoth();
     robot.getWheelMotorControllerInstance().stopBoth();
   }
 }

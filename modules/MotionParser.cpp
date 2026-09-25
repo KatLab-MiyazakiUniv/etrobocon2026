@@ -335,6 +335,20 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
                         targetDistance);
       return make_unique<UltraSonicCondition>(robot, targetDistance);
     }
+    case CONDITION_COMMAND::COLOR_OR_COLOR: {
+      std::string targetColorName1 = params[2];
+      std::string targetColorName2 = params[3];
+
+      auto targetColor1 = ColorSensorController::convertStringToColor(targetColorName1);
+      auto targetColor2 = ColorSensorController::convertStringToColor(targetColorName2);
+
+      auto colorCondition1 = std::make_unique<SensorColorCondition>(robot, targetColor1);
+      auto colorCondition2 = std::make_unique<SensorColorCondition>(robot, targetColor2);
+
+      return std::make_unique<CompoundCondition>(robot, std::move(colorCondition1),
+                                                 std::move(colorCondition2),
+                                                 CompoundCondition::LogicalOperator::OR);
+    }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Condition %s は未実装です",
                         params[0].c_str());
@@ -521,12 +535,19 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                            targetBrightness, brightnessPid, fromString<double>(motionParams[7]),
                            fromString<double>(motionParams[8]));
     }
+
     case MOTION_COMMAND::CAMERA_TRACKING: {
       CameraServer::ColorRegionDetectorRequest request;
-      request.requireLargestColorIndex = false;
-      request.hsvRangeCount = 1;
-      request.hsvRanges[0].lower = { 0, 0, 0 };
-      request.hsvRanges[0].upper = { 179, 255, 30 };
+      request.requireLargestColorIndex = fromString<bool>(motionParams[12]);
+      // request.hsvRanges = ImageProcessingColor::BottleColors;
+      int count = 0;
+      for(int i = 0; i < ImageProcessingColor::BottleColors.size(); i++) {
+        if(fromString<bool>(motionParams[13 + i])) {
+          request.hsvRanges[count] = ImageProcessingColor::BottleColors[i];
+          count++;
+        }
+      }
+      request.hsvRangeCount = count;
 
       request.roi = { fromString<int>(motionParams[8]), fromString<int>(motionParams[9]),
                       fromString<int>(motionParams[10]), fromString<int>(motionParams[11]) };
@@ -542,7 +563,9 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
           Pid::PidGain(fromString<double>(motionParams[4]), fromString<double>(motionParams[5]),
                        fromString<double>(motionParams[6])),
           request, fromString<bool>(motionParams[7]));
+      // ここでCameraTrackigのメンバ変数のdetectorのメンバ変数のhsvRangesをセットする
     }
+
     case MOTION_COMMAND::ABSOLUTE_ROTATION: {
       // AbsoluteRotation:
       // motionParams[2]=anglePid.kp
@@ -585,12 +608,37 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
     case MOTION_COMMAND::CALIBRATOR: {
       return new Calibrator(robot, std::move(condition));
     }
+
+    case MOTION_COMMAND::SNAPSHOT: {
+      Logger::printfLog(Logger::DEBUG, "[MotionParser] Snapshotを生成しました");
+
+      return new Snapshot(robot, motionParams[2], std::move(condition));
+    }
+
     case MOTION_COMMAND::RESET_AZIMUTH: {
       return new ResetAzimuth(robot, std::move(condition));
     }
-    case MOTION_COMMAND::SNAPSHOT: {
-      return new Snapshot(robot, "snapshot", std::move(condition));
+      // case MOTION_COMMAND::GATE_POSITION: {
+      //   CameraServer::QrCodeDetectorRequest qrRequest;
+      //   qrRequest.roi.x = fromString<int32_t>(motionParams[4]);
+      //   qrRequest.roi.y = fromString<int32_t>(motionParams[5]);
+      //   qrRequest.roi.width = fromString<int32_t>(motionParams[6]);
+      //   qrRequest.roi.height = fromString<int32_t>(motionParams[7]);
+      //   return new GatePositionDetection(robot, motionParams[2],
+      //   fromString<bool>(motionParams[3]),
+      //                                    qrRequest, std::move(condition));
+      // }
+
+    case MOTION_COMMAND::GATE_POSITION: {
+      CameraServer::QrCodeDetectorRequest qrRequest;
+      qrRequest.roi.x = fromString<int32_t>(motionParams[3]);
+      qrRequest.roi.y = fromString<int32_t>(motionParams[4]);
+      qrRequest.roi.width = fromString<int32_t>(motionParams[5]);
+      qrRequest.roi.height = fromString<int32_t>(motionParams[6]);
+      return new GatePositionDetection(robot, std::move(condition), qrRequest,
+                                       fromString<bool>(motionParams[2]));
     }
+
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
                         motionParams[0].c_str());
@@ -609,10 +657,11 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
           { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING },
           { "Calibrator", MOTION_COMMAND::CALIBRATOR },
-          { "ResetAzimuth", MOTION_COMMAND::RESET_AZIMUTH },
           { "Snapshot", MOTION_COMMAND::SNAPSHOT },
+          { "ResetAzimuth", MOTION_COMMAND::RESET_AZIMUTH },
           { "ETZumoExit", MOTION_COMMAND::ET_ZUMO_EXIT },
-          { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH }
+          { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH },
+          { "GatePosition", MOTION_COMMAND::GATE_POSITION }
 
         };
 
@@ -640,7 +689,10 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
           { "DistanceAndColor", CONDITION_COMMAND::DISTANCE_AND_COLOR },
           { "DistanceOrColor", CONDITION_COMMAND::DISTANCE_OR_COLOR },
           { "DistanceOrUltraSonic", CONDITION_COMMAND::DISTANCE_OR_ULTRA_SONIC },
-          { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC } };
+          { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC },
+          { "ColorOrColor", CONDITION_COMMAND::COLOR_OR_COLOR }
+
+        };
 
   auto it = conditionMap.find(str);
 

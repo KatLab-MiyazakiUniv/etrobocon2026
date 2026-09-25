@@ -122,7 +122,7 @@ namespace etrobocon2026_test {
       ColorSensorController::HSV grayLower = { hue, 36, 30 };
       ColorSensorController::HSV grayUpper = { hue, 0, 79 };
       ColorSensorController::HSV white = { hue, 36, 80 };
-      ColorSensorController::HSV uncertain = { hue, 37, 79 };
+      ColorSensorController::HSV uncertain = { hue, 37, 60 };
       EXPECT_EQ(Color::BLACK, ColorSensorController::convertHsvToColor(black));
       EXPECT_EQ(Color::GRAY, ColorSensorController::convertHsvToColor(grayLower));
       EXPECT_EQ(Color::GRAY, ColorSensorController::convertHsvToColor(grayUpper));

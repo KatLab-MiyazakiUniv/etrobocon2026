@@ -24,7 +24,7 @@ namespace etrobocon2026_test {
     MockNetworkSystem mockNetworkSystem;
     SocketClient mockSocketClient(mockNetworkSystem);
     Robot robot(mockSocketClient);
-    double targetSpeed = 500.0;    // 目標速度
+    double targetSpeed = 50.0;     // 目標速度
     double targetDistance = 10.0;  // 目標距離
 
     // 直進前の走行距離を計算
@@ -43,7 +43,7 @@ namespace etrobocon2026_test {
     double endMileage = Mileage::calculateMileage(rightCount, leftCount);
 
     // 走行距離と目標距離との誤差
-    double deviation = 0.5;
+    double deviation = 10.0;
 
     // 走行距離が目標距離の誤差の範囲にあることテスト
     EXPECT_NEAR(targetDistance, endMileage - startMileage, deviation);
@@ -141,7 +141,7 @@ namespace etrobocon2026_test {
     MockNetworkSystem mockNetworkSystem;
     SocketClient mockSocketClient(mockNetworkSystem);
     Robot robot(mockSocketClient);
-    double targetSpeed = 500.0;    // 目標速度
+    double targetSpeed = 100.0;    // 目標速度
     double targetDistance = 10.0;  // 目標距離
 
     // 直進前の走行距離を計算

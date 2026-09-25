@@ -28,7 +28,7 @@ void AreaMaster::run()
                       + (robot.getCourse() == Course::Left ? "Left" : "Right") + ".csv";
 
   } else if(area == Area::ETZumo) {
-    commandFilePath = basePath + areaCommandNames[4]
+    commandFilePath = basePath + areaCommandNames[1]
                       + (robot.getCourse() == Course::Left ? "Left" : "Right") + ".csv";
 
   } else {

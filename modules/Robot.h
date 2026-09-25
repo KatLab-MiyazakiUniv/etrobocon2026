@@ -162,13 +162,13 @@ class Robot {
    * @brief QR1検出済みかのフラグを取得する
    * @return  QR1検出済みかのフラグ
    */
-  bool getHaveQR1contents();
+  bool getHaveQR1contents() const;
 
   /**
    * @brief QR2検出済みかのフラグを取得する
    * @return  QR2検出済みかのフラグ
    */
-  bool getHaveQR2contents();
+  bool getHaveQR2contents() const;
 
   /**
    * @brief QR1検出済みのフラグをセットする

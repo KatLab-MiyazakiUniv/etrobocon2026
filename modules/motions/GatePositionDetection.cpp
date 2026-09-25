@@ -25,11 +25,11 @@ void GatePositionDetection::executeStep()
 {
   // QR検出済みならreturn
   if(decryptRequired) {
-    if(getHaveQR2contents()) {
+    if(robot.getHaveQR2contents()) {
       return;
     }
   } else {
-    if(getHaveQR1contents()) {
+    if(robot.getHaveQR1contents()) {
       return;
     }
   }
@@ -52,9 +52,9 @@ void GatePositionDetection::executeStep()
 
     // QR検出成功ならフラグを更新
     if(decryptRequired) {
-      setHaveQR2contents()
+      robot.setHaveQR2contents();
     } else {
-      setHaveQR1contents()
+      robot.setHaveQR1contents();
     }
   }
 

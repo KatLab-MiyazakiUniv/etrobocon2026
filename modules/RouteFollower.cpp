@@ -41,7 +41,7 @@ namespace {
   /**
    * @brief 動作切り替え待機時間[ms]
    */
-  constexpr int MOTION_SWITCH_WAIT = 200;
+  constexpr int MOTION_SWITCH_WAIT = 100;
 
 }  // namespace
 

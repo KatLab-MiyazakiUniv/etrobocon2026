@@ -31,7 +31,7 @@ namespace {
   /**
    * @brief QR①検出位置の許容誤差[mm]
    */
-  constexpr double FIRST_DETECTION_TOLERANCE = 10.0;
+  constexpr double FIRST_DETECTION_TOLERANCE = 15.0;
 
   /**
    * @brief 外周ゲートでQR①位置から前進する距離[mm]

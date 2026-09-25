@@ -1,8 +1,8 @@
 #動作コマンド名,動作ID,条件コマンド名,条件ID
 # キャリブレイター
-#Calibrator,001,RepeatCount,001
+Calibrator,001,RepeatCount,001
 
-Snapshot,clearBuffer1,RepeatCount,001
+Snapshot,clearBuffer1
 CameraTracking,S001,Distance,035
 CameraTracking,R001,Distance,040
 CameraTracking,S001,Distance,035

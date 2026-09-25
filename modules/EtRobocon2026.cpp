@@ -167,6 +167,10 @@ void EtRobocon2026::start()
   RealNetworkSystem real;
   SocketClient client(real);
   Robot robot(client);
+
+  robot.getCameraSocketClientInstance().connectToServer();
+
+  
   // int voltage = BatteryController::getVoltage();
   // Logger::printfLog(Logger::INFO, "バッテリー電圧: %d mV", voltage);
   // robot.getCameraSocketClientInstance().connectToServer();
@@ -192,10 +196,6 @@ void EtRobocon2026::start()
   // CsvLogger::outputToFile();
   Logger::info("Timed ET Rally start");
 
-  RealNetworkSystem networkSystem;
-  SocketClient cameraSocketClient(networkSystem);
-
-  robot.getCameraSocketClientInstance().connectToServer();
 
   // Robotが保持しているMapDataを使用する
   MapData& mapData = robot.getMapDataInstance();

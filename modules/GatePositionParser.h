@@ -64,9 +64,9 @@ class GatePositionParser {
    * @return 青色・黄色ゲート形式の場合true
    */
   bool isBlueYellowFormat() const;
-};
 
-std::string plaintext;
-Robot & robot;
+  std::string plaintext;
+  Robot& robot;
+};
 
 #endif

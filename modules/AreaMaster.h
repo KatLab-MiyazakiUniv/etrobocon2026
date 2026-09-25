@@ -36,7 +36,7 @@ class AreaMaster {
   static const std::string basePath;
 
   // コマンドファイル名（各エリア名）
-  static const std::array<std::string, 5> areaCommandNames;
+  static const std::array<std::string, 6> areaCommandNames;
 
   /**
    * @brief 動作リストを実行してメモリを解放する

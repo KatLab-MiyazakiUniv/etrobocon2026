@@ -11,7 +11,7 @@
 using namespace std;
 const string AreaMaster::basePath
     = "etrobocon2026/datafiles/commands/Area/";  // エリアコマンドCSVファイルを置いているディレクトリのパス
-const array<string, 5> AreaMaster::areaCommandNames
+const array<string, 6> AreaMaster::areaCommandNames
     = { "LineTrace", "RedBottleDelivery", "BlueBottleDelivery", "YellowBottleDelivery", "ETZumo",
         "Area2" };  // エリア名の配列
 

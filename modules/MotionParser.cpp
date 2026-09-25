@@ -349,6 +349,27 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
                                                  std::move(colorCondition2),
                                                  CompoundCondition::LogicalOperator::OR);
     }
+    case CONDITION_COMMAND::COLOR_REGION_CENTER_CONDITION: {
+     CameraServer::ColorRegionDetectorRequest request;
+      // request.hsvRanges = ImageProcessingColor::BottleColors;
+      int count = 0;
+      for(int i = 0; i < ImageProcessingColor::BottleColors.size(); i++) {
+        if(fromString<bool>(params[8 + i])) {
+          request.hsvRanges[count] = ImageProcessingColor::BottleColors[i];
+          count++;
+        }
+      }
+      request.hsvRangeCount = count;
+
+      request.roi = { fromString<int>(params[4]), fromString<int>(params[5]),
+                      fromString<int>(params[6]), fromString<int>(params[7]) };
+
+      double targetCenterY = fromString<double>(params[2]);
+      int consecutiveCountThreshold = fromString<int>(params[3]);
+
+      return std::make_unique<ColorRegionCenterCondition>(
+    robot, request,targetCenterY,consecutiveCountThreshold);
+    }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Condition %s は未実装です",
                         params[0].c_str());
@@ -689,7 +710,9 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
           { "DistanceOrColor", CONDITION_COMMAND::DISTANCE_OR_COLOR },
           { "DistanceOrUltraSonic", CONDITION_COMMAND::DISTANCE_OR_ULTRA_SONIC },
           { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC },
-          { "ColorOrColor", CONDITION_COMMAND::COLOR_OR_COLOR }
+          { "ColorOrColor", CONDITION_COMMAND::COLOR_OR_COLOR },
+          { "ColorRegion", CONDITION_COMMAND::COLOR_REGION_CENTER_CONDITION },
+
 
         };
 

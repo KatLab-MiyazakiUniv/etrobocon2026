@@ -170,10 +170,11 @@ void EtRobocon2026::start()
 
   robot.getCameraSocketClientInstance().connectToServer();
 
-  
-  // int voltage = BatteryController::getVoltage();
-  // Logger::printfLog(Logger::INFO, "バッテリー電圧: %d mV", voltage);
-  // robot.getCameraSocketClientInstance().connectToServer();
+  for(int i = 0; i < 10; i++){
+  int voltage = BatteryController::getVoltage();
+  Logger::printfLog(Logger::INFO, "バッテリー電圧: %d mV", voltage);
+  ClockUtil::wait(10);
+  }
 
   // Rコース
   // robot.setCourse(Course::Right);

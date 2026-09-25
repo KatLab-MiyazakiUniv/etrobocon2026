@@ -13,10 +13,11 @@ CameraTracking,L001,Distance,025
 CameraTracking,L002,Distance,095
 CameraTracking,S001,Distance,015
 
-CameraTracking,R001,Distance,035
+CameraTracking,R001,Distance,032
 CameraTracking,S001,Distance,015
-CameraTracking,L002,Distance,030
-CameraTracking,S001,ColorRegion,001
+CameraTracking,L002,Distance,035
+CameraTracking,S001,Distance,050
+CameraTracking,S002,ColorRegion,001
 CameraTracking,000,Distance,000
 
 CameraTracking,BC,Distance,035

@@ -260,7 +260,7 @@ RelativeRotation,-104,1.5,2.5,0.0,-104.0
 RelativeRotation,-103,1.5,2.5,0.0,-103.0
 RelativeRotation,-102,1.5,2.5,0.0,-102.0
 RelativeRotation,-101,1.5,2.5,0.0,-101.0
-RelativeRotation,-100,1.5,2.5,0.0,-100.0
+RelativeRotation,-100,0.03,0.5,0.0,-100.0
 RelativeRotation,-099,1.5,2.5,0.0,-99.0
 RelativeRotation,-098,1.5,2.5,0.0,-98.0
 RelativeRotation,-097,1.5,2.5,0.0,-97.0
@@ -460,7 +460,7 @@ RelativeRotation,096,1.5,2.5,0.0,96.0
 RelativeRotation,097,1.5,2.5,0.0,97.0
 RelativeRotation,098,1.5,2.5,0.0,98.0
 RelativeRotation,099,1.5,2.5,0.0,99.0
-RelativeRotation,100,1.5,2.5,0.0,100.0
+RelativeRotation,100,0.03,0.5,0.0,100.0
 RelativeRotation,101,1.5,2.5,0.0,101.0
 RelativeRotation,102,1.5,2.5,0.0,102.0
 RelativeRotation,103,1.5,2.5,0.0,103.0

@@ -31,7 +31,7 @@ namespace {
   /**
    * @brief QR①検出位置の許容誤差[mm]
    */
-  constexpr double FIRST_DETECTION_TOLERANCE = 10.0;
+  constexpr double FIRST_DETECTION_TOLERANCE = 15.0;
 
   /**
    * @brief 外周ゲートでQR①位置から前進する距離[mm]
@@ -41,7 +41,7 @@ namespace {
   /**
    * @brief 動作切り替え待機時間[ms]
    */
-  constexpr int MOTION_SWITCH_WAIT = 200;
+  constexpr int MOTION_SWITCH_WAIT = 100;
 
 }  // namespace
 

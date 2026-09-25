@@ -1,6 +1,6 @@
 /**
  * @file   SquareDetector.h
- * @brief  ETラリー上のQRコードを点の集合から正方形領域として検出する画像処理クラス
+ * @brief  点群から回転矩形を検出する画像処理クラス
  * @author okuyama0528 yutaro-1214
  */
 

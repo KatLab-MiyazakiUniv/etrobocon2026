@@ -137,13 +137,13 @@ namespace CameraServer {
     PointData corners[QR_CODE_CORNER_COUNT] = {};  // QRコードの各頂点の座標(左上から時計回りの順)
   };
 
-  static constexpr uint32_t SQUARE_CORNER_COUNT = 4;  // 正方形の頂点数
+  static constexpr uint32_t SQUARE_CORNER_COUNT = 4;  // 短形の頂点数
 
   /**
    * @brief カメラサーバーに正方形検出を要求するリクエスト構造体
    */
   struct SquareDetectorRequest {
-    Command command = Command::SQUARE_DETECTION;  // 正方形検出コマンド
+    Command command = Command::SQUARE_DETECTION;  // 短形検出コマンド
     RectData roi;                                 // 検出対象の領域
     bool resetTracking = false;                   // 前回の検出結果をリセットするかどうか
   };
@@ -153,7 +153,7 @@ namespace CameraServer {
    */
   struct SquareDetectorResponse {
     bool wasDetected = false;                     // 検出できたかどうか
-    PointData corners[SQUARE_CORNER_COUNT] = {};  // 正方形の各頂点の座標
+    PointData corners[SQUARE_CORNER_COUNT] = {};  // 短形の各頂点の座標
     double centerX = 0.0;                         // 画像上の正方形中心X座標[px]
     double centerY = 0.0;                         // 画像上の正方形中心Y座標[px]
     double forwardDistance = 0.0;                 // 正方形までの前方距離[mm]

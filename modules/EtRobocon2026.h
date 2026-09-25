@@ -11,7 +11,7 @@
 #include "Logger.h"
 
 #include <memory>
-
+#include "AreaMaster.h"
 #include "ClockUtil.h"
 #include "CourseMirror.h"
 #include "DijkstraRoutePlanner.h"

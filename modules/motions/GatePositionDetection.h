@@ -12,8 +12,6 @@
 #include <string>
 #include "GatePositionParser.h"
 #include "Logger.h"
-#include "RepeatCountCondition.h"
-#include "Snapshot.h"
 #include "Decrypter.h"
 
 class GatePositionDetection : public BaseMotion {
@@ -21,13 +19,14 @@ class GatePositionDetection : public BaseMotion {
   /**
    * @brief コンストラクタ
    * @param _robot ロボットインスタンス
-   * @param _fileName 撮影画像の保存ファイル名
    * @param _decryptRequired 復号するか
+   * @param _qrDetectionRequest QRコード検出リクエスト
    * @param continuationCondition 継続条件
    */
-  GatePositionDetection(Robot& _robot, const std::string& _fileName, bool _decryptRequired,
+  GatePositionDetection(Robot& _robot,
+                        std::unique_ptr<BaseContinuationCondition> continuationCondition,
                         const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
-                        std::unique_ptr<BaseContinuationCondition> continuationCondition);
+                        bool _decryptRequired);
 
   /**
    * @brief デストラクタ
@@ -41,7 +40,6 @@ class GatePositionDetection : public BaseMotion {
   void executeStep() override;
 
  private:
-  std::string fileName;
   CameraServer::QrCodeDetectorRequest qrDetectionRequest;  // QRコード検出リクエスト
   bool decryptRequired;
 };

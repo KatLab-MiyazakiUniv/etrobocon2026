@@ -84,9 +84,7 @@ void CameraTracking::executeStep()
                         success, wasDetected);
       return;
     }
-
     // 黒を除く最大面積の色範囲取得>
-
     if(response.largestColorIndex != -1) {
       Logger::printfLog(Logger::DEBUG, "CameraTracking:最大色の検知失敗");
     }
@@ -147,7 +145,8 @@ void CameraTracking::finish()
 {
   if(isStopMotorPower) {
     ClockUtil::sleep(10);
-    robot.getWheelMotorControllerInstance().brakeBoth();
+    // robot.getWheelMotorControllerInstance().brakeBoth();
+    robot.getWheelMotorControllerInstance().stopBoth();
   }
 }
 

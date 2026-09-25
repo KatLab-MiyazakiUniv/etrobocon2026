@@ -7,11 +7,9 @@
 #include "GatePositionDetection.h"
 
 GatePositionDetection::GatePositionDetection(
-    Robot& _robot, const std::string& _fileName, bool _decryptRequired,
-    const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
-    std::unique_ptr<BaseContinuationCondition> continuationCondition)
+    Robot& _robot, std::unique_ptr<BaseContinuationCondition> continuationCondition,
+    const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest, bool _decryptRequired)
   : BaseMotion(_robot, std::move(continuationCondition)),
-    fileName(_fileName),
     qrDetectionRequest(_qrDetectionRequest),
     decryptRequired(_decryptRequired)
 {
@@ -25,17 +23,7 @@ GatePositionDetection::~GatePositionDetection()
 
 void GatePositionDetection::executeStep()
 {
-  // -----------------------------
-  // 1. 写真撮影
-  // -----------------------------
-
-  Snapshot snapshot(robot, fileName, std::make_unique<RepeatCountCondition>(robot, 1));
-
-  snapshot.run();
-
-  // -----------------------------
-  // 2. QRコードを検出
-  // -----------------------------
+  // QRコードを検出
 
   SocketClient& client = robot.getCameraSocketClientInstance();
   bool success = false;
@@ -52,9 +40,7 @@ void GatePositionDetection::executeStep()
     Logger::error("GatePositionDetection: QRコードの検出に成功しました。");
   }
 
-  // -----------------------------
-  // 3. QRコードの暗号文を復号
-  // -----------------------------
+  //  QRコードの暗号文を復号
   std::string gatePositionData;
 
   if(decryptRequired) {

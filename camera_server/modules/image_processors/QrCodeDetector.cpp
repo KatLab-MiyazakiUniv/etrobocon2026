@@ -113,7 +113,6 @@ QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
   }
   cv::Mat roiFrame = frame(roiRect);
 
-  // --- Step 1: 生画像 (Raw) でデコード試行 ---
   ZXing::ImageView ivRaw(roiFrame.data, roiFrame.cols, roiFrame.rows, ZXing::ImageFormat::BGR,
                          static_cast<int>(roiFrame.step));
   auto qrCode = ZXing::ReadBarcode(ivRaw, options);
@@ -122,7 +121,6 @@ QrCodeDetectionResult QrCodeDetector::detect(const cv::Mat& frame)
     return createResult(qrCode, roiRect);
   }
 
-  // --- Step 2: シャープ化 + CLAHE (コントラスト強調 & 輪郭強調) でデコード試行 ---
   cv::Mat imgStep2 = applySharpen(applyCLAHE(roiFrame), 1.5);
   ZXing::ImageView ivStep2(imgStep2.data, imgStep2.cols, imgStep2.rows, ZXing::ImageFormat::BGR,
                            static_cast<int>(imgStep2.step));

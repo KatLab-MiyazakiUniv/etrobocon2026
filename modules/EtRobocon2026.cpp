@@ -15,13 +15,15 @@ namespace {
 
   /**
    * @brief ここでコースを設定する
+   LコースならL_COURSE
+   RコースならR_COURSE
    */
   constexpr CourseSide COURSE_SIDE = CourseSide::L_COURSE;
 
   /**
    * @brief 最大周回数
    */
-  constexpr int LAP_COUNT = 3;
+  constexpr int LAP_COUNT = 2;
 
   /**
    * @brief 最終地点へ向かう時間閾値[ms]
@@ -301,3 +303,5 @@ void EtRobocon2026::start()
 
     Logger::info("Timed ET Rally finished");
   }
+
+}

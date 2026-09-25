@@ -158,12 +158,6 @@ class Robot {
    */
   MapData& getMapDataInstance();
 
-  /**
-   * @brief ゲート位置情報を取得する
-   * @return ゲート位置情報
-   */
-  const MapData& getMapDataInstance() const;
-
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
   ArmMotorController armMotorController;        // ArmMotorController インスタンス

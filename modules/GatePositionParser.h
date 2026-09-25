@@ -33,9 +33,6 @@ class GatePositionParser {
   bool parse();
 
  private:
-  std::string plaintext;
-  Robot& robot;
-
   /**
    * @brief 赤色ゲートの位置情報を解析する
    * @return 解析に成功した場合true
@@ -68,5 +65,8 @@ class GatePositionParser {
    */
   bool isBlueYellowFormat() const;
 };
+
+std::string plaintext;
+Robot & robot;
 
 #endif

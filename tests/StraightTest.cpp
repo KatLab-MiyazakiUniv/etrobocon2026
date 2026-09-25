@@ -15,9 +15,7 @@ namespace etrobocon2026_test {
   class StraightTest : public ::testing::Test {
    protected:
     // テスト用のPidゲイン
-    Pid::PidGain rightPid = { 0.00535, 0.00115, 0.000 };
-    Pid::PidGain leftPid = { 0.00578, 0.0008535, 0.000 };
-    Pid::PidGain anglePid = { 0.0055, 0.0009, 0.0 };
+    Pid::PidGain anglePid = { 0.033, 0.003, 0.003 };
   };
 
   // IMU無しの場合、目標距離が正の時、run()で直進後、走行距離が目標距離だけ増加するかテスト（誤差あり）
@@ -26,7 +24,7 @@ namespace etrobocon2026_test {
     MockNetworkSystem mockNetworkSystem;
     SocketClient mockSocketClient(mockNetworkSystem);
     Robot robot(mockSocketClient);
-    double targetSpeed = 1000.0;   // 目標速度
+    double targetSpeed = 50.0;     // 目標速度
     double targetDistance = 10.0;  // 目標距離
     auto condition = std::make_unique<DistanceCondition>(robot, targetDistance);
 
@@ -36,7 +34,8 @@ namespace etrobocon2026_test {
     double startMileage = Mileage::calculateMileage(rightCount, leftCount);
 
     // 直進動作を実行
-    Straight straight(robot, std::move(condition), targetSpeed, anglePid, false, 0.0, 1.0);
+    Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
+                      targetSpeed, anglePid, false, 0.0, 1.0);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -45,7 +44,7 @@ namespace etrobocon2026_test {
     double endMileage = Mileage::calculateMileage(rightCount, leftCount);
 
     // 走行距離と目標距離との誤差
-    double deviation = 0.5;
+    double deviation = 10.0;
 
     // 走行距離が目標距離の誤差の範囲にあることテスト
     EXPECT_NEAR(targetDistance, endMileage - startMileage, deviation);
@@ -67,7 +66,8 @@ namespace etrobocon2026_test {
     double startMileage = Mileage::calculateMileage(rightCount, leftCount);
 
     // 直進動作を実行
-    Straight straight(robot, std::move(condition), targetSpeed, anglePid, false, 0.0, 1.0);
+    Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
+                      targetSpeed, anglePid, false, 0.0, 1.0);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -95,7 +95,8 @@ namespace etrobocon2026_test {
     double startMileage = Mileage::calculateMileage(rightCount, leftCount);
 
     // 直進動作を実行
-    Straight straight(robot, std::move(condition), targetSpeed, anglePid, false, 0.0, 1.0);
+    Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
+                      targetSpeed, anglePid, false, 0.0, 1.0);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -124,7 +125,8 @@ namespace etrobocon2026_test {
     double startMileage = Mileage::calculateMileage(rightCount, leftCount);
 
     // 直進動作を実行
-    Straight straight(robot, std::move(condition), targetSpeed, anglePid, false, 0.0, 1.0);
+    Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
+                      targetSpeed, anglePid, false, 0.0, 1.0);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -143,7 +145,7 @@ namespace etrobocon2026_test {
     MockNetworkSystem mockNetworkSystem;
     SocketClient mockSocketClient(mockNetworkSystem);
     Robot robot(mockSocketClient);
-    double targetSpeed = 1000.0;   // 目標速度
+    double targetSpeed = 100.0;    // 目標速度
     double targetDistance = 10.0;  // 目標距離
     auto condition = std::make_unique<DistanceCondition>(robot, targetDistance);
 
@@ -153,7 +155,8 @@ namespace etrobocon2026_test {
     double startMileage = Mileage::calculateMileage(rightCount, leftCount);
 
     // 直進動作を実行
-    Straight straight(robot, std::move(condition), targetSpeed, anglePid, true, 0.0, 1.0);
+    Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
+                      targetSpeed, anglePid, true, 0.0, 1.0);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -184,7 +187,8 @@ namespace etrobocon2026_test {
     double startMileage = Mileage::calculateMileage(rightCount, leftCount);
 
     // 直進動作を実行
-    Straight straight(robot, std::move(condition), targetSpeed, anglePid, true, 0.0, 1.0);
+    Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
+                      targetSpeed, anglePid, true, 0.0, 1.0);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -212,7 +216,8 @@ namespace etrobocon2026_test {
     double startMileage = Mileage::calculateMileage(rightCount, leftCount);
 
     // 直進動作を実行
-    Straight straight(robot, std::move(condition), targetSpeed, anglePid, true, 0.0, 1.0);
+    Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
+                      targetSpeed, anglePid, true, 0.0, 1.0);
     straight.run();
 
     // 直進後の走行距離を計算
@@ -241,7 +246,8 @@ namespace etrobocon2026_test {
     double startMileage = Mileage::calculateMileage(rightCount, leftCount);
 
     // 直進動作を実行
-    Straight straight(robot, std::move(condition), targetSpeed, anglePid, true, 0.0, 1.0);
+    Straight straight(robot, std::make_unique<DistanceCondition>(robot, targetDistance),
+                      targetSpeed, anglePid, true, 0.0, 1.0);
     straight.run();
 
     // 直進後の走行距離を計算

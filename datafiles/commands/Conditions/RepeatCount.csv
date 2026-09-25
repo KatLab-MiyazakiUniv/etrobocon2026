@@ -1,0 +1,3 @@
+コマンド名,ID,targetCount
+RepeatCount,ID,int
+RepeatCount,001,1

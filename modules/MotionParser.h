@@ -19,13 +19,64 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "BaseMotion.h"
 #include "Logger.h"
 #include "DistanceCondition.h"
+#include "SensorColorCondition.h"
+#include "RunningTimeCondition.h"
+#include "MotionTimeCondition.h"
+#include "CompoundCondition.h"
+#include "RelativeAngleCondition.h"
+#include "AbsoluteAngleCondition.h"
+#include "RepeatCountCondition.h"
+#include "LineTrace.h"
+#include "Straight.h"
+#include "AbsoluteRotation.h"
+#include "RelativeRotation.h"
+#include "CameraTracking.h"
+#include "Calibrator.h"
+#include "ResetAzimuth.h"
+#include "Snapshot.h"
+#include "ETZumoExit.h"
+#include "ETZumoFinish.h"
+#include "ProjectedDistanceCondition.h"
+#include "ETZumoExitCondition.h"
+#include "UltraSonicCondition.h"
+#include "ImageProcessingColor.h"
+#include "GatePositionDetection.h"
 
 class MotionParser {
  public:
   // 動作コマンド名を持つ列挙型クラス
-  enum class MOTION_COMMAND { STRAIGHT, QR_TRACKING, NONE };
+  enum class MOTION_COMMAND {
+    EXAMPLE,
+    STRAIGHT,
+    LINETRACE,
+    CAMERA_TRACKING,
+    RELATIVE_ROTATION,
+    ABSOLUTE_ROTATION,
+    CALIBRATOR,
+    SNAPSHOT,
+    RESET_AZIMUTH,
+    ET_ZUMO_EXIT,
+    ET_ZUMO_FINISH,
+    GATE_POSITION,
+    NONE
+  };
   // 条件コマンド名を持つ列挙型クラス
-  enum class CONDITION_COMMAND { DISTANCE, NONE };
+  enum class CONDITION_COMMAND {
+    DISTANCE,
+    PROJECTED_DISTANCE,
+    ABSOLUTE_ANGLE,
+    RELATIVE_ANGLE,
+    SENSOR_COLOR,
+    RUNNING_TIME,
+    MOTION_TIME,
+    DISTANCE_AND_COLOR,
+    DISTANCE_OR_COLOR,
+    REPEAT_COUNT,
+    ULTRA_SONIC,
+    DISTANCE_OR_ULTRA_SONIC,
+    COLOR_OR_COLOR,
+    NONE
+  };
 
   /**
    * @brief Area CSVファイルを解析して動作インスタンスのリストを生成する
@@ -54,7 +105,8 @@ class MotionParser {
    * @return 条件インスタンス（未定義の場合は nullptr）
    */
   static std::unique_ptr<BaseContinuationCondition> createConditionInstance(
-      Robot& robot, const std::vector<std::string>& params);
+      Robot& robot, const std::vector<std::string>& params,
+      std::shared_ptr<ProjectedMileage> mileage = nullptr);
 
   /**
    * @brief パラメータから動作インスタンスを生成する
@@ -65,7 +117,9 @@ class MotionParser {
    */
   static BaseMotion* createMotionInstance(Robot& robot,
                                           const std::vector<std::string>& motionParams,
-                                          std::unique_ptr<BaseContinuationCondition> condition);
+                                          std::unique_ptr<BaseContinuationCondition> condition,
+                                          std::shared_ptr<ProjectedMileage> sharedMileage
+                                          = nullptr);
 
   /**
    * @brief 文字列を列挙型MOTION_COMMANDに変換する

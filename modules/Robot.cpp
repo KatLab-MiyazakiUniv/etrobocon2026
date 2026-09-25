@@ -115,7 +115,36 @@ int Robot::getTargetBrightness() const
   return targetBrightness;
 }
 
+void Robot::setIndexOfLabel(int _indexOfLabel)
+{
+  indexOfLabel = _indexOfLabel;
+}
+
+int Robot::getIndexOfLabel() const
+{
+  return indexOfLabel;
+}
+
 MapData& Robot::getMapDataInstance()
 {
   return mapData;
+}
+bool Robot::getHaveQR1contents() const
+{
+  return haveQR1contents;
+}
+
+bool Robot::getHaveQR2contents() const
+{
+  return haveQR2contents;
+}
+
+void Robot::setHaveQR1contents()
+{
+  haveQR1contents = true;
+}
+
+void Robot::setHaveQR2contents()
+{
+  haveQR2contents = true;
 }

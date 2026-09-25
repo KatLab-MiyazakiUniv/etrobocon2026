@@ -141,10 +141,44 @@ class Robot {
   int getTargetBrightness() const;
 
   /**
-   * @brief マップデータの参照を返す
-   * @return MapDataの参照
+   * @brief ボトルキャリーで取得した色範囲のインデックス設定する
+   * @param _indexOfLabel ボトルキャリーで取得した色範囲のインデックス
+   */
+  void setIndexOfLabel(int _indexOfLabel);
+
+  /**
+   * @brief ボトルキャリーで取得した色領域のインデックスを取得する
+   * @return indexOfLabel ボトルキャリーで取得した色範囲のインデックス
+   */
+  int getIndexOfLabel() const;
+
+  /**
+   * @brief ゲート位置情報を取得する
+   * @return ゲート位置情報
    */
   MapData& getMapDataInstance();
+
+  /**
+   * @brief QR1検出済みかのフラグを取得する
+   * @return  QR1検出済みかのフラグ
+   */
+  bool getHaveQR1contents() const;
+
+  /**
+   * @brief QR2検出済みかのフラグを取得する
+   * @return  QR2検出済みかのフラグ
+   */
+  bool getHaveQR2contents() const;
+
+  /**
+   * @brief QR1検出済みのフラグをセットする
+   */
+  void setHaveQR1contents();
+
+  /**
+   * @brief QR2検出済みのフラグをセットする
+   */
+  void setHaveQR2contents();
 
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
@@ -153,14 +187,17 @@ class Robot {
   ColorSensorController colorSensorController;  // ColorSensorController インスタンス
   UltraSonicController ultraSonicController;    // UltraSonicController インスタンス
   SocketClient& cameraSocketClient;             // カメラサーバー用の SocketClient インスタンス
-  Course course;                                // コース(Left or Right)
-  Edge edge;                                    // エッジの左右判定
+  Course course = Course::Left;                 // コース(Left or Right)
+  Edge edge = Edge::LeftEdge;                   // エッジの左右判定
   int runningStartTime = 0;                     // 走行開始時間
   spikeapi::Button button;                      // Buttonインスタンス
   spikeapi::ForceSensor forceSensor;            // ForceSensorインスタンス
   spikeapi::Display display;                    // Displayインスタンス
   char decryptionKey[5] = { 0 };                // 復号キー
   int targetBrightness = 50;                    // 目標輝度
-  MapData mapData;
+  int indexOfLabel = 0;                         // ボトルキャリーで取得した色範囲のインデックス
+  MapData mapData;                              // ゲート位置情報
+  bool haveQR1contents = false;                 // QR1を検出済みかのフラグ
+  bool haveQR2contents = false;                 // QR2を検出済みかのフラグ
 };
 #endif

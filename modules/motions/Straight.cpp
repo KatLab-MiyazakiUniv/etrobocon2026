@@ -95,5 +95,6 @@ void Straight::executeStep()
 }
 void Straight::finish()
 {
+  ClockUtil::sleep(10);
   robot.getWheelMotorControllerInstance().stopBoth();
 }

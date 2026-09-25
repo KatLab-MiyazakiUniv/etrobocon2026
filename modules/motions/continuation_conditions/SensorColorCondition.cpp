@@ -17,6 +17,11 @@ SensorColorCondition::~SensorColorCondition()
   LOG_DESTROY("SensorColorCondition");
 }
 
+void SensorColorCondition::prepare()
+{
+  colorCount = 0;
+}
+
 bool SensorColorCondition::shouldContinue()
 {
   if(targetColor == ColorSensorController::COLOR::NONE) {
@@ -26,6 +31,7 @@ bool SensorColorCondition::shouldContinue()
   // HSV値を取得
   ColorSensorController::HSV hsv;
   robot.getColorSensorControllerInstance().getRawHSV(hsv, true);
+
   ColorSensorController::COLOR CurrentColor
       = robot.getColorSensorControllerInstance().convertHsvToColor(hsv);
   if(CurrentColor == targetColor) {

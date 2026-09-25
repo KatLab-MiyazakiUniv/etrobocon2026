@@ -230,6 +230,28 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
                                                  std::move(colorCondition),
                                                  CompoundCondition::LogicalOperator::AND);
     }
+        case CONDITION_COMMAND::COLOR_REGION_CENTER_CONDITION: {
+      CameraServer::ColorRegionDetectorRequest request;
+      // request.hsvRanges = ImageProcessingColor::BottleColors;
+      int count = 0;
+      for(int i = 0; i < ImageProcessingColor::BottleColors.size(); i++) {
+        if(fromString<bool>(params[8 + i])) {
+          request.hsvRanges[count] = ImageProcessingColor::BottleColors[i];
+          count++;
+        }
+      }
+      request.hsvRangeCount = count;
+
+      request.roi = { fromString<int>(params[4]), fromString<int>(params[5]),
+                      fromString<int>(params[6]), fromString<int>(params[7]) };
+
+      double targetCenterY = fromString<double>(params[2]);
+      int consecutiveCountThreshold = fromString<int>(params[3]);
+
+      return std::make_unique<ColorRegionCenterCondition>(
+    robot, request,targetCenterY,consecutiveCountThreshold);
+    }
+
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Condition %s は未実装です",
                         params[0].c_str());
@@ -365,6 +387,29 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
   }
 }
 
+    case CONDITION_COMMAND::COLOR_REGION_CENTER_CONDITION: {
+      CameraServer::ColorRegionDetectorRequest request;
+      // request.hsvRanges = ImageProcessingColor::BottleColors;
+      int count = 0;
+      for(int i = 0; i < ImageProcessingColor::BottleColors.size(); i++) {
+        if(fromString<bool>(params[8 + i])) {
+          request.hsvRanges[count] = ImageProcessingColor::BottleColors[i];
+          count++;
+        }
+      }
+      request.hsvRangeCount = count;
+
+      request.roi = { fromString<int>(params[4]), fromString<int>(params[5]),
+                      fromString<int>(params[6]), fromString<int>(params[7]) };
+
+      double targetCenterY = fromString<double>(params[2]);
+      int consecutiveCountThreshold = fromString<int>(params[3]);
+
+      return std::make_unique<ColorRegionCenterCondition>(
+    robot, request,targetCenterY,consecutiveCountThreshold);
+    }
+
+
 MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str)
 {
   // 条件コマンド文字列と、それに対応する列挙型CONDITION_COMMANDのマッピングを定義
@@ -376,6 +421,7 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
     { "RunningTime", CONDITION_COMMAND::RUNNING_TIME },
     { "MotionTime", CONDITION_COMMAND::MOTION_TIME },
     { "RepeatCount", CONDITION_COMMAND::REPEAT_COUNT },
+    {"ColorRegion", CONDITION_COMMAND::COLOR_REGION_CENTER_CONDITION },
     { "DistanceAndColor", CONDITION_COMMAND::DISTANCE_AND_COLOR },
   };
 

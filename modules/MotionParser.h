@@ -30,6 +30,7 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "AbsoluteRotation.h"
 #include "RelativeRotation.h"
 #include "CameraTracking.h"
+#include "ColorRegionCenterCondition.h"
 #include "./../common/ImageProcessingColor.h"
 
 class MotionParser {
@@ -54,6 +55,7 @@ class MotionParser {
     MOTION_TIME,
     REPEAT_COUNT,
     DISTANCE_AND_COLOR,
+    COLOR_REGION_CENTER_CONDITION,
     NONE
   };
 

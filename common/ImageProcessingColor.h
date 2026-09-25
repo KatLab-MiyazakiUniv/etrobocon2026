@@ -8,6 +8,7 @@
 #define IMAGE_PROCESSING_COLOR_H
 
 #include <vector>
+#include <string>
 #include "SocketProtocol.h"
 
 /**
@@ -25,7 +26,8 @@ class ImageProcessingColor {
     YELLOW,  // 黄
     BLACK,   // 黒
     GRAY,    // 灰(正確な値が不明なので0)
-    WHITE    // 白(正確な値が不明なので0)
+    WHITE,   // 白(正確な値が不明なので0)
+    None
   };
 
   /**
@@ -39,6 +41,13 @@ class ImageProcessingColor {
    * @return HSV範囲
    */
   static const CameraServer::HSVRangeData& getHSVRangeFromColor(Color color);
+
+  /**
+   * @brief 色に対応する文字列を取得する
+   * @param color 画像処理用の色
+   * @return 色に対応した文字列
+   */
+  static const std::string ColorToString(Color color);
 
  private:
   /**

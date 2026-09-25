@@ -11,9 +11,9 @@
 using namespace std;
 const string AreaMaster::basePath
     = "etrobocon2026/datafiles/commands/Area/";  // エリアコマンドCSVファイルを置いているディレクトリのパス
-const array<string, 6> AreaMaster::areaCommandNames
-    = { "LineTrace", "RedBottleDelivery", "BlueBottleDelivery", "YellowBottleDelivery", "ETZumo",
-        "Area2" };  // エリア名の配列
+const array<string, 5> AreaMaster::areaCommandNames = {
+  "LineTrace", "ETZumo", "RedBottleDelivery", "BlueBottleDelivery", "YellowBottleDelivery",
+};  // エリア名の配列
 
 AreaMaster::AreaMaster(Robot& _robot, Area _area) : robot(_robot), area(_area) {}
 
@@ -26,6 +26,11 @@ void AreaMaster::run()
   if(area == Area::BottleDelivery) {
     commandFilePath = basePath + areaCommandNames[static_cast<int>(area) + robot.getIndexOfLabel()]
                       + (robot.getCourse() == Course::Left ? "Left" : "Right") + ".csv";
+
+  } else if(area == Area::ETZumo) {
+    commandFilePath = basePath + areaCommandNames[4]
+                      + (robot.getCourse() == Course::Left ? "Left" : "Right") + ".csv";
+
   } else {
     commandFilePath = basePath + areaCommandNames[static_cast<int>(area)]
                       + (robot.getCourse() == Course::Left ? "Left" : "Right") + ".csv";

@@ -172,12 +172,12 @@ class Robot {
   /**
    * @brief 走行開始時間を取得する
    */
-  int getRunStartTime();
+  int getRunningStartTime();
 
   /**
    * @brief 走行開始時間をするセットする
    */
-  int setRunStartTime();
+  int setRunningStartTime();
 
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス

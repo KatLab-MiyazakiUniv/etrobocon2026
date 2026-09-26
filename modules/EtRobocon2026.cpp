@@ -6,8 +6,11 @@
 
 #include "EtRobocon2026.h"
 
+#include <cmath>
 #include <memory>
 #include <vector>
+
+#include "AngleNormalizer.h"
 
 namespace {
 
@@ -55,6 +58,13 @@ namespace {
    * @brief 直進時の最大出力率
    */
   constexpr double STRAIGHT_MAXOUT_RATE = 0.54;
+
+  /**
+   * @brief 回頭終了判定許容誤差[deg]
+   *
+   * RouteFollowerと同じ値を使用する。
+   */
+  constexpr double ROTATION_TOLERANCE = 2.0;
 
   /**
    * @brief Lコース座標を現在コース用へ変換する
@@ -161,6 +171,73 @@ namespace {
            && findGate(mapData, GoalColor::YELLOW) != nullptr;
   }
 
+  /**
+   * @brief Directionを角度へ変換する
+   * @param direction 方向
+   * @return 方向に対応する角度[deg]
+   */
+  double directionToHeading(Direction direction)
+  {
+    switch(direction) {
+      case Direction::RIGHT:
+        return 0.0;
+
+      case Direction::UP:
+        return 90.0;
+
+      case Direction::LEFT:
+        return 180.0;
+
+      case Direction::DOWN:
+        return -90.0;
+    }
+
+    return 0.0;
+  }
+
+  /**
+   * @brief 2つの方向から必要な相対回頭角度を計算する
+   * @param from 現在方向
+   * @param to 目標方向
+   * @return 相対回頭角度[deg]
+   */
+  double calculateRotationAngle(Direction from, Direction to)
+  {
+    const double currentHeading = directionToHeading(from);
+    const double targetHeading = directionToHeading(to);
+
+    return AngleNormalizer::normalizeAngle(currentHeading - targetHeading);
+  }
+
+  /**
+   * @brief 2地点間を1回の直進で移動する場合の距離を計算する
+   * @param map ETラリーマップ
+   * @param from 開始格子座標
+   * @param to 終了格子座標
+   * @return 直進距離[mm]
+   * @return 0.0 縦横一直線ではない場合
+   */
+  double calculateStraightDistance(const EtRallyMap& map, const Point& from, const Point& to)
+  {
+    const EtRallyMap::Node fromNode = map.getNode(from.x, from.y);
+    const EtRallyMap::Node toNode = map.getNode(to.x, to.y);
+
+    // Y方向への直進
+    if(from.x == to.x) {
+      return std::abs(toNode.y - fromNode.y);
+    }
+
+    // X方向への直進
+    if(from.y == to.y) {
+      return std::abs(toNode.x - fromNode.x);
+    }
+
+    Logger::printfLog(Logger::ERROR, "EtRobocon2026: diagonal straight route (%d,%d) -> (%d,%d)",
+                      from.x, from.y, to.x, to.y);
+
+    return 0.0;
+  }
+
 }  // namespace
 
 void EtRobocon2026::start()
@@ -221,22 +298,35 @@ void EtRobocon2026::start()
   GateRoutePlanner routePlanner(mapData);
   EtRallyMap etRallyMap;
 
+  /**
+   * @brief QR補正後の開始位置
+   */
   Point startPoint;
 
   /**
-   * @brief ラベル位置からETラリー開始座標を決定する
+   * @brief QR補正前の外周位置
+   *
+   * ゲート情報不足時はQR補正後にここまでバックする。
+   */
+  Point outerPoint;
+
+  /**
+   * @brief ラベル位置から開始位置と外周位置を決定する
    */
   switch(robot.getIndexOfLabel()) {
     case 0:
       startPoint = convertPoint({ 2, 4 });
+      outerPoint = convertPoint({ 0, 4 });
       break;
 
     case 1:
       startPoint = convertPoint({ 2, 6 });
+      outerPoint = convertPoint({ 0, 6 });
       break;
 
     case 2:
       startPoint = convertPoint({ 2, 8 });
+      outerPoint = convertPoint({ 0, 8 });
       break;
 
     default:
@@ -251,7 +341,9 @@ void EtRobocon2026::start()
   int currentGridY = startPoint.y;
 
   /**
-   * @brief ETラリー開始時の向き
+   * @brief ETラリー開始時の方向
+   *
+   * LコースではX増加方向へ進むLEFT。
    */
   Direction currentDirection = convertDirection(Direction::LEFT);
 
@@ -300,11 +392,11 @@ void EtRobocon2026::start()
                       result.correctionAngle, result.straightDistance);
 
     // ----------------------------------------
-    // QRコード方向へ回頭
+    // QR方向へ回頭
     // ----------------------------------------
 
-    auto rotateCondition
-        = std::make_unique<RelativeAngleCondition>(robot, result.correctionAngle, 2.0);
+    auto rotateCondition = std::make_unique<RelativeAngleCondition>(robot, result.correctionAngle,
+                                                                    ROTATION_TOLERANCE);
 
     RelativeRotation rotate(robot, std::move(rotateCondition), squareRotationPid,
                             result.correctionAngle);
@@ -312,7 +404,7 @@ void EtRobocon2026::start()
     rotate.run();
 
     // ----------------------------------------
-    // QRコードに向かって距離補正
+    // QRまで直進
     // ----------------------------------------
 
     auto straightCondition = std::make_unique<DistanceCondition>(robot, result.straightDistance);
@@ -323,11 +415,11 @@ void EtRobocon2026::start()
     straight.run();
 
     // ----------------------------------------
-    // ETラリー開始方向へ戻す
+    // 元のETラリー開始方向へ戻す
     // ----------------------------------------
 
-    auto returnCondition
-        = std::make_unique<RelativeAngleCondition>(robot, -result.correctionAngle, 2.0);
+    auto returnCondition = std::make_unique<RelativeAngleCondition>(robot, -result.correctionAngle,
+                                                                    ROTATION_TOLERANCE);
 
     RelativeRotation returnRotate(robot, std::move(returnCondition), squareRotationPid,
                                   -result.correctionAngle);
@@ -338,8 +430,8 @@ void EtRobocon2026::start()
 
   } else {
     /**
-     * QRコードが検出できなかった場合でも、
-     * ETラリー自体は中止せずそのまま開始する。
+     * QR検出失敗時は補正を行わず、
+     * そのまま処理を続行する。
      */
     Logger::info("ET Rally start square not detected -> skip adjustment");
   }
@@ -365,10 +457,12 @@ void EtRobocon2026::start()
    *
    * trueの場合は、
    *
-   * 現在位置
-   *   ↓
+   * QR補正位置
+   *   ↓ バック
+   * 外周
+   *   ↓ 1回のStraight
    * (0,0)
-   *   ↓
+   *   ↓ 1回のStraight
    * (8,0)
    *
    * の順番で走行する。
@@ -384,6 +478,54 @@ void EtRobocon2026::start()
 
     shouldGoFinal = true;
     useFixedFinalRoute = true;
+
+    // ========================================
+    // QR補正後に外周までバック
+    // ========================================
+
+    if(result.wasDetected) {
+      const double backDistance = calculateStraightDistance(etRallyMap, startPoint, outerPoint);
+
+      if(backDistance <= 0.0) {
+        Logger::error("EtRobocon2026: invalid back distance");
+
+        robot.getWheelMotorControllerInstance().stopBoth();
+
+        return;
+      }
+
+      Logger::printfLog(Logger::INFO, "Back to outer grid: %.2f mm", backDistance);
+
+      auto backCondition = std::make_unique<DistanceCondition>(robot, backDistance);
+
+      /**
+       * 負の速度を指定することで、
+       * LEFT方向を向いたまま外周へバックする。
+       */
+      Straight backStraight(robot, std::move(backCondition), -TARGET_SPEED, straightAnglePid, true,
+                            STRAIGHT_DEADBAND_RATE, STRAIGHT_MAXOUT_RATE);
+
+      backStraight.run();
+
+      Logger::info("Back to outer grid finished");
+
+    } else {
+      /**
+       * QR補正を行っていない場合は、
+       * 開始前の外周位置にいるものとして扱う。
+       */
+      Logger::info("Start square not detected -> no back required");
+    }
+
+    /**
+     * 固定経路開始位置を外周へ更新する。
+     *
+     * バックでは向きを変更しないので、
+     * currentDirectionはLEFTのまま。
+     */
+    currentGridX = outerPoint.x;
+    currentGridY = outerPoint.y;
+    currentDirection = convertDirection(Direction::LEFT);
   }
 
   // ========================================
@@ -423,8 +565,8 @@ void EtRobocon2026::start()
 
         /**
          * 外周ゲートの場合は、
-         * RouteFollower内部でゲート通過後に
-         * 入口側へ戻ってくるため入口座標を現在位置とする。
+         * RouteFollower内部で入口側へ戻ってくるため、
+         * entranceを現在位置とする。
          */
         if(outerGate) {
           currentGridX = routeResult.entrance.x;
@@ -438,7 +580,7 @@ void EtRobocon2026::start()
         }
 
         // ----------------------------------------
-        // YELLOWゲート通過後に終了条件を確認する
+        // YELLOW通過後に終了条件を確認
         // ----------------------------------------
 
         if(targetColor == GoalColor::YELLOW) {
@@ -473,87 +615,142 @@ void EtRobocon2026::start()
   const Direction finalDirection = convertDirection(Direction::LEFT);
 
   // ========================================
-  // ゲート情報不足時の固定最終経路
+  // ゲート情報不足時の固定経路
   // ========================================
 
   if(useFixedFinalRoute) {
     /**
-     * ゲート情報が不足している場合は、
+     * 固定経路
      *
-     * 現在位置
+     * 外周位置
+     *   ↓
+     * UPへ回頭
+     *   ↓
+     * Straight 1回
      *   ↓
      * (0,0)
      *   ↓
+     * LEFTへ回頭
+     *   ↓
+     * Straight 1回
+     *   ↓
      * (8,0)
-     *
-     * の順番で走行する。
-     *
-     * ゲート情報によって経路が変化しないように、
-     * 空のゲート情報で経路探索する。
      */
 
     const Point turnPoint = convertPoint({ 0, 0 });
 
-    /**
-     * @brief (0,0)到着時の方向
-     *
-     * (0,0)にはUP向きで到着させる。
-     * その後、(8,0)へ向かうための回頭を
-     * (0,0)で行う。
-     */
     const Direction turnPointDirection = convertDirection(Direction::UP);
 
-    /**
-     * @brief 固定経路用の空ゲート情報
-     */
-    const std::vector<Gate> emptyGates;
+    // ========================================
+    // 外周位置でUPへ回頭
+    // ========================================
 
-    DijkstraRoutePlanner fixedRoutePlanner(emptyGates);
+    const double rotateToUpAngle = calculateRotationAngle(currentDirection, turnPointDirection);
 
-    // ----------------------------------------
-    // 現在位置 -> (0,0)
-    // ----------------------------------------
+    Logger::printfLog(Logger::INFO, "Fixed route: rotation to UP %.2f deg", rotateToUpAngle);
 
-    Logger::printfLog(Logger::INFO, "Fixed route: (%d,%d) -> (0,0)", currentGridX, currentGridY);
+    if(std::abs(rotateToUpAngle) > ROTATION_TOLERANCE) {
+      auto rotationCondition
+          = std::make_unique<RelativeAngleCondition>(robot, rotateToUpAngle, ROTATION_TOLERANCE);
 
-    RouteResult routeToTurnPoint = fixedRoutePlanner.search(
-        currentGridX, currentGridY, currentDirection, turnPoint, turnPointDirection);
+      RelativeRotation rotation(robot, std::move(rotationCondition), rotationPid, rotateToUpAngle);
 
-    if(routeToTurnPoint.route.size() < 2) {
-      Logger::error("EtRobocon2026: fixed route to (0,0) failed");
+      rotation.run();
+    }
+
+    currentDirection = turnPointDirection;
+
+    // ========================================
+    // 外周位置 -> (0,0)
+    //
+    // ここはStraightを1回だけ実行する。
+    // ========================================
+
+    const Point currentPoint{ currentGridX, currentGridY };
+
+    const double distanceToTurnPoint
+        = calculateStraightDistance(etRallyMap, currentPoint, turnPoint);
+
+    if(distanceToTurnPoint <= 0.0) {
+      Logger::error("EtRobocon2026: invalid distance to (0,0)");
 
       robot.getWheelMotorControllerInstance().stopBoth();
 
       return;
     }
 
-    routeFollower.run(routeToTurnPoint.route);
+    Logger::printfLog(Logger::INFO, "Fixed route: Straight (%d,%d) -> (0,0) %.2f mm", currentGridX,
+                      currentGridY, distanceToTurnPoint);
+
+    auto toTurnPointCondition = std::make_unique<DistanceCondition>(robot, distanceToTurnPoint);
+
+    Straight toTurnPointStraight(robot, std::move(toTurnPointCondition), TARGET_SPEED,
+                                 straightAnglePid, true, STRAIGHT_DEADBAND_RATE,
+                                 STRAIGHT_MAXOUT_RATE);
 
     /**
-     * (0,0)到着後の状態へ更新する。
+     * 外周から(0,0)まで、
+     * マスごとに分割せず1回のStraightで走行する。
      */
+    toTurnPointStraight.run();
+
     currentGridX = turnPoint.x;
     currentGridY = turnPoint.y;
     currentDirection = turnPointDirection;
 
-    // ----------------------------------------
+    // ========================================
+    // (0,0)でLEFTへ回頭
+    // ========================================
+
+    const double rotateToFinalAngle = calculateRotationAngle(currentDirection, finalDirection);
+
+    Logger::printfLog(Logger::INFO, "Fixed route: rotation at (0,0) %.2f deg", rotateToFinalAngle);
+
+    if(std::abs(rotateToFinalAngle) > ROTATION_TOLERANCE) {
+      auto rotationCondition
+          = std::make_unique<RelativeAngleCondition>(robot, rotateToFinalAngle, ROTATION_TOLERANCE);
+
+      RelativeRotation rotation(robot, std::move(rotationCondition), rotationPid,
+                                rotateToFinalAngle);
+
+      rotation.run();
+    }
+
+    currentDirection = finalDirection;
+
+    // ========================================
     // (0,0) -> (8,0)
-    // ----------------------------------------
+    //
+    // ここもStraightを1回だけ実行する。
+    // ========================================
 
-    Logger::info("Fixed route: (0,0) -> (8,0)");
+    const double distanceToFinal = calculateStraightDistance(etRallyMap, turnPoint, finalPoint);
 
-    RouteResult routeToFinal = fixedRoutePlanner.search(
-        currentGridX, currentGridY, currentDirection, finalPoint, finalDirection);
-
-    if(routeToFinal.route.size() < 2) {
-      Logger::error("EtRobocon2026: fixed route to final failed");
+    if(distanceToFinal <= 0.0) {
+      Logger::error("EtRobocon2026: invalid distance to (8,0)");
 
       robot.getWheelMotorControllerInstance().stopBoth();
 
       return;
     }
 
-    routeFollower.run(routeToFinal.route);
+    Logger::printfLog(Logger::INFO, "Fixed route: Straight (0,0) -> (8,0) %.2f mm",
+                      distanceToFinal);
+
+    auto toFinalCondition = std::make_unique<DistanceCondition>(robot, distanceToFinal);
+
+    Straight toFinalStraight(robot, std::move(toFinalCondition), TARGET_SPEED, straightAnglePid,
+                             true, STRAIGHT_DEADBAND_RATE, STRAIGHT_MAXOUT_RATE);
+
+    /**
+     * (0,0)から(8,0)まで、
+     * マスごとに分割せず1回のStraightで走行する。
+     */
+    toFinalStraight.run();
+
+    currentGridX = finalPoint.x;
+    currentGridY = finalPoint.y;
+    currentDirection = finalDirection;
 
   } else {
     // ========================================

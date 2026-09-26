@@ -77,7 +77,7 @@ CameraTracking,RED,DistanceOrColor,RED025
 Straight,-001,Distance,005
 
 #RelativeRotation,-110,RelativeAngle,-110
-AbsoluteRotation,001,AbsoluteAngle,001
+AbsoluteRotation,090,AbsoluteAngle,090
 
 
 Straight,001,ColorOrColor,001

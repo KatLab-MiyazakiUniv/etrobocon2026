@@ -77,11 +77,11 @@ Straight,005,Distance,004
 Straight,-001,Distance,010
 
 #RelativeRotation,-110,RelativeAngle,-110
-#AbsoluteRotation,001,AbsoluteAngle,001
+#AbsoluteRotation,090,AbsoluteAngle,090
 
 
 AbsoluteRotation,-180,AbsoluteAngle,-180
 Straight,005,Distance,055
-AbsoluteRotation,001,AbsoluteAngle,001
+AbsoluteRotation,090,AbsoluteAngle,090
 
 Straight,005,ColorOrColor,001

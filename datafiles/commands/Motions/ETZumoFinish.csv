@@ -2,3 +2,4 @@
 ETZumoFinish,ID,string,string,string,string
 ETZumoFinish,L001,ETZumoExit,L001,RepeatCount,001,Straight,003,Distance,003,AbsoluteRotation,004,AbsoluteAngle,004,Straight,002,ProjectedDistance,002,AbsoluteRotation,005,AbsoluteAngle,005,Straight,004,ProjectedDistance,003
 ETZumoFinish,R001,ETZumoExit,R001,RepeatCount,001,Straight,003,Distance,003,AbsoluteRotation,-004,AbsoluteAngle,-004,Straight,002,ProjectedDistance,002,AbsoluteRotation,-005,AbsoluteAngle,-005,Straight,004,ProjectedDistance,003
+ETZumoFinish,001,ETZumoExit,001,RepeatCount,001,Straight,003,Distance,003,AbsoluteRotation,-085,AbsoluteAngle,-085,Straight,002,ProjectedDistance,002,AbsoluteRotation,-090,AbsoluteAngle,-090,Straight,004,ProjectedDistance,003

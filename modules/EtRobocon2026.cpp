@@ -253,8 +253,8 @@ void EtRobocon2026::start()
 
   robot.getCameraSocketClientInstance().connectToServer();
 
-  // int voltage = BatteryController::getVoltage();
-  // Logger::printfLog(Logger::INFO, "バッテリー電圧: %d mV", voltage);
+  int voltage = BatteryController::getVoltage();
+  Logger::printfLog(Logger::INFO, "バッテリー電圧: %d mV", voltage);
 
   // ========================================
   // コース設定
@@ -325,8 +325,8 @@ void EtRobocon2026::start()
       break;
 
     case 2:
-      startPoint = convertPoint({ 2, 8 });
-      outerPoint = convertPoint({ 0, 8 });
+      startPoint = convertPoint({ 2, 4 });
+      outerPoint = convertPoint({ 0, 4 });
       break;
 
     default:

@@ -1,5 +1,6 @@
 コマンド名,ID,targetAngle
 AbsoluteAngle,ID,double
+AbsoluteAngle,000,000
 AbsoluteAngle,001,001
 AbsoluteAngle,002,002
 AbsoluteAngle,003,003

@@ -6,6 +6,9 @@
 
 #include "EtRobocon2026.h"
 
+#include <memory>
+#include <vector>
+
 namespace {
 
   /**
@@ -15,8 +18,9 @@ namespace {
 
   /**
    * @brief ここでコースを設定する
-   LコースならL_COURSE
-   RコースならR_COURSE
+   *
+   * LコースならL_COURSE
+   * RコースならR_COURSE
    */
   constexpr CourseSide COURSE_SIDE = CourseSide::L_COURSE;
 
@@ -163,39 +167,39 @@ void EtRobocon2026::start()
 {
   // CsvLogger::init();
   // CsvLogger::writeHeader();
+
   Logger::info("Hello KATLAB");
+
   RealNetworkSystem real;
   SocketClient client(real);
   Robot robot(client);
 
   robot.getCameraSocketClientInstance().connectToServer();
 
-  
   // int voltage = BatteryController::getVoltage();
   // Logger::printfLog(Logger::INFO, "バッテリー電圧: %d mV", voltage);
-  // robot.getCameraSocketClientInstance().connectToServer();
 
   // Rコース
   // robot.setCourse(Course::Right);
-  // robot.setEdge(Edge::LeftEdge);
   // robot.setEdge(Edge::LeftEdge);
 
   // Lコース
   robot.setCourse(Course::Left);
   robot.setEdge(Edge::RightEdge);
+
   // LineTrace走行
   Area lineTraceArea = Area::LineTrace;
   AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
   lineTraceAreaMaster.run();
 
-  // BotlleDelivery走行
+  // BottleDelivery走行
   Area bottleDeliveryArea = Area::BottleDelivery;
   AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
   bottleDeliveryAreaMaster.run();
 
   // CsvLogger::outputToFile();
-  Logger::info("Timed ET Rally start");
 
+  Logger::info("Timed ET Rally start");
 
   // Robotが保持しているMapDataを使用する
   MapData& mapData = robot.getMapDataInstance();
@@ -217,6 +221,13 @@ void EtRobocon2026::start()
     case 2:
       startPoint = convertPoint({ 0, 8 });
       break;
+
+    default:
+      Logger::error("EtRobocon2026: invalid label index");
+
+      robot.getWheelMotorControllerInstance().stopBoth();
+
+      return;
   }
 
   int currentGridX = startPoint.x;
@@ -254,10 +265,25 @@ void EtRobocon2026::start()
 
   bool shouldGoFinal = false;
 
+  /**
+   * @brief ゲート情報不足時に固定ルートを使用するか
+   *
+   * trueの場合、
+   * 現在位置 -> (0,0) -> (8,0)
+   * の固定経路で最終地点へ向かう。
+   */
+  bool useFixedFinalRoute = false;
+
   if(!hasAllGates(mapData)) {
-    Logger::info("Gate information is incomplete -> go final");
+    Logger::info("Gate information is incomplete -> use fixed final route");
+
     shouldGoFinal = true;
+    useFixedFinalRoute = true;
   }
+
+  // --------------------------------------------------
+  // 通常のETラリー走行
+  // --------------------------------------------------
 
   if(!shouldGoFinal) {
     for(int lap = 1; lap <= LAP_COUNT && !shouldGoFinal; ++lap) {
@@ -324,23 +350,117 @@ void EtRobocon2026::start()
     }
   }
 
+  // --------------------------------------------------
+  // 最終地点
+  // --------------------------------------------------
+
   const Point finalPoint = convertPoint({ 8, 0 });
   const Direction finalDirection = convertDirection(Direction::LEFT);
 
-  DijkstraRoutePlanner finalRoutePlanner(mapData.getGates());
+  if(useFixedFinalRoute) {
+    // ==================================================
+    // ゲート情報不足時の固定ルート
+    //
+    // 開始位置
+    //   ↓
+    // (0,0)
+    //   ↓
+    // (8,0)
+    //
+    // 開始地点ではUP方向へ回頭し、
+    // (0,0)で横方向へ回頭する。
+    // ==================================================
 
-  RouteResult finalRoute = finalRoutePlanner.search(currentGridX, currentGridY, currentDirection,
-                                                    finalPoint, finalDirection);
+    const Point turnPoint = convertPoint({ 0, 0 });
 
-  if(finalRoute.route.size() < 2) {
-    Logger::error("EtRobocon2026: final route search failed");
+    /**
+     * @brief (0,0)到着時の方向
+     *
+     * 開始位置は(0,4)、(0,6)、(0,8)のいずれかなので、
+     * UP方向へ回頭して(0,0)へ向かう。
+     */
+    const Direction turnPointDirection = convertDirection(Direction::UP);
 
-    robot.getWheelMotorControllerInstance().stopBoth();
+    /**
+     * @brief 固定ルート用経路探索器
+     *
+     * ゲート情報によって経路が変化しないように、
+     * 空のゲート情報を渡す。
+     */
+    const std::vector<Gate> emptyGates;
+    DijkstraRoutePlanner fixedRoutePlanner(emptyGates);
 
-    return;
+    // --------------------------------------------------
+    // 現在位置 -> (0,0)
+    // --------------------------------------------------
+
+    Logger::printfLog(Logger::INFO, "Fixed route: (%d,%d) -> (0,0)", currentGridX, currentGridY);
+
+    RouteResult routeToTurnPoint = fixedRoutePlanner.search(
+        currentGridX, currentGridY, currentDirection, turnPoint, turnPointDirection);
+
+    if(routeToTurnPoint.route.size() < 2) {
+      Logger::error("EtRobocon2026: fixed route to (0,0) failed");
+
+      robot.getWheelMotorControllerInstance().stopBoth();
+
+      return;
+    }
+
+    routeFollower.run(routeToTurnPoint.route);
+
+    // (0,0)まで到着したものとして現在位置を更新する
+    currentGridX = turnPoint.x;
+    currentGridY = turnPoint.y;
+    currentDirection = turnPointDirection;
+
+    // --------------------------------------------------
+    // (0,0) -> (8,0)
+    // --------------------------------------------------
+
+    Logger::info("Fixed route: (0,0) -> (8,0)");
+
+    /**
+     * 現在方向はUPなので、
+     * (8,0)へ移動するための回頭は(0,0)で行われる。
+     */
+    RouteResult routeToFinal = fixedRoutePlanner.search(
+        currentGridX, currentGridY, currentDirection, finalPoint, finalDirection);
+
+    if(routeToFinal.route.size() < 2) {
+      Logger::error("EtRobocon2026: fixed route to final failed");
+
+      robot.getWheelMotorControllerInstance().stopBoth();
+
+      return;
+    }
+
+    routeFollower.run(routeToFinal.route);
+
+  } else {
+    // ==================================================
+    // 通常時の最終地点への経路探索
+    // ==================================================
+
+    DijkstraRoutePlanner finalRoutePlanner(mapData.getGates());
+
+    RouteResult finalRoute = finalRoutePlanner.search(currentGridX, currentGridY, currentDirection,
+                                                      finalPoint, finalDirection);
+
+    if(finalRoute.route.size() < 2) {
+      Logger::error("EtRobocon2026: final route search failed");
+
+      robot.getWheelMotorControllerInstance().stopBoth();
+
+      return;
+    }
+
+    routeFollower.run(finalRoute.route);
   }
 
-  routeFollower.run(finalRoute.route);
+  // --------------------------------------------------
+  // 最終地点到着後に100mm直進
+  // --------------------------------------------------
 
   auto finalStraightCondition = std::make_unique<DistanceCondition>(robot, FINAL_STRAIGHT_DISTANCE);
 
@@ -353,7 +473,7 @@ void EtRobocon2026::start()
 
   Logger::info("Timed ET Rally finished");
 
-  // BotlleDelivery走行
+  // ET相撲走行
   Area ETZumo = Area::ETZumo;
   AreaMaster ETZumouAreaMaster(robot, ETZumo);
   ETZumouAreaMaster.run();

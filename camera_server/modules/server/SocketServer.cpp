@@ -10,6 +10,7 @@
 SocketServer::SocketServer(SnapshotActionHandler& _snapshotHandler,
                            ColorRegionDetectionActionHandler& _colorRegionDetectionHandler,
                            QrCodeDetectionActionHandler& _qrCodeDetectionHandler,
+                           SquareDetectionActionHandler& _squareDetectionHandler,
                            INetworkSystem& _netSys, int _port)
   : netSys(_netSys),
     listenSocket(-1),
@@ -17,7 +18,8 @@ SocketServer::SocketServer(SnapshotActionHandler& _snapshotHandler,
     port(_port),
     snapshotHandler(_snapshotHandler),
     colorRegionDetectionHandler(_colorRegionDetectionHandler),
-    qrCodeDetectionHandler(_qrCodeDetectionHandler)
+    qrCodeDetectionHandler(_qrCodeDetectionHandler),
+    squareDetectionHandler(_squareDetectionHandler)
 {
   LOG_CREATE("SocketServer");
   Logger::printfLog(Logger::INFO, "SocketServer:ポート番号は%d", _port);
@@ -132,6 +134,15 @@ void SocketServer::handleConnection(int clientSocket)
                         0);
             break;
           }
+          case CameraServer::Command::SQUARE_DETECTION: {
+            auto* request = reinterpret_cast<CameraServer::SquareDetectorRequest*>(recvbuf);
+            Logger::info("SocketServer:SQUARE_DETECTIONを実行中");
+            CameraServer::SquareDetectorResponse response;
+            squareDetectionHandler.execute(*request, response);
+            netSys.send(clientSocket, reinterpret_cast<const char*>(&response), sizeof(response),
+                        0);
+            break;
+          }
           case CameraServer::Command::SHUTDOWN:
             shutdown();
             return;
@@ -194,4 +205,9 @@ const ColorRegionDetectionActionHandler& SocketServer::getColorRegionDetectionHa
 const QrCodeDetectionActionHandler& SocketServer::getQrCodeDetectionHandler() const
 {
   return qrCodeDetectionHandler;
+}
+
+const SquareDetectionActionHandler& SocketServer::getSquareDetectionHandler() const
+{
+  return squareDetectionHandler;
 }

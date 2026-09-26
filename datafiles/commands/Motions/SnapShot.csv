@@ -1,6 +1,0 @@
-Command,ID,fileName
-説明,説明,保存する画像ファイル名
-Snapshot,1,test.jpg
-Snapshot,2,gate_before.jpg
-Snapshot,3,gate_after.jpg
-Snapshot,4,qr_check.jpg

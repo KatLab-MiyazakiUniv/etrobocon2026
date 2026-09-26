@@ -1,36 +1,65 @@
-#QR1検出位置まで直進
-RelativeRotation,-045,RelativeAngle,-045
-Straight,001,Distance,028
-#青ラインとペットボトルの位置関係は一定
-#青ラインの奥のペットボトルをに角度を合わせるtargetXを小さくし左寄り走行
+RelativeRotation,-090,RelativeAngle,-090
+Straight,001,ColorOrColor,003
+RelativeRotation,090,RelativeAngle,090
+Straight,005,DistanceOrColor,GREEN100
+CameraTracking,S003,DistanceOrColor,BLUE020
+#Straight,005,Distance,008
+Straight,005,Distance,012
 
-Snapshot,clearBuffer1,RepeatCount,001
-CameraTracking,LBS009,Distance,015
-Straight,001,DistanceOrColor,BLUE025
 
-# QR1検出
-Snapshot,clearBuffer1,RepeatCount,001
+#CameraTracking,LBS002,DistanceOrColor,BULE032
+
+
+
+
+Snapshot,011,RepeatCount,001
+Snapshot,011,RepeatCount,001
 GatePosition,1-1,RepeatCount,001
 
 
-#QR1取得後の直線:回頭し110cmほど進む
-RelativeRotation,-050,RelativeAngle,-050
+Straight,005,Distance,002
 Snapshot,clearBuffer1,RepeatCount,001
-CameraTracking,LBS003,Distance,080
+GatePosition,1-2,RepeatCount,001
+
+Straight,005,ColorOrColor,001
+ResetAzimuth,001,RepeatCount,001
+
+#CameraTracking,000,Distance,000
+
+
+
+
+# QR1検出
+#Snapshot,clearBuffer1,RepeatCount,001
+#GatePosition,1-1,RepeatCount,001
+#Straight,005,DistanceOrColor,BLUE002
+#GatePosition,1-2,RepeatCount,001
+#Straight,005,DistanceOrColor,BLUE002
+#GatePosition,1-3,RepeatCount,001
+#Straight,005,DistanceOrColor,BLUE002
+#GatePosition,1-4,RepeatCount,001
+#Straight,005,DistanceOrColor,BLUE002
+#GatePosition,1-5,RepeatCount,001
+
+RelativeRotation,-100,RelativeAngle,-100
+Snapshot,clearBuffer1,RepeatCount,001
+#CameraTracking,LBS003-1,Distance,040
+CameraTracking,LBS003-4,Distance,080
 #CameraTracking,LBS008,DistanceOrColor,BLACK040
 
 #QR2取得前カーブ直前
 Straight,001,DistanceOrColor,BLACK070
 
 # QR2検出
+
 Snapshot,clearBuffer1,RepeatCount,001
+Snapshot,021,RepeatCount,001
 GatePosition,2-1,RepeatCount,001
 
-
 #青色まで移動
-RelativeRotation,-060,RelativeAngle,-060
+AbsoluteRotation,-165,AbsoluteAngle,-165
 #青色が写る範囲まで移動
-Straight,001,DistanceOrColor,BLUE045
+Straight,001,DistanceOrColor,BLUE040
 #青色がフレームに写る状態で赤色検知カメラ走行
 CameraTracking,BLUE,DistanceOrColor,BLUE025
 Snapshot,clearBuffer1,RepeatCount,001
@@ -41,7 +70,8 @@ Snapshot,clearBuffer1,RepeatCount,001
 
 Straight,-001,Distance,005
 
-RelativeRotation,-110,RelativeAngle,-110
+AbsoluteRotation,090,AbsoluteAngle,090
+
 
 
 Straight,001,ColorOrColor,001

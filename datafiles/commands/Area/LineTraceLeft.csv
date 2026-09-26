@@ -1,24 +1,27 @@
 #動作コマンド名,動作ID,条件コマンド名,条件ID
 # キャリブレイター
-#Calibrator,001,RepeatCount,001
+
+
+Calibrator,001,RepeatCount,001
 
 Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,S001,Distance,035
 CameraTracking,R001,Distance,040
 CameraTracking,S001,Distance,035
 CameraTracking,R001,Distance,040
-CameraTracking,S001,Distance,033
+CameraTracking,S001,Distance,030
 CameraTracking,L001,Distance,025
 CameraTracking,L002,Distance,095
 CameraTracking,S001,Distance,015
 
-CameraTracking,R001,Distance,035
+CameraTracking,R001,Distance,032
 CameraTracking,S001,Distance,015
-CameraTracking,L002,Distance,030
-CameraTracking,S001,Distance,095
-CameraTracking,BC,Distance,015
+CameraTracking,L002,Distance,035
+CameraTracking,S001,Distance,050
+CameraTracking,S002,ColorRegion,001
+CameraTracking,000,Distance,000
 
-#相撲
-CameraTracking,014,DistanceOrUltraSonic,001
-Straight,002,DistanceOrColor,004
-Straight,003,Distance,015
+Snapshot,clearBuffer1,RepeatCount,001
+CameraTracking,BC,Distance,030
+CameraTracking,BC3,Distance,005
+CameraTracking,000,Distance,000

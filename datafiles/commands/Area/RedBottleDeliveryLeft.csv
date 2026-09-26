@@ -3,16 +3,28 @@
 #Straight,001,ColorOrColor,002
 #RelativeRotation,060,RelativeAngle,060
 #Straight,005,Distance,020
-#CameraTracking,000,Distance,000
+#cameratracking,000,distance,000
+
 
 RelativeRotation,-090,RelativeAngle,-090
 Straight,001,ColorOrColor,003
 RelativeRotation,090,RelativeAngle,090
 Straight,005,DistanceOrColor,GREEN100
-Straight,005,DistanceOrColor,BLUE032
+CameraTracking,S003,DistanceOrColor,BLUE032
 #CameraTracking,LBS002,DistanceOrColor,BULE032
+
+
+
+
+Snapshot,011,RepeatCount,001
 Snapshot,011,RepeatCount,001
 GatePosition,1-1,RepeatCount,001
+
+
+Straight,005,Distance,002
+Snapshot,clearBuffer1,RepeatCount,001
+GatePosition,1-2,RepeatCount,001
+
 Straight,005,ColorOrColor,001
 ResetAzimuth,001,RepeatCount,001
 

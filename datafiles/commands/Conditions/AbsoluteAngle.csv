@@ -4,4 +4,6 @@ AbsoluteAngle,001,90
 AbsoluteAngle,002,180
 AbsoluteAngle,003,-20
 AbsoluteAngle,004,-80.0
-AbsoluteAngle,005,-90
+AbsoluteAngle,005,-120
+
+AbsoluteAngle,-090,-90

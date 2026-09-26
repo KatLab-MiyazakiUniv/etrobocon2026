@@ -5,10 +5,6 @@
 #Straight,005,Distance,020
 #cameratracking,000,distance,000
 
-Snapshot,clearBuffer1,RepeatCount,001
-CameraTracking,BC,Distance,030
-CameraTracking,BC3,Distance,005
-CameraTracking,000,Distance,000
 
 RelativeRotation,-090,RelativeAngle,-090
 Straight,001,ColorOrColor,003
@@ -66,6 +62,7 @@ Straight,001,DistanceOrColor,BLACK070
 Snapshot,clearBuffer1,RepeatCount,001
 GatePosition,2-1,RepeatCount,001
 
+
 #赤色まで移動
 #RelativeRotation,-060,RelativeAngle,-060
 AbsoluteRotation,-145,AbsoluteAngle,-145
@@ -84,7 +81,7 @@ Straight,-001,Distance,010
 
 
 AbsoluteRotation,-180,AbsoluteAngle,-180
-Straight,005,Distance,004
+Straight,005,Distance,055
 AbsoluteRotation,001,AbsoluteAngle,001
 
 Straight,005,ColorOrColor,001

@@ -1,5 +1,6 @@
 #動作コマンド名,動作ID,条件コマンド名,条件ID
 # キャリブレイター
 Snapshot,clearBuffer1,RepeatCount,001
-CameraTracking,BC,Distance,035
+CameraTracking,BC,Distance,030
+CameraTracking,BC3,Distance,005
 CameraTracking,000,Distance,000

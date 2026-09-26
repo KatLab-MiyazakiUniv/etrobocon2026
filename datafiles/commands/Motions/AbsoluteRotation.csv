@@ -5,3 +5,6 @@ AbsoluteRotation,002,0.002,0.002,0.002,180
 AbsoluteRotation,003,3.2,2.7,0.0,-20
 AbsoluteRotation,004,3.0,2.2,0.2,-80.0
 AbsoluteRotation,005,3.0,2.2,0.2,-90.0
+AbsoluteRotation,-180,0.001,0.001,0.001,-180.0
+AbsoluteRotation,075,0.001,0.001,0.001,75.0
+AbsoluteRotation,-145,0.001,0.001,0.001,-145.0

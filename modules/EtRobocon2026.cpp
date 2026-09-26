@@ -179,6 +179,10 @@ void EtRobocon2026::start()
   // int voltage = BatteryController::getVoltage();
   // Logger::printfLog(Logger::INFO, "バッテリー電圧: %d mV", voltage);
 
+  // ========================================
+  // コース設定
+  // ========================================
+
   // Rコース
   // robot.setCourse(Course::Right);
   // robot.setEdge(Edge::LeftEdge);
@@ -187,12 +191,18 @@ void EtRobocon2026::start()
   robot.setCourse(Course::Left);
   robot.setEdge(Edge::RightEdge);
 
-  // LineTrace走行
+  // ========================================
+  // ライントレース走行
+  // ========================================
+
   Area lineTraceArea = Area::LineTrace;
   AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
   lineTraceAreaMaster.run();
 
-  // BottleDelivery走行
+  // ========================================
+  // ボトルデリバリー走行
+  // ========================================
+
   Area bottleDeliveryArea = Area::BottleDelivery;
   AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
   bottleDeliveryAreaMaster.run();
@@ -200,6 +210,10 @@ void EtRobocon2026::start()
   // CsvLogger::outputToFile();
 
   Logger::info("Timed ET Rally start");
+
+  // ========================================
+  // ETラリー準備
+  // ========================================
 
   // Robotが保持しているMapDataを使用する
   MapData& mapData = robot.getMapDataInstance();
@@ -209,17 +223,20 @@ void EtRobocon2026::start()
 
   Point startPoint;
 
+  /**
+   * @brief ラベル位置からETラリー開始座標を決定する
+   */
   switch(robot.getIndexOfLabel()) {
     case 0:
-      startPoint = convertPoint({ 0, 4 });
+      startPoint = convertPoint({ 2, 4 });
       break;
 
     case 1:
-      startPoint = convertPoint({ 0, 6 });
+      startPoint = convertPoint({ 2, 6 });
       break;
 
     case 2:
-      startPoint = convertPoint({ 0, 8 });
+      startPoint = convertPoint({ 2, 8 });
       break;
 
     default:
@@ -233,6 +250,9 @@ void EtRobocon2026::start()
   int currentGridX = startPoint.x;
   int currentGridY = startPoint.y;
 
+  /**
+   * @brief ETラリー開始時の向き
+   */
   Direction currentDirection = convertDirection(Direction::LEFT);
 
   constexpr GoalColor TARGET_COLORS[] = { GoalColor::RED, GoalColor::BLUE, GoalColor::YELLOW };
@@ -249,7 +269,7 @@ void EtRobocon2026::start()
    *
    * QR①への微調整、
    * QR①後の-α、
-   * QR②への微調整に使用する。
+   * QR②への微調整などに使用する。
    */
   const Pid::PidGain squareRotationPid = { 4.9, 0.0, 0.12 };
 
@@ -258,21 +278,106 @@ void EtRobocon2026::start()
    */
   const Pid::PidGain straightAnglePid = { 0.033, 0.003, 0.03 };
 
+  // ========================================
+  // ETラリー開始位置QR補正
+  // ========================================
+
+  Logger::info("ET Rally start square adjustment");
+
+  CameraServer::SquareDetectorRequest request{};
+
+  request.roi.x = 0;
+  request.roi.y = 0;
+  request.roi.width = CAM_MAX_WIDTH;
+  request.roi.height = CAM_MAX_HEIGHT;
+
+  SquareAngleAdjustment adjustment(robot);
+
+  SquareAngleAdjustment::Result result = adjustment.calculate(request);
+
+  if(result.wasDetected) {
+    Logger::printfLog(Logger::INFO, "Start square detected: angle=%f distance=%f",
+                      result.correctionAngle, result.straightDistance);
+
+    // ----------------------------------------
+    // QRコード方向へ回頭
+    // ----------------------------------------
+
+    auto rotateCondition
+        = std::make_unique<RelativeAngleCondition>(robot, result.correctionAngle, 2.0);
+
+    RelativeRotation rotate(robot, std::move(rotateCondition), squareRotationPid,
+                            result.correctionAngle);
+
+    rotate.run();
+
+    // ----------------------------------------
+    // QRコードに向かって距離補正
+    // ----------------------------------------
+
+    auto straightCondition = std::make_unique<DistanceCondition>(robot, result.straightDistance);
+
+    Straight straight(robot, std::move(straightCondition), TARGET_SPEED, straightAnglePid, true,
+                      STRAIGHT_DEADBAND_RATE, STRAIGHT_MAXOUT_RATE);
+
+    straight.run();
+
+    // ----------------------------------------
+    // ETラリー開始方向へ戻す
+    // ----------------------------------------
+
+    auto returnCondition
+        = std::make_unique<RelativeAngleCondition>(robot, -result.correctionAngle, 2.0);
+
+    RelativeRotation returnRotate(robot, std::move(returnCondition), squareRotationPid,
+                                  -result.correctionAngle);
+
+    returnRotate.run();
+
+    Logger::info("ET Rally start square adjustment finished");
+
+  } else {
+    /**
+     * QRコードが検出できなかった場合でも、
+     * ETラリー自体は中止せずそのまま開始する。
+     */
+    Logger::info("ET Rally start square not detected -> skip adjustment");
+  }
+
+  // ========================================
+  // RouteFollower生成
+  // ========================================
+
   RouteFollower routeFollower(robot, etRallyMap, TARGET_SPEED, rotationPid, squareRotationPid,
                               straightAnglePid, STRAIGHT_DEADBAND_RATE, STRAIGHT_MAXOUT_RATE);
 
+  /**
+   * @brief ETラリー走行時間計測開始
+   *
+   * 開始位置QR補正に使用した時間は含めない。
+   */
   const int startTime = ClockUtil::now();
 
   bool shouldGoFinal = false;
 
   /**
-   * @brief ゲート情報不足時に固定ルートを使用するか
+   * @brief ゲート情報不足時に固定最終経路を使用するか
    *
-   * trueの場合、
-   * 現在位置 -> (0,0) -> (8,0)
-   * の固定経路で最終地点へ向かう。
+   * trueの場合は、
+   *
+   * 現在位置
+   *   ↓
+   * (0,0)
+   *   ↓
+   * (8,0)
+   *
+   * の順番で走行する。
    */
   bool useFixedFinalRoute = false;
+
+  // ========================================
+  // ゲート情報確認
+  // ========================================
 
   if(!hasAllGates(mapData)) {
     Logger::info("Gate information is incomplete -> use fixed final route");
@@ -281,9 +386,9 @@ void EtRobocon2026::start()
     useFixedFinalRoute = true;
   }
 
-  // --------------------------------------------------
-  // 通常のETラリー走行
-  // --------------------------------------------------
+  // ========================================
+  // 通常ETラリー走行
+  // ========================================
 
   if(!shouldGoFinal) {
     for(int lap = 1; lap <= LAP_COUNT && !shouldGoFinal; ++lap) {
@@ -316,6 +421,11 @@ void EtRobocon2026::start()
 
         routeFollower.run(routeResult.route);
 
+        /**
+         * 外周ゲートの場合は、
+         * RouteFollower内部でゲート通過後に
+         * 入口側へ戻ってくるため入口座標を現在位置とする。
+         */
         if(outerGate) {
           currentGridX = routeResult.entrance.x;
           currentGridY = routeResult.entrance.y;
@@ -326,6 +436,10 @@ void EtRobocon2026::start()
           currentGridY = routeResult.exit.y;
           currentDirection = routeResult.exitDirection;
         }
+
+        // ----------------------------------------
+        // YELLOWゲート通過後に終了条件を確認する
+        // ----------------------------------------
 
         if(targetColor == GoalColor::YELLOW) {
           const int elapsedTime = ClockUtil::now() - startTime;
@@ -350,49 +464,55 @@ void EtRobocon2026::start()
     }
   }
 
-  // --------------------------------------------------
+  // ========================================
   // 最終地点
-  // --------------------------------------------------
+  // ========================================
 
   const Point finalPoint = convertPoint({ 8, 0 });
+
   const Direction finalDirection = convertDirection(Direction::LEFT);
 
+  // ========================================
+  // ゲート情報不足時の固定最終経路
+  // ========================================
+
   if(useFixedFinalRoute) {
-    // ==================================================
-    // ゲート情報不足時の固定ルート
-    //
-    // 開始位置
-    //   ↓
-    // (0,0)
-    //   ↓
-    // (8,0)
-    //
-    // 開始地点ではUP方向へ回頭し、
-    // (0,0)で横方向へ回頭する。
-    // ==================================================
+    /**
+     * ゲート情報が不足している場合は、
+     *
+     * 現在位置
+     *   ↓
+     * (0,0)
+     *   ↓
+     * (8,0)
+     *
+     * の順番で走行する。
+     *
+     * ゲート情報によって経路が変化しないように、
+     * 空のゲート情報で経路探索する。
+     */
 
     const Point turnPoint = convertPoint({ 0, 0 });
 
     /**
      * @brief (0,0)到着時の方向
      *
-     * 開始位置は(0,4)、(0,6)、(0,8)のいずれかなので、
-     * UP方向へ回頭して(0,0)へ向かう。
+     * (0,0)にはUP向きで到着させる。
+     * その後、(8,0)へ向かうための回頭を
+     * (0,0)で行う。
      */
     const Direction turnPointDirection = convertDirection(Direction::UP);
 
     /**
-     * @brief 固定ルート用経路探索器
-     *
-     * ゲート情報によって経路が変化しないように、
-     * 空のゲート情報を渡す。
+     * @brief 固定経路用の空ゲート情報
      */
     const std::vector<Gate> emptyGates;
+
     DijkstraRoutePlanner fixedRoutePlanner(emptyGates);
 
-    // --------------------------------------------------
+    // ----------------------------------------
     // 現在位置 -> (0,0)
-    // --------------------------------------------------
+    // ----------------------------------------
 
     Logger::printfLog(Logger::INFO, "Fixed route: (%d,%d) -> (0,0)", currentGridX, currentGridY);
 
@@ -409,21 +529,19 @@ void EtRobocon2026::start()
 
     routeFollower.run(routeToTurnPoint.route);
 
-    // (0,0)まで到着したものとして現在位置を更新する
+    /**
+     * (0,0)到着後の状態へ更新する。
+     */
     currentGridX = turnPoint.x;
     currentGridY = turnPoint.y;
     currentDirection = turnPointDirection;
 
-    // --------------------------------------------------
+    // ----------------------------------------
     // (0,0) -> (8,0)
-    // --------------------------------------------------
+    // ----------------------------------------
 
     Logger::info("Fixed route: (0,0) -> (8,0)");
 
-    /**
-     * 現在方向はUPなので、
-     * (8,0)へ移動するための回頭は(0,0)で行われる。
-     */
     RouteResult routeToFinal = fixedRoutePlanner.search(
         currentGridX, currentGridY, currentDirection, finalPoint, finalDirection);
 
@@ -438,9 +556,9 @@ void EtRobocon2026::start()
     routeFollower.run(routeToFinal.route);
 
   } else {
-    // ==================================================
+    // ========================================
     // 通常時の最終地点への経路探索
-    // ==================================================
+    // ========================================
 
     DijkstraRoutePlanner finalRoutePlanner(mapData.getGates());
 
@@ -458,9 +576,9 @@ void EtRobocon2026::start()
     routeFollower.run(finalRoute.route);
   }
 
-  // --------------------------------------------------
-  // 最終地点到着後に100mm直進
-  // --------------------------------------------------
+  // ========================================
+  // 最終地点到着後の追加直進
+  // ========================================
 
   auto finalStraightCondition = std::make_unique<DistanceCondition>(robot, FINAL_STRAIGHT_DISTANCE);
 
@@ -473,8 +591,13 @@ void EtRobocon2026::start()
 
   Logger::info("Timed ET Rally finished");
 
+  // ========================================
   // ET相撲走行
+  // ========================================
+
   Area ETZumo = Area::ETZumo;
+
   AreaMaster ETZumouAreaMaster(robot, ETZumo);
+
   ETZumouAreaMaster.run();
 }

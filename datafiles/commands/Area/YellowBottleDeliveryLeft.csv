@@ -5,13 +5,20 @@
 #Straight,005,Distance,020
 #cameratracking,000,distance,000
 
+Snapshot,clearBuffer1,RepeatCount,001
+CameraTracking,BC,Distance,030
+CameraTracking,BC3,Distance,005
+CameraTracking,000,Distance,000
 
 RelativeRotation,-090,RelativeAngle,-090
 Straight,001,ColorOrColor,003
 RelativeRotation,090,RelativeAngle,090
 Straight,005,DistanceOrColor,GREEN100
-CameraTracking,S003,DistanceOrColor,BLUE024
-Straight,005,Distance,008
+CameraTracking,S003,DistanceOrColor,BLUE020
+#Straight,005,Distance,008
+Straight,005,Distance,012
+
+
 #CameraTracking,LBS002,DistanceOrColor,BULE032
 
 
@@ -48,7 +55,8 @@ ResetAzimuth,001,RepeatCount,001
 
 RelativeRotation,-090,RelativeAngle,-090
 Snapshot,clearBuffer1,RepeatCount,001
-CameraTracking,LBS003,Distance,080
+CameraTracking,LBS003-1,Distance,040
+CameraTracking,LBS003-2,Distance,040
 #CameraTracking,LBS008,DistanceOrColor,BLACK040
 
 #QR2取得前カーブ直前

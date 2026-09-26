@@ -185,9 +185,9 @@ void EtRobocon2026::start()
   robot.setCourse(Course::Left);
   robot.setEdge(Edge::RightEdge);
   // LineTrace走行
-  Area lineTraceArea = Area::LineTrace;
-  AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
-  lineTraceAreaMaster.run();
+  // Area lineTraceArea = Area::LineTrace;
+  // AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
+  // lineTraceAreaMaster.run();
 
   // BotlleDelivery走行
   Area bottleDeliveryArea = Area::BottleDelivery;
@@ -208,15 +208,15 @@ void EtRobocon2026::start()
 
   switch(robot.getIndexOfLabel()) {
     case 0:
-      startPoint = convertPoint({ 0, 4 });
+      startPoint = convertPoint({ 2, 4 });
       break;
 
     case 1:
-      startPoint = convertPoint({ 0, 6 });
+      startPoint = convertPoint({ 2, 6 });
       break;
 
     case 2:
-      startPoint = convertPoint({ 0, 8 });
+      startPoint = convertPoint({ 2, 8 });
       break;
   }
 
@@ -247,6 +247,41 @@ void EtRobocon2026::start()
    * @brief 直進角度PID
    */
   const Pid::PidGain straightAnglePid = { 0.033, 0.003, 0.03 };
+
+CameraServer::SquareDetectorRequest request{};
+request.roi.x = 0;
+request.roi.y = 0;
+request.roi.width = CAM_MAX_WIDTH;
+request.roi.height = CAM_MAX_HEIGHT;
+
+SquareAngleAdjustment adjustment(robot);
+SquareAngleAdjustment::Result result = adjustment.calculate(request);
+
+if(result.wasDetected) {
+auto rotateCondition =
+std::make_unique<RelativeAngleCondition>(robot, result.correctionAngle, 2.0);
+
+RelativeRotation rotate(robot, std::move(rotateCondition), squareRotationPid,
+result.correctionAngle);
+rotate.run();
+
+auto straightCondition =
+std::make_unique<DistanceCondition>(robot, result.straightDistance);
+
+Straight straight(robot, std::move(straightCondition), TARGET_SPEED,
+straightAnglePid, true,
+STRAIGHT_DEADBAND_RATE, STRAIGHT_MAXOUT_RATE);
+straight.run();
+
+auto returnCondition =
+std::make_unique<RelativeAngleCondition>(robot, -result.correctionAngle, 2.0);
+
+RelativeRotation returnRotate(robot, std::move(returnCondition), squareRotationPid,
+-result.correctionAngle);
+returnRotate.run();
+}
+
+
 
   RouteFollower routeFollower(robot, etRallyMap, TARGET_SPEED, rotationPid, squareRotationPid,
                               straightAnglePid, STRAIGHT_DEADBAND_RATE, STRAIGHT_MAXOUT_RATE);

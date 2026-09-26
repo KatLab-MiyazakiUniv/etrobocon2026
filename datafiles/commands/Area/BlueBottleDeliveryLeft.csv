@@ -1,9 +1,17 @@
+#QR1検出位置まで直進
+#RelativeRotation,-060,RelativeAngle,-060
+#Straight,001,ColorOrColor,002
+#RelativeRotation,060,RelativeAngle,060
+#Straight,005,Distance,020
+#cameratracking,000,distance,000
+
 
 RelativeRotation,-090,RelativeAngle,-090
 Straight,001,ColorOrColor,003
 RelativeRotation,090,RelativeAngle,090
 Straight,005,DistanceOrColor,GREEN100
-CameraTracking,S003,DistanceOrColor,BLUE032
+CameraTracking,S003,DistanceOrColor,BLUE024
+Straight,005,Distance,008
 #CameraTracking,LBS002,DistanceOrColor,BULE032
 
 
@@ -51,9 +59,9 @@ Snapshot,clearBuffer1,RepeatCount,001
 GatePosition,2-1,RepeatCount,001
 
 #青色まで移動
-RelativeRotation,-065,RelativeAngle,-065
+AbsoluteRotation,-155,AbsoluteAngle,-155
 #青色が写る範囲まで移動
-Straight,001,DistanceOrColor,BLUE045
+Straight,001,DistanceOrColor,BLUE040
 #青色がフレームに写る状態で赤色検知カメラ走行
 CameraTracking,BLUE,DistanceOrColor,BLUE025
 Snapshot,clearBuffer1,RepeatCount,001

@@ -1,25 +1,27 @@
-動作コマンド名,動作ID,条件コマンド名,条件ID
+#動作コマンド名,動作ID,条件コマンド名,条件ID
+# キャリブレイター
+
+
 Calibrator,001,RepeatCount,001
-LineTrace,002,Distance,052
-LineTrace,003,Distance,043
-LineTrace,002,Distance,035
-LineTrace,003,Distance,040
-LineTrace,001,Distance,020
 
-LineTrace,008,Distance,050
-LineTrace,005,Distance,240
+Snapshot,clearBuffer1,RepeatCount,001
+CameraTracking,S001,Distance,035
+CameraTracking,R-R001,Distance,040
+CameraTracking,S001,Distance,035
+CameraTracking,R-R001,Distance,040
+CameraTracking,S001,Distance,030
+CameraTracking,R-L001,Distance,025
+CameraTracking,R-L002,Distance,095
+CameraTracking,S001,Distance,015
 
-
-
+CameraTracking,R-R001,Distance,032
+CameraTracking,S001,Distance,015
+CameraTracking,R-L002,Distance,035
+CameraTracking,S001,Distance,050
+CameraTracking,S002,ColorRegion,001
 CameraTracking,000,Distance,000
 
-
-CameraTracking,LTS003,Distance,060
-CameraTracking,LTS004,Distance,040
-
+Snapshot,clearBuffer1,RepeatCount,001
+CameraTracking,BC,Distance,030
+CameraTracking,BC3,Distance,005
 CameraTracking,000,Distance,000
-#LineTrace,006,Distance,006
-#LineTrace,004,Distance,004
-#LineTrace,006,Distance,005
-#LineTrace,004,Distance,004
-#LineTrace,006,Distance,007

@@ -25,7 +25,7 @@ namespace {
    * LコースならL_COURSE
    * RコースならR_COURSE
    */
-  constexpr CourseSide COURSE_SIDE = CourseSide::L_COURSE;
+  constexpr CourseSide COURSE_SIDE = CourseSide::R_COURSE;
 
   /**
    * @brief 最大周回数
@@ -261,12 +261,13 @@ void EtRobocon2026::start()
   // ========================================
 
   // Rコース
-  // robot.setCourse(Course::Right);
-  // robot.setEdge(Edge::LeftEdge);
+  robot.setCourse(Course::Right);
+  robot.setEdge(Edge::LeftEdge);
 
   // Lコース
-  robot.setCourse(Course::Left);
-  robot.setEdge(Edge::RightEdge);
+  // robot.setCourse(Course::Left);
+  // robot.setEdge(Edge::RightEdge);
+  
 
   // ========================================
   // ライントレース走行

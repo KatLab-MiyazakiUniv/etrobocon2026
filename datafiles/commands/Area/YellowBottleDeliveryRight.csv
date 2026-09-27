@@ -1,7 +1,7 @@
 動作コマンド名,動作ID,条件コマンド名,条件ID
 
 #赤色まで移動
-#RelativeRotation,-060,RelativeAngle,-060
+#RelativeRotation,060,RelativeAngle,060
 AbsoluteRotation,155,AbsoluteAngle,155
 #赤色が写る範囲まで移動
 Straight,001,DistanceOrColor,YELLOW060

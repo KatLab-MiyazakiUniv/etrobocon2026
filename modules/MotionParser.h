@@ -16,6 +16,7 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include <sstream>
 #include <memory>
 #include <unordered_map>
+#include "BaseMotion.h"
 #include "Logger.h"
 #include "DistanceCondition.h"
 #include "SensorColorCondition.h"
@@ -40,6 +41,9 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "UltraSonicCondition.h"
 #include "ImageProcessingColor.h"
 #include "GatePositionDetection.h"
+#include "ColorRegionCenterCondition.h"
+
+
 
 class MotionParser {
  public:
@@ -74,6 +78,7 @@ class MotionParser {
     ULTRA_SONIC,
     DISTANCE_OR_ULTRA_SONIC,
     COLOR_OR_COLOR,
+    COLOR_REGION_CENTER_CONDITION,
     NONE
   };
 

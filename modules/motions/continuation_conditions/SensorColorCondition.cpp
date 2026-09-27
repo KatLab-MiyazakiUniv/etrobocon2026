@@ -47,3 +47,4 @@ bool SensorColorCondition::shouldContinue()
 
   return true;
 }
+

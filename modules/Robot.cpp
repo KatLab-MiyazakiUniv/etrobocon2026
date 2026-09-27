@@ -74,9 +74,9 @@ int Robot::getRunningStartTime()
   return runningStartTime;
 }
 
-void Robot::setRunningStartTime(int time)
+void Robot::setRunningStartTime()
 {
-  runningStartTime = time;
+  runningStartTime = ClockUtil::now();
 }
 
 spikeapi::Button& Robot::getButtonInstance()

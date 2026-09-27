@@ -22,8 +22,10 @@ int main()
 
   ColorRegionDetectionActionHandler colorRegionDetectionHandler(camera);
   QrCodeDetectionActionHandler qrCodeDetectionHandler(camera);
+  SquareDetectionActionHandler squareDetectionActionHandler(camera);
   SnapshotActionHandler snapshotHandler(camera);
-  SocketServer server(snapshotHandler, colorRegionDetectionHandler, qrCodeDetectionHandler, real);
+  SocketServer server(snapshotHandler, colorRegionDetectionHandler, qrCodeDetectionHandler,
+                      squareDetectionActionHandler, real);
   if(!server.init()) {
     Logger::error("サーバーの初期化に失敗");
     return -1;

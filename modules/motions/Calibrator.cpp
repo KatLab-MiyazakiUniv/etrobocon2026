@@ -174,6 +174,7 @@ void Calibrator::waitForStart()
   while(!robot.getForceSensorInstance().isPressed(PRESS_POWER)) {
     ClockUtil::sleep();
   }
+  robot.setRunningStartTime();
 }
 
 void Calibrator::inputAndSetDecryptionKey()

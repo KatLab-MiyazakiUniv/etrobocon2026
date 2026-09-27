@@ -2,7 +2,7 @@
 DistanceOrUltraSonic,ID,double,double
 #ウルトラソニック距離10mm
 
-DistanceOrUltraSonic,001,10,10
+DistanceOrUltraSonic,001,800,50
 DistanceOrUltraSonic,001001,10,10
 DistanceOrUltraSonic,002001,20,10
 DistanceOrUltraSonic,003001,30,10
@@ -16,7 +16,7 @@ DistanceOrUltraSonic,010001,100,10
 DistanceOrUltraSonic,011001,110,10
 DistanceOrUltraSonic,012001,120,10
 DistanceOrUltraSonic,013001,130,10
-DistanceOrUltraSonic,014001,140,10
+DistanceOrUltraSonic,014,800,50
 DistanceOrUltraSonic,015001,150,10
 DistanceOrUltraSonic,016001,160,10
 DistanceOrUltraSonic,017001,170,10

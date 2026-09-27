@@ -106,17 +106,6 @@ class Robot {
   void setEdge(Edge edge);
 
   /**
-   * @brief 走行開始時間を返す
-   * @return 走行開始時間
-   */
-  int getRunningStartTime();
-
-  /**
-   * @brief 走行開始時間を設定する
-   */
-  void setRunningStartTime(int time);
-
-  /**
    * @brief 復号キーを設定する
    * @param key 4文字の復号キー
    */
@@ -179,6 +168,16 @@ class Robot {
    * @brief QR2検出済みのフラグをセットする
    */
   void setHaveQR2contents();
+
+  /**
+   * @brief 走行開始時間を取得する
+   */
+  int getRunningStartTime();
+
+  /**
+   * @brief 走行開始時間をするセットする
+   */
+  void setRunningStartTime();
 
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス

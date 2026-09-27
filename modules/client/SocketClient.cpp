@@ -105,6 +105,12 @@ bool SocketClient::executeQrCodeDetection(const CameraServer::QrCodeDetectorRequ
   return executeAction(request, response);
 }
 
+bool SocketClient::executeSquareDetection(const CameraServer::SquareDetectorRequest& request,
+                                          CameraServer::SquareDetectorResponse& response)
+{
+  return executeAction(request, response);
+}
+
 template <typename Req, typename Res>
 bool SocketClient::executeAction(const Req& request, Res& response)
 {

@@ -52,10 +52,7 @@ bool ColorRegionCenterCondition::shouldContinue()
         inRangeCount, consecutiveCountThreshold, currentCenterY, targetCenterY);
   } else {
     inRangeCount = 0;
-    Logger::printfLog(
-        Logger::DEBUG,
-        "ColorRegionCenterCondition: 失敗");
-    
+    Logger::printfLog(Logger::DEBUG, "ColorRegionCenterCondition: 失敗");
   }
 
   // 規定回数連続で範囲内に入ったら終了 (shouldContinue = false)
@@ -71,5 +68,3 @@ double ColorRegionCenterCondition::getTargetCenterY() const
 {
   return targetCenterY;
 }
-
-

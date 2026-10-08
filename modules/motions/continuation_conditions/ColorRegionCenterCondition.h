@@ -22,8 +22,7 @@ class ColorRegionCenterCondition : public BaseContinuationCondition {
    */
   ColorRegionCenterCondition(Robot& _robot,
                              const CameraServer::ColorRegionDetectorRequest& _colorDetectionRequest,
-                             double _targetCenterY, 
-                             int _consecutiveCountThreshold = 1);
+                             double _targetCenterY, int _consecutiveCountThreshold = 1);
 
   /**
    * デストラクタ
@@ -45,7 +44,6 @@ class ColorRegionCenterCondition : public BaseContinuationCondition {
    * @brief 目標中心X座標を取得する
    */
   double getTargetCenterY() const;
-
 
  private:
   CameraServer::ColorRegionDetectorRequest colorDetectionRequest;

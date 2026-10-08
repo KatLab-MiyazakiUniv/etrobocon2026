@@ -267,7 +267,6 @@ void EtRobocon2026::start()
   // Lコース
   // robot.setCourse(Course::Left);
   // robot.setEdge(Edge::RightEdge);
-  
 
   // ========================================
   // ライントレース走行

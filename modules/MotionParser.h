@@ -43,8 +43,6 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "GatePositionDetection.h"
 #include "ColorRegionCenterCondition.h"
 
-
-
 class MotionParser {
  public:
   // 動作コマンド名を持つ列挙型クラス

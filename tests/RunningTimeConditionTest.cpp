@@ -18,7 +18,7 @@ namespace etrobocon2026_test {
     Robot robot(mockSocketClient);
 
     // 走行開始時間をセット
-    robot.setRunningStartTime(ClockUtil::now());
+    robot.setRunningStartTime();
 
     int targetTime = 10000;
 
@@ -35,7 +35,7 @@ namespace etrobocon2026_test {
     Robot robot(mockSocketClient);
 
     // 走行開始時間をセット
-    robot.setRunningStartTime(ClockUtil::now());
+    robot.setRunningStartTime();
 
     int targetTime = 100;
 
@@ -58,7 +58,7 @@ namespace etrobocon2026_test {
     Robot robot(mockSocketClient);
 
     // 走行開始時間をセット
-    robot.setRunningStartTime(ClockUtil::now());
+    robot.setRunningStartTime();
 
     ClockUtil::sleep(500);
 
@@ -77,7 +77,7 @@ namespace etrobocon2026_test {
     Robot robot(mockSocketClient);
 
     // 走行開始時間をセット
-    robot.setRunningStartTime(ClockUtil::now());
+    robot.setRunningStartTime();
 
     int targetTime = 0;
 
@@ -94,7 +94,7 @@ namespace etrobocon2026_test {
     Robot robot(mockSocketClient);
 
     // 走行開始時間をセット
-    robot.setRunningStartTime(ClockUtil::now());
+    robot.setRunningStartTime();
 
     int targetTime = -10;
 

@@ -349,6 +349,27 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
                                                  std::move(colorCondition2),
                                                  CompoundCondition::LogicalOperator::OR);
     }
+    case CONDITION_COMMAND::COLOR_REGION_CENTER_CONDITION: {
+      CameraServer::ColorRegionDetectorRequest request;
+      // request.hsvRanges = ImageProcessingColor::BottleColors;
+      int count = 0;
+      for(int i = 0; i < ImageProcessingColor::BottleColors.size(); i++) {
+        if(fromString<bool>(params[8 + i])) {
+          request.hsvRanges[count] = ImageProcessingColor::BottleColors[i];
+          count++;
+        }
+      }
+      request.hsvRangeCount = count;
+
+      request.roi = { fromString<int>(params[4]), fromString<int>(params[5]),
+                      fromString<int>(params[6]), fromString<int>(params[7]) };
+
+      double targetCenterY = fromString<double>(params[2]);
+      int consecutiveCountThreshold = fromString<int>(params[3]);
+
+      return std::make_unique<ColorRegionCenterCondition>(robot, request, targetCenterY,
+                                                          consecutiveCountThreshold);
+    }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Condition %s は未実装です",
                         params[0].c_str());
@@ -638,7 +659,6 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       return new GatePositionDetection(robot, std::move(condition), qrRequest,
                                        fromString<bool>(motionParams[2]));
     }
-
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
                         motionParams[0].c_str());
@@ -677,22 +697,23 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
 MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str)
 {
   // 条件コマンド文字列と、それに対応する列挙型CONDITION_COMMANDのマッピングを定義
-  static const unordered_map<string, CONDITION_COMMAND> conditionMap
-      = { { "Distance", CONDITION_COMMAND::DISTANCE },
-          { "ProjectedDistance", CONDITION_COMMAND::PROJECTED_DISTANCE },
-          { "AbsoluteAngle", CONDITION_COMMAND::ABSOLUTE_ANGLE },
-          { "RelativeAngle", CONDITION_COMMAND::RELATIVE_ANGLE },
-          { "SensorColor", CONDITION_COMMAND::SENSOR_COLOR },
-          { "RunningTime", CONDITION_COMMAND::RUNNING_TIME },
-          { "MotionTime", CONDITION_COMMAND::MOTION_TIME },
-          { "RepeatCount", CONDITION_COMMAND::REPEAT_COUNT },
-          { "DistanceAndColor", CONDITION_COMMAND::DISTANCE_AND_COLOR },
-          { "DistanceOrColor", CONDITION_COMMAND::DISTANCE_OR_COLOR },
-          { "DistanceOrUltraSonic", CONDITION_COMMAND::DISTANCE_OR_ULTRA_SONIC },
-          { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC },
-          { "ColorOrColor", CONDITION_COMMAND::COLOR_OR_COLOR }
+  static const unordered_map<string, CONDITION_COMMAND> conditionMap = {
+    { "Distance", CONDITION_COMMAND::DISTANCE },
+    { "ProjectedDistance", CONDITION_COMMAND::PROJECTED_DISTANCE },
+    { "AbsoluteAngle", CONDITION_COMMAND::ABSOLUTE_ANGLE },
+    { "RelativeAngle", CONDITION_COMMAND::RELATIVE_ANGLE },
+    { "SensorColor", CONDITION_COMMAND::SENSOR_COLOR },
+    { "RunningTime", CONDITION_COMMAND::RUNNING_TIME },
+    { "MotionTime", CONDITION_COMMAND::MOTION_TIME },
+    { "RepeatCount", CONDITION_COMMAND::REPEAT_COUNT },
+    { "DistanceAndColor", CONDITION_COMMAND::DISTANCE_AND_COLOR },
+    { "DistanceOrColor", CONDITION_COMMAND::DISTANCE_OR_COLOR },
+    { "DistanceOrUltraSonic", CONDITION_COMMAND::DISTANCE_OR_ULTRA_SONIC },
+    { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC },
+    { "ColorOrColor", CONDITION_COMMAND::COLOR_OR_COLOR },
+    { "ColorRegion", CONDITION_COMMAND::COLOR_REGION_CENTER_CONDITION },
 
-        };
+  };
 
   auto it = conditionMap.find(str);
 

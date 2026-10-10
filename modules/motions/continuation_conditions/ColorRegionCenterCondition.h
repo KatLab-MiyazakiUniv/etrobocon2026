@@ -17,14 +17,12 @@ class ColorRegionCenterCondition : public BaseContinuationCondition {
    * コンストラクタ
    * @param _robot Robot クラスのインスタンスの参照
    * @param _colorDetectionRequest 色領域検出リクエスト設定
-   * @param _targetCenterX 目標とする中心X座標
-   * @param _toleranceX 許容誤差範囲 (目標 ± toleranceX)
+   * @param _targetCenterY 目標とする中心Y座標
    * @param _consecutiveCountThreshold 終了判定に必要な連続合致回数 (デフォルト1)
    */
   ColorRegionCenterCondition(Robot& _robot,
                              const CameraServer::ColorRegionDetectorRequest& _colorDetectionRequest,
-                             double _targetCenterX, double _toleranceX,
-                             int _consecutiveCountThreshold = 1);
+                             double _targetCenterY, int _consecutiveCountThreshold = 1);
 
   /**
    * デストラクタ
@@ -45,17 +43,11 @@ class ColorRegionCenterCondition : public BaseContinuationCondition {
   /**
    * @brief 目標中心X座標を取得する
    */
-  double getTargetCenterX() const;
-
-  /**
-   * @brief 許容誤差範囲を取得する
-   */
-  double getToleranceX() const;
+  double getTargetCenterY() const;
 
  private:
   CameraServer::ColorRegionDetectorRequest colorDetectionRequest;
-  double targetCenterX;           // 目標中心X座標
-  double toleranceX;              // 許容誤差 (±toleranceX)
+  double targetCenterY;           // 目標中心X座標
   int consecutiveCountThreshold;  // 条件を満たす必要がある連続回数
   int inRangeCount;               // 範囲内に入った連続回数
 };

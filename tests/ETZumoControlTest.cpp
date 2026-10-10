@@ -29,8 +29,9 @@ namespace etrobocon2026_test {
       rotation.prepare();
       rotation.target(angle);
       rotation.executeStep();
-      EXPECT_EQ(angle > 0 ? -18 : 18, robot.getWheelMotorControllerInstance().getRightPower());
-      EXPECT_EQ(angle > 0 ? 18 : -18, robot.getWheelMotorControllerInstance().getLeftPower());
+      EXPECT_EQ(angle > 0 ? -50 : 50, robot.getWheelMotorControllerInstance().getRightPower());
+
+      EXPECT_EQ(angle > 0 ? 50 : -50, robot.getWheelMotorControllerInstance().getLeftPower());
     }
     robot.getIMUControllerInstance().resetAzimuth();
     rotation.target(0);

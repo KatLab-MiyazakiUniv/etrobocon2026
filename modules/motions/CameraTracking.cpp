@@ -39,7 +39,7 @@ CameraTracking::CameraTracking(Robot& _robot,
     speedCalculator(_robot, _targetSpeed),
     cameraPid(_pidGain.kp, _pidGain.ki, _pidGain.kd, _targetXCoordinate)
 {
-  LOG_CREATE("CameraTracking");
+  LOG_CREATE("QrCameraTracking");
 }
 
 CameraTracking::~CameraTracking()
@@ -66,6 +66,11 @@ void CameraTracking::executeStep()
   // 初期Speed値を計算
   double baseRightPower = speedCalculator.calculateRightMotorPower();
   double baseLeftPower = speedCalculator.calculateLeftMotorPower();
+
+  Logger::printfLog(Logger::DEBUG, "CameraTracking:executeStep:右の初期スピード値計算結果[%lf]",
+                    baseRightPower);
+  Logger::printfLog(Logger::DEBUG, "CameraTracking:executeStep:左の初期スピード値計算結果[%lf]",
+                    baseLeftPower);
 
   // 検出処理の呼び出し
   SocketClient& client = robot.getCameraSocketClientInstance();
@@ -128,6 +133,7 @@ void CameraTracking::executeStep()
 
   // 旋回値の計算
   double turningPower = cameraPid.calculatePid(currentX) * -1;
+  Logger::printfLog(Logger::DEBUG, ":旋回量の計算値[%lf]", turningPower);
 
   // モータのPower値をセット（前進の時0を下回らないように，後進の時0を上回らないようにセット）
   double rightPower = baseRightPower > 0.0 ? std::max(baseRightPower - turningPower, 0.0)
@@ -135,6 +141,8 @@ void CameraTracking::executeStep()
   double leftPower = baseLeftPower > 0.0 ? std::max(baseLeftPower + turningPower, 0.0)
                                          : std::min(baseLeftPower - turningPower, 0.0);
 
+  Logger::printfLog(Logger::DEBUG, ":最終的な右モータのpower値[%lf]", rightPower);
+  Logger::printfLog(Logger::DEBUG, ":最終的な左モータのpower値[%lf]", leftPower);
   robot.getWheelMotorControllerInstance().setRightPower(rightPower);
   robot.getWheelMotorControllerInstance().setLeftPower(leftPower);
 }
@@ -144,9 +152,19 @@ void CameraTracking::wait() {}
 void CameraTracking::finish()
 {
   if(isStopMotorPower) {
+    Logger::printfLog(Logger::DEBUG, "stopBoth()前の右power値は[%d]",
+                      robot.getWheelMotorControllerInstance().getRightPower());
+    Logger::printfLog(Logger::DEBUG, "stopBoth()前の左power値は[%d]",
+                      robot.getWheelMotorControllerInstance().getLeftPower());
+
     ClockUtil::sleep(10);
     // robot.getWheelMotorControllerInstance().brakeBoth();
     robot.getWheelMotorControllerInstance().stopBoth();
+
+    Logger::printfLog(Logger::DEBUG, "stopBoth()後の右power値は[%d]",
+                      robot.getWheelMotorControllerInstance().getRightPower());
+    Logger::printfLog(Logger::DEBUG, "stopBoth()後の左power値は[%d]",
+                      robot.getWheelMotorControllerInstance().getLeftPower());
   }
 }
 

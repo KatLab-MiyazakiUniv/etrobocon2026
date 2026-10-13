@@ -14,15 +14,15 @@
 
 void EtRobocon2026::start()
 {
-  // CsvLogger::init();
-  // CsvLogger::writeHeader();
+  CsvLogger::init();
+  CsvLogger::writeHeader();
   Logger::info("Hello KATLAB");
   RealNetworkSystem real;
   SocketClient client(real);
   Robot robot(client);
-  // int voltage = BatteryController::getVoltage();
-  // Logger::printfLog(Logger::INFO, "バッテリー電圧: %d mV", voltage);
-  // robot.getCameraSocketClientInstance().connectToServer();
+  int voltage = BatteryController::getVoltage();
+  Logger::printfLog(Logger::INFO, "バッテリー電圧: %d mV", voltage);
+  robot.getCameraSocketClientInstance().connectToServer();
 
   // Rコース
   // robot.setCourse(Course::Right);
@@ -42,5 +42,5 @@ void EtRobocon2026::start()
   AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
   bottleDeliveryAreaMaster.run();
 
-  // CsvLogger::outputToFile();
+  CsvLogger::outputToFile();
 }

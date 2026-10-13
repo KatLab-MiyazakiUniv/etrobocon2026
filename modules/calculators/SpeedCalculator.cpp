@@ -28,6 +28,9 @@ double SpeedCalculator::calculateRightMotorPower()
 {
   rightMotorPower
       = robot.getWheelMotorControllerInstance().getRightPower();  // rightMotorPowerの初期化
+
+  Logger::printfLog(Logger::DEBUG, "SpeedCalculator:の右power値は[%d]", rightMotorPower);
+
   // 右タイヤの走行速度を算出
   double currentRightSpeed = robot.getWheelMotorControllerInstance().getRightSpeed();
   // 走行速度に相当する右タイヤのPower値を算出
@@ -40,6 +43,9 @@ double SpeedCalculator::calculateLeftMotorPower()
 {
   leftMotorPower
       = robot.getWheelMotorControllerInstance().getLeftPower();  // leftMotorPowerの初期化
+
+  Logger::printfLog(Logger::DEBUG, "SpeedCalculator:の左power値は[%d]", leftMotorPower);
+
   // 左タイヤの走行速度を算出
   double currentLeftSpeed = robot.getWheelMotorControllerInstance().getLeftSpeed();
   // 走行速度に相当する左タイヤのPower値を算出

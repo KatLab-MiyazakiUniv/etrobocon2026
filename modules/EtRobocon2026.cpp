@@ -5,42 +5,68 @@
  */
 
 #include "EtRobocon2026.h"
+
+#include <chrono>
+#include <thread>
+
 #include "AreaMaster.h"
-#include "Robot.h"
+#include "BatteryController.h"
 #include "Course.h"
 #include "CsvLogger.h"
+#include "IMUCalibrator.h"
 #include "RealNetworkSystem.h"
-#include "BatteryController.h"
+#include "Robot.h"
+
+namespace {
+
+  /**
+   * @brief IMUキャリブレーションのサンプル数
+   */
+  constexpr unsigned int IMU_CALIBRATION_SAMPLES = 500;
+
+  /**
+   * @brief IMUキャリブレーションの測定間隔[ms]
+   */
+  constexpr unsigned int IMU_CALIBRATION_INTERVAL_MS = 10;
+
+}  // namespace
 
 void EtRobocon2026::start()
 {
   // CsvLogger::init();
   // CsvLogger::writeHeader();
+
   Logger::info("Hello KATLAB");
+
   RealNetworkSystem real;
   SocketClient client(real);
   Robot robot(client);
+
   // int voltage = BatteryController::getVoltage();
   // Logger::printfLog(Logger::INFO, "バッテリー電圧: %d mV", voltage);
+
   // robot.getCameraSocketClientInstance().connectToServer();
 
-  // Rコース
-  // robot.setCourse(Course::Right);
-  // robot.setEdge(Edge::LeftEdge);
-  // robot.setEdge(Edge::LeftEdge);
+  // IMUキャリブレーション
+  Logger::info("IMUキャリブレーション開始");
 
-  // Lコース
-  robot.setCourse(Course::Left);
-  robot.setEdge(Edge::RightEdge);
-  // LineTrace走行
-  Area lineTraceArea = Area::LineTrace;
-  AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
-  lineTraceAreaMaster.run();
+  IMUCalibrator calibrator(robot.getIMUControllerInstance());
+  calibrator.start(IMU_CALIBRATION_SAMPLES);
 
-  // BotlleDelivery走行
-  Area bottleDeliveryArea = Area::BottleDelivery;
-  AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
-  bottleDeliveryAreaMaster.run();
+  while(!calibrator.isCalibrated()) {
+    calibrator.update();
 
-  // CsvLogger::outputToFile();
+    std::this_thread::sleep_for(std::chrono::milliseconds(IMU_CALIBRATION_INTERVAL_MS));
+  }
+
+  Logger::info("IMUキャリブレーション完了");
+
+  // 測定結果を取得
+  auto bias = calibrator.getBias();
+  auto noise = calibrator.getStandardDeviation();
+
+  Logger::printfLog(Logger::INFO, "IMU Bias X: %.6f Y: %.6f Z: %.6f deg/s", bias.x, bias.y, bias.z);
+
+  Logger::printfLog(Logger::INFO, "IMU Noise X: %.6f Y: %.6f Z: %.6f deg/s", noise.x, noise.y,
+                    noise.z);
 }

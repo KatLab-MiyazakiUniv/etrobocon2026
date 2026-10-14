@@ -14,8 +14,8 @@
 #include "AngleNormalizer.h"
 #include "Logger.h"
 #include <string>
-#include "GatePositionParser.h"
-#include "Decrypter.h"
+#include "GatePosition.h"
+#include "RepeatCount.h"
 
 class QRStraight : public BaseMotion {
  public:

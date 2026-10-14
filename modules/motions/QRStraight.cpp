@@ -63,59 +63,13 @@ void QRStraight::prepare()
 }
 void QRStraight::executeStep()
 {
-  // QR検出処理
-
   // QR検出済みならすぐに直進動作に移行
-  if(decryptRequired && !robot.getHaveQR2contents()
-     || !decryptRequired && !robot.getHaveQR1contents()) {
-    // QRコードを検出
-
-    SocketClient& client = robot.getCameraSocketClientInstance();
-    bool success = false;
-    bool wasDetected = false;
-
-    CameraServer::QrCodeDetectorResponse qrResponse;
-    success = client.executeQrCodeDetection(qrDetectionRequest, qrResponse);
-    wasDetected = qrResponse.wasDetected;
-
-    if(!wasDetected || !success) {
-      Logger::error("GatePositionDetection: QRコードの検出に失敗しました。");
-    } else {
-      Logger::error("GatePositionDetection: QRコードの検出に成功しました。");
-
-      // QR検出成功ならフラグを更新
-      if(decryptRequired) {
-        robot.setHaveQR2contents();
-      } else {
-        robot.setHaveQR1contents();
-        //  QRコードの暗号文を復号
-        std::string gatePositionData;
-
-        if(decryptRequired) {
-          // AesDecryptor decryptor(std::string(robot.getDecryptionKey()), qrResponse.content);
-          // 青・黄色：復号する
-          gatePositionData
-              = Decrypter::decrypt(std::string(robot.getDecryptionKey()), qrResponse.content);
-
-          if(gatePositionData.empty()) {
-            Logger::error("GatePositionDetection: QRコードの復号に失敗しました。");
-          }
-        } else {
-          // 赤：復号しない
-          gatePositionData = qrResponse.content;
-        }
-
-        //  平文を解析して,ゲート位置情報をRobotに設定
-
-        GatePositionParser parser(gatePositionData, robot);
-
-        if(!parser.parse()) {
-          Logger::error("GatePositionDetection: ゲート位置情報の解析に失敗しました。");
-        }
-
-        Logger::info("GatePositionDetection: ゲート位置情報の設定に成功しました。");
-      }
-    }
+  if((decryptRequired && !robot.getHaveQR2contents())
+     || (!decryptRequired && !robot.getHaveQR1contents())) {
+    // QR検出処理
+    RepeatCount repeatCount(robot, 1);
+    GatePosition gatePsition(robot, repeatCount, qrDetectionRequest, decryptRequired);
+    gatePosition.run();
   }
 
   double requiredRightPower = speedCalculator.calculateRightMotorPower();

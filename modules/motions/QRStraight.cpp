@@ -67,8 +67,8 @@ void QRStraight::executeStep()
   if((decryptRequired && !robot.getHaveQR2contents())
      || (!decryptRequired && !robot.getHaveQR1contents())) {
     // QR検出処理
-    RepeatCount repeatCount(robot, 1);
-    GatePosition gatePsition(robot, repeatCount, qrDetectionRequest, decryptRequired);
+    RepeatCountCondition repeatCount(robot, 1);
+    GatePositionDetection gatePsition(robot, repeatCount, qrDetectionRequest, decryptRequired);
     gatePosition.run();
   }
 

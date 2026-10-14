@@ -68,8 +68,8 @@ void QRStraight::executeStep()
      || (!decryptRequired && !robot.getHaveQR1contents())) {
     // QR検出処理
     repeatCount = std::make_unique<RepeatCountCondition>(robot, 1);
-    GatePositionDetection gatePsition(robot, std::move(repeatCount), qrDetectionRequest,
-                                      decryptRequired);
+    GatePositionDetection gatePosition(robot, std::move(repeatCount), qrDetectionRequest,
+                                       decryptRequired);
     gatePosition.run();
   }
 

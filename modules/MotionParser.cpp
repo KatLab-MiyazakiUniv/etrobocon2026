@@ -660,7 +660,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                                        fromString<bool>(motionParams[2]));
     }
     case MOTION_COMMAND::QR_STRAIGHT: {
-        Pid::PidGain anglePid{ fromString<double>(motionParams[3]),
+      Pid::PidGain anglePid{ fromString<double>(motionParams[3]),
                              fromString<double>(motionParams[4]),
                              fromString<double>(motionParams[5]) };
 
@@ -674,9 +674,10 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       qrRequest.roi.y = fromString<int32_t>(motionParams[11]);
       qrRequest.roi.width = fromString<int32_t>(motionParams[12]);
       qrRequest.roi.height = fromString<int32_t>(motionParams[13]);
-      
-      return new QRStraight(robot, std::move(condition),fromString<double>(motionParams[2]), anglePid,
-                            shouldUseIMU, deadbandRate, maxoutRate, qrRequest, fromString<bool>(motionParams[9]));
+
+      return new QRStraight(robot, std::move(condition), fromString<double>(motionParams[2]),
+                            anglePid, shouldUseIMU, deadbandRate, maxoutRate, qrRequest,
+                            fromString<bool>(motionParams[9]));
     }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
@@ -702,7 +703,6 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH },
           { "GatePosition", MOTION_COMMAND::GATE_POSITION },
           { "QRStraight", MOTION_COMMAND::QR_STRAIGHT }
-
 
         };
 

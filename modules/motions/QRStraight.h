@@ -23,20 +23,20 @@ class QRStraight : public BaseMotion {
    * コンストラクタ
    * @brief カメラ画像(色領域検出)を使ったPID走行クラスを初期化する
    * @param _robot ロボットインスタンス
-   * @param _decryptRequired 復号するか
-   * @param _qrDetectionRequest QRコード検出リクエスト
    * @param _continuationCondition 継続条件クラスのインスタンス
    * @param _targetSpeed 目標速度
    * @param _anglePidGain 角度制御用PIDゲイン
    * @param _shouldUseIMU IMUを使用するかどうか
    * @param _deadbandRate turningPowerに適用するデッドバンドの割合(0.0〜1.0、basePowerに対する割合)
    * @param _maxoutRate turningPowerに適用するマックスアウトの割合(0.0〜1.0、basePowerに対する割合)
+   * @param _decryptRequired 復号するか
+   * @param _qrDetectionRequest QRコード検出リクエスト
    */
   QRStraight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-             double _targetSpeed, const Pid::PidGain& _pidGain,
-             const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest, bool _decryptRequired,
+             double _targetSpeed, const Pid::PidGain& _pidGain, bool _decryptRequired,
              const Pid::PidGain& _anglePidGain, bool _shouldUseIMU, double _deadbandRate,
-             double _maxoutRate);
+             double _maxoutRate, const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
+             bool _decryptRequired);
 
   /**
    * デストラクタ
@@ -58,11 +58,6 @@ class QRStraight : public BaseMotion {
    * @brief 1周期分の動作を実行する
    */
   void executeStep() override;
-
-  /**
-   * @brief 1周期分の待機を行う
-   */
-  void wait() override;
 
   /**
    * @brief 動作終了後の処理を行う

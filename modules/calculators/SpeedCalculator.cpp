@@ -26,36 +26,36 @@ SpeedCalculator::SpeedCalculator(Robot& _robot, const Pid::PidGain& _rightPid,
 
 double SpeedCalculator::calculateRightMotorPower()
 {
+  Logger::debug("AHK:---------SpeedCalculator::calculateRightMotorPower()---------");
   rightMotorPower
       = robot.getWheelMotorControllerInstance().getRightPower();  // rightMotorPowerの初期化
-  Logger::printfLog(Logger::DEBUG, "SpeedCalculator:現状の右power値は[%d]", rightMotorPower);
+  Logger::printfLog(Logger::DEBUG, "AHK:rightMotorPower[%d]", rightMotorPower);
 
   // 右タイヤの走行速度を算出
   double currentRightSpeed = robot.getWheelMotorControllerInstance().getRightSpeed();
-  Logger::printfLog(Logger::DEBUG, "SpeedCalculator:currentRightSpeedは[%d]", currentRightSpeed);
+  Logger::printfLog(Logger::DEBUG, "AHK:currentRightSpeed[%d]", currentRightSpeed);
 
   // 走行速度に相当する右タイヤのPower値を算出
   rightMotorPower += rightPid.calculatePid(currentRightSpeed);
-  Logger::printfLog(Logger::DEBUG, "SpeedCalculator:次にセットするrightMotorPowerは[%d]",
-                    rightMotorPower);
-
+  Logger::printfLog(Logger::DEBUG, "AHK:rightMotorPower[%d]", rightMotorPower);
+  Logger::debug("AHK:---------SpeedCalculator::calculateRightMotorPower()---------");
   return rightMotorPower;
 }
 
 double SpeedCalculator::calculateLeftMotorPower()
 {
+  Logger::debug("AHK:---------SpeedCalculator::calculateLeftMotorPower()---------");
   leftMotorPower
       = robot.getWheelMotorControllerInstance().getLeftPower();  // leftMotorPowerの初期化
-  Logger::printfLog(Logger::DEBUG, "SpeedCalculator:の左power値は[%d]", leftMotorPower);
+  Logger::printfLog(Logger::DEBUG, "AHK:leftMotorPower[%d]", leftMotorPower);
 
   // 左タイヤの走行速度を算出
   double currentLeftSpeed = robot.getWheelMotorControllerInstance().getLeftSpeed();
-  Logger::printfLog(Logger::DEBUG, "SpeedCalculator:currentLeftSpeedは[%d]", currentLeftSpeed);
+  Logger::printfLog(Logger::DEBUG, "AHK:currentLeftSpeed[%d]", currentLeftSpeed);
 
   // 走行速度に相当する左タイヤのPower値を算出
   leftMotorPower += leftPid.calculatePid(currentLeftSpeed);
-  Logger::printfLog(Logger::DEBUG, "SpeedCalculator:次にセットするleftMotorPowerは[%d]",
-                    leftMotorPower);
-
+  Logger::printfLog(Logger::DEBUG, "AHK:leftMotorPower[%d]", leftMotorPower);
+  Logger::debug("AHK:---------SpeedCalculator::calculateLeftMotorPower()---------");
   return leftMotorPower;
 }

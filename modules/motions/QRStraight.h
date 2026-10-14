@@ -1,6 +1,6 @@
 /**
  * @file   QRStraight.h
- * @brief  QR検出しながら直進するクラス
+ * @brief  QR検出を行いながら直進するクラス
  * @author migaku2645
  */
 
@@ -21,7 +21,7 @@ class QRStraight : public BaseMotion {
  public:
   /**
    * コンストラクタ
-   * @brief カメラ画像(色領域検出)を使ったPID走行クラスを初期化する
+   * @brief QR検出を行いながら直進するクラスを初期化する
    * @param _robot ロボットインスタンス
    * @param _continuationCondition 継続条件クラスのインスタンス
    * @param _targetSpeed 目標速度
@@ -29,7 +29,7 @@ class QRStraight : public BaseMotion {
    * @param _shouldUseIMU IMUを使用するかどうか
    * @param _deadbandRate turningPowerに適用するデッドバンドの割合(0.0〜1.0、basePowerに対する割合)
    * @param _maxoutRate turningPowerに適用するマックスアウトの割合(0.0〜1.0、basePowerに対する割合)
-   * @param _decryptRequired 復号するか
+   * @param _decryptRequired 暗号解読するか
    * @param _qrDetectionRequest QRコード検出リクエスト
    */
   QRStraight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
@@ -72,6 +72,6 @@ class QRStraight : public BaseMotion {
   double deadbandRate;              // turningPowerに適用するデッドバンドの割合(0.0〜1.0)
   double maxoutRate;                // turningPowerに適用するマックスアウトの割合(0.0〜1.0)
   CameraServer::QrCodeDetectorRequest qrDetectionRequest;  // QRコード検出リクエスト
-  bool decryptRequired = false;
+  bool decryptRequired = false;                            // 暗号解読するか
 };
 #endif

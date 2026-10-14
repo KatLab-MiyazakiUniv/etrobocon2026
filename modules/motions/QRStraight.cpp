@@ -65,7 +65,7 @@ void QRStraight::executeStep()
 {
   // QR検出処理
 
-  // QR検出済みなら何もしない
+  // QR検出済みならすぐに直進動作に移行
   if(decryptRequired && !robot.getHaveQR2contents()
      || !decryptRequired && !robot.getHaveQR1contents()) {
     // QRコードを検出

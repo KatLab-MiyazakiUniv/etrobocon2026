@@ -1,7 +1,7 @@
 /**
  * @file   RouteFollower.h
  * @brief  経路探索結果に従って自己位置を使用せず走行するクラス
- * @author yutaro-1214
+ * @author yutaro-1214 okuyama0528
  */
 
 #ifndef ROUTE_FOLLOWER_H
@@ -10,8 +10,8 @@
 #include <cmath>
 #include <memory>
 #include <vector>
-
 #include "AngleNormalizer.h"
+#include "BaseMotion.h"
 #include "ClockUtil.h"
 #include "DistanceCondition.h"
 #include "EtRallyMap.h"
@@ -29,7 +29,7 @@
 /**
  * @brief 経路探索結果に従って走行するクラス
  */
-class RouteFollower {
+class RouteFollower : public BaseMotion {
  public:
   /**
    * @brief コンストラクタ
@@ -48,14 +48,32 @@ class RouteFollower {
                 double _straightMaxoutRate);
 
   /**
-   * @brief 経路探索結果に従って走行する
-   * @param route 走行する経路
+   * @brief 走行する経路を設定する
+   * @param _route 走行経路
    */
-  void run(const std::vector<RouteState>& route);
+  void setRoute(const std::vector<RouteState>& _route);
+
+ protected:
+  /**
+   * @brief 走行開始前の初期化処理
+   */
+  void prepare() override;
+
+  /**
+   * @brief 経路の1区間を走行する
+   */
+  void executeStep() override;
+
+  /**
+   * @brief 走行終了後の処理
+   */
+  void finish() override;
 
  private:
-  Robot& robot;                    // ロボット本体
   const EtRallyMap& map;           // ETラリーのマップ情報
+  std::vector<RouteState> route;   // 走行経路
+  std::size_t nextIndex = 1;       // 次に走行する区間の番号
+  bool failed = false;             // 走行異常の判定
   double targetSpeed;              // 目標走行速度
   Pid::PidGain rotationPid;        // 通常回頭用PIDゲイン
   Pid::PidGain squareRotationPid;  // 正方形補正回頭用PIDゲイン
@@ -153,5 +171,4 @@ class RouteFollower {
    */
   double calculateDistanceToGate(const RouteState& from, const Gate& gate) const;
 };
-
 #endif  // ROUTE_FOLLOWER_H

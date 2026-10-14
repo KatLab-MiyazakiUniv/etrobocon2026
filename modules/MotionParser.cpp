@@ -659,6 +659,9 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       return new GatePositionDetection(robot, std::move(condition), qrRequest,
                                        fromString<bool>(motionParams[2]));
     }
+    case MOTION_COMMAND::ET_RALLY: {
+      return new EtRallyMotion(robot, std::move(condition));
+    }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
                         motionParams[0].c_str());
@@ -681,9 +684,8 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "ResetAzimuth", MOTION_COMMAND::RESET_AZIMUTH },
           { "ETZumoExit", MOTION_COMMAND::ET_ZUMO_EXIT },
           { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH },
-          { "GatePosition", MOTION_COMMAND::GATE_POSITION }
-
-        };
+          { "GatePosition", MOTION_COMMAND::GATE_POSITION },
+          { "ETRally", MOTION_COMMAND::ET_RALLY } };
 
   auto it = commandMap.find(str);
 
@@ -712,7 +714,6 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
     { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC },
     { "ColorOrColor", CONDITION_COMMAND::COLOR_OR_COLOR },
     { "ColorRegion", CONDITION_COMMAND::COLOR_REGION_CENTER_CONDITION },
-
   };
 
   auto it = conditionMap.find(str);

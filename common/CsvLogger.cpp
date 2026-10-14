@@ -9,6 +9,8 @@
 // CSVログのバッファとインデックスの初期化
 char CsvLogger::logs[LOG_BUFFER_SIZE] = "";
 int CsvLogger::currentIndex = 0;
+// csvロガーをしよするためにグローバル変数を記述>要削除
+LogData GLOBAL_logData;
 
 // 現在のログファイルパス
 std::string CsvLogger::fileName

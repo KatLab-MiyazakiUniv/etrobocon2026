@@ -17,6 +17,7 @@ void EtRobocon2026::start()
   CsvLogger::init();
   CsvLogger::writeHeader();
   Logger::info("Hello KATLAB");
+
   RealNetworkSystem real;
   SocketClient client(real);
   Robot robot(client);

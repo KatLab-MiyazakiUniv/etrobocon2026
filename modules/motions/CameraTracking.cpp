@@ -66,10 +66,6 @@ void CameraTracking::executeStep()
   // 初期Speed値を計算
   double baseRightPower = speedCalculator.calculateRightMotorPower();
   double baseLeftPower = speedCalculator.calculateLeftMotorPower();
-  Logger::info("AHK:---------CameraTracking::executeStep()---------");
-  Logger::printfLog(Logger::DEBUG, "AHK:baseRightPower[%lf]", baseRightPower);
-  Logger::printfLog(Logger::DEBUG, "AHK:baseLeftPower[%lf]", baseLeftPower);
-  Logger::info("AHK:---------CameraTracking::executeStep()---------");
 
   // 検出処理の呼び出し
   SocketClient& client = robot.getCameraSocketClientInstance();
@@ -130,34 +126,23 @@ void CameraTracking::executeStep()
     return;
   }
 
-  // 初期Speed値を計算
-  Logger::info("AHK:---------CameraTracking::executeStep()-"
-               "時間のかかる検出処理後のモーターのパワー値に着目--------");
-  Logger::printfLog(Logger::DEBUG, "rightPower値は[%d]",
-                    robot.getWheelMotorControllerInstance().getRightPower());
-  Logger::printfLog(Logger::DEBUG, "leftPower値は[%d]",
-                    robot.getWheelMotorControllerInstance().getLeftPower());
-
-  Logger::info("AHK:---------CameraTracking::executeStep()-"
-               "時間のかかる検出処理後のモーターのパワー値に着目--------");
+  // 色領域検出処理後のモーターのパワー値を取得する
+  GLOBAL_logData.afterDetectRightMotorPower
+      = robot.getWheelMotorControllerInstance().getRightPower();
+  GLOBAL_logData.afterDetectLeftMotorPower = robot.getWheelMotorControllerInstance().getLeftPower();
 
   // 旋回値の計算
-
-  Logger::info("AHK:---------CameraTracking::executeStep()---------");
   double turningPower = cameraPid.calculatePid(currentX) * -1;
-  Logger::printfLog(Logger::DEBUG, "AHK:turningPower[%lf]", turningPower);
-  Logger::info("AHK:---------CameraTracking::executeStep()---------");
+  GLOBAL_logData.turningPower = turningPower;
 
   // モータのPower値をセット（前進の時0を下回らないように，後進の時0を上回らないようにセット）
   double rightPower = baseRightPower > 0.0 ? std::max(baseRightPower - turningPower, 0.0)
                                            : std::min(baseRightPower + turningPower, 0.0);
   double leftPower = baseLeftPower > 0.0 ? std::max(baseLeftPower + turningPower, 0.0)
                                          : std::min(baseLeftPower - turningPower, 0.0);
-
-  Logger::info("AHK:---------CameraTracking::executeStep()---------");
-  Logger::printfLog(Logger::DEBUG, "AHK:rightPower[%lf]", rightPower);
-  Logger::printfLog(Logger::DEBUG, "AHK:leftPower[%lf]", leftPower);
-  Logger::info("AHK:---------CameraTracking::executeStep()---------");
+  GLOBAL_logData.finalRightMotorPower = rightPower;
+  GLOBAL_logData.finalLeftMotorPower = leftPower;
+  CsvLogger::add(GLOBAL_logData);
 
   robot.getWheelMotorControllerInstance().setRightPower(rightPower);
   robot.getWheelMotorControllerInstance().setLeftPower(leftPower);
@@ -183,6 +168,8 @@ void CameraTracking::finish()
     Logger::printfLog(Logger::DEBUG, "stopBoth()後の左power値は[%d]",
                       robot.getWheelMotorControllerInstance().getLeftPower());
     Logger::info("AHK:---------CameraTracking::finish()---------");
+
+    CsvLogger::add(GLOBAL_logData);
   }
 }
 

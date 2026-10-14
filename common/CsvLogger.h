@@ -45,8 +45,26 @@ struct LogData {
   std::optional<double> deadbandPower;  // デッドバンド閾値
   std::optional<double> maxoutPower;    // 旋回Power上限
   std::optional<int> maxoutActive;      // 上限に張り付いた場合は1
+
+  std::optional<int> currentRightMotorPower;
+  std::optional<int> currentRightSpeed;
+  std::optional<int> baseRightPower;
+
+  std::optional<int> currentLeftMotorPower;
+  std::optional<int> currentLeftSpeed;
+  std::optional<int> baseLeftPower;
+
+  std::optional<int> afterDetectRightMotorPower;
+  std::optional<int> afterDetectLeftMotorPower;
+
+  std::optional<int> turningPower;
+
+  std::optional<int> finalRightMotorPower;
+  std::optional<int> finalLeftMotorPower;
   // 今後新しいセンサー値（例: gyro）を追加したい場合は、ここに std::optional<int> gyro;
 };
+
+extern LogData GLOBAL_logData;  // 他のファイルから共有するための宣言(要削除)
 
 class CsvLogger {
  public:

@@ -10,6 +10,7 @@
 #include "Pid.h"
 #include "Robot.h"
 #include "SystemInfo.h"
+#include "CsvLogger.h"
 
 class SpeedCalculator {
  public:

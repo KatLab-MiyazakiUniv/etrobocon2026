@@ -80,7 +80,6 @@ void QRStraight::executeStep()
 
     if(!wasDetected || !success) {
       Logger::error("GatePositionDetection: QRコードの検出に失敗しました。");
-      return;
     } else {
       Logger::error("GatePositionDetection: QRコードの検出に成功しました。");
 
@@ -100,7 +99,6 @@ void QRStraight::executeStep()
 
           if(gatePositionData.empty()) {
             Logger::error("GatePositionDetection: QRコードの復号に失敗しました。");
-            return;
           }
         } else {
           // 赤：復号しない
@@ -113,7 +111,6 @@ void QRStraight::executeStep()
 
         if(!parser.parse()) {
           Logger::error("GatePositionDetection: ゲート位置情報の解析に失敗しました。");
-          return;
         }
 
         Logger::info("GatePositionDetection: ゲート位置情報の設定に成功しました。");
@@ -160,5 +157,4 @@ void QRStraight::finish()
 {
   ClockUtil::sleep(10);
   robot.getWheelMotorControllerInstance().stopBoth();
-  Logger::info("GatePositionDetection: ゲート位置情報の設定に成功しました。");
 }

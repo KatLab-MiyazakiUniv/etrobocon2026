@@ -14,6 +14,7 @@
 #include "AngleNormalizer.h"
 #include "Logger.h"
 #include <string>
+#include <memory>
 #include "GatePositionDetection.h"
 #include "RepeatCountCondition.h"
 

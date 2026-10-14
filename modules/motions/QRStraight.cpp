@@ -160,4 +160,5 @@ void QRStraight::finish()
 {
   ClockUtil::sleep(10);
   robot.getWheelMotorControllerInstance().stopBoth();
+  Logger::info("GatePositionDetection: ゲート位置情報の設定に成功しました。")
 }

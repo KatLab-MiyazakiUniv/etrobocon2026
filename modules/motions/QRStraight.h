@@ -33,10 +33,9 @@ class QRStraight : public BaseMotion {
    * @param _qrDetectionRequest QRコード検出リクエスト
    */
   QRStraight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-             double _targetSpeed, const Pid::PidGain& _pidGain, bool _decryptRequired,
-             const Pid::PidGain& _anglePidGain, bool _shouldUseIMU, double _deadbandRate,
-             double _maxoutRate, const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
-             bool _decryptRequired);
+             double _targetSpeed, const Pid::PidGain& _anglePidGain, bool _shouldUseIMU,
+             double _deadbandRate, double _maxoutRate,
+             const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest, bool _decryptRequired);
 
   /**
    * デストラクタ

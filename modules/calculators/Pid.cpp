@@ -57,7 +57,6 @@ void Pid::prepare()
 
 double Pid::calculatePid(double currentValue)
 {
-  Logger::debug("AHK:---------Pid::calculatePid()---------");
   if(prevTime <= 0) {
     prevTime = ClockUtil::now();
     Logger::warning("PIDの初回呼び出し時間が設定されていません");
@@ -102,8 +101,5 @@ double Pid::calculatePid(double currentValue)
   double d = pidGain.kd * filteredDerivative;
 
   // 操作量 = P制御 + I制御 + D制御
-  Logger::printfLog(Logger::DEBUG, "Pid::calculatePid()操作量[%lf]", p + i + d);
-
-  Logger::debug("AHK:---------Pid::calculatePid()---------");
   return (p + i + d);
 }

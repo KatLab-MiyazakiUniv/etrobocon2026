@@ -39,9 +39,9 @@ void EtRobocon2026::start()
   lineTraceAreaMaster.run();
 
   // BotlleDelivery走行
-  Area bottleDeliveryArea = Area::BottleDelivery;
-  AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
-  bottleDeliveryAreaMaster.run();
+  // Area bottleDeliveryArea = Area::BottleDelivery;
+  // AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
+  // bottleDeliveryAreaMaster.run();
 
-  CsvLogger::outputToFile();
+  //CsvLogger::outputToFile();
 }

@@ -153,24 +153,27 @@ void CameraTracking::wait() {}
 void CameraTracking::finish()
 {
   if(isStopMotorPower) {
-    Logger::info("AHK:---------CameraTracking::finish()---------");
-    Logger::printfLog(Logger::DEBUG, "rightPower値は[%d]",
-                      robot.getWheelMotorControllerInstance().getRightPower());
-    Logger::printfLog(Logger::DEBUG, "leftPower値は[%d]",
-                      robot.getWheelMotorControllerInstance().getLeftPower());
+    // Logger::info("AHK:---------CameraTracking::finish()---------");
+    // Logger::printfLog(Logger::DEBUG, "rightPower値は[%d]",
+    //                   robot.getWheelMotorControllerInstance().getRightPower());
+    // Logger::printfLog(Logger::DEBUG, "leftPower値は[%d]",
+    //                   robot.getWheelMotorControllerInstance().getLeftPower());
 
     ClockUtil::sleep(10);
     // robot.getWheelMotorControllerInstance().brakeBoth();
     robot.getWheelMotorControllerInstance().stopBoth();
 
-    Logger::printfLog(Logger::DEBUG, "stopBoth()後の右power値は[%d]",
-                      robot.getWheelMotorControllerInstance().getRightPower());
-    Logger::printfLog(Logger::DEBUG, "stopBoth()後の左power値は[%d]",
-                      robot.getWheelMotorControllerInstance().getLeftPower());
-    Logger::info("AHK:---------CameraTracking::finish()---------");
+    // Logger::printfLog(Logger::DEBUG, "stopBoth()後の右power値は[%d]",
+    //                   robot.getWheelMotorControllerInstance().getRightPower());
+    // Logger::printfLog(Logger::DEBUG, "stopBoth()後の左power値は[%d]",
+    //                   robot.getWheelMotorControllerInstance().getLeftPower());
+    // Logger::info("AHK:---------CameraTracking::finish()---------");
 
-    CsvLogger::add(GLOBAL_logData);
   }
+
+  GLOBAL_logData.brightness = 9999;
+  CsvLogger::add(GLOBAL_logData);
+  CsvLogger::outputToFile();
 }
 
 double CameraTracking::getTargetSpeed() const

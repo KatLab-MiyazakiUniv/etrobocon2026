@@ -8,7 +8,7 @@
 
 QRStraight::QRStraight(Robot& _robot,
                        std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                       double _targetSpeed, const Pid::PidGain& _pidGain, bool _shouldUseIMU,
+                       double _targetSpeed, const Pid::PidGain& _anglepidGain, bool _shouldUseIMU,
                        double _deadbandRate, double _maxoutRate,
                        const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
                        bool _decryptRequired)
@@ -160,5 +160,5 @@ void QRStraight::finish()
 {
   ClockUtil::sleep(10);
   robot.getWheelMotorControllerInstance().stopBoth();
-  Logger::info("GatePositionDetection: ゲート位置情報の設定に成功しました。")
+  Logger::info("GatePositionDetection: ゲート位置情報の設定に成功しました。");
 }

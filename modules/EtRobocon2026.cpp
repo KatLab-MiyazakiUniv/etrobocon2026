@@ -60,8 +60,7 @@ MapData& mapData = robot.getMapDataInstance();
 
 // Lコース基準のゲート座標を、Rコースなら左右反転
 
-auto toCurrentCourse = &robot -> Point {
-
+auto toCurrentCourse = [&robot](Point point) -> Point {
 if(robot.getCourse() == Course::Right) {
 
 return CourseMirror::mirrorPoint(point);

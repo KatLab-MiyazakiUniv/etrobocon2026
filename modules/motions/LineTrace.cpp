@@ -50,7 +50,6 @@ bool LineTrace::canStart()
 void LineTrace::prepare()
 {
   edgeSign = (robot.getEdge() == Edge::LeftEdge) ? -1 : 1;
-
   brightnessPid.prepare();
 }
 
@@ -59,10 +58,13 @@ void LineTrace::executeStep()
   // 目標スピードに必要なパワー値を計算
   double baseRightPower = speedCalculator.calculateRightMotorPower();
   double baseLeftPower = speedCalculator.calculateLeftMotorPower();
+  // いいのか?モーターが逆回転の場合も絶対値を取得してるが,,
+  //あと,マックスアウトとデッドバンドは旋回量*割合じゃなくて、絶対値を引数にし、過小な変化の無視と過大な値の制限に使ったほうがいいんじゃないの?>basePowerからの変化のほうがいいか、、>今のままでいい。代わりにグラフを作成し、確認する事が必須。
   double basePower = (std::abs(baseRightPower) + std::abs(baseLeftPower)) / 2.0;
 
   // PIDで旋回値を計算
   int brightness = robot.getColorSensorControllerInstance().getReflectance();
+  // 目標輝度との差分?
   double rawTurningPower = brightnessPid.calculatePid(brightness) * edgeSign;
   double turningPower = rawTurningPower;
 

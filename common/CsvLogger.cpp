@@ -35,39 +35,37 @@ std::string CsvLogger::fileName
 // "finalRightMotorPower",
 // "finalLeftMotorPower"
 //       };
-const std::vector<std::string> CsvLogger::HEADERS
-    = { "time",
-        "comand:id",
-        "brightness",
-        "rightPower",
-        "leftPower",
-        "rightSpeed",
-        "leftSpeed",
-        "currentVal",
-        "target",
-        "kp",
-        "ki",
-        "kd",
-        "error",
-        "rawTurn",
-        "turn",
-        "basePower",
-        "deadbandPower",
-        "maxoutPower",
-        "maxoutActive",
-        "currentRightMotorPower",
-        "currentRightSpeed",
-        "baseRightPower",
-        "currentLeftMotorPower",
-        "currentLeftSpeed",
-        "baseLeftPower",
-        "afterDetectRightMotorPower",
-        "afterDetectLeftMotorPower",
-        "turningPower",
-        "finalRightMotorPower",
-        "finalLeftMotorPower" };
-
-
+const std::vector<std::string> CsvLogger::HEADERS = { "time",
+                                                      "comand:id",
+                                                      "brightness",
+                                                      "rightPower",
+                                                      "leftPower",
+                                                      "rightSpeed",
+                                                      "leftSpeed",
+                                                      "currentVal",
+                                                      "target",
+                                                      "kp",
+                                                      "ki",
+                                                      "kd",
+                                                      "error",
+                                                      "rawTurn",
+                                                      "turn",
+                                                      "basePower",
+                                                      "deadbandPower",
+                                                      "maxoutPower",
+                                                      "maxoutActive",
+                                                      "targetSpeed",
+                                                      "currentRightMotorPower",
+                                                      "currentRightSpeed",
+                                                      "baseRightPower",
+                                                      "currentLeftMotorPower",
+                                                      "currentLeftSpeed",
+                                                      "baseLeftPower",
+                                                      "afterDetectRightMotorPower",
+                                                      "afterDetectLeftMotorPower",
+                                                      "turningPower",
+                                                      "finalRightMotorPower",
+                                                      "finalLeftMotorPower" };
 
 // CSVログの初期化
 void CsvLogger::init()
@@ -104,7 +102,7 @@ void CsvLogger::writeHeader()
 }
 
 // 各種値を追加する
-void CsvLogger::add(const LogData& data)
+void CsvLogger::add(LogData& data)
 {
   LogData localData = data;
 
@@ -140,30 +138,30 @@ void CsvLogger::add(const LogData& data)
     }
   };
   // 一行分のCSVデータを構築
-/*   std::string rowStr = "";
-  appendField(rowStr, localData.time, false);
-  appendField(rowStr, localData.id, false);
-  appendField(rowStr, localData.brightness, false);
-  appendField(rowStr, localData.rightPower, false);
-  appendField(rowStr, localData.leftPower, false);
-  appendField(rowStr, localData.rightSpeed, false);
-  appendField(rowStr, localData.leftSpeed, false);
-  appendField(rowStr, localData.currentVal, false);
-  appendField(rowStr, localData.target, false);
-  appendField(rowStr, localData.kp, false);
-  appendField(rowStr, localData.ki, false);
-  appendField(rowStr, localData.kd, false);
-  appendField(rowStr, localData.error, false);
-  appendField(rowStr, localData.rawTurn, false);
-  appendField(rowStr, localData.turn, false);
-  appendField(rowStr, localData.basePower, false);
-  appendField(rowStr, localData.deadbandPower, false);
-  appendField(rowStr, localData.maxoutPower, false);
-  appendField(rowStr, localData.maxoutActive, true);
-  rowStr += "\n";
- */
+  /*   std::string rowStr = "";
+    appendField(rowStr, localData.time, false);
+    appendField(rowStr, localData.id, false);
+    appendField(rowStr, localData.brightness, false);
+    appendField(rowStr, localData.rightPower, false);
+    appendField(rowStr, localData.leftPower, false);
+    appendField(rowStr, localData.rightSpeed, false);
+    appendField(rowStr, localData.leftSpeed, false);
+    appendField(rowStr, localData.currentVal, false);
+    appendField(rowStr, localData.target, false);
+    appendField(rowStr, localData.kp, false);
+    appendField(rowStr, localData.ki, false);
+    appendField(rowStr, localData.kd, false);
+    appendField(rowStr, localData.error, false);
+    appendField(rowStr, localData.rawTurn, false);
+    appendField(rowStr, localData.turn, false);
+    appendField(rowStr, localData.basePower, false);
+    appendField(rowStr, localData.deadbandPower, false);
+    appendField(rowStr, localData.maxoutPower, false);
+    appendField(rowStr, localData.maxoutActive, true);
+    rowStr += "\n";
+   */
 
-// 一行分のCSVデータを構築（HEADERSおよびLogDataの順序と完全に一致）
+  // 一行分のCSVデータを構築（HEADERSおよびLogDataの順序と完全に一致）
   std::string rowStr = "";
   appendField(rowStr, localData.time, false);
   appendField(rowStr, localData.id, false);
@@ -184,6 +182,7 @@ void CsvLogger::add(const LogData& data)
   appendField(rowStr, localData.deadbandPower, false);
   appendField(rowStr, localData.maxoutPower, false);
   appendField(rowStr, localData.maxoutActive, false);
+  appendField(rowStr, localData.targetSpeed, false);
   appendField(rowStr, localData.currentRightMotorPower, false);
   appendField(rowStr, localData.currentRightSpeed, false);
   appendField(rowStr, localData.baseRightPower, false);
@@ -194,9 +193,8 @@ void CsvLogger::add(const LogData& data)
   appendField(rowStr, localData.afterDetectLeftMotorPower, false);
   appendField(rowStr, localData.turningPower, false);
   appendField(rowStr, localData.finalRightMotorPower, false);
-  appendField(rowStr, localData.finalLeftMotorPower, true); // 最後のみ isLast = true
+  appendField(rowStr, localData.finalLeftMotorPower, true);  // 最後のみ isLast = true
   rowStr += "\n";
-
 
   int written = snprintf(&logs[currentIndex], remainBuffer, "%s", rowStr.c_str());
 
@@ -205,6 +203,8 @@ void CsvLogger::add(const LogData& data)
   } else if(written > 0) {
     currentIndex += written;
   }
+  // グローバル変数として使用する場合に伴って、変数を初期化する。Byソウシ(要削除)
+  GLOBAL_logData = {};
 }
 
 // ログファイルの出力先変更

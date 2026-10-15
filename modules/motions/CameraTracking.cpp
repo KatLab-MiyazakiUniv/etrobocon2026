@@ -63,6 +63,7 @@ void CameraTracking::prepare()
 
 void CameraTracking::executeStep()
 {
+  GLOBAL_logData.targetSpeed = targetSpeed;
   // 初期Speed値を計算
   double baseRightPower = speedCalculator.calculateRightMotorPower();
   double baseLeftPower = speedCalculator.calculateLeftMotorPower();
@@ -168,7 +169,6 @@ void CameraTracking::finish()
     // Logger::printfLog(Logger::DEBUG, "stopBoth()後の左power値は[%d]",
     //                   robot.getWheelMotorControllerInstance().getLeftPower());
     // Logger::info("AHK:---------CameraTracking::finish()---------");
-
   }
 
   GLOBAL_logData.brightness = 9999;

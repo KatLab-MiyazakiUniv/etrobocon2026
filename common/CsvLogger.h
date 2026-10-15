@@ -46,6 +46,7 @@ struct LogData {
   std::optional<double> maxoutPower;    // 旋回Power上限
   std::optional<int> maxoutActive;      // 上限に張り付いた場合は1
 
+  std::optional<double> targetSpeed;
   std::optional<int> currentRightMotorPower;
   std::optional<int> currentRightSpeed;
   std::optional<int> baseRightPower;
@@ -82,7 +83,7 @@ class CsvLogger {
    * @brief 各種値を追加する
    * @param data 走行データ構造体
    */
-  static void add(const LogData& data);
+  static void add(LogData& data);
 
   /**
    * @brief 記録した走行ログをファイル出力する

@@ -43,5 +43,5 @@ void EtRobocon2026::start()
   // AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
   // bottleDeliveryAreaMaster.run();
 
-  //CsvLogger::outputToFile();
+  CsvLogger::outputToFile();
 }

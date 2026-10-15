@@ -173,7 +173,7 @@ void CameraTracking::finish()
 
   GLOBAL_logData.brightness = 9999;
   CsvLogger::add(GLOBAL_logData);
-  CsvLogger::outputToFile();
+  // CsvLogger::outputToFile();
 }
 
 double CameraTracking::getTargetSpeed() const

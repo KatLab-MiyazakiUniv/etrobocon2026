@@ -115,7 +115,8 @@ bool GatePositionParser::parseBlueYellowPosition()
 
   MapData& mapData = robot.getMapDataInstance();
   const bool blueSuccess = mapData.setGate(GoalColor::BLUE, bluePosition[0], bluePosition[1]);
-  const bool yellowSuccess = mapData.setGate(GoalColor::YELLOW, yellowPosition[0], yellowPosition[1]);
+  const bool yellowSuccess
+      = mapData.setGate(GoalColor::YELLOW, yellowPosition[0], yellowPosition[1]);
 
   if(!blueSuccess || !yellowSuccess) {
     Logger::error("GatePositionParser: 青色または黄色ゲートの登録に失敗しました。");

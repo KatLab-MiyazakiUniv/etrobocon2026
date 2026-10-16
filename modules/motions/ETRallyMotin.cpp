@@ -41,10 +41,7 @@ namespace {
     {
     }
 
-    bool shouldContinue() override
-    {
-      return notCompleted();
-    }
+    bool shouldContinue() override { return notCompleted(); }
 
    private:
     std::function<bool()> notCompleted;
@@ -159,16 +156,13 @@ namespace {
   }
 }  // namespace
 
-EtRallyMotion::EtRallyMotion(
-    Robot& _robot,
-    std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-    const Pid::PidGain& _rotationPid,
-    const Pid::PidGain& _squareRotationPid,
-    const Pid::PidGain& _straightAnglePid)
-  : BaseMotion(
-        _robot,
-        std::make_unique<EtRallyCompletionCondition>(
-            _robot, [this]() { return !completed; })),
+EtRallyMotion::EtRallyMotion(Robot& _robot,
+                             std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+                             const Pid::PidGain& _rotationPid,
+                             const Pid::PidGain& _squareRotationPid,
+                             const Pid::PidGain& _straightAnglePid)
+  : BaseMotion(_robot, std::make_unique<EtRallyCompletionCondition>(
+                           _robot, [this]() { return !completed; })),
     rotationPid(_rotationPid),
     squareRotationPid(_squareRotationPid),
     straightAnglePid(_straightAnglePid)

@@ -11,10 +11,8 @@
 
 class ETZumoApproach : public BaseMotion {
  public:
-  ETZumoApproach(Robot& robot,
-                 std::unique_ptr<BaseContinuationCondition> condition,
-                 const Pid::PidGain& rotationPid,
-                 const Pid::PidGain& adjustmentPid,
+  ETZumoApproach(Robot& robot, std::unique_ptr<BaseContinuationCondition> condition,
+                 const Pid::PidGain& rotationPid, const Pid::PidGain& adjustmentPid,
                  const Pid::PidGain& straightPid);
 
   // AreaMasterで失敗を検知して後続動作を止める際に利用できる。

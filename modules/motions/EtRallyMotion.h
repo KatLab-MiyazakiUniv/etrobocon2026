@@ -33,10 +33,8 @@
 
 class EtRallyMotion : public BaseMotion {
  public:
-  EtRallyMotion(Robot& _robot,
-                std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                const Pid::PidGain& _rotationPid,
-                const Pid::PidGain& _squareRotationPid,
+  EtRallyMotion(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+                const Pid::PidGain& _rotationPid, const Pid::PidGain& _squareRotationPid,
                 const Pid::PidGain& _straightAnglePid);
 
  protected:

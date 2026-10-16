@@ -59,10 +59,14 @@ namespace {
   double directionToHeading(Direction direction)
   {
     switch(direction) {
-      case Direction::RIGHT: return 0.0;
-      case Direction::UP: return 90.0;
-      case Direction::LEFT: return 180.0;
-      case Direction::DOWN: return -90.0;
+      case Direction::RIGHT:
+        return 0.0;
+      case Direction::UP:
+        return 90.0;
+      case Direction::LEFT:
+        return 180.0;
+      case Direction::DOWN:
+        return -90.0;
     }
     return 0.0;
   }
@@ -93,19 +97,17 @@ namespace {
   void moveStraight(Robot& robot, double distance, double speed, const Pid::PidGain& gain)
   {
     auto condition = std::make_unique<DistanceCondition>(robot, distance);
-    Straight motion(robot, std::move(condition), speed, gain, true,
-                    STRAIGHT_DEADBAND_RATE, STRAIGHT_MAXOUT_RATE);
+    Straight motion(robot, std::move(condition), speed, gain, true, STRAIGHT_DEADBAND_RATE,
+                    STRAIGHT_MAXOUT_RATE);
     motion.run();
   }
 }  // namespace
 
-ETZumoApproach::ETZumoApproach(
-    Robot& _robot, std::unique_ptr<BaseContinuationCondition> _condition,
-    const Pid::PidGain& _rotationPid, const Pid::PidGain& _adjustmentPid,
-    const Pid::PidGain& _straightPid)
-  : BaseMotion(_robot,
-               std::make_unique<ETZumoApproachOnceCondition>(
-                   _robot, [this]() { return !completed; })),
+ETZumoApproach::ETZumoApproach(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _condition,
+                               const Pid::PidGain& _rotationPid, const Pid::PidGain& _adjustmentPid,
+                               const Pid::PidGain& _straightPid)
+  : BaseMotion(_robot, std::make_unique<ETZumoApproachOnceCondition>(
+                           _robot, [this]() { return !completed; })),
     rotationPid(_rotationPid),
     adjustmentPid(_adjustmentPid),
     straightPid(_straightPid)
@@ -162,8 +164,7 @@ void ETZumoApproach::executeStep()
   const auto result = adjustment.calculate(request);
 
   if(result.wasDetected) {
-    if(!std::isfinite(result.correctionAngle)
-       || !std::isfinite(result.straightDistance)
+    if(!std::isfinite(result.correctionAngle) || !std::isfinite(result.straightDistance)
        || result.straightDistance <= 0.0) {
       Logger::error("ETZumoApproach: invalid QR adjustment");
       return;

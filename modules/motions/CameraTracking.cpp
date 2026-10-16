@@ -137,10 +137,43 @@ void CameraTracking::executeStep()
   GLOBAL_logData.turningPower = turningPower;
 
   // モータのPower値をセット（前進の時0を下回らないように，後進の時0を上回らないようにセット）
-  double rightPower = baseRightPower > 0.0 ? std::max(baseRightPower - turningPower, 0.0)
-                                           : std::min(baseRightPower + turningPower, 0.0);
-  double leftPower = baseLeftPower > 0.0 ? std::max(baseLeftPower + turningPower, 0.0)
-                                         : std::min(baseLeftPower - turningPower, 0.0);
+  // double rightPower = baseRightPower > 0.0 ? std::max(baseRightPower - turningPower, 0.0)
+  //                                          : std::min(baseRightPower + turningPower, 0.0);
+  // double leftPower = baseLeftPower > 0.0 ? std::max(baseLeftPower + turningPower, 0.0)
+  
+  // 右モータのPower値をセット（前進時は0を下回らない、後進時は0を上回らない）
+  double rightPower = baseRightPower - turningPower;
+  if (baseRightPower > 0.0) {
+      rightPower = std::max(rightPower, 0.0);
+  } else {
+      rightPower = std::min(rightPower, 0.0);
+  }
+
+  // 左モータのPower値をセット
+  double leftPower = baseLeftPower + turningPower;
+  if (baseLeftPower > 0.0) {
+      leftPower = std::max(leftPower, 0.0);
+  } else {
+      leftPower = std::min(leftPower, 0.0);
+  }
+  
+
+  //旋回量の大小関係が逆転したかどうかを判定
+    double rightTurningPower = -turningPower;
+    double leftTurningPower = turningPower;
+    bool BiggerBeforeRightTurningPower = false;
+    bool BiggerAfterRightTurningPower = false;
+
+    if(rightTurningPower > leftTurningPower){
+         BiggerBeforeRightTurningPower = true;
+    }
+    if(rightPower > leftPower){
+         BiggerAfterRightTurningPower = true;
+    }
+    if (BiggerBeforeRightTurningPower !=  BiggerAfterRightTurningPower) {
+    Logger::info("旋回量の大小関係が逆転");
+    }
+
   GLOBAL_logData.finalRightMotorPower = rightPower;
   GLOBAL_logData.finalLeftMotorPower = leftPower;
   CsvLogger::add(GLOBAL_logData);

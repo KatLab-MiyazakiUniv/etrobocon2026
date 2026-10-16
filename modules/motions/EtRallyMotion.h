@@ -1,20 +1,18 @@
 /**
  * @file   EtRallyMotion.h
  * @brief  ETラリー全体の動作を管理するクラス
- * @author okuyama0528
  */
-
 #ifndef ET_RALLY_MOTION_H
 #define ET_RALLY_MOTION_H
 
-#include "EtRallyCompletionCondition.h"
+#include <memory>
+#include "BaseMotion.h"
+#include "Pid.h"
 #include <cmath>
-#include <functional>
 #include <memory>
 #include <utility>
 #include <vector>
 #include "AngleNormalizer.h"
-#include "BaseMotion.h"
 #include "ClockUtil.h"
 #include "Course.h"
 #include "CourseMirror.h"
@@ -33,37 +31,24 @@
 #include "Straight.h"
 #include "SystemInfo.h"
 
-/**
- * @brief ETラリー全体の動作を管理するクラス
- */
 class EtRallyMotion : public BaseMotion {
  public:
-  /**
-   * コンストラクタ
-   * @brief EtRallyMotionを初期化する
-   * @param _robot ロボットクラスのインスタンス
-   * @param _continuationCondition 動作を継続する条件を判定するクラスのインスタンス
-   */
-  EtRallyMotion(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition);
+  EtRallyMotion(Robot& _robot,
+                std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+                const Pid::PidGain& _rotationPid,
+                const Pid::PidGain& _squareRotationPid,
+                const Pid::PidGain& _straightAnglePid);
 
  protected:
-  /**
-   * @brief ETラリー開始前に必要な準備を行う
-   */
   void prepare() override;
-
-  /**
-   * @brief ETラリーの走行処理を実行する
-   */
   void executeStep() override;
-
-  /**
-   * @brief ETラリー終了後の処理を行う
-   */
   void finish() override;
 
  private:
-  bool completed = false;  // ETラリー全体の動作が完了したかどうか
+  bool completed = false;
+  Pid::PidGain rotationPid;        // 90度回頭などの通常回頭PID
+  Pid::PidGain squareRotationPid;  // QR補正などの調整回頭PID
+  Pid::PidGain straightAnglePid;   // 直進角度PID
 };
 
 #endif  // ET_RALLY_MOTION_H

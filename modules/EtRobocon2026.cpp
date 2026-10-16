@@ -1,112 +1,70 @@
 /**
-
-* @file   EtRobocon2026.cpp
-
-* @brief  ETラリー単独試走用（ゲート情報を仮登録）
-
-* @author HaruArima08
-
-*/
+ * @file   EtRobocon2026.cpp
+ * @brief  全体を制御するクラス
+ * @author HaruArima08
+ */
 
 #include "EtRobocon2026.h"
 
-#include "CourseMirror.h"
-
-#include "MapData.h"
-
-#include "RouteTypes.h"
-
 void EtRobocon2026::start()
-
 {
+  // CsvLogger::init();
+  // CsvLogger::writeHeader();
 
-Logger::info("Hello KATLAB");
+  Logger::info("Hello KATLAB");
 
-RealNetworkSystem real;
+  RealNetworkSystem real;
+  SocketClient client(real);
+  Robot robot(client);
 
-SocketClient client(real);
+  robot.getCameraSocketClientInstance().connectToServer();
 
-Robot robot(client);
+  int voltage = BatteryController::getVoltage();
+  Logger::printfLog(Logger::INFO, "バッテリー電圧: %d mV", voltage);
 
-robot.getCameraSocketClientInstance().connectToServer();
+  // ========================================
+  // コース設定
+  // ========================================
 
-int voltage = BatteryController::getVoltage();
+  // Rコース
+  robot.setCourse(Course::Right);
+  robot.setEdge(Edge::LeftEdge);
 
-Logger::printfLog(Logger::INFO, "バッテリー電圧: %d mV", voltage);
+  // Lコース
+  // robot.setCourse(Course::Left);
+  // robot.setEdge(Edge::RightEdge);
 
-// ========================================
+  // ========================================
+  // ライントレース走行
+  // ========================================
 
-// 試走用コース設定
+  Area lineTraceArea = Area::LineTrace;
+  AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
+  lineTraceAreaMaster.run();
 
-// ========================================
+  // ========================================
+  // ボトルデリバリー走行
+  // ========================================
 
-robot.setCourse(Course::Right);
+  Area bottleDeliveryArea = Area::BottleDelivery;
+  AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
+  bottleDeliveryAreaMaster.run();
 
-robot.setEdge(Edge::LeftEdge);
+  // CsvLogger::outputToFile();
 
-// Lコースで試走するときは上の2行をコメントアウトして使用
+    // ========================================
+  // ET相撲走行
+  // ========================================
 
-// robot.setCourse(Course::Left);
+  Area ETZumo = Area::ETZumo;
+  AreaMaster ETZumouAreaMaster(robot, ETZumo);
+  ETZumouAreaMaster.run();
 
-// robot.setEdge(Edge::RightEdge);
+  // ========================================
+  // ETラリー走行
+  // ========================================
 
-// ========================================
-
-// 仮のゲート情報（Lコース基準）
-
-// ========================================
-
-MapData& mapData = robot.getMapDataInstance();
-
-// Lコース基準のゲート座標を、Rコースなら左右反転
-
-auto toCurrentCourse = [&robot](Point point) -> Point {
-if(robot.getCourse() == Course::Right) {
-
-return CourseMirror::mirrorPoint(point);
-
-}
-
-return point;
-
-};
-
-// 赤：横向きゲート
-
-mapData.setGatePoint(GoalColor::RED,
-
-toCurrentCourse({ 7, 9 }),
-
-toCurrentCourse({ 9, 9 }));
-
-// 青：縦向きゲート
-
-mapData.setGatePoint(GoalColor::BLUE,
-
-toCurrentCourse({ 7, 5 }),
-
-toCurrentCourse({ 7, 7 }));
-
-// 黄：横向きゲート
-
-mapData.setGatePoint(GoalColor::YELLOW,
-
-toCurrentCourse({ 1, 5 }),
-
-toCurrentCourse({ 3, 5 }));
-
-Logger::info("ET Rally: test gate data registered");
-
-// ========================================
-
-// ETラリーだけをMotionParser経由で実行
-
-// ========================================
-
-Area etRallyArea = Area::ETRally;
-
-AreaMaster etRallyAreaMaster(robot, etRallyArea);
-
-etRallyAreaMaster.run();
-
+  Area etRallyArea = Area::ETRally;
+  AreaMaster etRallyAreaMaster(robot, etRallyArea);
+  etRallyAreaMaster.run();
 }

@@ -65,8 +65,9 @@ const std::vector<std::string> CsvLogger::HEADERS = { "time",
                                                       "afterDetectLeftMotorPower",
                                                       "turningPower",
                                                       "finalRightMotorPower",
-                                                      "finalLeftMotorPower" };
-
+                                                      "finalLeftMotorPower" ,
+                                                      "isReverseTurningPowerAndFinalPower"
+};
 // CSVログの初期化
 void CsvLogger::init()
 {
@@ -193,7 +194,8 @@ void CsvLogger::add(LogData& data)
   appendField(rowStr, localData.afterDetectLeftMotorPower, false);
   appendField(rowStr, localData.turningPower, false);
   appendField(rowStr, localData.finalRightMotorPower, false);
-  appendField(rowStr, localData.finalLeftMotorPower, true);  // 最後のみ isLast = true
+  appendField(rowStr, localData.finalLeftMotorPower, false);  // 最後のみ isLast = true
+  appendField(rowStr, localData.isReverseTurningPowerAndFinalPower, true);  // 最後のみ isLast = true
   rowStr += "\n";
 
   int written = snprintf(&logs[currentIndex], remainBuffer, "%s", rowStr.c_str());

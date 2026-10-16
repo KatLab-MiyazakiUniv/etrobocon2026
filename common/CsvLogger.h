@@ -62,6 +62,7 @@ struct LogData {
 
   std::optional<int> finalRightMotorPower;
   std::optional<int> finalLeftMotorPower;
+  std::optional<double> isReverseTurningPowerAndFinalPower;
   // 今後新しいセンサー値（例: gyro）を追加したい場合は、ここに std::optional<int> gyro;
 };
 

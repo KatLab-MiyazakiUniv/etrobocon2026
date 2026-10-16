@@ -172,6 +172,9 @@ void CameraTracking::executeStep()
     }
     if (BiggerBeforeRightTurningPower !=  BiggerAfterRightTurningPower) {
     Logger::info("旋回量の大小関係が逆転");
+    GLOBAL_logData.isReverseTurningPowerAndFinalPower = 100.0;
+    }else {
+    GLOBAL_logData.isReverseTurningPowerAndFinalPower = 0.0;
     }
 
   GLOBAL_logData.finalRightMotorPower = rightPower;

@@ -68,7 +68,8 @@ bool GatePositionParser::parseRedPosition()
   }
 
   // MapData::setGate()の登録結果を呼び出し元へ返す
-  if(!robot.getMapDataInstance().setGate(GoalColor::RED, position[0], position[1])) {
+  if(!robot.getMapDataInstance().setGate(GoalColor::RED, position[0], position[1],
+                                         robot.getCourse())) {
     Logger::error("GatePositionParser: 赤色ゲートの登録に失敗しました。");
     return false;
   }
@@ -114,9 +115,10 @@ bool GatePositionParser::parseBlueYellowPosition()
   }
 
   MapData& mapData = robot.getMapDataInstance();
-  const bool blueSuccess = mapData.setGate(GoalColor::BLUE, bluePosition[0], bluePosition[1]);
+  const bool blueSuccess
+      = mapData.setGate(GoalColor::BLUE, bluePosition[0], bluePosition[1], robot.getCourse());
   const bool yellowSuccess
-      = mapData.setGate(GoalColor::YELLOW, yellowPosition[0], yellowPosition[1]);
+      = mapData.setGate(GoalColor::YELLOW, yellowPosition[0], yellowPosition[1], robot.getCourse());
 
   if(!blueSuccess || !yellowSuccess) {
     Logger::error("GatePositionParser: 青色または黄色ゲートの登録に失敗しました。");

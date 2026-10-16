@@ -685,9 +685,8 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                                straightAnglePid);
     }
     case MOTION_COMMAND::ET_ZUMO_APPROACH: {
-      // Motions/ETZumoApproach.csv: 通常回頭・QR調整回頭・直進の3種類のPID
-      if(motionParams.size() < 11) {
-        Logger::error("[MotionParser] ETZumoApproach requires 11 columns");
+      if(motionParams.size() < 14) {
+        Logger::error("[MotionParser] ETZumoApproach requires 14 columns");
         return nullptr;
       }
 
@@ -703,8 +702,12 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                                 fromString<double>(motionParams[9]),
                                 fromString<double>(motionParams[10]) };
 
+      double targetSpeed = fromString<double>(motionParams[11]);
+      double straightDeadbandRate = fromString<double>(motionParams[12]);
+      double straightMaxoutRate = fromString<double>(motionParams[13]);
+
       return new ETZumoApproach(robot, std::move(condition), rotationPid, adjustmentPid,
-                                straightPid);
+                                straightPid, targetSpeed, straightDeadbandRate, straightMaxoutRate);
     }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",

@@ -1,5 +1,5 @@
-コマンド名,ID,rotationKp,rotationKi,rotationKd,adjustRotationKp,adjustRotationKi,adjustRotationKd,straightKp,straightKi,straightKd
-ETZumoApproach,ID,double,double,double,double,double,double,double,double,double
-ETZumoApproach,L001,1.4,0.0,0.1,4.9,0.0,0.12,0.033,0.003,0.03
-ETZumoApproach,R001,1.4,0.0,0.1,4.9,0.0,0.12,0.033,0.003,0.03
-ETZumoApproach,001,1.4,0.0,0.1,4.9,0.0,0.12,0.033,0.003,0.03
+コマンド名,ID,rotationKp,rotationKi,rotationKd,adjustRotationKp,adjustRotationKi,adjustRotationKd,straightKp,straightKi,straightKd,targetSpeed,straightDeadbandRate,straightMaxoutRate
+ETZumoApproach,ID,double,double,double,double,double,double,double,double,double,double,double,double
+ETZumoApproach,L001,1.4,0.0,0.1,4.9,0.0,0.12,0.033,0.003,0.03,300.0,0.25,0.54
+ETZumoApproach,R001,1.4,0.0,0.1,4.9,0.0,0.12,0.033,0.003,0.03,300.0,0.25,0.54
+ETZumoApproach,001,1.4,0.0,0.1,4.9,0.0,0.12,0.033,0.003,0.03,300.0,0.25,0.54

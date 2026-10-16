@@ -34,6 +34,7 @@ class MapData {
    * @param color ゲートの色
    * @param startNumber ゲートの始点を表す座標番号
    * @param endNumber ゲートの終点を表す座標番号
+   * @param course コースの種類
    * @return true/登録成功、false/登録失敗
    */
   bool setGate(GoalColor color, int startNumber, int endNumber, Course course);

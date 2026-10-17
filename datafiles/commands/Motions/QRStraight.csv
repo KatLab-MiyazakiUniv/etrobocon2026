@@ -1,0 +1,3 @@
+Command,ID,Speed,AngleKp,AngleKi,AngleKd,UseIMU,DeadbandRate,MaxoutRate,bool,int,int,int,int
+コマンド名,動作ID,走行速度,角度P,角度I,角度D,IMUを使うか,デッドバンド,マックスアウト,decryptRequired,roiX,roiY,roiWidth,roiHeight
+QRStraight,001,100,0.033,0.003,0.03,true,0.0,1.0,0,0,0,1920,1080

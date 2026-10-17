@@ -667,7 +667,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       // [8..10] 直進角度PID(Kp, Ki, Kd)
       if(motionParams.size() < 11) {
         Logger::printfLog(Logger::ERROR,
-                          "[MotionParser] ETRallyのPIDパラメータ数が不足しています（11列必要）");
+                          "[MotionParser] ETRallyのPIDパラメータ数が不足しています（14列必要）");
         return nullptr;
       }
 
@@ -680,9 +680,14 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       Pid::PidGain straightAnglePid{ fromString<double>(motionParams[8]),
                                      fromString<double>(motionParams[9]),
                                      fromString<double>(motionParams[10]) };
+      double targetSpeed = fromString<double>(motionParams[11]);
+double straightDeadbandRate = fromString<double>(motionParams[12]);
+double straightMaxoutRate = fromString<double>(motionParams[13]);
 
-      return new EtRallyMotion(robot, std::move(condition), rotationPid, squareRotationPid,
-                               straightAnglePid);
+      return new EtRallyMotion(
+    robot, std::move(condition),
+    rotationPid, squareRotationPid, straightAnglePid,
+    targetSpeed, straightDeadbandRate, straightMaxoutRate);
     }
     case MOTION_COMMAND::ET_ZUMO_APPROACH: {
       if(motionParams.size() < 14) {

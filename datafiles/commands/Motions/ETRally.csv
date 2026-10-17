@@ -1,5 +1,5 @@
-コマンド名,ID,rotationKp,rotationKi,rotationKd,adjustRotationKp,adjustRotationKi,adjustRotationKd,straightKp,straightKi,straightKd
-ETRally,ID,double,double,double,double,double,double,double,double,double
-ETRally,L001,1.4,0.0,0.1,4.9,0.0,0.12,0.033,0.003,0.03
-ETRally,R001,1.4,0.0,0.1,4.9,0.0,0.12,0.033,0.003,0.03
-ETRally,001,1.4,0.0,0.1,4.9,0.0,0.12,0.033,0.003,0.03
+コマンド名,ID,rotationKp,rotationKi,rotationKd,squareRotationKp,squareRotationKi,squareRotationKd,straightKp,straightKi,straightKd,targetSpeed,straightDeadbandRate,straightMaxoutRate
+EtRally,ID,double,double,double,double,double,double,double,double,double,double,double,double
+ETRally,L001,1.4,0.0,0.1,4.9,0.0,0.12,0.033,0.003,0.03,300.0,0.25,0.54
+ETRally,R001,1.4,0.0,0.1,4.9,0.0,0.12,0.033,0.003,0.03,300.0,0.25,0.54
+ETRally,001,1.4,0.0,0.1,4.9,0.0,0.12,0.033,0.003,0.03,300.0,0.25,0.54

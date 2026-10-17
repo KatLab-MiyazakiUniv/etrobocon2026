@@ -60,18 +60,12 @@ void QRStraight::prepare()
   }
 
   anglePid.prepare();
+  GatePosition gatePosition(robot, qrDetectionRequest, decryptRequired);
 }
 void QRStraight::executeStep()
 {
-  // QR検出済みならすぐに直進動作に移行
-  if((decryptRequired && !robot.getHaveQR2contents())
-     || (!decryptRequired && !robot.getHaveQR1contents())) {
-    // QR検出処理
-    auto repeatCount = std::make_unique<RepeatCountCondition>(robot, 1);
-    GatePositionDetection gatePosition(robot, std::move(repeatCount), qrDetectionRequest,
-                                       decryptRequired);
-    gatePosition.run();
-  }
+  // 検出処理
+  setGatePosition();
 
   double requiredRightPower = speedCalculator.calculateRightMotorPower();
   double requiredLeftPower = speedCalculator.calculateLeftMotorPower();

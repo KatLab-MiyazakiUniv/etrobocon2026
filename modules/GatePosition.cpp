@@ -1,0 +1,87 @@
+/**
+ * @file   GatePosition.cpp
+ * @brief  QRコードからゲート位置情報を取得するクラス
+ * @author migaku2645
+ */
+
+#include "GatePosition.h"
+
+GatePosition::GatePosition(Robot& _robot,
+                           const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
+                           bool _decryptRequired)
+  : robot(_robot), qrDetectionRequest(_qrDetectionRequest), decryptRequired(_decryptRequired)
+{
+  LOG_CREATE("GatePosition");
+}
+
+GatePosition::~GatePosition()
+{
+  LOG_DESTROY("GatePosition");
+}
+
+void GatePosition::setGatePosition()
+{
+  // QR検出済みならreturn
+  if(decryptRequired) {
+    if(robot.getHaveQR2contents()) {
+      return;
+    }
+  } else {
+    if(robot.getHaveQR1contents()) {
+      return;
+    }
+  }
+
+  // QRコードを検出
+
+  SocketClient& client = robot.getCameraSocketClientInstance();
+  bool success = false;
+  bool wasDetected = false;
+
+  CameraServer::QrCodeDetectorResponse qrResponse;
+  success = client.executeQrCodeDetection(qrDetectionRequest, qrResponse);
+  wasDetected = qrResponse.wasDetected;
+
+  if(!wasDetected || !success) {
+    Logger::error("GatePositionDetection: QRコードの検出に失敗しました。");
+    return;
+  } else {
+    Logger::error("GatePositionDetection: QRコードの検出に成功しました。");
+
+    //  QRコードの暗号文を復号
+    std::string gatePositionData;
+
+    if(decryptRequired) {
+      // AesDecryptor decryptor(std::string(robot.getDecryptionKey()), qrResponse.content);
+      // 青・黄色：復号する
+      gatePositionData
+          = Decrypter::decrypt(std::string(robot.getDecryptionKey()), qrResponse.content);
+
+      if(gatePositionData.empty()) {
+        Logger::error("GatePositionDetection: QRコードの復号に失敗しました。");
+        return;
+      }
+    } else {
+      // 赤：復号しない
+      gatePositionData = qrResponse.content;
+    }
+
+    //  平文を解析して,ゲート位置情報をRobotに設定
+
+    GatePositionParser parser(gatePositionData, robot);
+
+    if(!parser.parse()) {
+      Logger::error("GatePositionDetection: ゲート位置情報の解析に失敗しました。");
+      return;
+    }
+
+    Logger::info("GatePositionDetection: ゲート位置情報の設定に成功しました。");
+
+    // QR検出/解読成功ならフラグを更新
+    if(decryptRequired) {
+      robot.setHaveQR2contents();
+    } else {
+      robot.setHaveQR1contents();
+    }
+  }
+}

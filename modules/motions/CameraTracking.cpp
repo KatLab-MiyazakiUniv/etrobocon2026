@@ -63,6 +63,10 @@ void CameraTracking::prepare()
 
 void CameraTracking::executeStep()
 {
+
+  // グローバル変数として使用する場合に伴って、変数を初期化する。Byソウシ(要削除)
+  GLOBAL_logData = {};
+
   GLOBAL_logData.targetSpeed = targetSpeed;
   // 初期Speed値を計算
   double baseRightPower = speedCalculator.calculateRightMotorPower();

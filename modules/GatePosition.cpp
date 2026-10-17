@@ -1,6 +1,6 @@
 /**
- * @file   GatePositionDetection.cpp
- * @brief  QRコードからゲート位置情報を取得する動作クラス
+ * @file   GatePosition.cpp
+ * @brief  QRコードからゲート位置情報を取得するクラス
  * @author migaku2645
  */
 

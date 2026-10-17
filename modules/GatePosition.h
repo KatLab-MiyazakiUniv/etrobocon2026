@@ -35,6 +35,7 @@ class GatePosition {
   void setGatePosition();
 
  private:
+  Robot& robot;                                            // Robot インスタンスの参照
   CameraServer::QrCodeDetectorRequest qrDetectionRequest;  // QRコード検出リクエスト
   bool decryptRequired = false;
 };

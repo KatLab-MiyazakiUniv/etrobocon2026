@@ -9,12 +9,12 @@
 GatePosition::GatePosition(Robot& _robot,
                            const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
                            bool _decryptRequired)
-  : qrDetectionRequest(_qrDetectionRequest), decryptRequired(_decryptRequired)
+  : robot(_robot), qrDetectionRequest(_qrDetectionRequest), decryptRequired(_decryptRequired)
 {
   LOG_CREATE("GatePosition");
 }
 
-GatePositionDetection::~GatePosition()
+GatePosition::~GatePosition()
 {
   LOG_DESTROY("GatePosition");
 }

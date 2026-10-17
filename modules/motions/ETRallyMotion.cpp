@@ -125,7 +125,8 @@ void EtRallyMotion::executeStep()
 
   while(true) {
     for(const GoalColor targetColor : TARGET_COLORS) {
-      Logger::printfLog(Logger::INFO, "ラップ %d: %s ゲートへ移動", lap, colorToString(targetColor));
+      Logger::printfLog(Logger::INFO, "ラップ %d: %s ゲートへ移動", lap,
+                        colorToString(targetColor));
 
       // 現在位置と方向から指定色のゲートまで経路探索
       GateRouteResult routeResult

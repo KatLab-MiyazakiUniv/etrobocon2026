@@ -7,10 +7,10 @@
 #include "ETZumoApproach.h"
 
 namespace {
-  constexpr double ROTATION_TOLERANCE
-      = 2.0;  // 回頭時の許容誤差(補正角度がこの値以下なら回頭しない)
-  constexpr double FINAL_STRAIGHT_DISTANCE
-      = 100.0;  // 外周経由でET相撲開始位置までの最終直進距離(mm)
+  // 回頭時の許容誤差(補正角度がこの値以下なら回頭しない)
+  constexpr double ROTATION_TOLERANCE = 2.0;
+  // 外周経由でET相撲開始位置までの最終直進距離(mm)
+  constexpr double FINAL_STRAIGHT_DISTANCE = 100.0;
 
   // 指定された座標をコースに応じて変換する
   Point convertPoint(const Point& point, Course course)
@@ -100,7 +100,7 @@ void ETZumoApproach::executeStep()
   Point startPoint;
   Point outerPoint;
 
-  // ラベル番号に応じてET相撲開始位置を設定する
+  // ボトルの色に応じてET相撲開始位置を設定する
   switch(robot.getIndexOfLabel()) {
     case 0:
       startPoint = convertPoint({ 2, 4 }, course);
@@ -149,7 +149,6 @@ void ETZumoApproach::executeStep()
     moveStraight(robot, backDistance, -targetSpeed, straightPid, straightDeadbandRate,
                  straightMaxoutRate);
   } else {
-    // 以前の処理と同じ仮定：QRを検出できなければ外周位置にいるものとして扱う。
     Logger::info(
         "ETZumoApproach:正方形が検出されませんでした。外周位置にいるものとして処理を続行します");
   }

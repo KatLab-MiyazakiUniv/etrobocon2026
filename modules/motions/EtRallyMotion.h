@@ -82,7 +82,7 @@ class EtRallyMotion : public BaseMotion {
    * @return 変換後の方向
    */
   static Direction convertDirection(Direction direction, Course course);
-  
+
   /**
    * @brief デバッグ用にGoalColorを文字列へ変換する
    * @param color ゲートの色

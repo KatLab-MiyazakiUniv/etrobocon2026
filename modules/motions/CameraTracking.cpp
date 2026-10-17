@@ -63,7 +63,6 @@ void CameraTracking::prepare()
 
 void CameraTracking::executeStep()
 {
-
   // グローバル変数として使用する場合に伴って、変数を初期化する。Byソウシ(要削除)
   GLOBAL_logData = {};
 
@@ -87,6 +86,9 @@ void CameraTracking::executeStep()
       Logger::printfLog(Logger::WARNING,
                         "CameraTracking:色領域が検出されませんでした。success:%d wasDetected:%d",
                         success, wasDetected);
+      // グローバル変数として使用する場合に伴って、変数を初期化する。Byソウシ(要削除)
+      CsvLogger::add(GLOBAL_logData);
+      GLOBAL_logData = {};
       return;
     }
     // 黒を除く最大面積の色範囲取得>
@@ -120,14 +122,20 @@ void CameraTracking::executeStep()
   } else {
     Logger::error("CameraTracking:検出方式が不正です");
   }
-
   if(!success) {
     Logger::warning("CameraTracking:通信に失敗しました");
+      // グローバル変数として使用する場合に伴って、変数を初期化する。Byソウシ(要削除)
+      CsvLogger::add(GLOBAL_logData);
+      GLOBAL_logData = {};
     return;
   }
 
   if(!wasDetected) {
     Logger::warning("CameraTracking:検出対象が検出できませんでした");
+      // グローバル変数として使用する場合に伴って、変数を初期化する。Byソウシ(要削除)
+      CsvLogger::add(GLOBAL_logData);
+      GLOBAL_logData = {};
+
     return;
   }
 
@@ -144,7 +152,7 @@ void CameraTracking::executeStep()
   // double rightPower = baseRightPower > 0.0 ? std::max(baseRightPower - turningPower, 0.0)
   //                                          : std::min(baseRightPower + turningPower, 0.0);
   // double leftPower = baseLeftPower > 0.0 ? std::max(baseLeftPower + turningPower, 0.0)
-  
+
   // 右モータのPower値をセット（前進時は0を下回らない、後進時は0を上回らない）
   double rightPower = baseRightPower - turningPower;
   if (baseRightPower > 0.0) {
@@ -160,7 +168,7 @@ void CameraTracking::executeStep()
   } else {
       leftPower = std::min(leftPower, 0.0);
   }
-  
+
 
   //旋回量の大小関係が逆転したかどうかを判定
     double rightTurningPower = -turningPower;

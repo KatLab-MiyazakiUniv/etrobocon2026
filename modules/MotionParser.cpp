@@ -660,6 +660,10 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                                        fromString<bool>(motionParams[2]));
     }
     case MOTION_COMMAND::QR_STRAIGHT: {
+      if(motionParams.size() < 13) {
+        Logger::printfLog(Logger::ERROR, "[MotionParser] QRStraightのパラメータ数が不足しています");
+        return nullptr;
+      }
       Pid::PidGain anglePid{ fromString<double>(motionParams[3]),
                              fromString<double>(motionParams[4]),
                              fromString<double>(motionParams[5]) };

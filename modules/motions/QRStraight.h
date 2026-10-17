@@ -29,8 +29,9 @@ class QRStraight : public BaseMotion {
    * @param _shouldUseIMU IMUを使用するかどうか
    * @param _deadbandRate turningPowerに適用するデッドバンドの割合(0.0〜1.0、basePowerに対する割合)
    * @param _maxoutRate turningPowerに適用するマックスアウトの割合(0.0〜1.0、basePowerに対する割合)
-   * @param _decryptRequired 暗号解読するか
    * @param _qrDetectionRequest QRコード検出リクエスト
+   * @param _decryptRequired 暗号解読するか
+
    */
   QRStraight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
              double _targetSpeed, const Pid::PidGain& _anglePidGain, bool _shouldUseIMU,

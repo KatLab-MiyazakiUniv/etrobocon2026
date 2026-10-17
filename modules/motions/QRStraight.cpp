@@ -15,13 +15,13 @@ QRStraight::QRStraight(Robot& _robot,
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
     speedCalculator(_robot, _targetSpeed),
-    qrDetectionRequest(_qrDetectionRequest),
-    decryptRequired(_decryptRequired),
     anglePid(_anglePidGain.kp, _anglePidGain.ki, _anglePidGain.kd, 0.0),
     shouldUseIMU(_shouldUseIMU),
     targetAngle(0.0),
     deadbandRate(_deadbandRate),
-    maxoutRate(_maxoutRate)
+    maxoutRate(_maxoutRate),
+    qrDetectionRequest(_qrDetectionRequest),
+    decryptRequired(_decryptRequired)
 {
   LOG_CREATE("QRStraight");
 }

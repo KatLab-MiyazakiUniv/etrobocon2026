@@ -681,13 +681,12 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                                      fromString<double>(motionParams[9]),
                                      fromString<double>(motionParams[10]) };
       double targetSpeed = fromString<double>(motionParams[11]);
-double straightDeadbandRate = fromString<double>(motionParams[12]);
-double straightMaxoutRate = fromString<double>(motionParams[13]);
+      double straightDeadbandRate = fromString<double>(motionParams[12]);
+      double straightMaxoutRate = fromString<double>(motionParams[13]);
 
-      return new EtRallyMotion(
-    robot, std::move(condition),
-    rotationPid, squareRotationPid, straightAnglePid,
-    targetSpeed, straightDeadbandRate, straightMaxoutRate);
+      return new EtRallyMotion(robot, std::move(condition), rotationPid, squareRotationPid,
+                               straightAnglePid, targetSpeed, straightDeadbandRate,
+                               straightMaxoutRate);
     }
     case MOTION_COMMAND::ET_ZUMO_APPROACH: {
       if(motionParams.size() < 14) {

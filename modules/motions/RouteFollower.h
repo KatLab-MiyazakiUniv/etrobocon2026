@@ -53,6 +53,14 @@ class RouteFollower : public BaseMotion {
    */
   void setRoute(const std::vector<RouteState>& _route);
 
+  /**
+   * @brief 外周ゲートか判定する
+   * @param gate 判定するゲート
+   * @return true 外周ゲート
+   * @return false 内側ゲート
+   */
+  bool isOuterGate(const Gate& gate) const;
+
  protected:
   /**
    * @brief 走行開始前の初期化処理
@@ -154,14 +162,6 @@ class RouteFollower : public BaseMotion {
    * @return nullptr ゲートが存在しない場合
    */
   const Gate* findGate(const RouteState& from, const RouteState& to) const;
-
-  /**
-   * @brief 外周ゲートか判定する
-   * @param gate 判定するゲート
-   * @return true 外周ゲート
-   * @return false 内側ゲート
-   */
-  bool isOuterGate(const Gate& gate) const;
 
   /**
    * @brief 区間開始位置からゲート中央までの距離を計算する

@@ -60,11 +60,11 @@ void QRStraight::prepare()
   }
 
   anglePid.prepare();
-  GatePosition gatePosition(robot, qrDetectionRequest, decryptRequired);
 }
 void QRStraight::executeStep()
 {
   // 検出処理
+  GatePosition gatePosition(robot, qrDetectionRequest, decryptRequired);
   setGatePosition();
 
   double requiredRightPower = speedCalculator.calculateRightMotorPower();

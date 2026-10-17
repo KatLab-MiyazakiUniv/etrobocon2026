@@ -65,7 +65,7 @@ void QRStraight::executeStep()
 {
   // 検出処理
   GatePosition gatePosition(robot, qrDetectionRequest, decryptRequired);
-  setGatePosition();
+  getePosition.setGatePosition();
 
   double requiredRightPower = speedCalculator.calculateRightMotorPower();
   double requiredLeftPower = speedCalculator.calculateLeftMotorPower();

@@ -1,2 +1,10 @@
 動作コマンド名,動作ID,条件コマンド名,条件ID
 ETZumoApproach,L001,RepeatCount,001
+#ETZumoExit,L001,RepeatCount,001
+CameraTracking,014,DistanceOrUltraSonic,001
+CameraTracking,001,RepeatCount,001
+Straight,004,ColorOrColor,004
+Straight,003,Distance,030
+AbsoluteRotation,-090,AbsoluteAngle,-090
+
+#ColorSensorDebug,001,RepeatCount,010

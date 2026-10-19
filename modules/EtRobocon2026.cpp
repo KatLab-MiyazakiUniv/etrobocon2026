@@ -1,6 +1,7 @@
+
 /**
  * @file   EtRobocon2026.cpp
- * @brief  全体を制御するクラス
+ * @brief  ETラリー単独試走用
  * @author HaruArima08
  */
 
@@ -8,9 +9,6 @@
 
 void EtRobocon2026::start()
 {
-  // CsvLogger::init();
-  // CsvLogger::writeHeader();
-
   Logger::info("Hello KATLAB");
 
   RealNetworkSystem real;
@@ -22,7 +20,10 @@ void EtRobocon2026::start()
   int voltage = BatteryController::getVoltage();
   Logger::printfLog(Logger::INFO, "バッテリー電圧: %d mV", voltage);
 
+  // ========================================
   // コース設定
+  // ========================================
+
   // Rコース
   robot.setCourse(Course::Right);
   robot.setEdge(Edge::LeftEdge);
@@ -31,24 +32,27 @@ void EtRobocon2026::start()
   // robot.setCourse(Course::Left);
   // robot.setEdge(Edge::RightEdge);
 
-  // ライントレース走行
-  Area lineTraceArea = Area::LineTrace;
-  AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
-  lineTraceAreaMaster.run();
+  // ========================================
+  // ゲート情報の仮登録
+  // ========================================
 
-  // ボトルデリバリー走行
-  Area bottleDeliveryArea = Area::BottleDelivery;
-  AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
-  bottleDeliveryAreaMaster.run();
+  MapData& mapData = robot.getMapDataInstance();
 
-  // CsvLogger::outputToFile();
+  // 赤ゲート：Lコース座標 (7,9) ～ (9,9)
+  mapData.setGate(GoalColor::RED, 25, 15, robot.getCourse());
 
-  // ET相撲走行
-  Area ETZumo = Area::ETZumo;
-  AreaMaster ETZumouAreaMaster(robot, ETZumo);
-  ETZumouAreaMaster.run();
+  // 青ゲート：Lコース座標 (7,5) ～ (7,7)
+  mapData.setGate(GoalColor::BLUE, 23, 24, robot.getCourse());
 
+  // 黄ゲート：Lコース座標 (1,5) ～ (3,5)
+  mapData.setGate(GoalColor::YELLOW, 53, 43, robot.getCourse());
+
+  Logger::info("ET Rally: test gate data registered");
+
+  // ========================================
   // ETラリー走行
+  // ========================================
+
   Area etRallyArea = Area::ETRally;
   AreaMaster etRallyAreaMaster(robot, etRallyArea);
   etRallyAreaMaster.run();

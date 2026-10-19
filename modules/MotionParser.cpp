@@ -703,6 +703,9 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       return new ETZumoApproach(robot, std::move(condition), rotationPid, adjustmentPid,
                                 straightPid, targetSpeed, straightDeadbandRate, straightMaxoutRate);
     }
+    case MOTION_COMMAND::COLOR_SENSOR_DEBUG: {
+  return new ColorSensorDebug(robot, std::move(condition));
+}
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
                         motionParams[0].c_str());
@@ -727,7 +730,8 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH },
           { "GatePosition", MOTION_COMMAND::GATE_POSITION },
           { "ETRally", MOTION_COMMAND::ET_RALLY },
-          { "ETZumoApproach", MOTION_COMMAND::ET_ZUMO_APPROACH } };
+          { "ETZumoApproach", MOTION_COMMAND::ET_ZUMO_APPROACH },
+          { "ColorSensorDebug", MOTION_COMMAND::COLOR_SENSOR_DEBUG } };
 
   auto it = commandMap.find(str);
 

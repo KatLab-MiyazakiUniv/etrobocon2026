@@ -44,6 +44,7 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "ColorRegionCenterCondition.h"
 #include "EtRallyMotion.h"
 #include "ETZumoApproach.h"
+#include "ColorSensorDebug.h"
 
 class MotionParser {
  public:
@@ -63,6 +64,7 @@ class MotionParser {
     GATE_POSITION,
     ET_RALLY,
     ET_ZUMO_APPROACH,
+    COLOR_SENSOR_DEBUG,
     NONE
   };
   // 条件コマンド名を持つ列挙型クラス

@@ -82,6 +82,15 @@ void EtRallyMotion::executeStep()
     Logger::printfLog(Logger::INFO, "Start square detected: angle=%f distance=%f",
                       result.correctionAngle, result.straightDistance);
 
+    // QR補正値が不正な場合は停止
+    if(!std::isfinite(result.correctionAngle)
+       || !std::isfinite(result.straightDistance)
+       || result.straightDistance <= 0.0) {
+      Logger::error("EtRallyMotion: invalid QR adjustment");
+      robot.getWheelMotorControllerInstance().stopBoth();
+      return;
+    }
+
     // 正方形の方向へ回頭
     auto rotateCondition = std::make_unique<RelativeAngleCondition>(robot, result.correctionAngle,
                                                                     ROTATION_TOLERANCE);
@@ -95,12 +104,19 @@ void EtRallyMotion::executeStep()
                       straightDeadbandRate, straightMaxoutRate);
     straight.run();
 
+    // 正方形まで進んだ距離をバック
+    auto backwardCondition = std::make_unique<DistanceCondition>(robot, result.straightDistance);
+    Straight backward(robot, std::move(backwardCondition), -std::abs(targetSpeed),
+                      straightAnglePid, true, straightDeadbandRate, straightMaxoutRate);
+    backward.run();
+
     // 元のETラリー開始方向へ戻す
     auto returnCondition = std::make_unique<RelativeAngleCondition>(robot, -result.correctionAngle,
                                                                     ROTATION_TOLERANCE);
     RelativeRotation returnRotate(robot, std::move(returnCondition), squareRotationPid,
                                   -result.correctionAngle);
     returnRotate.run();
+
     Logger::info("ETラリー開始位置QR補正完了");
 
   } else {

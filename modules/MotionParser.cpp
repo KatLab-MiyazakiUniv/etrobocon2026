@@ -559,8 +559,8 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
 
 
     case MOTION_COMMAND::CAMERA_TRACKING: {
-      if(motionParams.size() < 20) {
-        Logger::printfLog(Logger::ERROR, "[MotionParser] CameraTrackingのパラメータ数が不足しています");
+      if(motionParams.size() < 19) {
+        Logger::printfLog(Logger::ERROR, "[MotionParser] CameraTrackingのパラメータ数は[%d]です。不足です。",motionParams.size());
         return nullptr;
       }
 
@@ -589,7 +589,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
           robot, std::move(condition), fromString<double>(motionParams[2]), targetXCoordinate,
           Pid::PidGain(fromString<double>(motionParams[4]), fromString<double>(motionParams[5]),
                        fromString<double>(motionParams[6])),
-          request, fromString<bool>(motionParams[7]),fromString<double>(motionParams[18]),fromString<double>(motionParams[19]));
+          request, fromString<bool>(motionParams[7]),fromString<double>(motionParams[17]),fromString<double>(motionParams[18]));
     }
 
 

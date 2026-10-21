@@ -58,6 +58,11 @@ void Straight::prepare()
 }
 void Straight::executeStep()
 {
+
+  // グローバル変数として使用する場合に伴って、変数を初期化する。Byソウシ(要削除)
+  GLOBAL_logData = {};
+
+
   double requiredRightPower = speedCalculator.calculateRightMotorPower();
   double requiredLeftPower = speedCalculator.calculateLeftMotorPower();
   double turningPower = 0.0;
@@ -92,6 +97,9 @@ void Straight::executeStep()
   // モーターにPower値をセット
   robot.getWheelMotorControllerInstance().setRightPower(requiredRightPower + turningPower);
   robot.getWheelMotorControllerInstance().setLeftPower(requiredLeftPower - turningPower);
+
+  CsvLogger::add(GLOBAL_logData);
+
 }
 void Straight::finish()
 {

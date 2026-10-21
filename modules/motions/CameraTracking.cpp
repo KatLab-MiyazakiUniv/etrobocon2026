@@ -9,7 +9,7 @@
 CameraTracking::CameraTracking(
     Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
     double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
-    const CameraServer::ColorRegionDetectorRequest& _colorDetectionRequest, bool _isStopMotorPower)
+    const CameraServer::ColorRegionDetectorRequest& _colorDetectionRequest, bool _isStopMotorPower, double _deadbandRate, double _maxoutRate)
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
     targetXCoordinate(_targetXCoordinate),
@@ -18,6 +18,8 @@ CameraTracking::CameraTracking(
     qrDetectionRequest(),
     isStopMotorPower(_isStopMotorPower),
     speedCalculator(_robot, _targetSpeed),
+    deadbandRate(_deadbandRate),
+    maxoutRate(_maxoutRate),
     cameraPid(_pidGain.kp, _pidGain.ki, _pidGain.kd, _targetXCoordinate)
 {
   LOG_CREATE("CameraTracking");
@@ -28,7 +30,7 @@ CameraTracking::CameraTracking(Robot& _robot,
                                double _targetSpeed, int _targetXCoordinate,
                                const Pid::PidGain& _pidGain,
                                const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
-                               bool _isStopMotorPower)
+                               bool _isStopMotorPower, double _deadbandRate, double _maxoutRate)
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
     targetXCoordinate(_targetXCoordinate),
@@ -37,6 +39,8 @@ CameraTracking::CameraTracking(Robot& _robot,
     qrDetectionRequest(_qrDetectionRequest),
     isStopMotorPower(_isStopMotorPower),
     speedCalculator(_robot, _targetSpeed),
+    deadbandRate(_deadbandRate),
+    maxoutRate(_maxoutRate),
     cameraPid(_pidGain.kp, _pidGain.ki, _pidGain.kd, _targetXCoordinate)
 {
   LOG_CREATE("QrCameraTracking");
@@ -71,6 +75,7 @@ void CameraTracking::executeStep()
   double baseRightPower = speedCalculator.calculateRightMotorPower();
   double baseLeftPower = speedCalculator.calculateLeftMotorPower();
 
+  double basePower = (std::abs(baseRightPower) + std::abs(baseLeftPower)) / 2.0;
 
   // 検出処理の呼び出し
   SocketClient& client = robot.getCameraSocketClientInstance();

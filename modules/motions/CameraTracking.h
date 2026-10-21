@@ -33,11 +33,13 @@ class CameraTracking : public BaseMotion {
    * @param _pidGain カメラ制御用PIDゲイン
    * @param _colorDetectionRequest 色領域検出リクエスト
    * @param _isStopMotorPower モーターを停止するかどうか
+   * @param _deadbandRate turningPowerに適用するデッドバンドの割合(0.0〜1.0、basePowerに対する割合)
+   * @param _maxoutRate turningPowerに適用するマックスアウトの割合(0.0〜1.0、basePowerに対する割合)
    */
   CameraTracking(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                  double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
                  const CameraServer::ColorRegionDetectorRequest& _colorDetectionRequest,
-                 bool _isStopMotorPower = true);
+                 bool _isStopMotorPower = true,  double _deadbandRate, double _maxoutRate);
 
   /**
    * コンストラクタ
@@ -49,11 +51,13 @@ class CameraTracking : public BaseMotion {
    * @param _pidGain カメラ制御用PIDゲイン
    * @param _qrDetectionRequest QRコード検出リクエスト
    * @param _isStopMotorPower モーターを停止するかどうか
+   * @param _deadbandRate turningPowerに適用するデッドバンドの割合(0.0〜1.0、basePowerに対する割合)
+   * @param _maxoutRate turningPowerに適用するマックスアウトの割合(0.0〜1.0、basePowerに対する割合)
    */
   CameraTracking(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                  double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
                  const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
-                 bool _isStopMotorPower = true);
+                 bool _isStopMotorPower = true,  double _deadbandRate, double _maxoutRate);
 
   /**
    * デストラクタ
@@ -131,6 +135,8 @@ class CameraTracking : public BaseMotion {
   CameraServer::QrCodeDetectorRequest qrDetectionRequest;          // QRコード検出リクエスト
   bool isStopMotorPower;                                           // モーターを停止するかどうか
   SpeedCalculator speedCalculator;  // 目標速度に対するモータパワー計算
+  double deadbandRate;  // turningPowerに適用するデッドバンドの割合(0.0〜1.0)
+  double maxoutRate;    // turningPowerに適用するマックスアウトの割合(0.0〜1.0)
   Pid cameraPid;                    // カメラ画像x座標に対するPID制御
 };
 

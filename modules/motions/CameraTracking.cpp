@@ -25,7 +25,7 @@ CameraTracking::CameraTracking(
 
 
   Logger::printfLog(Logger::DEBUG, "isStopは%d",isStopMotorPower);
-  for(int i =0;i<3;i++){
+  for(int i =0;i<4;i++){
   Logger::printfLog(Logger::DEBUG, "インスタンス化時のupper色範囲h[%lf]s[%lf]v[%lf]",colorDetectionRequest.hsvRanges[i].lower.h,colorDetectionRequest.hsvRanges[i].lower.s, colorDetectionRequest.hsvRanges[i].lower.v);
 
   Logger::printfLog(Logger::DEBUG, "インスタンス化時のlower色範囲h[%lf]s[%lf]v[%lf]",colorDetectionRequest.hsvRanges[i].upper.h,colorDetectionRequest.hsvRanges[i].upper.s, colorDetectionRequest.hsvRanges[i].upper.v);

@@ -20,9 +20,9 @@ void EtRobocon2026::start()
   RealNetworkSystem real;
   SocketClient client(real);
   Robot robot(client);
-  // int voltage = BatteryController::getVoltage();
-  // Logger::printfLog(Logger::INFO, "バッテリー電圧: %d mV", voltage);
-  // robot.getCameraSocketClientInstance().connectToServer();
+  int voltage = BatteryController::getVoltage();
+  Logger::printfLog(Logger::INFO, "バッテリー電圧: %d mV", voltage);
+  robot.getCameraSocketClientInstance().connectToServer();
 
   // Rコース
   // robot.setCourse(Course::Right);
@@ -38,9 +38,9 @@ void EtRobocon2026::start()
   lineTraceAreaMaster.run();
 
   // BotlleDelivery走行
-  Area bottleDeliveryArea = Area::BottleDelivery;
-  AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
-  bottleDeliveryAreaMaster.run();
+  // Area bottleDeliveryArea = Area::BottleDelivery;
+  // AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
+  // bottleDeliveryAreaMaster.run();
 
   // CsvLogger::outputToFile();
 }

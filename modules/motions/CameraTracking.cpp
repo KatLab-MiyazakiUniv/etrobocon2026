@@ -71,6 +71,7 @@ void CameraTracking::executeStep()
   double baseRightPower = speedCalculator.calculateRightMotorPower();
   double baseLeftPower = speedCalculator.calculateLeftMotorPower();
 
+
   // 検出処理の呼び出し
   SocketClient& client = robot.getCameraSocketClientInstance();
   bool success = false;

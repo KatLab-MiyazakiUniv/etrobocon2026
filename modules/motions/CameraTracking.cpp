@@ -57,6 +57,19 @@ bool CameraTracking::canStart()
     Logger::error("CameraTracking:目標スピードが0です");
     return false;
   }
+
+  // マックスアウトの割合が0.0〜1.0の範囲外の場合は開始しない
+  if(maxoutRate < 0.0 || maxoutRate > 1.0) {
+    Logger::warning("マックスアウトの割合は0.0〜1.0の範囲で設定してください");
+    return false;
+  }
+
+  // デッドバンドの割合がマックスアウトの割合を上回る場合は開始しない
+  if(deadbandRate < 0.0 || deadbandRate > maxoutRate) {
+    Logger::warning("デッドバンドの割合は0.0以上かつマックスアウトの割合以下で設定してください");
+    return false;
+  }
+
   return true;
 }
 
@@ -158,6 +171,21 @@ void CameraTracking::executeStep()
   // double rightPower = baseRightPower > 0.0 ? std::max(baseRightPower - turningPower, 0.0)
   //                                          : std::min(baseRightPower + turningPower, 0.0);
   // double leftPower = baseLeftPower > 0.0 ? std::max(baseLeftPower + turningPower, 0.0)
+
+
+
+  // デッドバンドとマックスアウトを適用
+  double deadbandPower = deadbandRate * basePower;
+  double maxoutPower = maxoutRate * basePower;
+
+  // デッドバンド: 閾値未満の旋回値を無視し、微小な揺れを防ぐ
+  if(std::abs(turningPower) < deadbandPower) {
+    turningPower = 0.0;
+  } else {
+    // マックスアウト: 閾値を超える旋回値を制限し、急激な旋回を防ぐ
+    turningPower = std::min(std::max(turningPower, -maxoutPower), maxoutPower);
+  }
+
 
   // 右モータのPower値をセット（前進時は0を下回らない、後進時は0を上回らない）
   double rightPower = baseRightPower - turningPower;

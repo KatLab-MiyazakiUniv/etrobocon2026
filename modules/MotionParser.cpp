@@ -558,46 +558,15 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
     }
 
 
-    // case MOTION_COMMAND::CAMERA_TRACKING: {
-    //   if(motionParams.size() < 19) {
-    //     Logger::printfLog(Logger::ERROR, "[MotionParser] CameraTrackingのパラメータ数が不足しています");
-    //     return nullptr;
-    //   }
-    //
-    //
-    //   CameraServer::ColorRegionDetectorRequest request;
-    //   request.requireLargestColorIndex = fromString<bool>(motionParams[12]);
-    //   int count = 0;
-    //   for(int i = 0; i < ImageProcessingColor::BottleColors.size(); i++) {
-    //     if(fromString<bool>(motionParams[13 + i])) {
-    //       request.hsvRanges[count] = ImageProcessingColor::BottleColors[i];
-    //       count++;
-    //     }
-    //   }
-    //   request.hsvRangeCount = count;
-    //
-    //   request.roi = { fromString<int>(motionParams[8]), fromString<int>(motionParams[9]),
-    //                   fromString<int>(motionParams[10]), fromString<int>(motionParams[11]) };
-    //
-    //   int targetXCoordinate = fromString<int>(motionParams[3]);
-    //
-    //   Logger::printfLog(Logger::DEBUG,
-    //                     "[MotionParser] CameraTracking: targetXCoorddinate=%.d を生成しました",
-    //                     targetXCoordinate);
-    //
-    //   return new CameraTracking(
-    //       robot, std::move(condition), fromString<double>(motionParams[2]), targetXCoordinate,
-    //       Pid::PidGain(fromString<double>(motionParams[4]), fromString<double>(motionParams[5]),
-    //                    fromString<double>(motionParams[6])),
-    //       request, fromString<bool>(motionParams[7]),formString<bool>(moitonParams[18]),formString<bool>(moitonParams[19]));
-    // }
-
-
     case MOTION_COMMAND::CAMERA_TRACKING: {
-      CameraServer::ColorRegionDetectorRequest request;
+      if(motionParams.size() < 20) {
+        Logger::printfLog(Logger::ERROR, "[MotionParser] CameraTrackingのパラメータ数が不足しています");
+        return nullptr;
+      }
 
+
+      CameraServer::ColorRegionDetectorRequest request;
       request.requireLargestColorIndex = fromString<bool>(motionParams[12]);
-      // request.hsvRanges = ImageProcessingColor::BottleColors;
       int count = 0;
       for(int i = 0; i < ImageProcessingColor::BottleColors.size(); i++) {
         if(fromString<bool>(motionParams[13 + i])) {
@@ -620,9 +589,40 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
           robot, std::move(condition), fromString<double>(motionParams[2]), targetXCoordinate,
           Pid::PidGain(fromString<double>(motionParams[4]), fromString<double>(motionParams[5]),
                        fromString<double>(motionParams[6])),
-          request, fromString<bool>(motionParams[7]));
-      // ここでCameraTrackigのメンバ変数のdetectorのメンバ変数のhsvRangesをセットする
+          request, fromString<bool>(motionParams[7]),fromString<double>(motionParams[18]),fromString<double>(motionParams[19]));
     }
+
+
+    // case MOTION_COMMAND::CAMERA_TRACKING: {
+    //   CameraServer::ColorRegionDetectorRequest request;
+    //
+    //   request.requireLargestColorIndex = fromString<bool>(motionParams[12]);
+    //   // request.hsvRanges = ImageProcessingColor::BottleColors;
+    //   int count = 0;
+    //   for(int i = 0; i < ImageProcessingColor::BottleColors.size(); i++) {
+    //     if(fromString<bool>(motionParams[13 + i])) {
+    //       request.hsvRanges[count] = ImageProcessingColor::BottleColors[i];
+    //       count++;
+    //     }
+    //   }
+    //   request.hsvRangeCount = count;
+    //
+    //   request.roi = { fromString<int>(motionParams[8]), fromString<int>(motionParams[9]),
+    //                   fromString<int>(motionParams[10]), fromString<int>(motionParams[11]) };
+    //
+    //   int targetXCoordinate = fromString<int>(motionParams[3]);
+    //
+    //   Logger::printfLog(Logger::DEBUG,
+    //                     "[MotionParser] CameraTracking: targetXCoorddinate=%.d を生成しました",
+    //                     targetXCoordinate);
+    //
+    //   return new CameraTracking(
+    //       robot, std::move(condition), fromString<double>(motionParams[2]), targetXCoordinate,
+    //       Pid::PidGain(fromString<double>(motionParams[4]), fromString<double>(motionParams[5]),
+    //                    fromString<double>(motionParams[6])),
+    //       request, fromString<bool>(motionParams[7]));
+    //   // ここでCameraTrackigのメンバ変数のdetectorのメンバ変数のhsvRangesをセットする
+    // }
 
     //引数の順番ミスの疑い>
     // case MOTION_COMMAND::CAMERA_TRACKING: {

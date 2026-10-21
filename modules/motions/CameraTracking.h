@@ -39,7 +39,7 @@ class CameraTracking : public BaseMotion {
   CameraTracking(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                  double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
                  const CameraServer::ColorRegionDetectorRequest& _colorDetectionRequest,
-                 bool _isStopMotorPower = true,  double _deadbandRate, double _maxoutRate);
+                 bool _isStopMotorPower = true,  double _deadbandRate=0.0, double _maxoutRate=1.0);
 
   /**
    * コンストラクタ
@@ -57,7 +57,7 @@ class CameraTracking : public BaseMotion {
   CameraTracking(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                  double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
                  const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
-                 bool _isStopMotorPower = true,  double _deadbandRate, double _maxoutRate);
+                 bool _isStopMotorPower = true,  double _deadbandRate=0.0, double _maxoutRate=1.0);
 
   /**
    * デストラクタ

@@ -9,7 +9,8 @@
 CameraTracking::CameraTracking(
     Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
     double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
-    const CameraServer::ColorRegionDetectorRequest& _colorDetectionRequest, bool _isStopMotorPower, double _deadbandRate, double _maxoutRate)
+    const CameraServer::ColorRegionDetectorRequest& _colorDetectionRequest, bool _isStopMotorPower,
+    double _deadbandRate, double _maxoutRate)
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
     targetXCoordinate(_targetXCoordinate),
@@ -81,9 +82,9 @@ void CameraTracking::prepare()
 void CameraTracking::executeStep()
 {
   // グローバル変数として使用する場合に伴って、変数を初期化する。Byソウシ(要削除)
-  GLOBAL_logData = {};
+  CsvLogger::current_logData = {};
 
-  GLOBAL_logData.targetSpeed = targetSpeed;
+  CsvLogger::current_logData.targetSpeed = targetSpeed;
   // 初期Speed値を計算
   double baseRightPower = speedCalculator.calculateRightMotorPower();
   double baseLeftPower = speedCalculator.calculateLeftMotorPower();
@@ -106,8 +107,8 @@ void CameraTracking::executeStep()
                         "CameraTracking:色領域が検出されませんでした。success:%d wasDetected:%d",
                         success, wasDetected);
       // グローバル変数として使用する場合に伴って、変数を初期化する。Byソウシ(要削除)
-      CsvLogger::add(GLOBAL_logData);
-      GLOBAL_logData = {};
+      CsvLogger::add(CsvLogger::current_logData);
+      CsvLogger::current_logData = {};
       return;
     }
     // 黒を除く最大面積の色範囲取得>
@@ -143,36 +144,24 @@ void CameraTracking::executeStep()
   }
   if(!success) {
     Logger::warning("CameraTracking:通信に失敗しました");
-      // グローバル変数として使用する場合に伴って、変数を初期化する。Byソウシ(要削除)
-      CsvLogger::add(GLOBAL_logData);
-      GLOBAL_logData = {};
+    // グローバル変数として使用する場合に伴って、変数を初期化する。Byソウシ(要削除)
+    CsvLogger::add(CsvLogger::current_logData);
+    CsvLogger::current_logData = {};
     return;
   }
 
   if(!wasDetected) {
     Logger::warning("CameraTracking:検出対象が検出できませんでした");
-      // グローバル変数として使用する場合に伴って、変数を初期化する。Byソウシ(要削除)
-      CsvLogger::add(GLOBAL_logData);
-      GLOBAL_logData = {};
+    // グローバル変数として使用する場合に伴って、変数を初期化する。Byソウシ(要削除)
+    CsvLogger::add(CsvLogger::current_logData);
+    CsvLogger::current_logData = {};
 
     return;
   }
 
-  // 色領域検出処理後のモーターのパワー値を取得する
-  GLOBAL_logData.afterDetectRightMotorPower
-      = robot.getWheelMotorControllerInstance().getRightPower();
-  GLOBAL_logData.afterDetectLeftMotorPower = robot.getWheelMotorControllerInstance().getLeftPower();
-
   // 旋回値の計算
   double turningPower = cameraPid.calculatePid(currentX) * -1;
-  GLOBAL_logData.turningPower = turningPower;
-
-  // モータのPower値をセット（前進の時0を下回らないように，後進の時0を上回らないようにセット）
-  // double rightPower = baseRightPower > 0.0 ? std::max(baseRightPower - turningPower, 0.0)
-  //                                          : std::min(baseRightPower + turningPower, 0.0);
-  // double leftPower = baseLeftPower > 0.0 ? std::max(baseLeftPower + turningPower, 0.0)
-
-
+  CsvLogger::current_logData.turningPower = turningPower;
 
   // デッドバンドとマックスアウトを適用
   double deadbandPower = deadbandRate * basePower;
@@ -186,46 +175,25 @@ void CameraTracking::executeStep()
     turningPower = std::min(std::max(turningPower, -maxoutPower), maxoutPower);
   }
 
-
   // 右モータのPower値をセット（前進時は0を下回らない、後進時は0を上回らない）
   double rightPower = baseRightPower - turningPower;
-  if (baseRightPower > 0.0) {
-      rightPower = std::max(rightPower, 0.0);
+  if(baseRightPower > 0.0) {
+    rightPower = std::max(rightPower, 0.0);
   } else {
-      rightPower = std::min(rightPower, 0.0);
+    rightPower = std::min(rightPower, 0.0);
   }
 
   // 左モータのPower値をセット
   double leftPower = baseLeftPower + turningPower;
-  if (baseLeftPower > 0.0) {
-      leftPower = std::max(leftPower, 0.0);
+  if(baseLeftPower > 0.0) {
+    leftPower = std::max(leftPower, 0.0);
   } else {
-      leftPower = std::min(leftPower, 0.0);
+    leftPower = std::min(leftPower, 0.0);
   }
 
-
-  //旋回量の大小関係が逆転したかどうかを判定
-    double rightTurningPower = -turningPower;
-    double leftTurningPower = turningPower;
-    bool BiggerBeforeRightTurningPower = false;
-    bool BiggerAfterRightTurningPower = false;
-
-    if(rightTurningPower > leftTurningPower){
-         BiggerBeforeRightTurningPower = true;
-    }
-    if(rightPower > leftPower){
-         BiggerAfterRightTurningPower = true;
-    }
-    if (BiggerBeforeRightTurningPower !=  BiggerAfterRightTurningPower) {
-    Logger::info("旋回量の大小関係が逆転");
-    GLOBAL_logData.isReverseTurningPowerAndFinalPower = 100.0;
-    }else {
-    GLOBAL_logData.isReverseTurningPowerAndFinalPower = 0.0;
-    }
-
-  GLOBAL_logData.finalRightMotorPower = rightPower;
-  GLOBAL_logData.finalLeftMotorPower = leftPower;
-  CsvLogger::add(GLOBAL_logData);
+  CsvLogger::current_logData.finalRightMotorPower = rightPower;
+  CsvLogger::current_logData.finalLeftMotorPower = leftPower;
+  CsvLogger::add(CsvLogger::current_logData);
 
   robot.getWheelMotorControllerInstance().setRightPower(rightPower);
   robot.getWheelMotorControllerInstance().setLeftPower(leftPower);
@@ -236,25 +204,13 @@ void CameraTracking::wait() {}
 void CameraTracking::finish()
 {
   if(isStopMotorPower) {
-    // Logger::info("AHK:---------CameraTracking::finish()---------");
-    // Logger::printfLog(Logger::DEBUG, "rightPower値は[%d]",
-    //                   robot.getWheelMotorControllerInstance().getRightPower());
-    // Logger::printfLog(Logger::DEBUG, "leftPower値は[%d]",
-    //                   robot.getWheelMotorControllerInstance().getLeftPower());
-
     ClockUtil::sleep(10);
     // robot.getWheelMotorControllerInstance().brakeBoth();
     robot.getWheelMotorControllerInstance().stopBoth();
-
-    // Logger::printfLog(Logger::DEBUG, "stopBoth()後の右power値は[%d]",
-    //                   robot.getWheelMotorControllerInstance().getRightPower());
-    // Logger::printfLog(Logger::DEBUG, "stopBoth()後の左power値は[%d]",
-    //                   robot.getWheelMotorControllerInstance().getLeftPower());
-    // Logger::info("AHK:---------CameraTracking::finish()---------");
   }
 
-  GLOBAL_logData.brightness = 9999;
-  CsvLogger::add(GLOBAL_logData);
+  CsvLogger::current_logData.brightness = 9999;
+  CsvLogger::add(CsvLogger::current_logData);
   // CsvLogger::outputToFile();
 }
 

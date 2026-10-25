@@ -39,7 +39,8 @@ class CameraTracking : public BaseMotion {
   CameraTracking(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                  double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
                  const CameraServer::ColorRegionDetectorRequest& _colorDetectionRequest,
-                 bool _isStopMotorPower = true,  double _deadbandRate=0.0, double _maxoutRate=1.0);
+                 bool _isStopMotorPower = true, double _deadbandRate = 0.0,
+                 double _maxoutRate = 1.0);
 
   /**
    * コンストラクタ
@@ -57,7 +58,8 @@ class CameraTracking : public BaseMotion {
   CameraTracking(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                  double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
                  const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
-                 bool _isStopMotorPower = true,  double _deadbandRate=0.0, double _maxoutRate=1.0);
+                 bool _isStopMotorPower = true, double _deadbandRate = 0.0,
+                 double _maxoutRate = 1.0);
 
   /**
    * デストラクタ
@@ -135,8 +137,8 @@ class CameraTracking : public BaseMotion {
   CameraServer::QrCodeDetectorRequest qrDetectionRequest;          // QRコード検出リクエスト
   bool isStopMotorPower;                                           // モーターを停止するかどうか
   SpeedCalculator speedCalculator;  // 目標速度に対するモータパワー計算
-  double deadbandRate;  // turningPowerに適用するデッドバンドの割合(0.0〜1.0)
-  double maxoutRate;    // turningPowerに適用するマックスアウトの割合(0.0〜1.0)
+  double deadbandRate;              // turningPowerに適用するデッドバンドの割合(0.0〜1.0)
+  double maxoutRate;                // turningPowerに適用するマックスアウトの割合(0.0〜1.0)
   Pid cameraPid;                    // カメラ画像x座標に対するPID制御
 };
 

@@ -16,13 +16,15 @@
 #include "MultiThread.h"
 #include "FrameSave.h"
 
+#include <opencv2/core.hpp>
+
 class ColorRegionDetectionActionHandler {
  public:
   /**
    * @brief コンストラクタ
    * @param camera カメラキャプチャのインスタンス
    */
-  ColorRegionDetectionActionHandler(CameraCapture& camera);
+  explicit ColorRegionDetectionActionHandler(CameraCapture& camera);
 
   /**
    * @brief デストラクタ
@@ -40,6 +42,22 @@ class ColorRegionDetectionActionHandler {
  private:
   CameraCapture& camera;
   ColorRegionDetector detector;
+
+  // 画像座標からワールド座標への射影変換行列
+  cv::Mat homography;
+
+  /**
+   * @brief ホモグラフィ行列を初期化する
+   */
+  void initializeHomography();
+
+  /**
+   * @brief 画像座標をワールド座標（mm）に変換する
+   * @param pixelX 画像上のX座標
+   * @param pixelY 画像上のY座標
+   * @return ワールド座標（変換失敗時はNaN）
+   */
+  cv::Point2f pixelToWorld(double pixelX, double pixelY) const;
 };
 
 #endif  // COLOR_REGION_DETECTION_ACTION_HANDLER_H

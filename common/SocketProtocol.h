@@ -115,6 +115,11 @@ namespace CameraServer {
   struct ColorRegionDetectorResponse {
     BoundingBoxDetectionResult result;  // 色領域の検出結果
     int32_t largestColorIndex = -1;     // 最も面積が大きい色のインデックス
+
+    double centerX = 0.0;
+    double centerY = 0.0;
+    double forwardDistance = 0.0;
+    double lateralDistance = 0.0;
   };
 
   static constexpr uint32_t QR_CODE_CORNER_COUNT = 4;   // QRコードの頂点数

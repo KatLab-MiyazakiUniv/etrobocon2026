@@ -22,6 +22,7 @@
 #define DEFAULT_CSV_LOG_FILE_PATH "etrobocon2026/datafiles/logfiles/"
 #define DEFAULT_CSV_LOG_FILE_NAME "runlog.csv"
 #define DEFAULT_CSV_ARCHIVE_PATH "etrobocon2026/datafiles/logfiles/archive/"
+
 /**
  * @struct LogData
  * @brief CsvLoggerで記録する走行データをまとめた構造体
@@ -70,7 +71,8 @@ class CsvLogger {
 
   /*
    * @brief 既存ログファイルを別ディレクトリへ退避
-   *
+   * @param targetDir 移動元のディレクトリ
+   * @param archiveDir 移動先のディレクトリ
    * */
   static void archiveExistingFiles(const std::filesystem::path& targetDir,
                                    const std::filesystem::path& archiveDir);

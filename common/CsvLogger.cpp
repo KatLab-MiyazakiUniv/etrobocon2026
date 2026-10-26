@@ -15,6 +15,7 @@ LogData CsvLogger::current_logData = {};
 std::string CsvLogger::fileName
     = std::string(DEFAULT_CSV_LOG_FILE_PATH) + DEFAULT_CSV_LOG_FILE_NAME;
 
+// CSVヘッダーの定義
 const std::vector<std::string> CsvLogger::HEADERS = {
   "time",
   "comand:id",
@@ -157,7 +158,6 @@ void CsvLogger::add(LogData& data)
   } else if(written > 0) {
     currentIndex += written;
   }
-  // グローバル変数として使用する場合に伴って、変数を初期化する。Byソウシ(要削除)
   current_logData = {};
 }
 
@@ -170,11 +170,6 @@ void CsvLogger::setFileName(const std::string& name, const std::string& path)
   CsvLogger::fileName = finalPath + finalName;
 }
 
-/**
- * @brief 指定ディレクトリ内の既存ファイルを別ディレクトリへ移動する
- * @param targetDir 監視・移動元のディレクトリ
- * @param archiveDir 移動先のディレクトリ
- */
 void CsvLogger::archiveExistingFiles(const std::filesystem::path& targetDir,
                                      const std::filesystem::path& archiveDir)
 {
@@ -194,13 +189,12 @@ void CsvLogger::archiveExistingFiles(const std::filesystem::path& targetDir,
 
   // targetDir 直下にあるファイルを探索して移動
   for(const auto& entry : std::filesystem::directory_iterator(targetDir)) {
-    // 通常ファイルのみを対象にする（サブディレクトリや退避先自体は除外）
     if(entry.is_regular_file()) {
       std::filesystem::path oldFilePath = entry.path();
       std::filesystem::path newFilePath = archiveDir / oldFilePath.filename();
 
       try {
-        // 同名ファイルが移動先に既に存在する場合は上書き移動、またはリネーム
+        // 同名ファイルが移動先に既に存在する場合
         std::filesystem::rename(oldFilePath, newFilePath);
       } catch(const std::exception& e) {
         Logger::error(("CsvLogger: Failed to move file: " + oldFilePath.string()).c_str());

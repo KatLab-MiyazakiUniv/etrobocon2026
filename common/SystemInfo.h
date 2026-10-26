@@ -14,18 +14,6 @@ static constexpr double WHEEL_RADIUS = 28.0;      // 車輪の半径[mm]
 static constexpr int MOTOR_POWER_MAX = 100;       // モータのPower値の上限値
 static constexpr int MOTOR_POWER_MIN = -100;      // モータのPower値の下限値
 
-// 停止
-static constexpr int MOTOR_POWER_STOP   = 0;
-
-// 負方向（後退）の目標速度に応じたPower値定義
-static constexpr int MOTOR_POWER_AT_MINUS_100 = -50;
-static constexpr int MOTOR_POWER_AT_MINUS_200 = -50;
-static constexpr int MOTOR_POWER_AT_MINUS_300 = -50;
-static constexpr int MOTOR_POWER_AT_MINUS_400 = -50;
-static constexpr int MOTOR_POWER_AT_MINUS_500 = -50;
-static constexpr int MOTOR_POWER_AT_MINUS_550 = -100; // -550以下
-
-
 // カメラ撮影解像度の範囲
 static constexpr int CAM_MIN_WIDTH = 320;    // カメラ撮影解像度の幅（最小値）[px]
 static constexpr int CAM_MIN_HEIGHT = 240;   // カメラ撮影解像度の高さ（最小値）[px]

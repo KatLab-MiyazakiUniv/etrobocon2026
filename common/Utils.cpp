@@ -17,7 +17,6 @@ std::tm Utils::getLocalTime()
 
     std::tm globalTime{};
     //UNIX タイムスタンプ
-    //引数にnullptrを指定する事で,返り値を受け取る
     std::time_t now = std::time(nullptr);
     //Docker環境では地域標準時は世界協定時
     //明示的に世界協定時

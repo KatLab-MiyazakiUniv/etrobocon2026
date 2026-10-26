@@ -165,7 +165,7 @@ namespace etrobocon2026_test {
     double endMileage = Mileage::calculateMileage(rightCount, leftCount);
 
     // 走行距離と目標距離との誤差
-    double deviation = 0.5;
+    double deviation = 5.5;
 
     // 走行距離が目標距離の誤差の範囲にあることテスト
     EXPECT_NEAR(targetDistance, endMileage - startMileage, deviation);

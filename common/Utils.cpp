@@ -11,21 +11,18 @@ std::string Utils::toStrInt(double value)
   return std::to_string(static_cast<int>(value));
 }
 
-
 std::tm Utils::getLocalTime()
 {
+  std::tm globalTime{};
+  // UNIX タイムスタンプ
+  std::time_t now = std::time(nullptr);
+  // Docker環境では地域標準時は世界協定時
+  // 明示的に世界協定時
+  gmtime_r(&now, &globalTime);
 
-    std::tm globalTime{};
-    //UNIX タイムスタンプ
-    std::time_t now = std::time(nullptr);
-    //Docker環境では地域標準時は世界協定時
-    //明示的に世界協定時
-    gmtime_r(&now, &globalTime);
+  globalTime.tm_year += 1900;
+  globalTime.tm_mon += 1;
+  globalTime.tm_hour += 9;
 
-    globalTime.tm_year += 1900;
-    globalTime.tm_mon += 1;
-    globalTime.tm_hour += 9;
-
-    return globalTime;
+  return globalTime;
 }
-

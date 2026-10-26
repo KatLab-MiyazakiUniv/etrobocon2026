@@ -593,7 +593,6 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
           fromString<double>(motionParams[18]));
     }
 
-
     case MOTION_COMMAND::ABSOLUTE_ROTATION: {
       // AbsoluteRotation:
       // motionParams[2]=anglePid.kp

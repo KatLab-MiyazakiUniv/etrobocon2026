@@ -659,6 +659,60 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       return new GatePositionDetection(robot, std::move(condition), qrRequest,
                                        fromString<bool>(motionParams[2]));
     }
+    case MOTION_COMMAND::ET_RALLY: {
+      // Motions/ETRally.csv:
+      // [0] 動作名 [1] ID
+      // [2..4] 通常回頭PID(Kp, Ki, Kd)
+      // [5..7] 調整回頭PID(Kp, Ki, Kd)
+      // [8..10] 直進角度PID(Kp, Ki, Kd)
+      if(motionParams.size() < 11) {
+        Logger::printfLog(Logger::ERROR,
+                          "[MotionParser] ETRallyのPIDパラメータ数が不足しています（14列必要）");
+        return nullptr;
+      }
+
+      Pid::PidGain rotationPid{ fromString<double>(motionParams[2]),
+                                fromString<double>(motionParams[3]),
+                                fromString<double>(motionParams[4]) };
+      Pid::PidGain squareRotationPid{ fromString<double>(motionParams[5]),
+                                      fromString<double>(motionParams[6]),
+                                      fromString<double>(motionParams[7]) };
+      Pid::PidGain straightAnglePid{ fromString<double>(motionParams[8]),
+                                     fromString<double>(motionParams[9]),
+                                     fromString<double>(motionParams[10]) };
+      double targetSpeed = fromString<double>(motionParams[11]);
+      double straightDeadbandRate = fromString<double>(motionParams[12]);
+      double straightMaxoutRate = fromString<double>(motionParams[13]);
+
+      return new EtRallyMotion(robot, std::move(condition), rotationPid, squareRotationPid,
+                               straightAnglePid, targetSpeed, straightDeadbandRate,
+                               straightMaxoutRate);
+    }
+    case MOTION_COMMAND::ET_ZUMO_APPROACH: {
+      if(motionParams.size() < 14) {
+        Logger::error("[MotionParser] ETZumoApproach requires 14 columns");
+        return nullptr;
+      }
+
+      Pid::PidGain rotationPid{ fromString<double>(motionParams[2]),
+                                fromString<double>(motionParams[3]),
+                                fromString<double>(motionParams[4]) };
+
+      Pid::PidGain adjustmentPid{ fromString<double>(motionParams[5]),
+                                  fromString<double>(motionParams[6]),
+                                  fromString<double>(motionParams[7]) };
+
+      Pid::PidGain straightPid{ fromString<double>(motionParams[8]),
+                                fromString<double>(motionParams[9]),
+                                fromString<double>(motionParams[10]) };
+
+      double targetSpeed = fromString<double>(motionParams[11]);
+      double straightDeadbandRate = fromString<double>(motionParams[12]);
+      double straightMaxoutRate = fromString<double>(motionParams[13]);
+
+      return new ETZumoApproach(robot, std::move(condition), rotationPid, adjustmentPid,
+                                straightPid, targetSpeed, straightDeadbandRate, straightMaxoutRate);
+    }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
                         motionParams[0].c_str());
@@ -681,9 +735,9 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "ResetAzimuth", MOTION_COMMAND::RESET_AZIMUTH },
           { "ETZumoExit", MOTION_COMMAND::ET_ZUMO_EXIT },
           { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH },
-          { "GatePosition", MOTION_COMMAND::GATE_POSITION }
-
-        };
+          { "GatePosition", MOTION_COMMAND::GATE_POSITION },
+          { "ETRally", MOTION_COMMAND::ET_RALLY },
+          { "ETZumoApproach", MOTION_COMMAND::ET_ZUMO_APPROACH } };
 
   auto it = commandMap.find(str);
 
@@ -712,7 +766,6 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
     { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC },
     { "ColorOrColor", CONDITION_COMMAND::COLOR_OR_COLOR },
     { "ColorRegion", CONDITION_COMMAND::COLOR_REGION_CENTER_CONDITION },
-
   };
 
   auto it = conditionMap.find(str);

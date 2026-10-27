@@ -1,12 +1,19 @@
 /**
  * @file   SquareDetectionActionHandler.cpp
  * @brief  正方形検出要求を処理し、検出結果を実距離へ変換するクラス
- * @author yutaro-1214
+ * @author okuyama0528 yutaro-1214
  */
 
 #include "SquareDetectionActionHandler.h"
 
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <limits>
+#include <vector>
+
 namespace {
+
   /**
    * @brief 画像上の基準点[px]
    * 1920×1080画像から取得した8個の黒点中心座標
@@ -15,18 +22,15 @@ namespace {
     cv::Point2f(729.13F, 408.15F),   // (50, 150)
     cv::Point2f(963.67F, 408.06F),   // (100, 150)
     cv::Point2f(1198.66F, 407.19F),  // (150, 150)
-
     cv::Point2f(705.05F, 537.40F),   // (50, 100)
     cv::Point2f(1228.23F, 536.45F),  // (150, 100)
-
-    cv::Point2f(674.65F, 699.43F),  // (50, 50)
-    cv::Point2f(970.28F, 698.92F),  // (100, 50)
-    cv::Point2f(1265.69F, 698.89F)  // (150, 50)
+    cv::Point2f(674.65F, 699.43F),   // (50, 50)
+    cv::Point2f(970.28F, 698.92F),   // (100, 50)
+    cv::Point2f(1265.69F, 698.89F)   // (150, 50)
   };
 
   /**
    * @brief 校正用紙上の基準点[mm]
-   * 校正用紙左下を原点とする。
    */
   const std::vector<cv::Point2f> WORLD_POINTS
       = { cv::Point2f(50.0F, 150.0F), cv::Point2f(100.0F, 150.0F), cv::Point2f(150.0F, 150.0F),
@@ -39,67 +43,40 @@ namespace {
   constexpr double BOARD_WIDTH = 200.0;
 
   /**
-   * @brief 校正用紙の奥行き[mm]
-   */
-  constexpr double BOARD_HEIGHT = 200.0;
-
-  /**
    * @brief カメラから校正用紙手前端までの距離[mm]
-   * 実際に設置した距離に合わせて変更すること。
    */
   constexpr double CAMERA_TO_BOARD_NEAR_EDGE = 200.0;
 
   /**
    * @brief 1回の検出で取得するフレーム数
-   * カメラに残っている古いフレームを避けるため、
-   * 複数枚取得して最後の画像を使用する。
    */
-  constexpr int FRAME_CAPTURE_COUNT = 10;
+  constexpr int FRAME_CAPTURE_COUNT = 3;
 
-  /**
-   * @brief 検出回数
-   */
-  int detectionCount = 0;
 }  // namespace
 
 SquareDetectionActionHandler::SquareDetectionActionHandler(CameraCapture& _camera)
   : camera(_camera), detector(cv::Rect(0, 0, CAM_MAX_WIDTH, CAM_MAX_HEIGHT))
 {
   initializeHomography();
-
-  LOG_CREATE("SquareDetectionActionHandler");
 }
 
-SquareDetectionActionHandler::~SquareDetectionActionHandler()
-{
-  LOG_DESTROY("SquareDetectionActionHandler");
-}
+SquareDetectionActionHandler::~SquareDetectionActionHandler() {}
 
 void SquareDetectionActionHandler::initializeHomography()
 {
   if(IMAGE_POINTS.size() != WORLD_POINTS.size() || IMAGE_POINTS.size() < 4) {
-    Logger::error("SquareDetectionActionHandler:"
-                  "ホモグラフィ計算用の基準点が不正です");
     homography.release();
     return;
   }
 
-  // 8点の基準点から画像座標を実座標へ変換するホモグラフィ行列を求める
-  // 第3引数を0にしてRANSACを使用せず、全ての点を使って計算する
+  // 8点の基準点からホモグラフィ行列を計算
   homography = cv::findHomography(IMAGE_POINTS, WORLD_POINTS, 0);
 
   if(homography.empty()) {
-    Logger::error("SquareDetectionActionHandler:"
-                  "ホモグラフィ行列の計算に失敗しました");
     return;
   }
 
-  /*
-   * 計算精度を保つため、double型へ変換する。
-   */
   homography.convertTo(homography, CV_64F);
-  Logger::printfLog(Logger::INFO, "SquareDetectionActionHandler: "
-                                  "ホモグラフィ行列を初期化しました");
 }
 
 cv::Point2f SquareDetectionActionHandler::pixelToWorld(double pixelX, double pixelY) const
@@ -128,88 +105,65 @@ void SquareDetectionActionHandler::execute(const CameraServer::SquareDetectorReq
                                            CameraServer::SquareDetectorResponse& response)
 {
   response = {};
-  ++detectionCount;
 
-  Logger::printfLog(Logger::INFO, "SquareDetectionActionHandler: 検出開始 #%d", detectionCount);
+  // =====================================================
+  // ホモグラフィ確認
+  // =====================================================
 
   if(homography.empty()) {
-    Logger::error("SquareDetectionActionHandler:"
-                  "ホモグラフィ行列が初期化されていません");
     response.wasDetected = false;
     return;
   }
 
-  /*
-   * カメラに残っている古いフレームを避けるため、
-   * 10フレーム取得して最後のフレームを使用する。
-   */
+  // =====================================================
+  // 1. カメラ画像取得
+  //
+  // 古いフレームを避けるため3フレーム取得
+  // 最後のフレームのみを検出に使用する
+  // =====================================================
+
   cv::Mat frame;
 
   for(int i = 0; i < FRAME_CAPTURE_COUNT; ++i) {
     cv::Mat currentFrame;
 
     if(!camera.getFrame(currentFrame)) {
-      Logger::error("SquareDetectionActionHandler:"
-                    "フレームの取得に失敗しました");
       response.wasDetected = false;
       return;
     }
 
-    const cv::Scalar meanValue = cv::mean(currentFrame);
-
-    Logger::printfLog(Logger::INFO,
-                      "SquareDetectionActionHandler: "
-                      "検出=%d "
-                      "フレーム=%d/%d "
-                      "平均=(%.2f, %.2f, %.2f)",
-                      detectionCount, i + 1, FRAME_CAPTURE_COUNT, meanValue[0], meanValue[1],
-                      meanValue[2]);
-
-    frame = currentFrame.clone();
+    // 検出に使う最後のフレームのみをコピーする
+    if(i == FRAME_CAPTURE_COUNT - 1) {
+      frame = currentFrame.clone();
+    }
   }
 
-  /*
-   * ROI設定
-   */
-  const cv::Rect roi(request.roi.x, request.roi.y, request.roi.width, request.roi.height);
-  detector.setValidatedRoi(roi);
-  Logger::printfLog(Logger::INFO,
-                    "SquareDetectionActionHandler: "
-                    "ROI=(%d,%d,%d,%d)",
-                    request.roi.x, request.roi.y, request.roi.width, request.roi.height);
+  // =====================================================
+  // 2. ROI設定
+  // =====================================================
 
-  /*
-   * 正方形検出
-   */
+  const cv::Rect roi(request.roi.x, request.roi.y, request.roi.width, request.roi.height);
+
+  detector.setValidatedRoi(roi);
+
+  // =====================================================
+  // 3. 正方形検出
+  // =====================================================
+
   BoundingBoxDetectionResult detectionResult{};
+
   detector.detect(frame, detectionResult);
 
   if(!detectionResult.wasDetected) {
-    Logger::printfLog(Logger::WARNING,
-                      "SquareDetectionActionHandler: "
-                      "検出 #%d "
-                      "正方形を検出できませんでした",
-                      detectionCount);
     response.wasDetected = false;
+
     return;
   }
 
-  Logger::printfLog(Logger::INFO,
-                    "SquareDetectionActionHandler: "
-                    "検出 #%d "
-                    "正方形を検出しました "
-                    "左上=(%d,%d) "
-                    "右上=(%d,%d) "
-                    "右下=(%d,%d) "
-                    "左下=(%d,%d)",
-                    detectionCount, detectionResult.topLeft.x, detectionResult.topLeft.y,
-                    detectionResult.topRight.x, detectionResult.topRight.y,
-                    detectionResult.bottomRight.x, detectionResult.bottomRight.y,
-                    detectionResult.bottomLeft.x, detectionResult.bottomLeft.y);
+  // =====================================================
+  // 4. 画像上の正方形中心座標
+  // =====================================================
 
-  /*
-   * 画像上の正方形中心座標
-   */
   const double centerX = (detectionResult.topLeft.x + detectionResult.topRight.x
                           + detectionResult.bottomRight.x + detectionResult.bottomLeft.x)
                          / 4.0;
@@ -218,15 +172,10 @@ void SquareDetectionActionHandler::execute(const CameraServer::SquareDetectorReq
                           + detectionResult.bottomRight.y + detectionResult.bottomLeft.y)
                          / 4.0;
 
-  Logger::printfLog(Logger::INFO,
-                    "SquareDetectionActionHandler: "
-                    "検出 #%d "
-                    "画像中心=(%.2f, %.2f)",
-                    detectionCount, centerX, centerY);
+  // =====================================================
+  // 5. 4頂点を実座標へ変換
+  // =====================================================
 
-  /*
-   * 検出した4頂点をそれぞれ実座標へ変換する
-   */
   const std::vector<cv::Point2f> imageCorners
       = { cv::Point2f(static_cast<float>(detectionResult.topLeft.x),
                       static_cast<float>(detectionResult.topLeft.y)),
@@ -242,11 +191,13 @@ void SquareDetectionActionHandler::execute(const CameraServer::SquareDetectorReq
   cv::perspectiveTransform(imageCorners, worldCorners, homography);
 
   if(worldCorners.size() != imageCorners.size()) {
-    Logger::warning("SquareDetectionActionHandler:"
-                    "ホモグラフィ変換に失敗しました");
     response.wasDetected = false;
     return;
   }
+
+  // =====================================================
+  // 6. 実座標の中心を計算
+  // =====================================================
 
   double worldX = 0.0;
   double worldY = 0.0;
@@ -260,39 +211,48 @@ void SquareDetectionActionHandler::execute(const CameraServer::SquareDetectorReq
   worldY /= static_cast<double>(worldCorners.size());
 
   if(!std::isfinite(worldX) || !std::isfinite(worldY)) {
-    Logger::error("SquareDetectionActionHandler:"
-                  "実座標の計算結果が不正です");
     response.wasDetected = false;
     return;
   }
 
-  Logger::printfLog(Logger::INFO,
-                    "SquareDetectionActionHandler: "
-                    "校正用紙座標=(%.2f, %.2f) mm",
-                    worldX, worldY);
+  // =====================================================
+  // 7. 前方距離・横方向距離を計算
+  // =====================================================
 
-  if(worldX < 0.0 || worldX > BOARD_WIDTH || worldY < 0.0 || worldY > BOARD_HEIGHT) {
-    Logger::printfLog(Logger::WARNING,
-                      "SquareDetectionActionHandler: "
-                      "変換結果が校正用紙の範囲外です "
-                      "(%.2f, %.2f)",
-                      worldX, worldY);
-  }
-
-  // 横方向距離
-  // 校正用紙中央を0mmとして左右の距離を計算する
   const double lateralDistance = worldX - BOARD_WIDTH / 2.0;
 
-  // 前方距離
-  // カメラから正方形までの前方距離を計算する
   const double forwardDistance = CAMERA_TO_BOARD_NEAR_EDGE + worldY;
 
-  Logger::printfLog(Logger::INFO,
-                    "SquareDetectionActionHandler: "
-                    "検出 #%d "
-                    "前方=%.2f mm "
-                    "横方向=%.2f mm",
-                    detectionCount, forwardDistance, lateralDistance);
+  // =====================================================
+  // 8. 回頭補正用角度を計算
+  //
+  // SquareAngleAdjustmentと同じ角度計算
+  // =====================================================
+
+  std::array<cv::Point, 4> corners = { detectionResult.topLeft, detectionResult.topRight,
+                                       detectionResult.bottomRight, detectionResult.bottomLeft };
+
+  // Y座標が小さい2点を選択
+  std::sort(corners.begin(), corners.end(),
+            [](const cv::Point& a, const cv::Point& b) { return a.y < b.y; });
+
+  const auto& point1 = corners[0];
+  const auto& point2 = corners[1];
+
+  // X座標が小さい方を左上、大きい方を右上とする
+  const auto& topLeft = point1.x < point2.x ? point1 : point2;
+  const auto& topRight = point1.x < point2.x ? point2 : point1;
+
+  const double deltaX = static_cast<double>(topRight.x - topLeft.x);
+  const double deltaY = static_cast<double>(topRight.y - topLeft.y);
+
+  const double angleRad = std::atan2(deltaY, deltaX);
+
+  const double angleDeg = angleRad * 180.0 / std::acos(-1.0);
+
+  // =====================================================
+  // 9. 検出結果をレスポンスへ格納
+  // =====================================================
 
   response.wasDetected = true;
   response.centerX = centerX;
@@ -300,5 +260,7 @@ void SquareDetectionActionHandler::execute(const CameraServer::SquareDetectorReq
   response.forwardDistance = forwardDistance;
   response.lateralDistance = lateralDistance;
 
-  Logger::info("SquareDetectionActionHandler: 検出終了");
+  // 現行のレスポンスには角度フィールドがないため、値はここでは返していない。
+  // 元の計算手順は維持する。
+  (void)angleDeg;
 }

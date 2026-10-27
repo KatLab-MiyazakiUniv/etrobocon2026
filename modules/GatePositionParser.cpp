@@ -35,7 +35,6 @@ bool GatePositionParser::parse()
   }
 
   Logger::error("GatePositionParser: 平文の形式が不正です。");
-
   return false;
 }
 
@@ -68,7 +67,12 @@ bool GatePositionParser::parseRedPosition()
     return false;
   }
 
-  robot.getMapDataInstance().setGate(GoalColor::RED, position[0], position[1]);
+  // MapData::setGate()の登録結果を呼び出し元へ返す
+  if(!robot.getMapDataInstance().setGate(GoalColor::RED, position[0], position[1],
+                                         robot.getCourse())) {
+    Logger::error("GatePositionParser: 赤色ゲートの登録に失敗しました。");
+    return false;
+  }
 
   return true;
 }
@@ -79,7 +83,6 @@ bool GatePositionParser::parseBlueYellowPosition()
 
   // "/"を基準に青と黄色を分割
   std::string blueText = plaintext.substr(0, slashPosition);
-
   std::string yellowText = plaintext.substr(slashPosition + 1);
 
   int bluePosition[2];
@@ -97,9 +100,30 @@ bool GatePositionParser::parseBlueYellowPosition()
     return false;
   }
 
-  robot.getMapDataInstance().setGate(GoalColor::BLUE, bluePosition[0], bluePosition[1]);
+  // 両方とも登録可能な座標番号であることを確認してから登録する
+  // これにより一方の座標番号だけが不正なときの部分更新を防ぐ
+  auto isValidPointNumber = [](int number) {
+    const int x = number / 10;
+    const int y = number % 10;
+    return x >= 1 && x <= 5 && y >= 1 && y <= 5;
+  };
 
-  robot.getMapDataInstance().setGate(GoalColor::YELLOW, yellowPosition[0], yellowPosition[1]);
+  if(!isValidPointNumber(bluePosition[0]) || !isValidPointNumber(bluePosition[1])
+     || !isValidPointNumber(yellowPosition[0]) || !isValidPointNumber(yellowPosition[1])) {
+    Logger::error("GatePositionParser: ゲート座標番号はX・Yともに1〜5で指定してください。");
+    return false;
+  }
+
+  MapData& mapData = robot.getMapDataInstance();
+  const bool blueSuccess
+      = mapData.setGate(GoalColor::BLUE, bluePosition[0], bluePosition[1], robot.getCourse());
+  const bool yellowSuccess
+      = mapData.setGate(GoalColor::YELLOW, yellowPosition[0], yellowPosition[1], robot.getCourse());
+
+  if(!blueSuccess || !yellowSuccess) {
+    Logger::error("GatePositionParser: 青色または黄色ゲートの登録に失敗しました。");
+    return false;
+  }
 
   return true;
 }
@@ -142,7 +166,6 @@ bool GatePositionParser::parsePosition(const std::string& text, int positions[2]
   // 2桁の整数か確認
   if(positions[0] < 10 || positions[0] > 99 || positions[1] < 10 || positions[1] > 99) {
     Logger::error("GatePositionParser: 位置情報は2桁の整数で指定してください。");
-
     return false;
   }
 

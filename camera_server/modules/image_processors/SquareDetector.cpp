@@ -6,6 +6,11 @@
 
 #include "SquareDetector.h"
 
+#include <climits>
+#include <cmath>
+#include <limits>
+#include <vector>
+
 namespace {
   /**
    * @brief 正方形候補
@@ -16,36 +21,37 @@ namespace {
   };
 
   /**
- 　* @brief 検出したいQRコードが画像の下側にあると予想されるため、その基準となるY位置
- 　*/
+   * @brief 検出したいQRコードが画像の下側にあると予想されるため、その基準となるY位置
+   */
   constexpr double TARGET_Y_RATIO = 0.82;
 
   /**
- 　* @brief QRコードの黒と白の境目を検出するための基準値
- 　*/
+   * @brief QRコードの黒と白の境目を検出するための基準値
+   */
   constexpr double CANNY_THRESHOLD_LOW = 50.0;
 
   /**
- 　* @brief QRコードの黒と白の境目を強い線として判断するための基準値
- 　*/
+   * @brief QRコードの黒と白の境目を強い線として判断するための基準値
+   */
   constexpr double CANNY_THRESHOLD_HIGH = 150.0;
 
   /**
- 　* @brief モルフォロジー処理で線をつなげる範囲の大きさ
- 　*/
+   * @brief モルフォロジー処理で線をつなげる範囲の大きさ
+   */
   constexpr int MORPH_KERNEL_SIZE = 7;
+
+  /**
+   * @brief 左右から検出対象外にする幅 [px]
+   */
+  constexpr int SIDE_CROP_PX = 300;
 }  // namespace
 
 SquareDetector::SquareDetector(const cv::Rect& _roi) : roi(_roi)
 {
   validateParameters();
-  LOG_CREATE("SquareDetector");
 }
 
-SquareDetector::~SquareDetector()
-{
-  LOG_DESTROY("SquareDetector");
-}
+SquareDetector::~SquareDetector() {}
 
 void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& result)
 {
@@ -53,17 +59,18 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
 
   // 入力画像確認
   if(frame.empty()) {
-    Logger::error("SquareDetector:入力フレームが空です。");
     return;
   }
 
-  // ROIの切り出し
+  // ROIの切り出し（画像の左右300pxを除外）
   const cv::Rect frameRect(0, 0, frame.cols, frame.rows);
-  const cv::Rect roiRect = roi & frameRect;
+  if(frame.cols <= 2 * SIDE_CROP_PX) {
+    return;
+  }
+  const cv::Rect sideCropRect(SIDE_CROP_PX, 0, frame.cols - 2 * SIDE_CROP_PX, frame.rows);
+  const cv::Rect roiRect = roi & frameRect & sideCropRect;
 
   if(roiRect.empty()) {
-    Logger::error("SquareDetector:"
-                  "ROIがフレーム内に収まっていません。");
     return;
   }
   const cv::Mat roiFrame = frame(roiRect);
@@ -137,14 +144,9 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
 
     // QRの候補として保存
     candidates.push_back({ rect, static_cast<double>(cluster.size()) });
-
-    Logger::printfLog(Logger::INFO, "SquareDetector: 中心=(%.1f,%.1f)", rect.center.x + roiRect.x,
-                      rect.center.y + roiRect.y);
   }
 
   if(candidates.empty()) {
-    Logger::warning("SquareDetector:"
-                    "正方形候補が見つかりませんでした。");
     return;
   }
 
@@ -167,14 +169,6 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
     const double dy = centerY - targetY;
     const double targetDistance = std::sqrt(dx * dx + dy * dy);
 
-    Logger::printfLog(Logger::INFO,
-                      "SquareDetector: "
-                      "候補 "
-                      "中心=(%.1f,%.1f) "
-                      "基準位置=(%.1f,%.1f) "
-                      "基準位置までの距離=%.1f",
-                      centerX, centerY, targetX, targetY, targetDistance);
-
     // 画面下を優先し、同じくらいなら基準位置に近い方を選ぶ
     if(!foundCandidate || centerY > bestCenterY + 40.0
        || (std::abs(centerY - bestCenterY) <= 40.0 && targetDistance < bestTargetDistance)) {
@@ -186,15 +180,11 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
   }
 
   if(!foundCandidate) {
-    Logger::warning("SquareDetector:"
-                    "条件を満たす正方形候補がありません。");
     return;
   }
 
   // 選択したQRコードの中心座標を取得
   const cv::RotatedRect bestRect = bestCandidate.rect;
-  const cv::Point2f currentCenter(bestRect.center.x + static_cast<float>(roiRect.x),
-                                  bestRect.center.y + static_cast<float>(roiRect.y));
 
   cv::Point2f rectPoints[4];
   bestRect.points(rectPoints);
@@ -246,23 +236,6 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
   result.bottomRight = bottomRight;
   result.bottomLeft = bottomLeft;
   result.wasDetected = true;
-
-  Logger::printfLog(Logger::INFO,
-                    "SquareDetector: "
-                    "正方形を検出しました "
-                    "中心=(%.1f,%.1f) "
-                    "目標距離=%.1f",
-                    currentCenter.x, currentCenter.y, bestTargetDistance);
-
-  Logger::printfLog(Logger::INFO,
-                    "SquareDetector: "
-                    "左上=(%d,%d) "
-                    "右上=(%d,%d) "
-                    "右下=(%d,%d) "
-                    "左下=(%d,%d)",
-                    result.topLeft.x, result.topLeft.y, result.topRight.x, result.topRight.y,
-                    result.bottomRight.x, result.bottomRight.y, result.bottomLeft.x,
-                    result.bottomLeft.y);
 }
 
 void SquareDetector::setValidatedRoi(const cv::Rect& _roi)

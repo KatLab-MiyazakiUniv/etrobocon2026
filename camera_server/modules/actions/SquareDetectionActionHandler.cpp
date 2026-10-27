@@ -2,7 +2,7 @@
 /**
  * @file   SquareDetectionActionHandler.cpp
  * @brief  正方形検出要求を処理し、検出結果を実距離へ変換するクラス
- *         距離と回頭補正用角度の算出時間を計測する
+ *         画像取得・正方形検出・距離と角度算出の処理時間を計測する
  * @author yutaro-1214
  */
 
@@ -64,7 +64,7 @@ namespace {
   /**
    * @brief 1回の検出で取得するフレーム数
    */
-  constexpr int FRAME_CAPTURE_COUNT = 10;
+  constexpr int FRAME_CAPTURE_COUNT = 3;
 
   /**
    * @brief 検出回数
@@ -159,8 +159,8 @@ void SquareDetectionActionHandler::execute(const CameraServer::SquareDetectorReq
   // =====================================================
   // 1. カメラ画像取得
   //
-  // 古いフレームを避けるため10フレーム取得
-  // 最後のフレームを使用する
+  // 古いフレームを避けるため3フレーム取得
+  // 最後のフレームのみを検出に使用する
   // =====================================================
 
   cv::Mat frame;
@@ -175,8 +175,14 @@ void SquareDetectionActionHandler::execute(const CameraServer::SquareDetectorReq
       return;
     }
 
-    frame = currentFrame.clone();
+    // 検出には最後のフレームしか使用しないため、コピーも最後だけにする
+    if(i == FRAME_CAPTURE_COUNT - 1) {
+      frame = currentFrame.clone();
+    }
   }
+
+  // 画像取得終了時刻
+  const auto captureEndTime = std::chrono::steady_clock::now();
 
   // =====================================================
   // 2. ROI設定
@@ -194,6 +200,9 @@ void SquareDetectionActionHandler::execute(const CameraServer::SquareDetectorReq
 
   detector.detect(frame, detectionResult);
 
+  // 正方形検出終了時刻（ROI設定の時間を含む）
+  const auto detectEndTime = std::chrono::steady_clock::now();
+
   if(!detectionResult.wasDetected) {
     Logger::printfLog(Logger::WARNING,
                       "SquareDetectionActionHandler: "
@@ -201,6 +210,15 @@ void SquareDetectionActionHandler::execute(const CameraServer::SquareDetectorReq
                       detectionCount);
 
     response.wasDetected = false;
+
+    const double captureMs
+        = std::chrono::duration<double, std::milli>(captureEndTime - startTime).count();
+    const double detectMs
+        = std::chrono::duration<double, std::milli>(detectEndTime - captureEndTime).count();
+    Logger::printfLog(Logger::INFO,
+                      "[SquareProfile] status=NOT_DETECTED capture=%.2f ms "
+                      "detect=%.2f ms total=%.2f ms",
+                      captureMs, detectMs, captureMs + detectMs);
     return;
   }
 
@@ -331,8 +349,22 @@ void SquareDetectionActionHandler::execute(const CameraServer::SquareDetectorReq
   const double elapsedSeconds
       = std::chrono::duration<double>(endTime - startTime).count();
 
+  const double captureMs
+      = std::chrono::duration<double, std::milli>(captureEndTime - startTime).count();
+  const double detectMs
+      = std::chrono::duration<double, std::milli>(detectEndTime - captureEndTime).count();
+  const double calculateMs
+      = std::chrono::duration<double, std::milli>(endTime - detectEndTime).count();
+
+  // 1行に3区間の時間をまとめて記録する
+  Logger::printfLog(Logger::INFO,
+                    "[SquareProfile] capture=%.2f ms detect=%.2f ms "
+                    "calculate=%.2f ms total=%.2f ms",
+                    captureMs, detectMs, calculateMs,
+                    captureMs + detectMs + calculateMs);
+
   // =====================================================
-  // 計測結果を1行で出力
+  // 従来どおり距離・角度・合計時間を出力
   // =====================================================
 
   Logger::printfLog(Logger::INFO,

@@ -26,22 +26,16 @@ namespace {
     cv::Point2f(1228.23F, 536.45F),  // (150, 100)
     cv::Point2f(674.65F, 699.43F),   // (50, 50)
     cv::Point2f(970.28F, 698.92F),   // (100, 50)
-    cv::Point2f(1265.69F, 698.89F)  // (150, 50)
+    cv::Point2f(1265.69F, 698.89F)   // (150, 50)
   };
 
   /**
    * @brief 校正用紙上の基準点[mm]
    */
-  const std::vector<cv::Point2f> WORLD_POINTS = {
-    cv::Point2f(50.0F, 150.0F),
-    cv::Point2f(100.0F, 150.0F),
-    cv::Point2f(150.0F, 150.0F),
-    cv::Point2f(50.0F, 100.0F),
-    cv::Point2f(150.0F, 100.0F),
-    cv::Point2f(50.0F, 50.0F),
-    cv::Point2f(100.0F, 50.0F),
-    cv::Point2f(150.0F, 50.0F)
-  };
+  const std::vector<cv::Point2f> WORLD_POINTS
+      = { cv::Point2f(50.0F, 150.0F), cv::Point2f(100.0F, 150.0F), cv::Point2f(150.0F, 150.0F),
+          cv::Point2f(50.0F, 100.0F), cv::Point2f(150.0F, 100.0F), cv::Point2f(50.0F, 50.0F),
+          cv::Point2f(100.0F, 50.0F), cv::Point2f(150.0F, 50.0F) };
 
   /**
    * @brief 校正用紙の横幅[mm]
@@ -64,17 +58,13 @@ SquareDetectionActionHandler::SquareDetectionActionHandler(CameraCapture& _camer
   : camera(_camera), detector(cv::Rect(0, 0, CAM_MAX_WIDTH, CAM_MAX_HEIGHT))
 {
   initializeHomography();
-
 }
 
-SquareDetectionActionHandler::~SquareDetectionActionHandler()
-{
-}
+SquareDetectionActionHandler::~SquareDetectionActionHandler() {}
 
 void SquareDetectionActionHandler::initializeHomography()
 {
   if(IMAGE_POINTS.size() != WORLD_POINTS.size() || IMAGE_POINTS.size() < 4) {
-
     homography.release();
     return;
   }
@@ -83,12 +73,10 @@ void SquareDetectionActionHandler::initializeHomography()
   homography = cv::findHomography(IMAGE_POINTS, WORLD_POINTS, 0);
 
   if(homography.empty()) {
-
     return;
   }
 
   homography.convertTo(homography, CV_64F);
-
 }
 
 cv::Point2f SquareDetectionActionHandler::pixelToWorld(double pixelX, double pixelY) const
@@ -123,7 +111,6 @@ void SquareDetectionActionHandler::execute(const CameraServer::SquareDetectorReq
   // =====================================================
 
   if(homography.empty()) {
-
     response.wasDetected = false;
     return;
   }
@@ -141,7 +128,6 @@ void SquareDetectionActionHandler::execute(const CameraServer::SquareDetectorReq
     cv::Mat currentFrame;
 
     if(!camera.getFrame(currentFrame)) {
-
       response.wasDetected = false;
       return;
     }
@@ -169,7 +155,6 @@ void SquareDetectionActionHandler::execute(const CameraServer::SquareDetectorReq
   detector.detect(frame, detectionResult);
 
   if(!detectionResult.wasDetected) {
-
     response.wasDetected = false;
 
     return;
@@ -206,7 +191,6 @@ void SquareDetectionActionHandler::execute(const CameraServer::SquareDetectorReq
   cv::perspectiveTransform(imageCorners, worldCorners, homography);
 
   if(worldCorners.size() != imageCorners.size()) {
-
     response.wasDetected = false;
     return;
   }
@@ -227,7 +211,6 @@ void SquareDetectionActionHandler::execute(const CameraServer::SquareDetectorReq
   worldY /= static_cast<double>(worldCorners.size());
 
   if(!std::isfinite(worldX) || !std::isfinite(worldY)) {
-
     response.wasDetected = false;
     return;
   }
@@ -246,18 +229,12 @@ void SquareDetectionActionHandler::execute(const CameraServer::SquareDetectorReq
   // SquareAngleAdjustmentと同じ角度計算
   // =====================================================
 
-  std::array<cv::Point, 4> corners = {
-    detectionResult.topLeft,
-    detectionResult.topRight,
-    detectionResult.bottomRight,
-    detectionResult.bottomLeft
-  };
+  std::array<cv::Point, 4> corners = { detectionResult.topLeft, detectionResult.topRight,
+                                       detectionResult.bottomRight, detectionResult.bottomLeft };
 
   // Y座標が小さい2点を選択
   std::sort(corners.begin(), corners.end(),
-            [](const cv::Point& a, const cv::Point& b) {
-              return a.y < b.y;
-            });
+            [](const cv::Point& a, const cv::Point& b) { return a.y < b.y; });
 
   const auto& point1 = corners[0];
   const auto& point2 = corners[1];

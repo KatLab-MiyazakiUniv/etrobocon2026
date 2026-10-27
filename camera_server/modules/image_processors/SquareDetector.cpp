@@ -51,9 +51,7 @@ SquareDetector::SquareDetector(const cv::Rect& _roi) : roi(_roi)
   validateParameters();
 }
 
-SquareDetector::~SquareDetector()
-{
-}
+SquareDetector::~SquareDetector() {}
 
 void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& result)
 {
@@ -61,22 +59,18 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
 
   // 入力画像確認
   if(frame.empty()) {
-
     return;
   }
 
   // ROIの切り出し（画像の左右300pxを除外）
   const cv::Rect frameRect(0, 0, frame.cols, frame.rows);
   if(frame.cols <= 2 * SIDE_CROP_PX) {
-
     return;
   }
-  const cv::Rect sideCropRect(SIDE_CROP_PX, 0,
-                              frame.cols - 2 * SIDE_CROP_PX, frame.rows);
+  const cv::Rect sideCropRect(SIDE_CROP_PX, 0, frame.cols - 2 * SIDE_CROP_PX, frame.rows);
   const cv::Rect roiRect = roi & frameRect & sideCropRect;
 
   if(roiRect.empty()) {
-
     return;
   }
   const cv::Mat roiFrame = frame(roiRect);
@@ -150,11 +144,9 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
 
     // QRの候補として保存
     candidates.push_back({ rect, static_cast<double>(cluster.size()) });
-
   }
 
   if(candidates.empty()) {
-
     return;
   }
 
@@ -188,7 +180,6 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
   }
 
   if(!foundCandidate) {
-
     return;
   }
 
@@ -245,7 +236,6 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
   result.bottomRight = bottomRight;
   result.bottomLeft = bottomLeft;
   result.wasDetected = true;
-
 }
 
 void SquareDetector::setValidatedRoi(const cv::Rect& _roi)

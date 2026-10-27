@@ -1,16 +1,13 @@
-
 /**
  * @file   SquareDetectionActionHandler.cpp
  * @brief  正方形検出要求を処理し、検出結果を実距離へ変換するクラス
- *         画像取得・正方形検出・距離と角度算出の処理時間を計測する
- * @author yutaro-1214
+ * @author okuyama0528 yutaro-1214
  */
 
 #include "SquareDetectionActionHandler.h"
 
 #include <algorithm>
 #include <array>
-#include <chrono>
 #include <cmath>
 #include <limits>
 #include <vector>
@@ -52,11 +49,6 @@ namespace {
   constexpr double BOARD_WIDTH = 200.0;
 
   /**
-   * @brief 校正用紙の奥行き[mm]
-   */
-  constexpr double BOARD_HEIGHT = 200.0;
-
-  /**
    * @brief カメラから校正用紙手前端までの距離[mm]
    */
   constexpr double CAMERA_TO_BOARD_NEAR_EDGE = 200.0;
@@ -66,11 +58,6 @@ namespace {
    */
   constexpr int FRAME_CAPTURE_COUNT = 3;
 
-  /**
-   * @brief 検出回数
-   */
-  int detectionCount = 0;
-
 }  // namespace
 
 SquareDetectionActionHandler::SquareDetectionActionHandler(CameraCapture& _camera)
@@ -78,19 +65,16 @@ SquareDetectionActionHandler::SquareDetectionActionHandler(CameraCapture& _camer
 {
   initializeHomography();
 
-  LOG_CREATE("SquareDetectionActionHandler");
 }
 
 SquareDetectionActionHandler::~SquareDetectionActionHandler()
 {
-  LOG_DESTROY("SquareDetectionActionHandler");
 }
 
 void SquareDetectionActionHandler::initializeHomography()
 {
   if(IMAGE_POINTS.size() != WORLD_POINTS.size() || IMAGE_POINTS.size() < 4) {
-    Logger::error("SquareDetectionActionHandler:"
-                  "ホモグラフィ計算用の基準点が不正です");
+
     homography.release();
     return;
   }
@@ -99,16 +83,12 @@ void SquareDetectionActionHandler::initializeHomography()
   homography = cv::findHomography(IMAGE_POINTS, WORLD_POINTS, 0);
 
   if(homography.empty()) {
-    Logger::error("SquareDetectionActionHandler:"
-                  "ホモグラフィ行列の計算に失敗しました");
+
     return;
   }
 
   homography.convertTo(homography, CV_64F);
 
-  Logger::printfLog(Logger::INFO,
-                    "SquareDetectionActionHandler: "
-                    "ホモグラフィ行列を初期化しました");
 }
 
 cv::Point2f SquareDetectionActionHandler::pixelToWorld(double pixelX, double pixelY) const
@@ -136,22 +116,14 @@ cv::Point2f SquareDetectionActionHandler::pixelToWorld(double pixelX, double pix
 void SquareDetectionActionHandler::execute(const CameraServer::SquareDetectorRequest& request,
                                            CameraServer::SquareDetectorResponse& response)
 {
-  // =====================================================
-  // 距離と角度の算出時間 計測開始
-  // =====================================================
-
-  const auto startTime = std::chrono::steady_clock::now();
-
   response = {};
-  ++detectionCount;
 
   // =====================================================
   // ホモグラフィ確認
   // =====================================================
 
   if(homography.empty()) {
-    Logger::error("SquareDetectionActionHandler:"
-                  "ホモグラフィ行列が初期化されていません");
+
     response.wasDetected = false;
     return;
   }
@@ -169,20 +141,16 @@ void SquareDetectionActionHandler::execute(const CameraServer::SquareDetectorReq
     cv::Mat currentFrame;
 
     if(!camera.getFrame(currentFrame)) {
-      Logger::error("SquareDetectionActionHandler:"
-                    "フレームの取得に失敗しました");
+
       response.wasDetected = false;
       return;
     }
 
-    // 検出には最後のフレームしか使用しないため、コピーも最後だけにする
+    // 検出に使う最後のフレームのみをコピーする
     if(i == FRAME_CAPTURE_COUNT - 1) {
       frame = currentFrame.clone();
     }
   }
-
-  // 画像取得終了時刻
-  const auto captureEndTime = std::chrono::steady_clock::now();
 
   // =====================================================
   // 2. ROI設定
@@ -200,25 +168,10 @@ void SquareDetectionActionHandler::execute(const CameraServer::SquareDetectorReq
 
   detector.detect(frame, detectionResult);
 
-  // 正方形検出終了時刻（ROI設定の時間を含む）
-  const auto detectEndTime = std::chrono::steady_clock::now();
-
   if(!detectionResult.wasDetected) {
-    Logger::printfLog(Logger::WARNING,
-                      "SquareDetectionActionHandler: "
-                      "検出 #%d 正方形を検出できませんでした",
-                      detectionCount);
 
     response.wasDetected = false;
 
-    const double captureMs
-        = std::chrono::duration<double, std::milli>(captureEndTime - startTime).count();
-    const double detectMs
-        = std::chrono::duration<double, std::milli>(detectEndTime - captureEndTime).count();
-    Logger::printfLog(Logger::INFO,
-                      "[SquareProfile] status=NOT_DETECTED capture=%.2f ms "
-                      "detect=%.2f ms total=%.2f ms",
-                      captureMs, detectMs, captureMs + detectMs);
     return;
   }
 
@@ -253,8 +206,7 @@ void SquareDetectionActionHandler::execute(const CameraServer::SquareDetectorReq
   cv::perspectiveTransform(imageCorners, worldCorners, homography);
 
   if(worldCorners.size() != imageCorners.size()) {
-    Logger::warning("SquareDetectionActionHandler:"
-                    "ホモグラフィ変換に失敗しました");
+
     response.wasDetected = false;
     return;
   }
@@ -275,18 +227,9 @@ void SquareDetectionActionHandler::execute(const CameraServer::SquareDetectorReq
   worldY /= static_cast<double>(worldCorners.size());
 
   if(!std::isfinite(worldX) || !std::isfinite(worldY)) {
-    Logger::error("SquareDetectionActionHandler:"
-                  "実座標の計算結果が不正です");
+
     response.wasDetected = false;
     return;
-  }
-
-  if(worldX < 0.0 || worldX > BOARD_WIDTH || worldY < 0.0 || worldY > BOARD_HEIGHT) {
-    Logger::printfLog(Logger::WARNING,
-                      "SquareDetectionActionHandler: "
-                      "変換結果が校正用紙の範囲外です "
-                      "(%.2f, %.2f)",
-                      worldX, worldY);
   }
 
   // =====================================================
@@ -340,41 +283,7 @@ void SquareDetectionActionHandler::execute(const CameraServer::SquareDetectorReq
   response.forwardDistance = forwardDistance;
   response.lateralDistance = lateralDistance;
 
-  // =====================================================
-  // 10. 計測終了
-  // =====================================================
-
-  const auto endTime = std::chrono::steady_clock::now();
-
-  const double elapsedSeconds
-      = std::chrono::duration<double>(endTime - startTime).count();
-
-  const double captureMs
-      = std::chrono::duration<double, std::milli>(captureEndTime - startTime).count();
-  const double detectMs
-      = std::chrono::duration<double, std::milli>(detectEndTime - captureEndTime).count();
-  const double calculateMs
-      = std::chrono::duration<double, std::milli>(endTime - detectEndTime).count();
-
-  // 1行に3区間の時間をまとめて記録する
-  Logger::printfLog(Logger::INFO,
-                    "[SquareProfile] capture=%.2f ms detect=%.2f ms "
-                    "calculate=%.2f ms total=%.2f ms",
-                    captureMs, detectMs, calculateMs,
-                    captureMs + detectMs + calculateMs);
-
-  // =====================================================
-  // 従来どおり距離・角度・合計時間を出力
-  // =====================================================
-
-  Logger::printfLog(Logger::INFO,
-                    "[SquareTime] "
-                    "time=%.4f sec "
-                    "forward=%.2f mm "
-                    "lateral=%.2f mm "
-                    "angle=%.2f deg",
-                    elapsedSeconds,
-                    forwardDistance,
-                    lateralDistance,
-                    angleDeg);
+  // 現行のレスポンスには角度フィールドがないため、値はここでは返していない。
+  // 元の計算手順は維持する。
+  (void)angleDeg;
 }

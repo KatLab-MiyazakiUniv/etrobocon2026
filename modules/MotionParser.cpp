@@ -419,95 +419,105 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       return new ETZumoFinish(robot, std::move(condition), std::move(children), mileage);
     }
     case MOTION_COMMAND::ET_ZUMO_EXIT: {
-      // ETZumoExit:
-      // motionParams[0]=コマンド名
-      // motionParams[1]=動作ID
-      // motionParams[2]=CameraTrackingの動作ID
-      // motionParams[3]=DistanceOrUltraSonicの条件ID
-      // motionParams[4]=AbsoluteRotationの動作ID
-      // motionParams[5]=AbsoluteAngleの条件ID
-      // motionParams[6]=Straightの動作ID
+      // ETZumoExit: motionParams[0]=コマンド名
+      //             motionParams[1]=動作ID
+      //             motionParams[2]=0度方向への目標移動距離[mm]
+      //             motionParams[3]=CameraTrackingの動作ID
+      //             motionParams[4]=DistanceOrUltraSonicの条件ID
+      //             motionParams[5]=AbsoluteRotationの動作ID
+      //             motionParams[6]=AbsoluteAngleの条件ID
+      //             motionParams[7]=Straightの動作ID
 
-      // 必要な列数を確認する。
-      if(motionParams.size() != 7) {
+      // 必要な列数と目標距離を確認する。距離は有限の正の値のみ受け付ける。
+      if(motionParams.size() != 8 && motionParams.size() != 9) {
         Logger::printfLog(Logger::ERROR,
                           "[MotionParser] ETZumoExit: "
-                          "動作パラメータは7列必要です（実際: %zu列）",
+                          "動作パラメータは8列（任意の到着色を含む場合9列）必要です（実際: %zu列）",
                           motionParams.size());
         return nullptr;
       }
+      double targetDistance;
+      try {
+        targetDistance = fromString<double>(motionParams[2]);
+      } catch(const std::invalid_argument&) {
+        Logger::printfLog(Logger::ERROR,
+                          "[MotionParser] ETZumoExit ID=%s: 目標距離を数値に変換できません: %s",
+                          motionParams[1].c_str(), motionParams[2].c_str());
+        return nullptr;
+      }
+      if(!std::isfinite(targetDistance) || targetDistance <= 0.0) {
+        Logger::printfLog(Logger::ERROR,
+                          "[MotionParser] ETZumoExit ID=%s: 目標距離は有限の正の値が必要です: %s",
+                          motionParams[1].c_str(), motionParams[2].c_str());
+        return nullptr;
+      }
 
+      // 全ての子動作で同じ距離計測を共有し、動作が切り替わっても積算値を引き継ぐ。
+      auto mileage = sharedMileage ? sharedMileage : make_shared<ProjectedMileage>();
       vector<unique_ptr<BaseMotion>> motions;
 
       const string names[] = { "CameraTracking", "AbsoluteRotation", "Straight" };
-
-      const string ids[] = { motionParams[2], motionParams[4], motionParams[6] };
-
+      const string ids[] = { motionParams[3], motionParams[5], motionParams[7] };
       const string conditionNames[] = { "DistanceOrUltraSonic", "AbsoluteAngle" };
-
-      const string conditionIds[] = { motionParams[3], motionParams[5] };
+      const string conditionIds[] = { motionParams[4], motionParams[6] };
 
       for(int i = 0; i < 3; ++i) {
-        // 対応する動作CSVからパラメータを取得する。
+        // 速度やPIDゲインなどを、対応する動作CSVから取得する。
         auto params = extractParamsFromID(MOTIONS_PATH + names[i] + ".csv", ids[i]);
-
         if(params.empty()) {
-          Logger::printfLog(Logger::ERROR,
-                            "[MotionParser] ETZumoExit ID=%s: "
-                            "子動作の設定を取得できません: %s ID=%s",
-                            motionParams[1].c_str(), names[i].c_str(), ids[i].c_str());
+          Logger::printfLog(
+              Logger::ERROR,
+              "[MotionParser] ETZumoExit ID=%s: 子動作の設定を取得できません: %s ID=%s",
+              motionParams[1].c_str(), names[i].c_str(), ids[i].c_str());
           return nullptr;
         }
 
+        // 追尾は実走行距離または超音波検知、回頭は目標角度を個別の終了条件にする。
         unique_ptr<BaseContinuationCondition> continuationCondition;
-
         if(i < 2) {
-          // CameraTrackingとAbsoluteRotationには既存の条件を設定する。
           auto conditionParams
               = extractParamsFromID(CONDITIONS_PATH + conditionNames[i] + ".csv", conditionIds[i]);
-
           if(conditionParams.empty()) {
-            Logger::printfLog(Logger::ERROR,
-                              "[MotionParser] ETZumoExit ID=%s: "
-                              "子動作の条件設定を取得できません: %s ID=%s",
-                              motionParams[1].c_str(), conditionNames[i].c_str(),
-                              conditionIds[i].c_str());
+            Logger::printfLog(
+                Logger::ERROR,
+                "[MotionParser] ETZumoExit ID=%s: 子動作の条件設定を取得できません: %s ID=%s",
+                motionParams[1].c_str(), conditionNames[i].c_str(), conditionIds[i].c_str());
             return nullptr;
           }
-
           continuationCondition = createConditionInstance(robot, conditionParams);
-
           if(!continuationCondition) {
-            Logger::printfLog(Logger::ERROR,
-                              "[MotionParser] ETZumoExit ID=%s: "
-                              "継続条件の生成に失敗しました: %s ID=%s",
-                              motionParams[1].c_str(), conditionNames[i].c_str(),
-                              conditionIds[i].c_str());
+            Logger::printfLog(
+                Logger::ERROR,
+                "[MotionParser] ETZumoExit ID=%s: 継続条件の生成に失敗しました: %s ID=%s",
+                motionParams[1].c_str(), conditionNames[i].c_str(), conditionIds[i].c_str());
             return nullptr;
           }
-        } else {
-          // 最後のStraightはGRAY検知条件で終了する。
-          continuationCondition
-              = make_unique<SensorColorCondition>(robot, ColorSensorController::COLOR::GRAY);
         }
 
-        // 子動作を生成する。
-        unique_ptr<BaseMotion> motion(
-            createMotionInstance(robot, params, std::move(continuationCondition)));
+        const bool requireColor = i == 2 && motionParams.size() == 9;
+        if(requireColor) {
+          auto color = ColorSensorController::convertStringToColor(motionParams[8]);
+          if(color == ColorSensorController::COLOR::NONE) return nullptr;
+          continuationCondition = make_unique<SensorColorCondition>(robot, color);
+        }
+        // 0度方向への積算距離が目標に達した場合は、個別の条件に関係なく終了する。
+        auto projectedCondition = make_unique<ETZumoExitCondition>(
+            robot, mileage, targetDistance, std::move(continuationCondition), requireColor);
 
+        // 途中で生成に失敗しても、生成済みの子動作はunique_ptrによって解放される。
+        unique_ptr<BaseMotion> motion(
+            createMotionInstance(robot, params, std::move(projectedCondition)));
         if(!motion) {
           Logger::printfLog(Logger::ERROR,
-                            "[MotionParser] ETZumoExit ID=%s: "
-                            "子動作の生成に失敗しました: %s ID=%s",
+                            "[MotionParser] ETZumoExit ID=%s: 子動作の生成に失敗しました: %s ID=%s",
                             motionParams[1].c_str(), names[i].c_str(), ids[i].c_str());
           return nullptr;
         }
-
         motions.push_back(std::move(motion));
       }
 
-      // 子動作を複合動作へ渡す。
-      return new ETZumoExit(robot, std::move(condition), std::move(motions));
+      // 子動作リストを複合動作へ渡す。
+      return new ETZumoExit(robot, std::move(condition), mileage, std::move(motions));
     }
     case MOTION_COMMAND::STRAIGHT: {
       if(motionParams.size() < 9) {

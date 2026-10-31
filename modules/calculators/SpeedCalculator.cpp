@@ -41,7 +41,7 @@ double SpeedCalculator::calculateRightMotorPower()
 
 double SpeedCalculator::calculateLeftMotorPower()
 {
-  rightMotorPower = getPowerFromSpeed(targetSpeed);  // rightMotorPowerの初期化
+  leftMotorPower = getPowerFromSpeed(targetSpeed);  // leftMotorPowerの初期化
   CsvLogger::current_logData.currentLeftMotorPower = leftMotorPower;
 
   // 左タイヤの走行速度を算出

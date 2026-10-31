@@ -60,6 +60,7 @@ double Pid::calculatePid(double currentValue)
   if(prevTime <= 0) {
     prevTime = ClockUtil::now();
     Logger::warning("PIDの初回呼び出し時間が設定されていません");
+    return 0.0;
   }
   // 現在の時間を取得
   double currentTime = ClockUtil::now();
@@ -68,8 +69,8 @@ double Pid::calculatePid(double currentValue)
   // 前回の時間を更新する
   prevTime = currentTime;
 
-  // 0除算を避けるために delta=0 の場合はデフォルト周期0.01とする
-  if(delta <= 0) delta = 0.01;
+  // 0除算を避けるために delta = 0.01(10ms) 以下の場合はデフォルト周期0.01とする
+  if(delta <= 0.01) delta = 0.01;
 
   // 現在の目標値との偏差を求める
   double currentDeviation = targetValue - currentValue;

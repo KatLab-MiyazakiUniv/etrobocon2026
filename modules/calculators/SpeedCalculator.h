@@ -10,6 +10,7 @@
 #include "Pid.h"
 #include "Robot.h"
 #include "SystemInfo.h"
+#include "CsvLogger.h"
 
 class SpeedCalculator {
  public:
@@ -42,6 +43,12 @@ class SpeedCalculator {
    */
   double calculateLeftMotorPower();
 
+  /**
+   * @brief 目標走行速度に相当するのPower値の初期値を算出
+   * @return 走行速度に相当するタイヤのPower値
+   */
+  int getPowerFromSpeed(int speed);
+
  private:
   const double targetSpeed;  // 目標速度(mm/秒)
   Pid rightPid;              // 目標速度に対する右車輪のPID制御を行うクラスのインスタンス
@@ -51,5 +58,24 @@ class SpeedCalculator {
   Robot& robot;              // Robotクラスのインスタンスの参照
   static const Pid::PidGain DEFAULT_RIGHT_PID;  // 右車輪用のデフォルトPIDゲイン
   static const Pid::PidGain DEFAULT_LEFT_PID;   // 左車輪用のデフォルトPIDゲイン
+
+  // 正方向の目標速度に応じたPower値定義
+  static constexpr int MOTOR_POWER_AT_550 = 100;  // 550以上
+  static constexpr int MOTOR_POWER_AT_500 = 50;
+  static constexpr int MOTOR_POWER_AT_400 = 50;
+  static constexpr int MOTOR_POWER_AT_300 = 50;
+  static constexpr int MOTOR_POWER_AT_200 = 50;
+  static constexpr int MOTOR_POWER_AT_100 = 50;
+
+  // 停止
+  static constexpr int MOTOR_POWER_STOP = 0;
+
+  // 負方向（後退）の目標速度に応じたPower値定義
+  static constexpr int MOTOR_POWER_AT_MINUS_100 = -50;
+  static constexpr int MOTOR_POWER_AT_MINUS_200 = -50;
+  static constexpr int MOTOR_POWER_AT_MINUS_300 = -50;
+  static constexpr int MOTOR_POWER_AT_MINUS_400 = -50;
+  static constexpr int MOTOR_POWER_AT_MINUS_500 = -50;
+  static constexpr int MOTOR_POWER_AT_MINUS_550 = -100;  // -550以下
 };
 #endif

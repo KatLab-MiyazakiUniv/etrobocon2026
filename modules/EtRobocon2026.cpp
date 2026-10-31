@@ -256,6 +256,14 @@ void EtRobocon2026::start()
   int voltage = BatteryController::getVoltage();
   Logger::printfLog(Logger::INFO, "バッテリー電圧: %d mV", voltage);
 
+  // runlogのファイル名を作成
+  std::tm jstTime = Utils::getLocalTime();
+  char buffer[128];
+  std::snprintf(buffer, sizeof(buffer), "runlog_%d-%d_%d-%d-%d_voltage%dmv.csv", jstTime.tm_mon,
+                jstTime.tm_mday, jstTime.tm_hour, jstTime.tm_min, jstTime.tm_sec, voltage);
+  std::string runlogFileName = buffer;
+  CsvLogger::setFileName(runlogFileName);
+
   // ========================================
   // コース設定
   // ========================================

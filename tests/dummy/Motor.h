@@ -1,4 +1,3 @@
-
 /**
  * @file Motor.h
  * @brief モータクラス(ダミー)
@@ -11,6 +10,8 @@
 #include <stdint.h>
 #include "Port.h"
 #include "spikeapi.h"
+// デバッグ
+#include "Logger.h"
 
 namespace spikeapi {
   /**
@@ -56,7 +57,9 @@ namespace spikeapi {
         return count;
       }
 
-      count += speed * 0.05;
+      // Speed値とPower値の両方で増加
+      count += speed * 0.025;
+      count += power * 0.025;
       return count;
     }
     int32_t getCount() const { return count; }
@@ -90,10 +93,10 @@ namespace spikeapi {
      * @param power モータのパワー値（-100 ～ +100）
      * @return -
      */
-    void setPower(int power)
+    void setPower(int _power)
     {
-      this->power = power;
-      count += power * 0.05;
+      this->power = _power;
+      count += _power * 0.05;
       isSetSpeed = false;
     }
 

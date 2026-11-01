@@ -66,6 +66,7 @@ class SpeedCalculator {
   static constexpr int MOTOR_POWER_AT_300 = 50;
   static constexpr int MOTOR_POWER_AT_200 = 50;
   static constexpr int MOTOR_POWER_AT_100 = 50;
+  static constexpr int MOTOR_POWER_AT_MOVE = 30;  // 実機を動かす最低限のpower値
 
   // 停止
   static constexpr int MOTOR_POWER_STOP = 0;
@@ -77,5 +78,6 @@ class SpeedCalculator {
   static constexpr int MOTOR_POWER_AT_MINUS_400 = -50;
   static constexpr int MOTOR_POWER_AT_MINUS_500 = -50;
   static constexpr int MOTOR_POWER_AT_MINUS_550 = -100;  // -550以下
+  static constexpr int MOTOR_POWER_AT_MINUS_MOVE = -30;  // 実機を動かす最低限のpower値
 };
 #endif

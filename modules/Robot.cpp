@@ -1,3 +1,4 @@
+
 /**
  * @file   Robot.cpp
  * @brief  走行システム全体で再利用する外部リソースを管理するクラス
@@ -5,18 +6,25 @@
  */
 
 #include "Robot.h"
+#include "Logger.h"
 
 Robot::Robot(SocketClient& _cameraSocketClient)
   : wheelMotorController(),
     armMotorController(),
     imuController(),
     colorSensorController(),
+    colorDataManager(),
+    colorClassifier(colorDataManager),
     ultraSonicController(),
     cameraSocketClient(_cameraSocketClient),
     button(),
     forceSensor(EPort::PORT_D),
     display()
 {
+  // CSVから色データを読み込む
+  if(!colorDataManager.loadFromCsv()) {
+    Logger::error("Robot: failed to load color data");
+  }
 }
 
 WheelMotorController& Robot::getWheelMotorControllerInstance()
@@ -37,6 +45,11 @@ IMUController& Robot::getIMUControllerInstance()
 ColorSensorController& Robot::getColorSensorControllerInstance()
 {
   return colorSensorController;
+}
+
+ColorClassifier& Robot::getColorClassifierInstance()
+{
+  return colorClassifier;
 }
 
 UltraSonicController& Robot::getUltraSonicControllerInstance()
@@ -129,6 +142,7 @@ MapData& Robot::getMapDataInstance()
 {
   return mapData;
 }
+
 bool Robot::getHaveQR1contents() const
 {
   return haveQR1contents;
@@ -147,4 +161,9 @@ void Robot::setHaveQR1contents()
 void Robot::setHaveQR2contents()
 {
   haveQR2contents = true;
+}
+
+ColorDataManager& Robot::getColorDataManagerInstance()
+{
+  return colorDataManager;
 }

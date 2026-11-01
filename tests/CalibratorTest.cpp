@@ -98,6 +98,7 @@ namespace etrobocon2026_test {
     EXPECT_EQ("1234", actual);
 
     std::remove("etrobocon2026/key.txt");
-    std::filesystem::remove("etrobocon2026");
+    // テスト中に生成されたファイル・ディレクトリをまとめて削除
+    std::filesystem::remove_all("etrobocon2026");
   }
 }  // namespace etrobocon2026_test

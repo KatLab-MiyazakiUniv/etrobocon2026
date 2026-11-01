@@ -28,18 +28,27 @@ bool SensorColorCondition::shouldContinue()
     Logger::error("目標色が無効です。動作を終了します。");
     return false;
   }
-  // HSV値を取得
+
   ColorSensorController::HSV hsv;
   robot.getColorSensorControllerInstance().getRawHSV(hsv, true);
 
-  ColorSensorController::COLOR CurrentColor
-      = robot.getColorSensorControllerInstance().convertHsvToColor(hsv);
-  if(CurrentColor == targetColor) {
+  ColorSensorController::COLOR currentColor = ColorSensorController::COLOR::NONE;
+
+  // 校正済みデータがあれば ColorClassifier を使う
+  const auto* colorData = robot.getColorDataManagerInstance().getColorData(targetColor);
+  if(colorData != nullptr && colorData->acquired) {
+    currentColor = robot.getColorClassifierInstance().classify(hsv);
+  } else {
+    // 互換性のため従来の判定にフォールバック
+    currentColor = robot.getColorSensorControllerInstance().convertHsvToColor(hsv);
+  }
+
+  if(currentColor == targetColor) {
     colorCount++;
   } else {
     colorCount = 0;
   }
-  // 指定された色をJUDGE_COUNT回連続で取得したときモータが止まる
+
   if(colorCount >= JUDGE_COUNT) {
     Logger::info("Target color detected");
     return false;

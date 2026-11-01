@@ -132,10 +132,8 @@ EtRallyMotion::EtRallyMotion(Robot& _robot,
                              std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                              const Pid::PidGain& _rotationPid,
                              const Pid::PidGain& _squareRotationPid,
-                             const Pid::PidGain& _straightAnglePid,
-                             double _targetSpeed,
-                             double _straightDeadbandRate,
-                             double _straightMaxoutRate)
+                             const Pid::PidGain& _straightAnglePid, double _targetSpeed,
+                             double _straightDeadbandRate, double _straightMaxoutRate)
   : BaseMotion(_robot, std::make_unique<EtRallyCompletionCondition>(
                            _robot, [this]() { return !completed; })),
     rotationPid(_rotationPid),
@@ -216,8 +214,7 @@ void EtRallyMotion::executeStep()
    */
   Direction currentDirection = convertDirection(Direction::RIGHT, course);
 
-  constexpr GoalColor TARGET_COLORS[]
-      = { GoalColor::RED, GoalColor::BLUE, GoalColor::YELLOW };
+  constexpr GoalColor TARGET_COLORS[] = { GoalColor::RED, GoalColor::BLUE, GoalColor::YELLOW };
 
   // PIDゲイン・走行速度などはMotions/ETRally.csvからMotionParser経由で設定済み。
 
@@ -242,22 +239,20 @@ void EtRallyMotion::executeStep()
     // ----------------------------------------
     // QR方向へ回頭
     // ----------------------------------------
-    auto rotateCondition = std::make_unique<RelativeAngleCondition>(
-        robot, result.correctionAngle, ROTATION_TOLERANCE);
+    auto rotateCondition = std::make_unique<RelativeAngleCondition>(robot, result.correctionAngle,
+                                                                    ROTATION_TOLERANCE);
 
-    RelativeRotation rotate(robot, std::move(rotateCondition),
-                            squareRotationPid, result.correctionAngle);
+    RelativeRotation rotate(robot, std::move(rotateCondition), squareRotationPid,
+                            result.correctionAngle);
 
     rotate.run();
 
     // ----------------------------------------
     // QRまで直進
     // ----------------------------------------
-    auto straightCondition
-        = std::make_unique<DistanceCondition>(robot, result.straightDistance);
+    auto straightCondition = std::make_unique<DistanceCondition>(robot, result.straightDistance);
 
-    Straight straight(robot, std::move(straightCondition),
-                      targetSpeed, straightAnglePid, true,
+    Straight straight(robot, std::move(straightCondition), targetSpeed, straightAnglePid, true,
                       straightDeadbandRate, straightMaxoutRate);
 
     straight.run();
@@ -265,11 +260,11 @@ void EtRallyMotion::executeStep()
     // ----------------------------------------
     // 元のETラリー開始方向へ戻す
     // ----------------------------------------
-    auto returnCondition = std::make_unique<RelativeAngleCondition>(
-        robot, -result.correctionAngle, ROTATION_TOLERANCE);
+    auto returnCondition = std::make_unique<RelativeAngleCondition>(robot, -result.correctionAngle,
+                                                                    ROTATION_TOLERANCE);
 
-    RelativeRotation returnRotate(robot, std::move(returnCondition),
-                                  squareRotationPid, -result.correctionAngle);
+    RelativeRotation returnRotate(robot, std::move(returnCondition), squareRotationPid,
+                                  -result.correctionAngle);
 
     returnRotate.run();
 
@@ -308,8 +303,7 @@ void EtRallyMotion::executeStep()
 
   while(true) {
     for(const GoalColor targetColor : TARGET_COLORS) {
-      Logger::printfLog(Logger::INFO, "Lap %d Target=%s",
-                        lap, colorToString(targetColor));
+      Logger::printfLog(Logger::INFO, "Lap %d Target=%s", lap, colorToString(targetColor));
 
       GateRouteResult routeResult
           = routePlanner.search(currentGridX, currentGridY, currentDirection, targetColor);

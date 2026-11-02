@@ -65,6 +65,12 @@ double Pid::calculatePid(double currentValue)
   double currentTime = ClockUtil::now();
   // 周期を計算
   double delta = (currentTime - prevTime) / 1000;
+
+  //周期の調査のためにログを追加byそうし
+  CsvLogger::current_logData.delta
+      = delta;
+
+
   // 前回の時間を更新する
   prevTime = currentTime;
 

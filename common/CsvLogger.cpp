@@ -39,13 +39,21 @@ const std::vector<std::string> CsvLogger::HEADERS = {
   "targetSpeed",
   "currentRightMotorPower",
   "currentRightSpeed",
+
+  "afterDetectionRightSpeed",
+
   "baseRightPower",
   "currentLeftMotorPower",
   "currentLeftSpeed",
+
+  "afterDetectionLeftSpeed",
+
   "baseLeftPower",
   "turningPower",
   "finalRightMotorPower",
   "finalLeftMotorPower",
+
+  "delat",
 };
 // CSVログの初期化
 void CsvLogger::init()
@@ -142,13 +150,23 @@ void CsvLogger::add(LogData& data)
   appendField(rowStr, localData.targetSpeed, false);
   appendField(rowStr, localData.currentRightMotorPower, false);
   appendField(rowStr, localData.currentRightSpeed, false);
+
+  appendField(rowStr, localData.afterDetectionRightSpeed, false);
+
   appendField(rowStr, localData.baseRightPower, false);
   appendField(rowStr, localData.currentLeftMotorPower, false);
   appendField(rowStr, localData.currentLeftSpeed, false);
+
+  appendField(rowStr, localData.afterDetectionLeftSpeed, false);
+
   appendField(rowStr, localData.baseLeftPower, false);
   appendField(rowStr, localData.turningPower, false);
   appendField(rowStr, localData.finalRightMotorPower, false);
+  appendField(rowStr, localData.finalLeftMotorPower, false);
+
   appendField(rowStr, localData.finalLeftMotorPower, true);  // 最後のみ isLast = true
+
+
   rowStr += "\n";
 
   int written = snprintf(&logs[currentIndex], remainBuffer, "%s", rowStr.c_str());

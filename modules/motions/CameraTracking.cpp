@@ -159,6 +159,12 @@ void CameraTracking::executeStep()
     return;
   }
 
+// 色領域検出処理後のモーターのスピード値を取得する
+  CsvLogger::current_logData.afterDetectionRightSpeed
+      = robot.getWheelMotorControllerInstance().getRightSpeed();
+    CsvLogger::current_logData.afterDetectionLeftSpeed
+ = robot.getWheelMotorControllerInstance().getLeftSpeed();
+
   // 旋回値の計算
   double turningPower = cameraPid.calculatePid(currentX) * -1;
   CsvLogger::current_logData.turningPower = turningPower;

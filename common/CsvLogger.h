@@ -52,13 +52,20 @@ struct LogData {
   std::optional<double> targetSpeed;          // targetSpeed
   std::optional<int> currentRightMotorPower;  // スピカル内のモーターの初期値
   std::optional<int> currentRightSpeed;       // 公式apiで取得したモーター速度
+  std::optional<int> afterDetectionRightSpeed;       // 公式apiで取得したモーター速度(画像処理処理後)
   std::optional<int> baseRightPower;          // 旋回量を加える前の値
   std::optional<int> currentLeftMotorPower;   // スピカル内のモーターの初期値
   std::optional<int> currentLeftSpeed;        // 公式apiで取得したモーター速度
+  std::optional<int> afterDetectionLeftSpeed;       // 公式apiで取得したモーター速度(画像処理処理後)
   std::optional<int> baseLeftPower;           // 旋回量を加える前の値
   std::optional<int> turningPower;            // 旋回量
   std::optional<int> finalRightMotorPower;    // 最終値
   std::optional<int> finalLeftMotorPower;     // 最終値
+                                              
+// Pidのログ定義
+  std::optional<double> delta;          // pidで使用している周期(分岐前)
+
+
   // 今後新しいセンサー値（例: gyro）を追加したい場合は、ここに std::optional<int> gyro;
 };
 

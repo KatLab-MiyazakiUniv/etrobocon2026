@@ -18,6 +18,8 @@
 #include "ForceSensor.h"
 #include "Display.h"
 #include "MapData.h"
+#include "ColorDataManager.h"
+#include "ColorClassifier.h"
 #include <cstring>
 
 class Robot {
@@ -179,6 +181,18 @@ class Robot {
    */
   void setRunningStartTime();
 
+  /**
+   * @brief ColorClassifierのインスタンスの参照を返す
+   * @return ColorClassifierのインスタンスの参照
+   */
+  ColorClassifier& getColorClassifierInstance();
+
+  /**
+   * @brief ColorDataManagerのインスタンスの参照を返す
+   * @return ColorDataManagerのインスタンスの参照
+   */
+  ColorDataManager& getColorDataManagerInstance();
+
  private:
   WheelMotorController wheelMotorController;    // WheelMotorController インスタンス
   ArmMotorController armMotorController;        // ArmMotorController インスタンス
@@ -186,17 +200,19 @@ class Robot {
   ColorSensorController colorSensorController;  // ColorSensorController インスタンス
   UltraSonicController ultraSonicController;    // UltraSonicController インスタンス
   SocketClient& cameraSocketClient;             // カメラサーバー用の SocketClient インスタンス
-  Course course = Course::Left;                 // コース(Left or Right)
-  Edge edge = Edge::LeftEdge;                   // エッジの左右判定
-  int runningStartTime = 0;                     // 走行開始時間
-  spikeapi::Button button;                      // Buttonインスタンス
-  spikeapi::ForceSensor forceSensor;            // ForceSensorインスタンス
-  spikeapi::Display display;                    // Displayインスタンス
-  char decryptionKey[5] = { 0 };                // 復号キー
-  int targetBrightness = 50;                    // 目標輝度
-  int indexOfLabel = 0;                         // ボトルキャリーで取得した色範囲のインデックス
-  MapData mapData;                              // ゲート位置情報
-  bool haveQR1contents = false;                 // QR1を検出済みかのフラグ
-  bool haveQR2contents = false;                 // QR2を検出済みかのフラグ
+  ColorDataManager colorDataManager;
+  ColorClassifier colorClassifier;
+  Course course = Course::Left;       // コース(Left or Right)
+  Edge edge = Edge::LeftEdge;         // エッジの左右判定
+  int runningStartTime = 0;           // 走行開始時間
+  spikeapi::Button button;            // Buttonインスタンス
+  spikeapi::ForceSensor forceSensor;  // ForceSensorインスタンス
+  spikeapi::Display display;          // Displayインスタンス
+  char decryptionKey[5] = { 0 };      // 復号キー
+  int targetBrightness = 50;          // 目標輝度
+  int indexOfLabel = 0;               // ボトルキャリーで取得した色範囲のインデックス
+  MapData mapData;                    // ゲート位置情報
+  bool haveQR1contents = false;       // QR1を検出済みかのフラグ
+  bool haveQR2contents = false;       // QR2を検出済みかのフラグ
 };
 #endif

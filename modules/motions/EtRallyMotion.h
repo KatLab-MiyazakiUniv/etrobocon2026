@@ -106,6 +106,7 @@ class EtRallyMotion : public BaseMotion {
    */
   static bool hasAllGates(const MapData& mapData);
 
+  bool completed = false;          // ETラリー処理の完了フラグ
   Pid::PidGain rotationPid;        // 90度回頭などの通常回頭PID
   Pid::PidGain squareRotationPid;  // QR補正などの調整回頭PID
   Pid::PidGain straightAnglePid;   // 直進角度PID

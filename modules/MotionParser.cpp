@@ -665,7 +665,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       // [2..4] 通常回頭PID(Kp, Ki, Kd)
       // [5..7] 調整回頭PID(Kp, Ki, Kd)
       // [8..10] 直進角度PID(Kp, Ki, Kd)
-      if(motionParams.size() < 11) {
+      if(motionParams.size() < 14) {
         Logger::printfLog(Logger::ERROR,
                           "[MotionParser] ETRallyのPIDパラメータ数が不足しています（14列必要）");
         return nullptr;

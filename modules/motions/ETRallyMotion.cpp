@@ -1,6 +1,6 @@
 /**
  * @file   EtRallyMotion.cpp
- * @brief  ETラリー全体の動作を管理するクラス
+ * @brief  ETラリーの経路探索・継続周回・QR補正
  * @author okuyama0528
  */
 
@@ -8,12 +8,125 @@
 
 namespace {
 
+  // ETラリー全体を1回だけ実行するための継続条件。
+  // CSV由来の外部条件により、走行前にスキップされることを防ぐ。
+  class EtRallyCompletionCondition : public BaseContinuationCondition {
+   public:
+    EtRallyCompletionCondition(Robot& _robot, std::function<bool()> _notCompleted)
+      : BaseContinuationCondition(_robot), notCompleted(std::move(_notCompleted))
+    {
+    }
+
+    bool shouldContinue() override { return notCompleted(); }
+
+   private:
+    std::function<bool()> notCompleted;
+  };
+
   /**
    * @brief 回頭終了判定許容誤差[deg]
+   *
+   * RouteFollowerと同じ値を使用する。
    */
   constexpr double ROTATION_TOLERANCE = 2.0;
 
+  /**
+   * @brief 外周ゲートか判定する
+   * @param gate 判定するゲート
+   * @return true 外周ゲート
+   * @return false 内側ゲート
+   */
+  bool isOuterGate(const Gate& gate)
+  {
+    // 横向きゲート
+    if(gate.start.y == gate.end.y) {
+      const int gateY = gate.start.y;
+      return gateY == 1 || gateY == SystemInfo::Y_GRID_NUM - 1;
+    }
+
+    // 縦向きゲート
+    if(gate.start.x == gate.end.x) {
+      const int gateX = gate.start.x;
+      return gateX == 1 || gateX == SystemInfo::X_GRID_NUM - 1;
+    }
+
+    return false;
+  }
 }  // namespace
+
+/**
+ * @brief Lコース座標を現在コース用へ変換する
+ * @param point Lコース座標
+ * @return 現在コース用へ変換した座標
+ */
+Point EtRallyMotion::convertPoint(const Point& point, Course course)
+{
+  if(course == Course::Right) {
+    return CourseMirror::mirrorPoint(point);
+  }
+  return point;
+}
+
+/**
+ * @brief Lコース方向を現在コース用へ変換する
+ * @param direction Lコース方向
+ * @return 現在コース用へ変換した方向
+ */
+Direction EtRallyMotion::convertDirection(Direction direction, Course course)
+{
+  if(course == Course::Right) {
+    return CourseMirror::mirrorDirection(direction);
+  }
+  return direction;
+}
+
+/**
+ * @brief GoalColorを文字列へ変換する
+ * @param color 変換するゲート色
+ * @return GoalColorを表す文字列
+ */
+const char* EtRallyMotion::colorToString(GoalColor color)
+{
+  switch(color) {
+    case GoalColor::RED:
+      return "RED";
+    case GoalColor::BLUE:
+      return "BLUE";
+    case GoalColor::YELLOW:
+      return "YELLOW";
+  }
+  return "UNKNOWN";
+}
+
+/**
+ * @brief 指定した色のゲートを取得する
+ * @param mapData マップ情報
+ * @param color 取得するゲート色
+ * @return 指定色のゲートへのポインタ
+ * @return nullptr 指定色のゲートが存在しない場合
+ */
+const Gate* EtRallyMotion::findGate(const MapData& mapData, GoalColor color)
+{
+  for(const Gate& gate : mapData.getGates()) {
+    if(gate.color == color) {
+      return &gate;
+    }
+  }
+  return nullptr;
+}
+
+/**
+ * @brief 必要な3色のゲート情報がすべて存在するか判定する
+ * @param mapData マップ情報
+ * @return true RED、BLUE、YELLOWがすべて存在する
+ * @return false 1つ以上のゲート情報が存在しない
+ */
+bool EtRallyMotion::hasAllGates(const MapData& mapData)
+{
+  return findGate(mapData, GoalColor::RED) != nullptr
+         && findGate(mapData, GoalColor::BLUE) != nullptr
+         && findGate(mapData, GoalColor::YELLOW) != nullptr;
+}
 
 EtRallyMotion::EtRallyMotion(Robot& _robot,
                              std::unique_ptr<BaseContinuationCondition> _continuationCondition,
@@ -21,7 +134,8 @@ EtRallyMotion::EtRallyMotion(Robot& _robot,
                              const Pid::PidGain& _squareRotationPid,
                              const Pid::PidGain& _straightAnglePid, double _targetSpeed,
                              double _straightDeadbandRate, double _straightMaxoutRate)
-  : BaseMotion(_robot, std::move(_continuationCondition)),
+  : BaseMotion(_robot, std::make_unique<EtRallyCompletionCondition>(
+                           _robot, [this]() { return !completed; })),
     rotationPid(_rotationPid),
     squareRotationPid(_squareRotationPid),
     straightAnglePid(_straightAnglePid),
@@ -29,45 +143,85 @@ EtRallyMotion::EtRallyMotion(Robot& _robot,
     straightDeadbandRate(_straightDeadbandRate),
     straightMaxoutRate(_straightMaxoutRate)
 {
-  LOG_CREATE("EtRallyMotion");
+  // 元のETラリーには外部の継続条件がなかったため、
+  // MotionParserから渡された条件は走行の開始・終了判定に使用しない。
+  (void)_continuationCondition;
 }
 
-void EtRallyMotion::prepare() {}
+void EtRallyMotion::prepare()
+{
+  completed = false;
+}
 
 void EtRallyMotion::executeStep()
 {
-  // キャリブレーターで選択されたコースを取得
+  // 走行処理はここで1回だけ実行する（10ms制御周期の動作ではない）。
+  // 処理中にreturnした場合にもBaseMotion::run()が再実行しないよう先にtrueにする。
+  completed = true;
+  Logger::info("Timed ET Rally start");
+
+  // ========================================
+  // ETラリー準備
+  // ========================================
+
+  // Robotが保持しているMapDataを使用する
   const Course course = robot.getCourse();
 
-  // Robotが保持しているマップ情報を取得
+  Logger::printfLog(Logger::INFO, "ET Rally course: %s",
+                    course == Course::Right ? "Right" : "Left");
+
   MapData& mapData = robot.getMapDataInstance();
+
+  // ========================================
+  // ゲート情報の確認（走行前）
+  //
+  // 情報不足の場合、ETZumoFinishが地区大会用ゴールへ
+  // 走行済みなので、QR補正やゲート巡回を行わず終了する。
+  // ========================================
+  if(!hasAllGates(mapData)) {
+    Logger::info("EtRallyMotion: ゲート情報不足のためETラリー走行をスキップ");
+    robot.getWheelMotorControllerInstance().stopBoth();
+    return;
+  }
+
   GateRoutePlanner routePlanner(mapData);
   EtRallyMap etRallyMap;
 
-  // ET相撲終了後のETラリー開始位置（Lコース基準）
+  /**
+   * @brief ET相撲終了後のETラリー開始位置（Lコース基準）
+   *
+   * ラベル番号によらず(10,2)に固定する。
+   */
   const Point leftCourseStartPoint{ 10, 2 };
 
-  // マップの範囲外で経路探索を実行しないようにする
-  if(leftCourseStartPoint.x < 0 || leftCourseStartPoint.x > SystemInfo::X_GRID_NUM
-     || leftCourseStartPoint.y < 0 || leftCourseStartPoint.y > SystemInfo::Y_GRID_NUM) {
+  // マップの範囲外で経路探索を実行しないようにする。
+  if(leftCourseStartPoint.x < 0 || leftCourseStartPoint.x >= SystemInfo::X_GRID_NUM
+     || leftCourseStartPoint.y < 0 || leftCourseStartPoint.y >= SystemInfo::Y_GRID_NUM) {
     Logger::error("EtRallyMotion: start point is outside the rally map");
     robot.getWheelMotorControllerInstance().stopBoth();
     return;
   }
 
-  // Rコースの場合だけ座標を左右反転
   const Point startPoint = convertPoint(leftCourseStartPoint, course);
+
   int currentGridX = startPoint.x;
   int currentGridY = startPoint.y;
 
-  // Rコースの場合だけ方向を左右反転
+  /**
+   * @brief ETラリー開始時の方向
+   *
+   * Lコースでは右向き（RIGHT）。Rコースは鏡映変換する。
+   */
   Direction currentDirection = convertDirection(Direction::RIGHT, course);
 
-  // 通過するゲートの順番
   constexpr GoalColor TARGET_COLORS[] = { GoalColor::RED, GoalColor::BLUE, GoalColor::YELLOW };
 
-  // ETラリー開始位置で正方形を検出して補正する
-  Logger::info("ETラリー開始位置QR補正");
+  // PIDゲイン・走行速度などはMotions/ETRally.csvからMotionParser経由で設定済み。
+
+  // ========================================
+  // ETラリー開始位置QR補正
+  // ========================================
+  Logger::info("ET Rally start square adjustment");
 
   CameraServer::SquareDetectorRequest request{};
   request.roi.x = 0;
@@ -82,68 +236,75 @@ void EtRallyMotion::executeStep()
     Logger::printfLog(Logger::INFO, "Start square detected: angle=%f distance=%f",
                       result.correctionAngle, result.straightDistance);
 
-    // QR補正値が不正な場合は停止
-    if(!std::isfinite(result.correctionAngle) || !std::isfinite(result.straightDistance)
-       || result.straightDistance <= 0.0) {
-      Logger::error("EtRallyMotion: invalid QR adjustment");
-      robot.getWheelMotorControllerInstance().stopBoth();
-      return;
-    }
-
-    // 正方形の方向へ回頭
+    // ----------------------------------------
+    // QR方向へ回頭
+    // ----------------------------------------
     auto rotateCondition = std::make_unique<RelativeAngleCondition>(robot, result.correctionAngle,
                                                                     ROTATION_TOLERANCE);
+
     RelativeRotation rotate(robot, std::move(rotateCondition), squareRotationPid,
                             result.correctionAngle);
+
     rotate.run();
 
-    // 正方形まで直進
+    // ----------------------------------------
+    // QRまで直進
+    // ----------------------------------------
     auto straightCondition = std::make_unique<DistanceCondition>(robot, result.straightDistance);
+
     Straight straight(robot, std::move(straightCondition), targetSpeed, straightAnglePid, true,
                       straightDeadbandRate, straightMaxoutRate);
+
     straight.run();
 
-    // 正方形まで進んだ距離をバック
-    auto backwardCondition = std::make_unique<DistanceCondition>(robot, result.straightDistance);
-    Straight backward(robot, std::move(backwardCondition), -std::abs(targetSpeed), straightAnglePid,
-                      true, straightDeadbandRate, straightMaxoutRate);
-    backward.run();
-
+    // ----------------------------------------
     // 元のETラリー開始方向へ戻す
+    // ----------------------------------------
     auto returnCondition = std::make_unique<RelativeAngleCondition>(robot, -result.correctionAngle,
                                                                     ROTATION_TOLERANCE);
+
     RelativeRotation returnRotate(robot, std::move(returnCondition), squareRotationPid,
                                   -result.correctionAngle);
+
     returnRotate.run();
 
-    Logger::info("ETラリー開始位置QR補正完了");
-
+    Logger::info("ET Rally start square adjustment finished");
   } else {
-    // QRを検出できなければ補正を行わずに処理を続行
-    Logger::info("ETラリー開始位置QR補正失敗: QRを検出できませんでした");
+    /**
+     * QR検出失敗時は補正を行わず、
+     * そのまま処理を続行する。
+     */
+    Logger::info("ET Rally start square not detected -> skip adjustment");
   }
 
+  // ========================================
   // RouteFollower生成
+  // ========================================
   RouteFollower routeFollower(robot, etRallyMap, targetSpeed, rotationPid, squareRotationPid,
                               straightAnglePid, straightDeadbandRate, straightMaxoutRate);
 
-  // ゲート情報の確認
-  // 必要なゲート情報が不足している場合は停止
+  // ========================================
+  // ゲート情報の確認（既存処理）
+  // ========================================
+  // ゲート情報が足りない場合、最終地点には向かわず安全に終了する。
   if(!hasAllGates(mapData)) {
-    Logger::error("ゲート情報が不足しています");
+    Logger::error("EtRallyMotion: gate information is incomplete");
     robot.getWheelMotorControllerInstance().stopBoth();
     return;
   }
 
-  // ETラリー周回
+  // ========================================
+  // ETラリーを継続して周回
+  // ========================================
+  // 赤 -> 青 -> 黄 -> 赤 -> ... の順に、終了時刻を設けず繰り返す。
+  // 経路探索に失敗した場合は停止する。
+
   int lap = 1;
 
   while(true) {
     for(const GoalColor targetColor : TARGET_COLORS) {
-      Logger::printfLog(Logger::INFO, "ラップ %d: %s ゲートへ移動", lap,
-                        colorToString(targetColor));
+      Logger::printfLog(Logger::INFO, "Lap %d Target=%s", lap, colorToString(targetColor));
 
-      // 現在位置と方向から指定色のゲートまで経路探索
       GateRouteResult routeResult
           = routePlanner.search(currentGridX, currentGridY, currentDirection, targetColor);
 
@@ -153,7 +314,6 @@ void EtRallyMotion::executeStep()
         return;
       }
 
-      // 目標ゲートを取得
       const Gate* targetGate = findGate(mapData, targetColor);
 
       if(targetGate == nullptr) {
@@ -162,22 +322,17 @@ void EtRallyMotion::executeStep()
         return;
       }
 
-      // 外周ゲートかどうか判定
-      const bool outerGate = routeFollower.isOuterGate(*targetGate);
+      const bool outerGate = isOuterGate(*targetGate);
 
-      // 探索した経路をRouteFollowerに設定して走行
       routeFollower.setRoute(routeResult.route);
       routeFollower.run();
 
-      // 通過後の現在位置と方向を更新
+      // 外周ゲートではRouteFollowerが入口側に戻る。
       if(outerGate) {
-        // 外周ゲートでは入口側へ戻る
         currentGridX = routeResult.entrance.x;
         currentGridY = routeResult.entrance.y;
         currentDirection = routeResult.exitDirection;
-
       } else {
-        // 内側ゲートでは出口側へ進む
         currentGridX = routeResult.exit.x;
         currentGridY = routeResult.exit.y;
         currentDirection = routeResult.exitDirection;
@@ -191,54 +346,4 @@ void EtRallyMotion::executeStep()
 void EtRallyMotion::finish()
 {
   robot.getWheelMotorControllerInstance().stopBoth();
-}
-
-Point EtRallyMotion::convertPoint(const Point& point, Course course)
-{
-  if(course == Course::Right) {
-    return CourseMirror::mirrorPoint(point);
-  }
-  return point;
-}
-
-Direction EtRallyMotion::convertDirection(Direction direction, Course course)
-{
-  if(course == Course::Right) {
-    return CourseMirror::mirrorDirection(direction);
-  }
-  return direction;
-}
-
-const char* EtRallyMotion::colorToString(GoalColor color)
-{
-  switch(color) {
-    case GoalColor::RED:
-      return "RED";
-
-    case GoalColor::BLUE:
-      return "BLUE";
-
-    case GoalColor::YELLOW:
-      return "YELLOW";
-  }
-
-  return "UNKNOWN";
-}
-
-const Gate* EtRallyMotion::findGate(const MapData& mapData, GoalColor color)
-{
-  for(const Gate& gate : mapData.getGates()) {
-    if(gate.color == color) {
-      return &gate;
-    }
-  }
-
-  return nullptr;
-}
-
-bool EtRallyMotion::hasAllGates(const MapData& mapData)
-{
-  return findGate(mapData, GoalColor::RED) != nullptr
-         && findGate(mapData, GoalColor::BLUE) != nullptr
-         && findGate(mapData, GoalColor::YELLOW) != nullptr;
 }

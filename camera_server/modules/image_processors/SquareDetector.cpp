@@ -62,13 +62,17 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
     return;
   }
 
-  // ROIの切り出し（画像の左右300pxを除外）
-  const cv::Rect frameRect(0, 0, frame.cols, frame.rows);
-  if(frame.cols <= 2 * SIDE_CROP_PX) {
+  // ROIの切り出し（左右300pxを除外）
+  constexpr int SIDE_MARGIN = 300;
+
+  if(frame.cols <= SIDE_MARGIN * 2) {
+    Logger::error("SquareDetector: 画像の横幅が不足しています。");
     return;
   }
-  const cv::Rect sideCropRect(SIDE_CROP_PX, 0, frame.cols - 2 * SIDE_CROP_PX, frame.rows);
-  const cv::Rect roiRect = roi & frameRect & sideCropRect;
+
+  const cv::Rect frameRect(0, 0, frame.cols, frame.rows);
+  const cv::Rect croppedRect(SIDE_MARGIN, 0, frame.cols - SIDE_MARGIN * 2, frame.rows);
+  const cv::Rect roiRect = roi & frameRect & croppedRect;
 
   if(roiRect.empty()) {
     return;

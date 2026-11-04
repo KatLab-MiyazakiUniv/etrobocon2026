@@ -762,16 +762,15 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "GatePosition", MOTION_COMMAND::GATE_POSITION },
           { "ETRally", MOTION_COMMAND::ET_RALLY },
           { "ETZumoApproach", MOTION_COMMAND::ET_ZUMO_APPROACH },
-          { "QRStraight", MOTION_COMMAND::QR_STRAIGHT } };
-};
+          { "QRStraight", MOTION_COMMAND::QR_STRAIGHT } }
 
-auto it = commandMap.find(str);
+  auto it = commandMap.find(str);
 
-if(it != commandMap.end()) {
-  return it->second;
-}
+  if(it != commandMap.end()) {
+    return it->second;
+  }
 
-return MOTION_COMMAND::NONE;
+  return MOTION_COMMAND::NONE;
 }
 
 MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str)

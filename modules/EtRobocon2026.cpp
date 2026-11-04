@@ -22,7 +22,7 @@ void EtRobocon2026::start()
   int voltage = BatteryController::getVoltage();
   Logger::printfLog(Logger::INFO, "バッテリー電圧: %d mV", voltage);
 
-  Calibrator(robot, std::move(make_unique<RepeatCountCondition>(robot, 1)));
+  Calibrator(robot, std::move(std::make_unique<RepeatCountCondition>(robot, 1)));
   // コース設定
   // Rコース
   // robot.setCourse(Course::Right);

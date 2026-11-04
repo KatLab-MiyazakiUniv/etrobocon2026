@@ -258,21 +258,19 @@ void EtRallyMotion::executeStep()
     straight.run();
 
     // 正方形まで進んだ距離を後退
-    auto backwardCondition = std::make_unique<DistanceCondition>(
-        robot, result.straightDistance);
+    auto backwardCondition = std::make_unique<DistanceCondition>(robot, result.straightDistance);
 
-    Straight backward(robot, std::move(backwardCondition),
-                      -std::abs(targetSpeed), straightAnglePid,
+    Straight backward(robot, std::move(backwardCondition), -std::abs(targetSpeed), straightAnglePid,
                       true, straightDeadbandRate, straightMaxoutRate);
 
     backward.run();
 
     // 元のETラリー開始方向へ戻す
-    auto returnCondition = std::make_unique<RelativeAngleCondition>(
-        robot, -result.correctionAngle, ROTATION_TOLERANCE);
+    auto returnCondition = std::make_unique<RelativeAngleCondition>(robot, -result.correctionAngle,
+                                                                    ROTATION_TOLERANCE);
 
-    RelativeRotation returnRotate(robot, std::move(returnCondition),
-                                  squareRotationPid, -result.correctionAngle);
+    RelativeRotation returnRotate(robot, std::move(returnCondition), squareRotationPid,
+                                  -result.correctionAngle);
 
     returnRotate.run();
 

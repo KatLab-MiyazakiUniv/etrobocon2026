@@ -54,7 +54,7 @@ namespace {
    * カメラに残っている古いフレームを避けるため、
    * 複数枚取得して最後の画像を使用する。
    */
-  constexpr int FRAME_CAPTURE_COUNT = 10;
+  constexpr int FRAME_CAPTURE_COUNT = 3;
 
   /**
    * @brief 検出回数

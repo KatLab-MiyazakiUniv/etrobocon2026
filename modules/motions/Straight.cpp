@@ -56,51 +56,89 @@ void Straight::prepare()
 
   anglePid.prepare();
 }
+
+
 void Straight::executeStep()
 {
 
-  // グローバル変数として使用する場合に伴って、変数を初期化する。Byソウシ(要削除)
   GLOBAL_logData = {};
 
+  double rightMotorPower
+      = robot.getWheelMotorControllerInstance().getRightPower();  // rightMotorPowerの初期化
+  GLOBAL_logData.currentRightMotorPower = rightMotorPower;
 
-  double requiredRightPower = speedCalculator.calculateRightMotorPower();
-  double requiredLeftPower = speedCalculator.calculateLeftMotorPower();
-  double turningPower = 0.0;
+  // 右タイヤの走行速度を算出
+  double currentRightSpeed = robot.getWheelMotorControllerInstance().getRightSpeed();
+  GLOBAL_logData.currentRightSpeed = currentRightSpeed;
+ double leftMotorPower
+      = robot.getWheelMotorControllerInstance().getLeftPower();  // leftMotorPowerの初期化
+  GLOBAL_logData.currentLeftMotorPower = leftMotorPower;
 
-  if(shouldUseIMU) {
-    // 現在角度を取得
-    double currentAngle = robot.getIMUControllerInstance().getAzimuth();
+  // 左タイヤの走行速度を算出
+  double currentLeftSpeed = robot.getWheelMotorControllerInstance().getLeftSpeed();
+  GLOBAL_logData.currentLeftSpeed = currentLeftSpeed;
 
-    // 目標角度との差を計算
-    double angleDeviation = targetAngle - currentAngle;
-
-    // -180〜180度に正規化
-    angleDeviation = AngleNormalizer::normalizeAngle(angleDeviation);
-
-    // PID制御で旋回量を計算
-    turningPower = anglePid.calculatePid(angleDeviation);
-
-    double basepower = (std::abs(requiredRightPower) + std::abs(requiredLeftPower)) / 2.0;
-
-    // デッドバンドとマックスアウトを計算
-    double deadbandPower = deadbandRate * basepower;
-    double maxoutPower = maxoutRate * basepower;
-
-    // デッドバンド
-    if(std::abs(turningPower) < deadbandPower) {
-      turningPower = 0.0;
-    } else {
-      // マックスアウト
-      turningPower = std::min(std::max(turningPower, -maxoutPower), maxoutPower);
-    }
-  }
-  // モーターにPower値をセット
-  robot.getWheelMotorControllerInstance().setRightPower(requiredRightPower + turningPower);
-  robot.getWheelMotorControllerInstance().setLeftPower(requiredLeftPower - turningPower);
+  robot.getWheelMotorControllerInstance().setRightPower(1000);
+  robot.getWheelMotorControllerInstance().setLeftPower(1000);
 
   CsvLogger::add(GLOBAL_logData);
-
 }
+
+
+
+
+
+
+
+
+
+
+
+// void Straight::executeStep()
+// {
+//
+//   // グローバル変数として使用する場合に伴って、変数を初期化する。Byソウシ(要削除)
+//   GLOBAL_logData = {};
+//
+//
+//   double requiredRightPower = speedCalculator.calculateRightMotorPower();
+//   double requiredLeftPower = speedCalculator.calculateLeftMotorPower();
+//   double turningPower = 0.0;
+//
+//   if(shouldUseIMU) {
+//     // 現在角度を取得
+//     double currentAngle = robot.getIMUControllerInstance().getAzimuth();
+//
+//     // 目標角度との差を計算
+//     double angleDeviation = targetAngle - currentAngle;
+//
+//     // -180〜180度に正規化
+//     angleDeviation = AngleNormalizer::normalizeAngle(angleDeviation);
+//
+//     // PID制御で旋回量を計算
+//     turningPower = anglePid.calculatePid(angleDeviation);
+//
+//     double basepower = (std::abs(requiredRightPower) + std::abs(requiredLeftPower)) / 2.0;
+//
+//     // デッドバンドとマックスアウトを計算
+//     double deadbandPower = deadbandRate * basepower;
+//     double maxoutPower = maxoutRate * basepower;
+//
+//     // デッドバンド
+//     if(std::abs(turningPower) < deadbandPower) {
+//       turningPower = 0.0;
+//     } else {
+//       // マックスアウト
+//       turningPower = std::min(std::max(turningPower, -maxoutPower), maxoutPower);
+//     }
+//   }
+//   // モーターにPower値をセット
+//   robot.getWheelMotorControllerInstance().setRightPower(requiredRightPower + turningPower);
+//   robot.getWheelMotorControllerInstance().setLeftPower(requiredLeftPower - turningPower);
+//
+//   CsvLogger::add(GLOBAL_logData);
+//
+// }
 void Straight::finish()
 {
   ClockUtil::sleep(10);

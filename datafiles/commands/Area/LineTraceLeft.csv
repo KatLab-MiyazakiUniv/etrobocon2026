@@ -6,4 +6,7 @@
 #Calibrator,001,RepeatCount,001
 
 Snapshot,clearBuffer1,RepeatCount,001
+#初速を100にする
+Straight,007,Distance,50
+#検証速度
 Straight,006,Distance,300

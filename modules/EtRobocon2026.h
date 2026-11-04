@@ -29,6 +29,8 @@
 #include "Straight.h"
 #include "SystemInfo.h"
 #include "BatteryController.h"
+#include "Calibrator.h"
+#include "RepeatCountCondition.h"
 
 class EtRobocon2026 {
  public:

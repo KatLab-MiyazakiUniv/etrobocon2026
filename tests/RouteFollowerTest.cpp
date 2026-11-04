@@ -26,6 +26,7 @@ namespace etrobocon2026_test {
       { 2, 8, Direction::LEFT }, { 2, 8, Direction::LEFT }  // 同じ向きなので回頭不要
     };
 
-    EXPECT_NO_THROW(routeFollower.run(route));
+    routeFollower.setRoute(route);
+    EXPECT_NO_THROW(routeFollower.run());
   }
 }  // namespace etrobocon2026_test

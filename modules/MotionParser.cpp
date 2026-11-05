@@ -690,50 +690,39 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
     }
 
     case MOTION_COMMAND::ET_RALLY_FINISH: {
-  // Motions/EtRallyFinish.csv
-  // [0] 動作名 [1] ID
-  // [2..4] 回頭PID
-  // [5..7] 直進角度PID
-  // [8] 回頭角度
-  // [9] 直進距離
-  // [10] 目標速度
-  // [11] デッドバンド率
-  // [12] マックスアウト率
+      // Motions/EtRallyFinish.csv
+      // [0] 動作名 [1] ID
+      // [2..4] 回頭PID
+      // [5..7] 直進角度PID
+      // [8] 回頭角度
+      // [9] 直進距離
+      // [10] 目標速度
+      // [11] デッドバンド率
+      // [12] マックスアウト率
 
-  if(motionParams.size() < 13) {
-    Logger::error("[MotionParser] EtRallyFinishのパラメータ数が不足しています");
-    return nullptr;
-  }
+      if(motionParams.size() < 13) {
+        Logger::error("[MotionParser] EtRallyFinishのパラメータ数が不足しています");
+        return nullptr;
+      }
 
-  Pid::PidGain rotationPid{
-      fromString<double>(motionParams[2]),
-      fromString<double>(motionParams[3]),
-      fromString<double>(motionParams[4])
-  };
+      Pid::PidGain rotationPid{ fromString<double>(motionParams[2]),
+                                fromString<double>(motionParams[3]),
+                                fromString<double>(motionParams[4]) };
 
-  Pid::PidGain straightAnglePid{
-      fromString<double>(motionParams[5]),
-      fromString<double>(motionParams[6]),
-      fromString<double>(motionParams[7])
-  };
+      Pid::PidGain straightAnglePid{ fromString<double>(motionParams[5]),
+                                     fromString<double>(motionParams[6]),
+                                     fromString<double>(motionParams[7]) };
 
-  double rotationAngle = fromString<double>(motionParams[8]);
-  double straightDistance = fromString<double>(motionParams[9]);
-  double targetSpeed = fromString<double>(motionParams[10]);
-  double straightDeadbandRate = fromString<double>(motionParams[11]);
-  double straightMaxoutRate = fromString<double>(motionParams[12]);
+      double rotationAngle = fromString<double>(motionParams[8]);
+      double straightDistance = fromString<double>(motionParams[9]);
+      double targetSpeed = fromString<double>(motionParams[10]);
+      double straightDeadbandRate = fromString<double>(motionParams[11]);
+      double straightMaxoutRate = fromString<double>(motionParams[12]);
 
-  return new EtRallyFinish(
-      robot,
-      std::move(condition),
-      rotationPid,
-      straightAnglePid,
-      rotationAngle,
-      straightDistance,
-      targetSpeed,
-      straightDeadbandRate,
-      straightMaxoutRate);
-}
+      return new EtRallyFinish(robot, std::move(condition), rotationPid, straightAnglePid,
+                               rotationAngle, straightDistance, targetSpeed, straightDeadbandRate,
+                               straightMaxoutRate);
+    }
     case MOTION_COMMAND::ET_ZUMO_APPROACH: {
       if(motionParams.size() < 14) {
         Logger::error("[MotionParser] ETZumoApproach requires 14 columns");

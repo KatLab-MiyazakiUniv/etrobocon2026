@@ -28,16 +28,11 @@ class EtRallyFinish : public BaseMotion {
    * @param _straightDeadbandRate 直進デッドバンド率
    * @param _straightMaxoutRate 直進マックスアウト率
    */
-  explicit EtRallyFinish(
-    Robot& _robot,
-    std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-    const Pid::PidGain& _rotationPid,
-    const Pid::PidGain& _straightAnglePid,
-    double _rotationAngle,
-    double _straightDistance,
-    double _targetSpeed,
-    double _straightDeadbandRate,
-    double _straightMaxoutRate);
+  explicit EtRallyFinish(Robot& _robot,
+                         std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+                         const Pid::PidGain& _rotationPid, const Pid::PidGain& _straightAnglePid,
+                         double _rotationAngle, double _straightDistance, double _targetSpeed,
+                         double _straightDeadbandRate, double _straightMaxoutRate);
 
  protected:
   /**
@@ -56,13 +51,13 @@ class EtRallyFinish : public BaseMotion {
   void finish() override;
 
  private:
-  Pid::PidGain rotationPid;        // 回頭PIDゲイン
-  Pid::PidGain straightAnglePid;   // 直進角度PIDゲイン
-  double targetSpeed;              // 目標走行速度
-  double rotationAngle;            // 回頭角度[deg]
-  double straightDistance;         // 直進距離[mm]
-  double straightDeadbandRate;     // 直進デッドバンド率
-  double straightMaxoutRate;       // 直進マックスアウト率        
+  Pid::PidGain rotationPid;       // 回頭PIDゲイン
+  Pid::PidGain straightAnglePid;  // 直進角度PIDゲイン
+  double targetSpeed;             // 目標走行速度
+  double rotationAngle;           // 回頭角度[deg]
+  double straightDistance;        // 直進距離[mm]
+  double straightDeadbandRate;    // 直進デッドバンド率
+  double straightMaxoutRate;      // 直進マックスアウト率
 };
 
 #endif  // ET_RALLY_FINISH_H

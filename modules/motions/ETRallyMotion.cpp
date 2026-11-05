@@ -362,54 +362,52 @@ void EtRallyMotion::executeStep()
 
     // 残り時間で次の1周を完走できないと予測した場合は終了する。
     // 残り時間で次の1周を完走できないと予測した場合
-if(remainingTime <= firstLapTime) {
-  Logger::info("ETラリー周回終了 -> (10,10)へ移動");
+    if(remainingTime <= firstLapTime) {
+      Logger::info("ETラリー周回終了 -> (10,10)へ移動");
 
-  // 最終到達地点と向き（Lコース基準）
-  const Point finalPoint = convertPoint({ 10, 10 }, course);
-  const Direction finalDirection = convertDirection(Direction::LEFT, course);
+      // 最終到達地点と向き（Lコース基準）
+      const Point finalPoint = convertPoint({ 10, 10 }, course);
+      const Direction finalDirection = convertDirection(Direction::LEFT, course);
 
-  // マップの範囲外を指定していないか確認
-  if(finalPoint.x < 0 || finalPoint.x >= SystemInfo::X_GRID_NUM
-     || finalPoint.y < 0 || finalPoint.y >= SystemInfo::Y_GRID_NUM) {
-    Logger::error("EtRallyMotion: final point is outside the map");
-    robot.getWheelMotorControllerInstance().stopBoth();
-    return;
-  }
+      // マップの範囲外を指定していないか確認
+      if(finalPoint.x < 0 || finalPoint.x >= SystemInfo::X_GRID_NUM || finalPoint.y < 0
+         || finalPoint.y >= SystemInfo::Y_GRID_NUM) {
+        Logger::error("EtRallyMotion: final point is outside the map");
+        robot.getWheelMotorControllerInstance().stopBoth();
+        return;
+      }
 
-  // すでに目的地かつ指定方向なら移動しない
-  if(currentGridX != finalPoint.x || currentGridY != finalPoint.y
-     || currentDirection != finalDirection) {
+      // すでに目的地かつ指定方向なら移動しない
+      if(currentGridX != finalPoint.x || currentGridY != finalPoint.y
+         || currentDirection != finalDirection) {
+        // 現在位置・方向から(10,10)左向きまでの経路を探索
+        DijkstraRoutePlanner finalRoutePlanner(mapData.getGates());
 
-    // 現在位置・方向から(10,10)左向きまでの経路を探索
-    DijkstraRoutePlanner finalRoutePlanner(mapData.getGates());
+        RouteResult finalRoute = finalRoutePlanner.search(
+            currentGridX, currentGridY, currentDirection, finalPoint, finalDirection);
 
-    RouteResult finalRoute = finalRoutePlanner.search(
-        currentGridX, currentGridY, currentDirection,
-        finalPoint, finalDirection);
+        // 経路探索に失敗した場合
+        if(finalRoute.route.size() < 2) {
+          Logger::error("EtRallyMotion: final route search failed");
+          robot.getWheelMotorControllerInstance().stopBoth();
+          return;
+        }
 
-    // 経路探索に失敗した場合
-    if(finalRoute.route.size() < 2) {
-      Logger::error("EtRallyMotion: final route search failed");
-      robot.getWheelMotorControllerInstance().stopBoth();
-      return;
+        // 探索した経路に沿って走行
+        routeFollower.setRoute(finalRoute.route);
+        routeFollower.run();
+      }
+
+      // 到達後の位置・向きを更新
+      currentGridX = finalPoint.x;
+      currentGridY = finalPoint.y;
+      currentDirection = finalDirection;
+
+      Logger::info("ETラリー: (10,10)への移動完了");
+
+      // 周回を終了
+      break;
     }
-
-    // 探索した経路に沿って走行
-    routeFollower.setRoute(finalRoute.route);
-    routeFollower.run();
-  }
-
-  // 到達後の位置・向きを更新
-  currentGridX = finalPoint.x;
-  currentGridY = finalPoint.y;
-  currentDirection = finalDirection;
-
-  Logger::info("ETラリー: (10,10)への移動完了");
-
-  // 周回を終了
-  break;
-}
 
     ++lap;
   }

@@ -1,0 +1,4 @@
+コマンド名,ID,rotationKp,rotationKi,rotationKd,straightKp,straightKi,straightKd,rotationAngle,straightDistance,targetSpeed,straightDeadbandRate,straightMaxoutRate
+EtRallyFinish,ID,double,double,double,double,double,double,double,double,double,double,double
+EtRallyFinish,R001,1.4,0.0,0.1,0.033,0.003,0.03,30,300,300.0,0.25,0.54
+EtRallyFinish,L001,1.4,0.0,0.1,0.033,0.003,0.03,-30,300,300.0,0.25,0.54

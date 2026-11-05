@@ -43,6 +43,7 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "GatePositionDetection.h"
 #include "ColorRegionCenterCondition.h"
 #include "EtRallyMotion.h"
+#include "EtRallyFinish.h"
 #include "ETZumoApproach.h"
 #include "QRStraight.h"
 
@@ -63,6 +64,7 @@ class MotionParser {
     ET_ZUMO_FINISH,
     GATE_POSITION,
     ET_RALLY,
+    ET_RALLY_FINISH,
     ET_ZUMO_APPROACH,
     QR_STRAIGHT,
     NONE

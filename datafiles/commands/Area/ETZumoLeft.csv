@@ -1,3 +1,4 @@
 動作コマンド名,動作ID,条件コマンド名,条件ID
 ETZumoApproach,L001,RepeatCount,001
 ETZumoFinish,L001,RepeatCount,001
+EtRallyFinish,L001,RepeatCount,001

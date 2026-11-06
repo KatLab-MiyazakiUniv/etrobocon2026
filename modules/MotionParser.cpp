@@ -660,7 +660,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                                        fromString<bool>(motionParams[2]));
     }
     case MOTION_COMMAND::QR_STRAIGHT: {
-      if(motionParams.size() < 9) {
+      if(motionParams.size() < 10) {
         Logger::printfLog(Logger::ERROR, "[MotionParser] QRStraightのパラメータ数が不足しています");
         return nullptr;
       }
@@ -684,7 +684,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                             fromString<bool>(motionParams[9]));
     }
     case MOTION_COMMAND::QR_ROTATION: {
-      if(motionParams.size() < 6) {
+      if(motionParams.size() < 7) {
         Logger::printfLog(Logger::ERROR, "[MotionParser] QRStraightのパラメータ数が不足しています");
         return nullptr;
       }

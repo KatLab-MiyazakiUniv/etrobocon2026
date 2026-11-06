@@ -16,15 +16,15 @@ QRRotation::QRRotation(Robot& _robot,
     qrDetectionRequest(_qrDetectionRequest),
     decryptRequired(_decryptRequired)
 {
-  LOG_CREATE("RelativeRotation");
+  LOG_CREATE("QRRotation");
 }
 
-RelativeRotation::~RelativeRotation()
+QRRotation::~QRRotation()
 {
-  LOG_DESTROY("RelativeRotation");
+  LOG_DESTROY("QRRotation");
 }
 
-void RelativeRotation::prepare()
+void QRRotation::prepare()
 {
   double initialAngle = getCurrentAngle();  // 現在の走行体角度を取得する
 
@@ -35,7 +35,7 @@ void RelativeRotation::prepare()
   Rotation::prepare();
 }
 
-void RelativeRotation::executeStep()
+void QRRotation::executeStep()
 {
   // QR未検出なら検出処理を行う
   if(decryptRequired) {

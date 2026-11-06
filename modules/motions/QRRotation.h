@@ -1,10 +1,10 @@
 /**
- * @file   RelativeRotation.h
+ * @file   QRRotation.h
  * @brief  相対角度で回頭動作を実行するクラス
  * @author okuyama0528 yutaro-1214
  */
-#ifndef RELATIVE_ROTATION_H
-#define RELATIVE_ROTATION_H
+#ifndef QR_ROTATION_H
+#define QR_ROTATION_H
 
 #include "Rotation.h"
 #include "AngleNormalizer.h"

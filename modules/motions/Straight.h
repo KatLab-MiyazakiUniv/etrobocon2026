@@ -29,6 +29,10 @@ class Straight : public BaseMotion {
 
   Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
            double _targetSpeed, const Pid::PidGain& _anglePidGain, bool _shouldUseIMU,
+           double _deadbandRate, double _maxoutRate,const Pid::PidGain& _rightPidGain,const Pid::PidGain& _leftPidGain);
+
+  Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+           double _targetSpeed, const Pid::PidGain& _anglePidGain, bool _shouldUseIMU,
            double _deadbandRate, double _maxoutRate);
   /**
    * デストラクタ

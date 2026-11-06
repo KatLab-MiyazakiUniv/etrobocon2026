@@ -520,7 +520,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       return new ETZumoExit(robot, std::move(condition), mileage, std::move(motions));
     }
     case MOTION_COMMAND::STRAIGHT: {
-      if(motionParams.size() < 9) {
+      if(motionParams.size() < 15) {
         Logger::printfLog(Logger::ERROR, "[MotionParser] Straightのパラメータ数が不足しています");
         return nullptr;
       }
@@ -534,8 +534,16 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       double deadbandRate = fromString<double>(motionParams[7]);
       double maxoutRate = fromString<double>(motionParams[8]);
 
+      Pid::PidGain rightPid{ fromString<double>(motionParams[9]),
+                             fromString<double>(motionParams[10]),
+                             fromString<double>(motionParams[11]) };
+
+      Pid::PidGain leftPid{ fromString<double>(motionParams[12]),
+                             fromString<double>(motionParams[13]),
+                             fromString<double>(motionParams[14]) };
+
       return new Straight(robot, std::move(condition), fromString<double>(motionParams[2]),
-                          anglePid, shouldUseIMU, deadbandRate, maxoutRate);
+                          anglePid, shouldUseIMU, deadbandRate, maxoutRate,rightPid,leftPid);
     }
     case MOTION_COMMAND::LINETRACE: {
       if(motionParams.size() < 9) {

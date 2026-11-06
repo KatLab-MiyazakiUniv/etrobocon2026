@@ -269,12 +269,12 @@ void EtRobocon2026::start()
   // ========================================
 
   // Rコース
-  robot.setCourse(Course::Right);
-  robot.setEdge(Edge::LeftEdge);
+  // robot.setCourse(Course::Right);
+  // robot.setEdge(Edge::LeftEdge);
 
   // Lコース
-  // robot.setCourse(Course::Left);
-  // robot.setEdge(Edge::RightEdge);
+  robot.setCourse(Course::Left);
+  robot.setEdge(Edge::RightEdge);
 
   // ========================================
   // ライントレース走行
@@ -290,9 +290,9 @@ void EtRobocon2026::start()
 
   Area bottleDeliveryArea = Area::BottleDelivery;
   AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
-  bottleDeliveryAreaMaster.run();
+  // bottleDeliveryAreaMaster.run();
 
-  // CsvLogger::outputToFile();
+  CsvLogger::outputToFile();
 
   Logger::info("Timed ET Rally start");
 
@@ -409,7 +409,7 @@ void EtRobocon2026::start()
     RelativeRotation rotate(robot, std::move(rotateCondition), squareRotationPid,
                             result.correctionAngle);
 
-    rotate.run();
+    // rotate.run();
 
     // ----------------------------------------
     // QRまで直進
@@ -420,7 +420,7 @@ void EtRobocon2026::start()
     Straight straight(robot, std::move(straightCondition), TARGET_SPEED, straightAnglePid, true,
                       STRAIGHT_DEADBAND_RATE, STRAIGHT_MAXOUT_RATE);
 
-    straight.run();
+    // straight.run();
 
     // ----------------------------------------
     // 元のETラリー開始方向へ戻す
@@ -432,7 +432,7 @@ void EtRobocon2026::start()
     RelativeRotation returnRotate(robot, std::move(returnCondition), squareRotationPid,
                                   -result.correctionAngle);
 
-    returnRotate.run();
+    // returnRotate.run();
 
     Logger::info("ET Rally start square adjustment finished");
 
@@ -513,7 +513,7 @@ void EtRobocon2026::start()
       Straight backStraight(robot, std::move(backCondition), -TARGET_SPEED, straightAnglePid, true,
                             STRAIGHT_DEADBAND_RATE, STRAIGHT_MAXOUT_RATE);
 
-      backStraight.run();
+      // backStraight.run();
 
       Logger::info("Back to outer grid finished");
 
@@ -569,7 +569,7 @@ void EtRobocon2026::start()
 
         const bool outerGate = isOuterGate(*targetGate);
 
-        routeFollower.run(routeResult.route);
+        // routeFollower.run(routeResult.route);
 
         /**
          * 外周ゲートの場合は、
@@ -663,7 +663,7 @@ void EtRobocon2026::start()
 
       RelativeRotation rotation(robot, std::move(rotationCondition), rotationPid, rotateToUpAngle);
 
-      rotation.run();
+      // rotation.run();
     }
 
     currentDirection = turnPointDirection;
@@ -700,7 +700,7 @@ void EtRobocon2026::start()
      * 外周から(0,0)まで、
      * マスごとに分割せず1回のStraightで走行する。
      */
-    toTurnPointStraight.run();
+    // toTurnPointStraight.run();
 
     currentGridX = turnPoint.x;
     currentGridY = turnPoint.y;
@@ -721,7 +721,7 @@ void EtRobocon2026::start()
       RelativeRotation rotation(robot, std::move(rotationCondition), rotationPid,
                                 rotateToFinalAngle);
 
-      rotation.run();
+      // rotation.run();
     }
 
     currentDirection = finalDirection;
@@ -754,7 +754,7 @@ void EtRobocon2026::start()
      * (0,0)から(8,0)まで、
      * マスごとに分割せず1回のStraightで走行する。
      */
-    toFinalStraight.run();
+    // toFinalStraight.run();
 
     currentGridX = finalPoint.x;
     currentGridY = finalPoint.y;
@@ -778,7 +778,7 @@ void EtRobocon2026::start()
       return;
     }
 
-    routeFollower.run(finalRoute.route);
+    // routeFollower.run(finalRoute.route);
   }
 
   // ========================================
@@ -790,7 +790,7 @@ void EtRobocon2026::start()
   Straight finalStraight(robot, std::move(finalStraightCondition), TARGET_SPEED, straightAnglePid,
                          true, STRAIGHT_DEADBAND_RATE, STRAIGHT_MAXOUT_RATE);
 
-  finalStraight.run();
+  // finalStraight.run();
 
   robot.getWheelMotorControllerInstance().stopBoth();
 
@@ -804,5 +804,5 @@ void EtRobocon2026::start()
 
   AreaMaster ETZumouAreaMaster(robot, ETZumo);
 
-  ETZumouAreaMaster.run();
+  // ETZumouAreaMaster.run();
 }

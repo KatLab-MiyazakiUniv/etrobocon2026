@@ -8,10 +8,25 @@
 
 Straight::Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                    double _targetSpeed, const Pid::PidGain& _anglePidGain, bool _shouldUseIMU,
+                   double _deadbandRate, double _maxoutRate, const Pid::PidGain& _rightPid,const Pid::PidGain& _leftPid)
+  : BaseMotion(_robot, std::move(_continuationCondition)),
+    targetSpeed(_targetSpeed),
+    speedCalculator(_robot, _rightPid,_leftPid,_targetSpeed),
+    anglePid(_anglePidGain.kp, _anglePidGain.ki, _anglePidGain.kd, 0.0),
+    shouldUseIMU(_shouldUseIMU),
+    targetAngle(0.0),
+    deadbandRate(_deadbandRate),
+    maxoutRate(_maxoutRate)
+{
+  LOG_CREATE("Straight");
+}
+
+Straight::Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+                   double _targetSpeed, const Pid::PidGain& _anglePidGain, bool _shouldUseIMU,
                    double _deadbandRate, double _maxoutRate)
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
-    speedCalculator(_robot, _targetSpeed),
+    speedCalculator(_robot,_targetSpeed),
     anglePid(_anglePidGain.kp, _anglePidGain.ki, _anglePidGain.kd, 0.0),
     shouldUseIMU(_shouldUseIMU),
     targetAngle(0.0),

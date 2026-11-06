@@ -6,8 +6,8 @@
 #include "SpeedCalculator.h"
 #include "ClockUtil.h"
 
-const Pid::PidGain SpeedCalculator::DEFAULT_RIGHT_PID = { 0.014849, 0.004863, 0.0015 };
-const Pid::PidGain SpeedCalculator::DEFAULT_LEFT_PID = { 0.01574, 0.0045, 0.0015 };
+const Pid::PidGain SpeedCalculator::DEFAULT_RIGHT_PID = { 1.0, 1.0, 0.0 };
+const Pid::PidGain SpeedCalculator::DEFAULT_LEFT_PID = { 1.0, 1.0, 0.0};
 
 SpeedCalculator::SpeedCalculator(Robot& _robot, double _targetSpeed)
   : SpeedCalculator(_robot, DEFAULT_RIGHT_PID, DEFAULT_LEFT_PID, _targetSpeed)
@@ -56,35 +56,37 @@ double SpeedCalculator::calculateLeftMotorPower()
 
 int SpeedCalculator::getPowerFromSpeed(int speed)
 {
-  if(speed >= 550) {
-    return MOTOR_POWER_AT_550;
-  } else if(speed >= 500) {
-    return MOTOR_POWER_AT_500;
-  } else if(speed >= 400) {
-    return MOTOR_POWER_AT_400;
-  } else if(speed >= 300) {
-    return MOTOR_POWER_AT_300;
-  } else if(speed >= 200) {
-    return MOTOR_POWER_AT_200;
-  } else if(speed >= 100) {
-    return MOTOR_POWER_AT_100;
-  } else if(speed > 0) {
-    return MOTOR_POWER_AT_MOVE;
+  // if(speed >= 550) {
+  //   return MOTOR_POWER_AT_550;
+  // } else if(speed >= 500) {
+  //   return MOTOR_POWER_AT_500;
+  // } else if(speed >= 400) {
+  //   return MOTOR_POWER_AT_400;
+  // } else if(speed >= 300) {
+  //   return MOTOR_POWER_AT_300;
+  // } else if(speed >= 200) {
+  //   return MOTOR_POWER_AT_200;
+  // } else if(speed >= 100) {
+  //   return MOTOR_POWER_AT_100;
+  // } else if(speed > 0) {
+  //   return MOTOR_POWER_AT_MOVE;
 
-  } else if(speed <= -550) {
-    return MOTOR_POWER_AT_MINUS_550;
-  } else if(speed <= -500) {
-    return MOTOR_POWER_AT_MINUS_500;
-  } else if(speed <= -400) {
-    return MOTOR_POWER_AT_MINUS_400;
-  } else if(speed <= -300) {
-    return MOTOR_POWER_AT_MINUS_300;
-  } else if(speed <= -200) {
-    return MOTOR_POWER_AT_MINUS_200;
-  } else if(speed <= -100) {
-    return MOTOR_POWER_AT_MINUS_100;
-  } else if(speed <= 0) {
-    return MOTOR_POWER_AT_MINUS_MOVE;
-  }
+  // } else if(speed <= -550) {
+  //   return MOTOR_POWER_AT_MINUS_550;
+  // } else if(speed <= -500) {
+  //   return MOTOR_POWER_AT_MINUS_500;
+  // } else if(speed <= -400) {
+  //   return MOTOR_POWER_AT_MINUS_400;
+  // } else if(speed <= -300) {
+  //   return MOTOR_POWER_AT_MINUS_300;
+  // } else if(speed <= -200) {
+  //   return MOTOR_POWER_AT_MINUS_200;
+  // } else if(speed <= -100) {
+  //   return MOTOR_POWER_AT_MINUS_100;
+  // } else if(speed <= 0) {
+  //   return MOTOR_POWER_AT_MINUS_MOVE;
+  // }
+
+
   return MOTOR_POWER_STOP;
 }

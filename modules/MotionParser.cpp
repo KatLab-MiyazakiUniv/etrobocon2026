@@ -683,6 +683,31 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                             anglePid, shouldUseIMU, deadbandRate, maxoutRate, qrRequest,
                             fromString<bool>(motionParams[9]));
     }
+    case MOTION_COMMAND::QR_ROTATION: {
+      if(motionParams.size() < 6) {
+        Logger::printfLog(Logger::ERROR, "[MotionParser] QRStraightのパラメータ数が不足しています");
+        return nullptr;
+      }
+      Pid::PidGain anglePidGain{ fromString<double>(motionParams[2]),
+                                 fromString<double>(motionParams[3]),
+                                 fromString<double>(motionParams[4]) };
+
+      double relativeTargetAngle = fromString<double>(motionParams[5]);
+
+      CameraServer::QrCodeDetectorRequest qrRequest;
+      qrRequest.roi.x = 0;
+      qrRequest.roi.y = 0;
+      qrRequest.roi.width = 1920;
+      qrRequest.roi.height = 1080;
+
+      Logger::printfLog(
+          Logger::DEBUG,
+          "[MotionParser] QRRelativeRotation: relativeTargetAngle=%.1f を生成しました",
+          relativeTargetAngle);
+
+      return new RelativeRotation(robot, std::move(condition), anglePidGain, relativeTargetAngle,
+                                  qrRequest, fromString<bool>(motionParams[6]));
+    }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
                         motionParams[0].c_str());
@@ -706,9 +731,8 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "ETZumoExit", MOTION_COMMAND::ET_ZUMO_EXIT },
           { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH },
           { "GatePosition", MOTION_COMMAND::GATE_POSITION },
-          { "QRStraight", MOTION_COMMAND::QR_STRAIGHT }
-
-        };
+          { "QRStraight", MOTION_COMMAND::QR_STRAIGHT },
+          { "QRRotation", MOTION_COMMAND::QR_ROTATION } };
 
   auto it = commandMap.find(str);
 

@@ -8,7 +8,6 @@
 #define GATE_POSITION_H
 
 #include "SocketProtocol.h"
-#include <string>
 #include "GatePositionParser.h"
 #include "Logger.h"
 #include "Decrypter.h"
@@ -16,28 +15,19 @@
 class GatePosition {
  public:
   /**
-   * @brief コンストラクタ
-   * @param _robot ロボットインスタンス
-   * @param _decryptRequired 復号するか
-   * @param _qrDetectionRequest QRコード検出リクエスト
+   * @brief QR検出、復号、解析、ゲート位置情報の設定を行う
+   * @param robot ロボットインスタンス
+   * @param qrDetectionRequest QRコード検出リクエスト
+   * @param decryptRequired 復号するか
    */
-  GatePosition(Robot& _robot, const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
-               bool _decryptRequired);
-
-  /**
-   * @brief デストラクタ
-   */
-  ~GatePosition();
-
-  /**
-   * @brief QR検出、平文の解析、ゲート位置情報設定を一回行う
-   */
-  void setGatePosition();
+  static void setGatePosition(Robot& robot,
+                              const CameraServer::QrCodeDetectorRequest& qrDetectionRequest,
+                              bool decryptRequired);
 
  private:
-  Robot& robot;                                            // Robot インスタンスの参照
-  CameraServer::QrCodeDetectorRequest qrDetectionRequest;  // QRコード検出リクエスト
-  bool decryptRequired = false;
+  // インスタンス化禁止
+  GatePosition() = delete;
+  ~GatePosition() = delete;
 };
 
 #endif

@@ -660,7 +660,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                                        fromString<bool>(motionParams[2]));
     }
     case MOTION_COMMAND::QR_STRAIGHT: {
-      if(motionParams.size() < 13) {
+      if(motionParams.size() < 9) {
         Logger::printfLog(Logger::ERROR, "[MotionParser] QRStraightのパラメータ数が不足しています");
         return nullptr;
       }
@@ -674,10 +674,10 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       double maxoutRate = fromString<double>(motionParams[8]);
 
       CameraServer::QrCodeDetectorRequest qrRequest;
-      qrRequest.roi.x = fromString<int32_t>(motionParams[10]);
-      qrRequest.roi.y = fromString<int32_t>(motionParams[11]);
-      qrRequest.roi.width = fromString<int32_t>(motionParams[12]);
-      qrRequest.roi.height = fromString<int32_t>(motionParams[13]);
+      qrRequest.roi.x = 0;
+      qrRequest.roi.y = 0;
+      qrRequest.roi.width = 1920;
+      qrRequest.roi.height = 1080;
 
       return new QRStraight(robot, std::move(condition), fromString<double>(motionParams[2]),
                             anglePid, shouldUseIMU, deadbandRate, maxoutRate, qrRequest,

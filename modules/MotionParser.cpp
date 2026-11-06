@@ -705,8 +705,8 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
           "[MotionParser] QRRelativeRotation: relativeTargetAngle=%.1f を生成しました",
           relativeTargetAngle);
 
-      return new RelativeRotation(robot, std::move(condition), anglePidGain, relativeTargetAngle,
-                                  qrRequest, fromString<bool>(motionParams[6]));
+      return new QRRotation(robot, std::move(condition), anglePidGain, relativeTargetAngle,
+                            qrRequest, fromString<bool>(motionParams[6]));
     }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",

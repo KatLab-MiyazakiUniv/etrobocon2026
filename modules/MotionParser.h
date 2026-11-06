@@ -43,7 +43,7 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "GatePositionDetection.h"
 #include "ColorRegionCenterCondition.h"
 #include "QRStraight.h"
-#include "QRRelativeRotation.h"
+#include "QRRotation.h"
 
 class MotionParser {
  public:

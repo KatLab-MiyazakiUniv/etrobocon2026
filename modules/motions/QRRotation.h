@@ -13,7 +13,7 @@
 #include <cmath>
 #include "GatePosition.h"
 
-class RelativeRotation : public Rotation {
+class QRRotation : public Rotation {
  public:
   /**
    * @brief コンストラクタ
@@ -27,14 +27,14 @@ class RelativeRotation : public Rotation {
    * ロボット、継続条件、PIDゲイン、および相対角度を受け取り、
    * 相対回転動作の初期設定を行う
    */
-  RelativeRotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                   const Pid::PidGain& _anglePidGain, double _relativeTargetAngle,
-                   CameraServer::QrCodeDetectorRequest& _qrDetectionRequest, bool _decryptRequired);
+  QRRotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+             const Pid::PidGain& _anglePidGain, double _relativeTargetAngle,
+             CameraServer::QrCodeDetectorRequest& _qrDetectionRequest, bool _decryptRequired);
 
   /**
    * デストラクタ
    */
-  ~RelativeRotation();
+  ~QRRotation();
 
  protected:
   /**

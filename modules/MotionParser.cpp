@@ -659,6 +659,55 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       return new GatePositionDetection(robot, std::move(condition), qrRequest,
                                        fromString<bool>(motionParams[2]));
     }
+    case MOTION_COMMAND::QR_STRAIGHT: {
+      if(motionParams.size() < 10) {
+        Logger::printfLog(Logger::ERROR, "[MotionParser] QRStraightのパラメータ数が不足しています");
+        return nullptr;
+      }
+      Pid::PidGain anglePid{ fromString<double>(motionParams[3]),
+                             fromString<double>(motionParams[4]),
+                             fromString<double>(motionParams[5]) };
+
+      bool shouldUseIMU = motionParams[6] == "true";
+
+      double deadbandRate = fromString<double>(motionParams[7]);
+      double maxoutRate = fromString<double>(motionParams[8]);
+
+      CameraServer::QrCodeDetectorRequest qrRequest;
+      qrRequest.roi.x = 0;
+      qrRequest.roi.y = 0;
+      qrRequest.roi.width = 1920;
+      qrRequest.roi.height = 1080;
+
+      return new QRStraight(robot, std::move(condition), fromString<double>(motionParams[2]),
+                            anglePid, shouldUseIMU, deadbandRate, maxoutRate, qrRequest,
+                            fromString<bool>(motionParams[9]));
+    }
+    case MOTION_COMMAND::QR_ROTATION: {
+      if(motionParams.size() < 7) {
+        Logger::printfLog(Logger::ERROR, "[MotionParser] QRStraightのパラメータ数が不足しています");
+        return nullptr;
+      }
+      Pid::PidGain anglePidGain{ fromString<double>(motionParams[2]),
+                                 fromString<double>(motionParams[3]),
+                                 fromString<double>(motionParams[4]) };
+
+      double relativeTargetAngle = fromString<double>(motionParams[5]);
+
+      CameraServer::QrCodeDetectorRequest qrRequest;
+      qrRequest.roi.x = 0;
+      qrRequest.roi.y = 0;
+      qrRequest.roi.width = 1920;
+      qrRequest.roi.height = 1080;
+
+      Logger::printfLog(
+          Logger::DEBUG,
+          "[MotionParser] QRRelativeRotation: relativeTargetAngle=%.1f を生成しました",
+          relativeTargetAngle);
+
+      return new QRRotation(robot, std::move(condition), anglePidGain, relativeTargetAngle,
+                            qrRequest, fromString<bool>(motionParams[6]));
+    }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
                         motionParams[0].c_str());
@@ -681,9 +730,9 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "ResetAzimuth", MOTION_COMMAND::RESET_AZIMUTH },
           { "ETZumoExit", MOTION_COMMAND::ET_ZUMO_EXIT },
           { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH },
-          { "GatePosition", MOTION_COMMAND::GATE_POSITION }
-
-        };
+          { "GatePosition", MOTION_COMMAND::GATE_POSITION },
+          { "QRStraight", MOTION_COMMAND::QR_STRAIGHT },
+          { "QRRotation", MOTION_COMMAND::QR_ROTATION } };
 
   auto it = commandMap.find(str);
 

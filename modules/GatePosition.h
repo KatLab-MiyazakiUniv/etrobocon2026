@@ -1,5 +1,5 @@
 /**
- * @file   GatePositionDetection.h
+ * @file   GatePosition.h
  * @brief  QRコードからゲート位置情報を取得するクラス
  * @author migaku2645
  */

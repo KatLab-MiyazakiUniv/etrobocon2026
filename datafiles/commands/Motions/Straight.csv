@@ -1,4 +1,10 @@
 Command,ID,Speed,AngleKp,AngleKi,AngleKd,UseIMU,DeadbandRate,MaxoutRate
 コマンド名,動作ID,走行速度,角度P,角度I,角度D,IMUを使うか,デッドバンド,マックスアウト
 
-Straight,006,300,0.01,0.01,0.01,false,0.0,1.0,0.1,0.0,0.01,0.1,0.0,0.01
+
+
+#更に改良案
+Straight,006,500,0.01,0.01,0.01,false,0.0,1.0,0.28,0.1,0.00725,0.14,0.1,0.00725
+
+
+

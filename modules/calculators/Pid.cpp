@@ -84,6 +84,15 @@ double Pid::calculatePid(double currentValue)
   }
   // 微分の処理を行う
   double currentDerivative = (currentDeviation - prevDeviation) / delta;
+
+  // 初回は微分計算を行わない
+if(isFirstCalculation) {
+  prevDeviation = currentDeviation;
+  isFirstCalculation = false;
+
+  return pidGain.kp * currentDeviation;
+}
+
   /**
    * 微分項にローパスフィルタを適用
    * 偏差が大きい際に過大な変化量を一気に与えず

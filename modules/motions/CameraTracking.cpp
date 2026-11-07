@@ -9,7 +9,8 @@
 CameraTracking::CameraTracking(
     Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
     double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
-    const CameraServer::ColorRegionDetectorRequest& _colorDetectionRequest, bool _isStopMotorPower)
+    const CameraServer::ColorRegionDetectorRequest& _colorDetectionRequest, bool _isStopMotorPower,
+    double _deadbandRate, double _maxoutRate)
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
     targetXCoordinate(_targetXCoordinate),
@@ -18,6 +19,8 @@ CameraTracking::CameraTracking(
     qrDetectionRequest(),
     isStopMotorPower(_isStopMotorPower),
     speedCalculator(_robot, _targetSpeed),
+    deadbandRate(_deadbandRate),
+    maxoutRate(_maxoutRate),
     cameraPid(_pidGain.kp, _pidGain.ki, _pidGain.kd, _targetXCoordinate)
 {
   LOG_CREATE("CameraTracking");
@@ -28,7 +31,7 @@ CameraTracking::CameraTracking(Robot& _robot,
                                double _targetSpeed, int _targetXCoordinate,
                                const Pid::PidGain& _pidGain,
                                const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
-                               bool _isStopMotorPower)
+                               bool _isStopMotorPower, double _deadbandRate, double _maxoutRate)
   : BaseMotion(_robot, std::move(_continuationCondition)),
     targetSpeed(_targetSpeed),
     targetXCoordinate(_targetXCoordinate),
@@ -37,9 +40,11 @@ CameraTracking::CameraTracking(Robot& _robot,
     qrDetectionRequest(_qrDetectionRequest),
     isStopMotorPower(_isStopMotorPower),
     speedCalculator(_robot, _targetSpeed),
+    deadbandRate(_deadbandRate),
+    maxoutRate(_maxoutRate),
     cameraPid(_pidGain.kp, _pidGain.ki, _pidGain.kd, _targetXCoordinate)
 {
-  LOG_CREATE("CameraTracking");
+  LOG_CREATE("QrCameraTracking");
 }
 
 CameraTracking::~CameraTracking()
@@ -53,6 +58,19 @@ bool CameraTracking::canStart()
     Logger::error("CameraTracking:目標スピードが0です");
     return false;
   }
+
+  // マックスアウトの割合が0.0〜1.0の範囲外の場合は開始しない
+  if(maxoutRate < 0.0 || maxoutRate > 1.0) {
+    Logger::warning("マックスアウトの割合は0.0〜1.0の範囲で設定してください");
+    return false;
+  }
+
+  // デッドバンドの割合がマックスアウトの割合を上回る場合は開始しない
+  if(deadbandRate < 0.0 || deadbandRate > maxoutRate) {
+    Logger::warning("デッドバンドの割合は0.0以上かつマックスアウトの割合以下で設定してください");
+    return false;
+  }
+
   return true;
 }
 
@@ -63,9 +81,15 @@ void CameraTracking::prepare()
 
 void CameraTracking::executeStep()
 {
+  // グローバル変数として使用する場合に伴って、変数を初期化する。Byソウシ(要削除)
+  CsvLogger::current_logData = {};
+
+  CsvLogger::current_logData.targetSpeed = targetSpeed;
   // 初期Speed値を計算
   double baseRightPower = speedCalculator.calculateRightMotorPower();
   double baseLeftPower = speedCalculator.calculateLeftMotorPower();
+
+  double basePower = (std::abs(baseRightPower) + std::abs(baseLeftPower)) / 2.0;
 
   // 検出処理の呼び出し
   SocketClient& client = robot.getCameraSocketClientInstance();
@@ -82,6 +106,9 @@ void CameraTracking::executeStep()
       Logger::printfLog(Logger::WARNING,
                         "CameraTracking:色領域が検出されませんでした。success:%d wasDetected:%d",
                         success, wasDetected);
+      // グローバル変数として使用する場合に伴って、変数を初期化する。Byソウシ(要削除)
+      CsvLogger::add(CsvLogger::current_logData);
+      CsvLogger::current_logData = {};
       return;
     }
     // 黒を除く最大面積の色範囲取得>
@@ -115,25 +142,48 @@ void CameraTracking::executeStep()
   } else {
     Logger::error("CameraTracking:検出方式が不正です");
   }
-
   if(!success) {
     Logger::warning("CameraTracking:通信に失敗しました");
+    // グローバル変数として使用する場合に伴って、変数を初期化する。Byソウシ(要削除)
+    CsvLogger::add(CsvLogger::current_logData);
+    CsvLogger::current_logData = {};
     return;
   }
 
   if(!wasDetected) {
     Logger::warning("CameraTracking:検出対象が検出できませんでした");
+    // グローバル変数として使用する場合に伴って、変数を初期化する。Byソウシ(要削除)
+    CsvLogger::add(CsvLogger::current_logData);
+    CsvLogger::current_logData = {};
+
     return;
   }
 
   // 旋回値の計算
   double turningPower = cameraPid.calculatePid(currentX) * -1;
+  CsvLogger::current_logData.turningPower = turningPower;
+
+  // デッドバンドとマックスアウトを適用
+  double deadbandPower = deadbandRate * basePower;
+  double maxoutPower = maxoutRate * basePower;
+
+  // デッドバンド: 閾値未満の旋回値を無視し、微小な揺れを防ぐ
+  if(std::abs(turningPower) < deadbandPower) {
+    turningPower = 0.0;
+  } else {
+    // マックスアウト: 閾値を超える旋回値を制限し、急激な旋回を防ぐ
+    turningPower = std::min(std::max(turningPower, -maxoutPower), maxoutPower);
+  }
 
   // モータのPower値をセット（前進の時0を下回らないように，後進の時0を上回らないようにセット）
   double rightPower = baseRightPower > 0.0 ? std::max(baseRightPower - turningPower, 0.0)
                                            : std::min(baseRightPower + turningPower, 0.0);
   double leftPower = baseLeftPower > 0.0 ? std::max(baseLeftPower + turningPower, 0.0)
                                          : std::min(baseLeftPower - turningPower, 0.0);
+
+  CsvLogger::current_logData.finalRightMotorPower = rightPower;
+  CsvLogger::current_logData.finalLeftMotorPower = leftPower;
+  CsvLogger::add(CsvLogger::current_logData);
 
   robot.getWheelMotorControllerInstance().setRightPower(rightPower);
   robot.getWheelMotorControllerInstance().setLeftPower(leftPower);
@@ -148,6 +198,10 @@ void CameraTracking::finish()
     // robot.getWheelMotorControllerInstance().brakeBoth();
     robot.getWheelMotorControllerInstance().stopBoth();
   }
+
+  CsvLogger::current_logData.brightness = 9999;
+  CsvLogger::add(CsvLogger::current_logData);
+  // CsvLogger::outputToFile();
 }
 
 double CameraTracking::getTargetSpeed() const

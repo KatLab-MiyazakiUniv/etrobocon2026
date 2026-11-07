@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
   libzxing-dev \
   libssl-dev \
   nlohmann-json3-dev \
+  gnuplot \
   && gem install shell \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 

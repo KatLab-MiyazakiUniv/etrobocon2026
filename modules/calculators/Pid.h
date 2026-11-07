@@ -80,6 +80,7 @@ class Pid {
   double maxIntegral = 100.0;           // 累積積分値の最大値
   double minIntegral = -100.0;          // 累積積分値の最小値
   static constexpr double alpha = 0.8;  // ローパスフィルタの係数
+  bool isFirstCalculation = true;
 };
 
 #endif  // PID_H

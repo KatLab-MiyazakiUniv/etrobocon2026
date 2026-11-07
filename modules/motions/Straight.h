@@ -12,6 +12,7 @@
 #include "Pid.h"
 #include "AngleNormalizer.h"
 #include "Logger.h"
+#include "CsvLogger.h"
 
 class Straight : public BaseMotion {
  public:
@@ -26,6 +27,10 @@ class Straight : public BaseMotion {
    * @param _deadbandRate turningPowerに適用するデッドバンドの割合(0.0〜1.0、basePowerに対する割合)
    * @param _maxoutRate turningPowerに適用するマックスアウトの割合(0.0〜1.0、basePowerに対する割合)
    */
+
+  Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+           double _targetSpeed, const Pid::PidGain& _anglePidGain, bool _shouldUseIMU,
+           double _deadbandRate, double _maxoutRate,const Pid::PidGain& _rightPidGain,const Pid::PidGain& _leftPidGain);
 
   Straight(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
            double _targetSpeed, const Pid::PidGain& _anglePidGain, bool _shouldUseIMU,

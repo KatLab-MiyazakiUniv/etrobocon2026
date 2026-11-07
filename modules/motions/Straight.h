@@ -12,6 +12,7 @@
 #include "Pid.h"
 #include "AngleNormalizer.h"
 #include "Logger.h"
+#include "CsvLogger.h"
 
 class Straight : public BaseMotion {
  public:

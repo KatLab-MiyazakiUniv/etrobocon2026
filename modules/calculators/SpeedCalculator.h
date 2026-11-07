@@ -61,22 +61,22 @@ class SpeedCalculator {
 
   // 正方向の目標速度に応じたPower値定義
   static constexpr int MOTOR_POWER_AT_550 = 100;  // 550以上
-  static constexpr int MOTOR_POWER_AT_500 = 50;
-  static constexpr int MOTOR_POWER_AT_400 = 50;
-  static constexpr int MOTOR_POWER_AT_300 = 50;
-  static constexpr int MOTOR_POWER_AT_200 = 50;
-  static constexpr int MOTOR_POWER_AT_100 = 50;
+  static constexpr int MOTOR_POWER_AT_500 = 100;
+  static constexpr int MOTOR_POWER_AT_400 = 85;
+  static constexpr int MOTOR_POWER_AT_300 = 70;
+  static constexpr int MOTOR_POWER_AT_200 = 55;
+  static constexpr int MOTOR_POWER_AT_100 = 40;
   static constexpr int MOTOR_POWER_AT_MOVE = 30;  // 実機を動かす最低限のpower値
 
   // 停止
   static constexpr int MOTOR_POWER_STOP = 0;
 
   // 負方向（後退）の目標速度に応じたPower値定義
-  static constexpr int MOTOR_POWER_AT_MINUS_100 = -50;
-  static constexpr int MOTOR_POWER_AT_MINUS_200 = -50;
-  static constexpr int MOTOR_POWER_AT_MINUS_300 = -50;
-  static constexpr int MOTOR_POWER_AT_MINUS_400 = -50;
-  static constexpr int MOTOR_POWER_AT_MINUS_500 = -50;
+  static constexpr int MOTOR_POWER_AT_MINUS_100 = -40;
+  static constexpr int MOTOR_POWER_AT_MINUS_200 = -55;
+  static constexpr int MOTOR_POWER_AT_MINUS_300 = -70;
+  static constexpr int MOTOR_POWER_AT_MINUS_400 = -85;
+  static constexpr int MOTOR_POWER_AT_MINUS_500 = -100;
   static constexpr int MOTOR_POWER_AT_MINUS_550 = -100;  // -550以下
   static constexpr int MOTOR_POWER_AT_MINUS_MOVE = -30;  // 実機を動かす最低限のpower値
 };

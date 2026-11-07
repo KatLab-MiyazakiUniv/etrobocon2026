@@ -60,6 +60,7 @@ double Pid::calculatePid(double currentValue)
   if(prevTime <= 0) {
     prevTime = ClockUtil::now();
     Logger::warning("PIDの初回呼び出し時間が設定されていません");
+    // return 0.0;
   }
   // 現在の時間を取得
   double currentTime = ClockUtil::now();

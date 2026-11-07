@@ -71,8 +71,16 @@ void Straight::prepare()
 
   anglePid.prepare();
 }
+
+
+
+
 void Straight::executeStep()
 {
+
+   // グローバル変数として使用する場合に伴って、変数を初期化する。Byソウシ(要削除)
+  CsvLogger::current_logData = {};
+
   double requiredRightPower = speedCalculator.calculateRightMotorPower();
   double requiredLeftPower = speedCalculator.calculateLeftMotorPower();
   double turningPower = 0.0;
@@ -107,6 +115,11 @@ void Straight::executeStep()
   // モーターにPower値をセット
   robot.getWheelMotorControllerInstance().setRightPower(requiredRightPower + turningPower);
   robot.getWheelMotorControllerInstance().setLeftPower(requiredLeftPower - turningPower);
+
+CsvLogger::current_logData.finalRightMotorPower = requiredRightPower + turningPower;
+CsvLogger::current_logData.finalLeftMotorPower = requiredLeftPower - turningPower;
+
+  CsvLogger::add(CsvLogger::current_logData);
 }
 void Straight::finish()
 {

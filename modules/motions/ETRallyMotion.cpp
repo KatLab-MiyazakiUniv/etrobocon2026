@@ -369,9 +369,13 @@ void EtRallyMotion::executeStep()
       const Point finalPoint = convertPoint({ 10, 10 }, course);
       const Direction finalDirection = convertDirection(Direction::LEFT, course);
 
+      Logger::printfLog(Logger::INFO,
+                        "Final route: current=(%d,%d), target=(%d,%d)",
+                        currentGridX, currentGridY, finalPoint.x, finalPoint.y);
+
       // マップの範囲外を指定していないか確認
-      if(finalPoint.x < 0 || finalPoint.x >= SystemInfo::X_GRID_NUM || finalPoint.y < 0
-         || finalPoint.y >= SystemInfo::Y_GRID_NUM) {
+      if(finalPoint.x < 0 || finalPoint.x > SystemInfo::X_GRID_NUM || finalPoint.y < 0
+         || finalPoint.y > SystemInfo::Y_GRID_NUM) {
         Logger::error("EtRallyMotion: final point is outside the map");
         robot.getWheelMotorControllerInstance().stopBoth();
         return;
@@ -386,6 +390,9 @@ void EtRallyMotion::executeStep()
         RouteResult finalRoute = finalRoutePlanner.search(
             currentGridX, currentGridY, currentDirection, finalPoint, finalDirection);
 
+        Logger::printfLog(Logger::INFO, "Final route size=%d",
+                          static_cast<int>(finalRoute.route.size()));
+
         // 経路探索に失敗した場合
         if(finalRoute.route.size() < 2) {
           Logger::error("EtRallyMotion: final route search failed");
@@ -394,8 +401,10 @@ void EtRallyMotion::executeStep()
         }
 
         // 探索した経路に沿って走行
+        Logger::info("Final route: running");
         routeFollower.setRoute(finalRoute.route);
         routeFollower.run();
+        Logger::info("Final route: run finished");
       }
 
       // 到達後の位置・向きを更新

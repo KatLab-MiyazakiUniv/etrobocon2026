@@ -1,2 +1,3 @@
-Motion,MotionID,Condition,ConditionID
+コマンド名,動作ID,条件コマンド名,条件ID
 ETRally,L001,RepeatCount,001
+EtRallyFinish,L001,RepeatCount,001

@@ -193,7 +193,7 @@ void EtRallyMotion::executeStep()
 
   // マップの範囲外で経路探索を実行しないようにする。
   if(leftCourseStartPoint.x < 0 || leftCourseStartPoint.x > SystemInfo::X_GRID_NUM
-   || leftCourseStartPoint.y < 0 || leftCourseStartPoint.y > SystemInfo::Y_GRID_NUM) { 
+     || leftCourseStartPoint.y < 0 || leftCourseStartPoint.y > SystemInfo::Y_GRID_NUM) {
     Logger::error("EtRallyMotion: start point is outside the rally map");
     robot.getWheelMotorControllerInstance().stopBoth();
     return;
@@ -369,9 +369,8 @@ void EtRallyMotion::executeStep()
       const Point finalPoint = convertPoint({ 10, 10 }, course);
       const Direction finalDirection = convertDirection(Direction::LEFT, course);
 
-      Logger::printfLog(Logger::INFO,
-                        "Final route: current=(%d,%d), target=(%d,%d)",
-                        currentGridX, currentGridY, finalPoint.x, finalPoint.y);
+      Logger::printfLog(Logger::INFO, "Final route: current=(%d,%d), target=(%d,%d)", currentGridX,
+                        currentGridY, finalPoint.x, finalPoint.y);
 
       // マップの範囲外を指定していないか確認
       if(finalPoint.x < 0 || finalPoint.x > SystemInfo::X_GRID_NUM || finalPoint.y < 0

@@ -35,27 +35,7 @@ Straight,001,ColorOrColor,003
 AbsoluteRotation,000,AbsoluteAngle,000
 Straight,005,DistanceOrColor,GREEN100
 CameraTracking,S003,DistanceOrColor,BLUE020
-Straight,005,Distance,012
-
-
-
-
-
-
-Snapshot,011,RepeatCount,001
-GatePosition,1-1,RepeatCount,001
-
-
-Straight,005,Distance,002
-Snapshot,clearBuffer1,RepeatCount,001
-GatePosition,1-2,RepeatCount,001
-
-Straight,005,ColorOrColor,001
-
-
-
-
-
+QRStraight,001,DistanceOrColor,BLUE050
 
 
 AbsoluteRotation,090,AbsoluteAngle,090

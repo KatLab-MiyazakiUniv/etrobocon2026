@@ -659,6 +659,119 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       return new GatePositionDetection(robot, std::move(condition), qrRequest,
                                        fromString<bool>(motionParams[2]));
     }
+    case MOTION_COMMAND::ET_RALLY: {
+      // Motions/ETRally.csv:
+      // [0] 動作名 [1] ID
+      // [2..4] 通常回頭PID(Kp, Ki, Kd)
+      // [5..7] 調整回頭PID(Kp, Ki, Kd)
+      // [8..10] 直進角度PID(Kp, Ki, Kd)
+      if(motionParams.size() < 14) {
+        Logger::printfLog(Logger::ERROR,
+                          "[MotionParser] ETRallyのPIDパラメータ数が不足しています（14列必要）");
+        return nullptr;
+      }
+
+      Pid::PidGain rotationPid{ fromString<double>(motionParams[2]),
+                                fromString<double>(motionParams[3]),
+                                fromString<double>(motionParams[4]) };
+      Pid::PidGain squareRotationPid{ fromString<double>(motionParams[5]),
+                                      fromString<double>(motionParams[6]),
+                                      fromString<double>(motionParams[7]) };
+      Pid::PidGain straightAnglePid{ fromString<double>(motionParams[8]),
+                                     fromString<double>(motionParams[9]),
+                                     fromString<double>(motionParams[10]) };
+      double targetSpeed = fromString<double>(motionParams[11]);
+      double straightDeadbandRate = fromString<double>(motionParams[12]);
+      double straightMaxoutRate = fromString<double>(motionParams[13]);
+
+      return new EtRallyMotion(robot, std::move(condition), rotationPid, squareRotationPid,
+                               straightAnglePid, targetSpeed, straightDeadbandRate,
+                               straightMaxoutRate);
+    }
+
+    case MOTION_COMMAND::ET_RALLY_FINISH: {
+      // Motions/EtRallyFinish.csv
+      // [0] 動作名 [1] ID
+      // [2..4] 回頭PID
+      // [5..7] 直進角度PID
+      // [8] 回頭角度
+      // [9] 直進距離
+      // [10] 目標速度
+      // [11] デッドバンド率
+      // [12] マックスアウト率
+
+      if(motionParams.size() < 13) {
+        Logger::error("[MotionParser] EtRallyFinishのパラメータ数が不足しています");
+        return nullptr;
+      }
+
+      Pid::PidGain rotationPid{ fromString<double>(motionParams[2]),
+                                fromString<double>(motionParams[3]),
+                                fromString<double>(motionParams[4]) };
+
+      Pid::PidGain straightAnglePid{ fromString<double>(motionParams[5]),
+                                     fromString<double>(motionParams[6]),
+                                     fromString<double>(motionParams[7]) };
+
+      double rotationAngle = fromString<double>(motionParams[8]);
+      double straightDistance = fromString<double>(motionParams[9]);
+      double targetSpeed = fromString<double>(motionParams[10]);
+      double straightDeadbandRate = fromString<double>(motionParams[11]);
+      double straightMaxoutRate = fromString<double>(motionParams[12]);
+
+      return new EtRallyFinish(robot, std::move(condition), rotationPid, straightAnglePid,
+                               rotationAngle, straightDistance, targetSpeed, straightDeadbandRate,
+                               straightMaxoutRate);
+    }
+    case MOTION_COMMAND::ET_ZUMO_APPROACH: {
+      if(motionParams.size() < 14) {
+        Logger::error("[MotionParser] ETZumoApproach requires 14 columns");
+        return nullptr;
+      }
+
+      Pid::PidGain rotationPid{ fromString<double>(motionParams[2]),
+                                fromString<double>(motionParams[3]),
+                                fromString<double>(motionParams[4]) };
+
+      Pid::PidGain adjustmentPid{ fromString<double>(motionParams[5]),
+                                  fromString<double>(motionParams[6]),
+                                  fromString<double>(motionParams[7]) };
+
+      Pid::PidGain straightPid{ fromString<double>(motionParams[8]),
+                                fromString<double>(motionParams[9]),
+                                fromString<double>(motionParams[10]) };
+
+      double targetSpeed = fromString<double>(motionParams[11]);
+      double straightDeadbandRate = fromString<double>(motionParams[12]);
+      double straightMaxoutRate = fromString<double>(motionParams[13]);
+
+      return new ETZumoApproach(robot, std::move(condition), rotationPid, adjustmentPid,
+                                straightPid, targetSpeed, straightDeadbandRate, straightMaxoutRate);
+    }
+    case MOTION_COMMAND::QR_STRAIGHT: {
+      if(motionParams.size() < 13) {
+        Logger::printfLog(Logger::ERROR, "[MotionParser] QRStraightのパラメータ数が不足しています");
+        return nullptr;
+      }
+      Pid::PidGain anglePid{ fromString<double>(motionParams[3]),
+                             fromString<double>(motionParams[4]),
+                             fromString<double>(motionParams[5]) };
+
+      bool shouldUseIMU = motionParams[6] == "true";
+
+      double deadbandRate = fromString<double>(motionParams[7]);
+      double maxoutRate = fromString<double>(motionParams[8]);
+
+      CameraServer::QrCodeDetectorRequest qrRequest;
+      qrRequest.roi.x = fromString<int32_t>(motionParams[10]);
+      qrRequest.roi.y = fromString<int32_t>(motionParams[11]);
+      qrRequest.roi.width = fromString<int32_t>(motionParams[12]);
+      qrRequest.roi.height = fromString<int32_t>(motionParams[13]);
+
+      return new QRStraight(robot, std::move(condition), fromString<double>(motionParams[2]),
+                            anglePid, shouldUseIMU, deadbandRate, maxoutRate, qrRequest,
+                            fromString<bool>(motionParams[9]));
+    }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
                         motionParams[0].c_str());
@@ -669,7 +782,6 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
 
 MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
 {
-  // コマンド文字列(string)と、それに対応する列挙型MOTION_COMMANDのマッピングを定義
   static const unordered_map<string, MOTION_COMMAND> commandMap
       = { { "Straight", MOTION_COMMAND::STRAIGHT },
           { "LineTrace", MOTION_COMMAND::LINETRACE },
@@ -681,9 +793,11 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "ResetAzimuth", MOTION_COMMAND::RESET_AZIMUTH },
           { "ETZumoExit", MOTION_COMMAND::ET_ZUMO_EXIT },
           { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH },
-          { "GatePosition", MOTION_COMMAND::GATE_POSITION }
-
-        };
+          { "GatePosition", MOTION_COMMAND::GATE_POSITION },
+          { "ETRally", MOTION_COMMAND::ET_RALLY },
+          { "EtRallyFinish", MOTION_COMMAND::ET_RALLY_FINISH },
+          { "ETZumoApproach", MOTION_COMMAND::ET_ZUMO_APPROACH },
+          { "QRStraight", MOTION_COMMAND::QR_STRAIGHT } };
 
   auto it = commandMap.find(str);
 
@@ -712,7 +826,6 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
     { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC },
     { "ColorOrColor", CONDITION_COMMAND::COLOR_OR_COLOR },
     { "ColorRegion", CONDITION_COMMAND::COLOR_REGION_CENTER_CONDITION },
-
   };
 
   auto it = conditionMap.find(str);

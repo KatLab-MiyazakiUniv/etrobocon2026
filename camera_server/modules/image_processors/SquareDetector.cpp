@@ -43,7 +43,7 @@ namespace {
   /**
    * @brief 左右から検出対象外にする幅 [px]
    */
-  constexpr int SIDE_CROP_PX = 300;
+  constexpr int SIDE_CROP_PX = 200;
 }  // namespace
 
 SquareDetector::SquareDetector(const cv::Rect& _roi) : roi(_roi)

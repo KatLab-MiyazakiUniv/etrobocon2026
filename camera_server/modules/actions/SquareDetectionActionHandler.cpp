@@ -50,7 +50,7 @@ namespace {
   /**
    * @brief 1回の検出で取得するフレーム数
    */
-  constexpr int FRAME_CAPTURE_COUNT = 3;
+  constexpr int FRAME_CAPTURE_COUNT = 2;
 
 }  // namespace
 

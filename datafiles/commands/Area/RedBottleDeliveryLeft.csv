@@ -4,7 +4,7 @@
 
 
 #赤色まで移動
-AbsoluteRotation,-175,AbsoluteAngle,-175
+AbsoluteRotation,-165,AbsoluteAngle,-165
 #赤色が写る範囲まで移動
 Straight,001,DistanceOrColor,RED063
 #赤色がフレームに写る状態で赤色検知カメラ走行
@@ -16,5 +16,5 @@ Straight,-001,Distance,005
 
 AbsoluteRotation,090,AbsoluteAngle,090
 
-
+Straight,001,Distance,010
 Straight,001,ColorOrColor,001

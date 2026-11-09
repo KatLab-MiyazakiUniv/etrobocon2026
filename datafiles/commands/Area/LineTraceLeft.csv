@@ -33,14 +33,14 @@ CameraTracking,000,Distance,000
 AbsoluteRotation,-090,AbsoluteAngle,-090
 Straight,001,ColorOrColor,003
 AbsoluteRotation,000,AbsoluteAngle,000
-Straight,005,DistanceOrColor,GREEN030
+Straight,001,DistanceOrColor,GREEN030
 CameraTracking,S003,DistanceOrColor,BLUE020
 QRStraight,001,DistanceOrColor,BLUE050
 
 
 AbsoluteRotation,-090,AbsoluteAngle,-090
 Snapshot,clearBuffer1,RepeatCount,001
-CameraTracking,LBS003-4,Distance,080
+CameraTracking,LBS003-4,Distance,075
 
 #QR2取得前カーブ直前
 Straight,001,DistanceOrColor,BLACK070

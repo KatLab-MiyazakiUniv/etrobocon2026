@@ -42,7 +42,7 @@ void EtRobocon2026::start()
   AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
   bottleDeliveryAreaMaster.run();
 
-  // CsvLogger::outputToFile();
+  CsvLogger::outputToFile();
 
   // ET相撲走行
   Area ETZumo = Area::ETZumo;

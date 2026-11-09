@@ -1,8 +1,8 @@
 動作コマンド名,動作ID,条件コマンド名,条件ID
-AbsoluteRotation,085,AbsoluteAngle,085
+AbsoluteRotation,180,AbsoluteAngle,180
 Straight,001,Distance,010
 Straight,001,ColorRegion,004
-AbsoluteRotation,005,AbsoluteAngle,005
+AbsoluteRotation,090,AbsoluteAngle,090
 Straight,001,Distance,115
 #CameraTracking,000,RepeatCount,001
 #ETZumoApproach,L001,RepeatCount,001
@@ -11,10 +11,10 @@ CameraTracking,014,DistanceOrUltraSonic,001
 CameraTracking,001,RepeatCount,001
 Straight,004,ColorOrColor,004
 Straight,003,Distance,005
-AbsoluteRotation,-130,AbsoluteAngle,-130
+AbsoluteRotation,-040,AbsoluteAngle,-040
 CameraTracking,S003,Distance,020
 Straight,001,ColorOrColor,001
-AbsoluteRotation,-175,AbsoluteAngle,-175
+AbsoluteRotation,-090,AbsoluteAngle,-090
 #ColorSensorDebug,001,Distance,002
 
 #ColorSensorDebug,001,RepeatCount,010

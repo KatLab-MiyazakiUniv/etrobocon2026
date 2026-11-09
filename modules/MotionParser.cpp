@@ -772,6 +772,9 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                             anglePid, shouldUseIMU, deadbandRate, maxoutRate, qrRequest,
                             fromString<bool>(motionParams[9]));
     }
+    case MOTION_COMMAND::COLOR_SENSOR_DEBUG: {
+  return new ColorSensorDebug(robot, std::move(condition));
+}
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
                         motionParams[0].c_str());
@@ -797,7 +800,9 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "ETRally", MOTION_COMMAND::ET_RALLY },
           { "EtRallyFinish", MOTION_COMMAND::ET_RALLY_FINISH },
           { "ETZumoApproach", MOTION_COMMAND::ET_ZUMO_APPROACH },
-          { "QRStraight", MOTION_COMMAND::QR_STRAIGHT } };
+          { "QRStraight", MOTION_COMMAND::QR_STRAIGHT },
+          { "ETZumoApproach", MOTION_COMMAND::ET_ZUMO_APPROACH },
+          { "ColorSensorDebug", MOTION_COMMAND::COLOR_SENSOR_DEBUG } };
 
   auto it = commandMap.find(str);
 

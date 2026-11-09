@@ -46,8 +46,8 @@ class RelativeRotation : public Rotation {
 
  private:
   double relativeTargetAngle;                     // 回頭したい相対角度
-  static constexpr double MIN_TURN_POWER = 50.0;  // 実機で静止摩擦に合わせて調整
-  static constexpr double MAX_TURN_POWER = 60.0;
+  static constexpr double MIN_TURN_POWER = 70.0;  // 実機で静止摩擦に合わせて調整
+  static constexpr double MAX_TURN_POWER = 80.0;
   Pid::PidGain anglePidGain;
 };
 

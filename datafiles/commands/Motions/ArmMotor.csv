@@ -1,0 +1,4 @@
+コマンド名,ID,Power,TargetCount
+ArmMotor,ID,int,int32_t
+ArmMotor,001,20,180
+ArmMotor,002,20,-180

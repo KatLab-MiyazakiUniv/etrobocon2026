@@ -48,6 +48,7 @@ constexpr char SEPARATOR = ',';  // csvファイル内の区切り文字とし�
 #include "QRStraight.h"
 #include "QRRotation.h"
 #include "ColorSensorDebug.h"
+#include "ArmMotorMotion.h"
 
 class MotionParser {
  public:
@@ -71,6 +72,7 @@ class MotionParser {
     QR_STRAIGHT,
     QR_ROTATION,
     COLOR_SENSOR_DEBUG,
+    ARM_MOTOR,
     NONE
   };
   // 条件コマンド名を持つ列挙型クラス

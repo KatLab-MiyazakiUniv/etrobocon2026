@@ -100,6 +100,15 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
       continue;
     }
 
+    // アーム動作では時間制限条件を必須とする。
+    if(motionName == "ArmMotor" && conditionName != "MotionTime") {
+      Logger::printfLog(Logger::ERROR,
+                        "[MotionParser] ArmMotorにはMotionTime条件を指定してください: %s",
+                        motionId.c_str());
+      lineNum++;
+      continue;
+    }
+
     // 条件パラメータを取得する
     vector<string> conditionParams
         = extractParamsFromID(CONDITIONS_PATH + conditionName + ".csv", conditionId);
@@ -797,6 +806,32 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       return new QRRotation(robot, std::move(condition), anglePidGain, relativeTargetAngle,
                             qrRequest, fromString<bool>(motionParams[6]));
     }
+    case MOTION_COMMAND::ARM_MOTOR: {
+      /**
+       * ArmMotor.csv
+       * [0] command
+       * [1] id
+       * [2] power
+       * [3] targetCount
+       */
+      if(motionParams.size() != 4) {
+        Logger::error("[MotionParser] ArmMotorのパラメータは4列必要です");
+        return nullptr;
+      }
+
+      const int power = fromString<int>(motionParams[2]);
+      const int32_t targetCount = fromString<int32_t>(motionParams[3]);
+
+      if(power == 0 || power < -100 || power > 100 || targetCount <= 0) {
+        Logger::error("[MotionParser] ArmMotorの出力・回転量が不正です");
+        return nullptr;
+      }
+
+      Logger::printfLog(Logger::INFO, "[MotionParser] ArmMotor power=%d target=%ld",
+                        power, static_cast<long>(targetCount));
+
+      return new ArmMotorMotion(robot, std::move(condition), power, targetCount);
+    }
     case MOTION_COMMAND::COLOR_SENSOR_DEBUG: {
   return new ColorSensorDebug(robot, std::move(condition));
 }
@@ -828,7 +863,8 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "QRStraight", MOTION_COMMAND::QR_STRAIGHT },
           { "QRRotation", MOTION_COMMAND::QR_ROTATION },
           { "ETZumoApproach", MOTION_COMMAND::ET_ZUMO_APPROACH },
-          { "ColorSensorDebug", MOTION_COMMAND::COLOR_SENSOR_DEBUG } };
+           { "ColorSensorDebug", MOTION_COMMAND::COLOR_SENSOR_DEBUG },
+           { "ArmMotor", MOTION_COMMAND::ARM_MOTOR } };
 
   auto it = commandMap.find(str);
 

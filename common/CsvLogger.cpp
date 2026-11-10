@@ -9,19 +9,44 @@
 // CSVログのバッファとインデックスの初期化
 char CsvLogger::logs[LOG_BUFFER_SIZE] = "";
 int CsvLogger::currentIndex = 0;
+LogData CsvLogger::current_logData = {};
 
 // 現在のログファイルパス
 std::string CsvLogger::fileName
     = std::string(DEFAULT_CSV_LOG_FILE_PATH) + DEFAULT_CSV_LOG_FILE_NAME;
 
 // CSVヘッダーの定義
-const std::vector<std::string> CsvLogger::HEADERS
-    = { "time",          "comand:id",   "brightness",  "rightPower",
-        "leftPower",     "rightSpeed",  "leftSpeed",   "currentVal",
-        "target",        "kp",          "ki",          "kd",
-        "error",         "rawTurn",     "turn",        "basePower",
-        "deadbandPower", "maxoutPower", "maxoutActive" };
-
+const std::vector<std::string> CsvLogger::HEADERS = {
+  "time",
+  "comand:id",
+  "brightness",
+  "rightPower",
+  "leftPower",
+  "rightSpeed",
+  "leftSpeed",
+  "currentVal",
+  "target",
+  "kp",
+  "ki",
+  "kd",
+  "error",
+  "rawTurn",
+  "turn",
+  "basePower",
+  "deadbandPower",
+  "maxoutPower",
+  "maxoutActive",
+  "targetSpeed",
+  "currentRightMotorPower",
+  "currentRightSpeed",
+  "baseRightPower",
+  "currentLeftMotorPower",
+  "currentLeftSpeed",
+  "baseLeftPower",
+  "turningPower",
+  "finalRightMotorPower",
+  "finalLeftMotorPower",
+};
 // CSVログの初期化
 void CsvLogger::init()
 {
@@ -57,7 +82,7 @@ void CsvLogger::writeHeader()
 }
 
 // 各種値を追加する
-void CsvLogger::add(const LogData& data)
+void CsvLogger::add(LogData& data)
 {
   LogData localData = data;
 
@@ -92,7 +117,8 @@ void CsvLogger::add(const LogData& data)
       row += ",";
     }
   };
-  // 一行分のCSVデータを構築
+
+  // 一行分のCSVデータを構築（HEADERSおよびLogDataの順序と完全に一致）
   std::string rowStr = "";
   appendField(rowStr, localData.time, false);
   appendField(rowStr, localData.id, false);
@@ -112,7 +138,17 @@ void CsvLogger::add(const LogData& data)
   appendField(rowStr, localData.basePower, false);
   appendField(rowStr, localData.deadbandPower, false);
   appendField(rowStr, localData.maxoutPower, false);
-  appendField(rowStr, localData.maxoutActive, true);
+  appendField(rowStr, localData.maxoutActive, false);
+  appendField(rowStr, localData.targetSpeed, false);
+  appendField(rowStr, localData.currentRightMotorPower, false);
+  appendField(rowStr, localData.currentRightSpeed, false);
+  appendField(rowStr, localData.baseRightPower, false);
+  appendField(rowStr, localData.currentLeftMotorPower, false);
+  appendField(rowStr, localData.currentLeftSpeed, false);
+  appendField(rowStr, localData.baseLeftPower, false);
+  appendField(rowStr, localData.turningPower, false);
+  appendField(rowStr, localData.finalRightMotorPower, false);
+  appendField(rowStr, localData.finalLeftMotorPower, true);  // 最後のみ isLast = true
   rowStr += "\n";
 
   int written = snprintf(&logs[currentIndex], remainBuffer, "%s", rowStr.c_str());
@@ -122,6 +158,7 @@ void CsvLogger::add(const LogData& data)
   } else if(written > 0) {
     currentIndex += written;
   }
+  current_logData = {};
 }
 
 // ログファイルの出力先変更
@@ -133,10 +170,44 @@ void CsvLogger::setFileName(const std::string& name, const std::string& path)
   CsvLogger::fileName = finalPath + finalName;
 }
 
+void CsvLogger::archiveExistingFiles(const std::filesystem::path& targetDir,
+                                     const std::filesystem::path& archiveDir)
+{
+  if(!std::filesystem::exists(targetDir) || !std::filesystem::is_directory(targetDir)) {
+    return;
+  }
+
+  // 退避先ディレクトリが存在しない場合は作成
+  try {
+    if(!std::filesystem::exists(archiveDir)) {
+      std::filesystem::create_directories(archiveDir);
+    }
+  } catch(const std::exception& e) {
+    Logger::error("CsvLogger: Failed to create archive directory");
+    return;
+  }
+
+  // targetDir 直下にあるファイルを探索して移動
+  for(const auto& entry : std::filesystem::directory_iterator(targetDir)) {
+    if(entry.is_regular_file()) {
+      std::filesystem::path oldFilePath = entry.path();
+      std::filesystem::path newFilePath = archiveDir / oldFilePath.filename();
+
+      try {
+        // 同名ファイルが移動先に既に存在する場合
+        std::filesystem::rename(oldFilePath, newFilePath);
+      } catch(const std::exception& e) {
+        Logger::error(("CsvLogger: Failed to move file: " + oldFilePath.string()).c_str());
+      }
+    }
+  }
+}
+
 // ログファイルの出力
 void CsvLogger::outputToFile()
 {
   std::filesystem::path outputPath(CsvLogger::fileName);
+  std::filesystem::path logDir = outputPath.parent_path();
 
   // 出力先のディレクトリが存在しない場合は作成する
   if(!outputPath.parent_path().empty()) {
@@ -147,6 +218,10 @@ void CsvLogger::outputToFile()
       return;
     }
   }
+
+  // 既存ファイルをアーカイブ先へ移動する
+  std::filesystem::path archiveDir = logDir / "archive";
+  archiveExistingFiles(logDir, archiveDir);
 
   // CSVファイルをバイナリモードで開く
   std::ofstream file(outputPath, std::ios::binary | std::ios::trunc);

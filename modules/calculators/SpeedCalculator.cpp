@@ -26,24 +26,30 @@ SpeedCalculator::SpeedCalculator(Robot& _robot, const Pid::PidGain& _rightPid,
 
 double SpeedCalculator::calculateRightMotorPower()
 {
-  rightMotorPower
-      = robot.getWheelMotorControllerInstance().getRightPower();  // rightMotorPowerの初期化
+  rightMotorPower = getPowerFromSpeed(targetSpeed);  // rightMotorPowerの初期化
+  CsvLogger::current_logData.currentRightMotorPower = rightMotorPower;
+
   // 右タイヤの走行速度を算出
   double currentRightSpeed = robot.getWheelMotorControllerInstance().getRightSpeed();
+  CsvLogger::current_logData.currentRightSpeed = currentRightSpeed;
+
   // 走行速度に相当する右タイヤのPower値を算出
   rightMotorPower += rightPid.calculatePid(currentRightSpeed);
-
+  CsvLogger::current_logData.baseRightPower = rightMotorPower;
   return rightMotorPower;
 }
 
 double SpeedCalculator::calculateLeftMotorPower()
 {
-  leftMotorPower
-      = robot.getWheelMotorControllerInstance().getLeftPower();  // leftMotorPowerの初期化
+  leftMotorPower = getPowerFromSpeed(targetSpeed);  // leftMotorPowerの初期化
+  CsvLogger::current_logData.currentLeftMotorPower = leftMotorPower;
+
   // 左タイヤの走行速度を算出
   double currentLeftSpeed = robot.getWheelMotorControllerInstance().getLeftSpeed();
+  CsvLogger::current_logData.currentLeftSpeed = currentLeftSpeed;
+
   // 走行速度に相当する左タイヤのPower値を算出
   leftMotorPower += leftPid.calculatePid(currentLeftSpeed);
-
+  CsvLogger::current_logData.baseLeftPower = leftMotorPower;
   return leftMotorPower;
 }

@@ -23,7 +23,6 @@ GatePositionDetection::~GatePositionDetection()
 
 void GatePositionDetection::executeStep()
 {
-  // 検出処理
-  GatePosition gatePosition(robot, qrDetectionRequest, decryptRequired);
-  gatePosition.setGatePosition();
+    // 検出処理
+  GatePosition::setGatePosition(robot, qrDetectionRequest, decryptRequired);
 }

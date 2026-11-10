@@ -63,9 +63,19 @@ void QRStraight::prepare()
 }
 void QRStraight::executeStep()
 {
-  // 検出処理
-  GatePosition gatePosition(robot, qrDetectionRequest, decryptRequired);
-  gatePosition.setGatePosition();
+    // QR未検出なら検出処理を行う
+  if(decryptRequired) {
+    if(!robot.getHaveQR2contents()) {
+      // 検出処理
+      GatePosition::setGatePosition(robot, qrDetectionRequest, decryptRequired);
+    }
+  } else {
+    if(!robot.getHaveQR1contents()) {
+      // 検出処理
+      GatePosition::setGatePosition(robot, qrDetectionRequest, decryptRequired);
+    }
+  }
+
 
   double requiredRightPower = speedCalculator.calculateRightMotorPower();
   double requiredLeftPower = speedCalculator.calculateLeftMotorPower();

@@ -26,7 +26,9 @@ SpeedCalculator::SpeedCalculator(Robot& _robot, const Pid::PidGain& _rightPid,
 
 double SpeedCalculator::calculateRightMotorPower()
 {
-  rightMotorPower = getPowerFromSpeed(targetSpeed);  // rightMotorPowerの初期化
+rightMotorPower
+      = robot.getWheelMotorControllerInstance().getRightPower();  // rightMotorPowerの初期化
+
   CsvLogger::current_logData.currentRightMotorPower = rightMotorPower;
 
   // 右タイヤの走行速度を算出
@@ -41,7 +43,8 @@ double SpeedCalculator::calculateRightMotorPower()
 
 double SpeedCalculator::calculateLeftMotorPower()
 {
-  leftMotorPower = getPowerFromSpeed(targetSpeed);  // leftMotorPowerの初期化
+ leftMotorPower
+      = robot.getWheelMotorControllerInstance().getLeftPower();  // leftMotorPowerの初期化
   CsvLogger::current_logData.currentLeftMotorPower = leftMotorPower;
 
   // 左タイヤの走行速度を算出

@@ -54,4 +54,9 @@ void EtRobocon2026::start()
   Area etRallyArea = Area::ETRally;
   AreaMaster etRallyAreaMaster(robot, etRallyArea);
   etRallyAreaMaster.run();
+
+  // 調整のための一時的な走行
+  Area tmpArea = Area::Tmp;
+  AreaMaster tmpMaster(robot, tmpArea);
+  tmpAreaMaster.run();
 }

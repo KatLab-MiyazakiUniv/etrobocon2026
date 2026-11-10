@@ -1,5 +1,5 @@
 #動作コマンド名,動作ID,条件コマンド名,条件ID
-Calibrator,001,RepeatCount,001
+#Calibrator,001,RepeatCount,001
 # ライントレース
 Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,S001,Distance,035

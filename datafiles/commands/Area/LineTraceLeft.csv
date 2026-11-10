@@ -1,5 +1,5 @@
 #動作コマンド名,動作ID,条件コマンド名,条件ID
-
+Calibrator,001,RepeatCount,001
 # ライントレース
 Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,S001,Distance,035
@@ -26,3 +26,24 @@ CameraTracking,000,Distance,000
 
 
 # ボトルデリバリー
+
+AbsoluteRotation,-085,AbsoluteAngle,-085
+Straight,001,ColorOrColor,003
+AbsoluteRotation,000,AbsoluteAngle,000
+Straight,005,DistanceOrColor,GREEN030
+CameraTracking,S003,DistanceOrColor,BLUE020
+QRStraight,001,DistanceOrColor,BLUE040
+
+
+AbsoluteRotation,-090,AbsoluteAngle,-090
+Snapshot,clearBuffer1,RepeatCount,001
+CameraTracking,LBS003-4,Distance,070
+
+#QR2取得前カーブ直前
+Straight,001,DistanceOrColor,BLACK070
+
+# QR2検出
+
+Snapshot,clearBuffer1,RepeatCount,001
+Snapshot,021,RepeatCount,001
+#GatePosition,2-1,RepeatCount,001

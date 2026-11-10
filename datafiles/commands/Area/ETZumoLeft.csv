@@ -1,4 +1,4 @@
-動作コマンド名,動作ID,条件コマンド名,条件ID
+#動作コマンド名,動作ID,条件コマンド名,条件ID
 AbsoluteRotation,170,AbsoluteAngle,170
 Straight,001,Distance,010
 Straight,001,ColorRegion,004

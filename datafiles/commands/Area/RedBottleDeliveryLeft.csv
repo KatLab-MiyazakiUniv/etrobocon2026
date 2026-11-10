@@ -4,7 +4,8 @@
 
 
 #赤色まで移動
-AbsoluteRotation,-165,AbsoluteAngle,-165
+#AbsoluteRotation,-165,AbsoluteAngle,-165
+QRRotation,-070,RelativeAngle,-070
 #赤色が写る範囲まで移動
 Straight,001,DistanceOrColor,RED063
 #赤色がフレームに写る状態で赤色検知カメラ走行

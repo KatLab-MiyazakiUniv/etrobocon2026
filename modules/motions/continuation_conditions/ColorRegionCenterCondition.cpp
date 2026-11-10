@@ -41,10 +41,10 @@ bool ColorRegionCenterCondition::shouldContinue()
   }
 
   // バウンディングボックスの中心Y座標を計算
-  double currentCenterY = (response.result.topLeft.y + response.result.bottomRight.y) / 2.0;
+  double currentCenterY = response.result.bottomRight.y;
 
   // 目標値 ± toleranceY の範囲内か判定
-  if(currentCenterY > targetCenterY) {
+  if(currentCenterY < targetCenterY) {
     inRangeCount++;
     Logger::printfLog(
         Logger::DEBUG,

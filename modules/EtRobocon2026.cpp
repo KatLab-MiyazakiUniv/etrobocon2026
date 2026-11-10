@@ -30,8 +30,8 @@ void EtRobocon2026::start()
   std::string runlogFileName = buffer;
   CsvLogger::setFileName(runlogFileName);
 
-
-  Calibrator(robot, std::move(std::make_unique<RepeatCountCondition>(robot, 1)));
+  Calibrator calibrator(robot, std::move(std::make_unique<RepeatCountCondition>(robot, 1)));
+  calibrator.run();
   // コース設定
   // Rコース
   // robot.setCourse(Course::Right);
@@ -51,7 +51,7 @@ void EtRobocon2026::start()
   AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
   bottleDeliveryAreaMaster.run();
 
-  // CsvLogger::outputToFile();
+  CsvLogger::outputToFile();
 
   // ET相撲走行
   Area ETZumo = Area::ETZumo;

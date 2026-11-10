@@ -57,7 +57,6 @@ namespace {
 /**
  * @brief Lコース座標を現在コース用へ変換する
  * @param point Lコース座標
- * @return 現在コース用へ変換した座標
  */
 Point EtRallyMotion::convertPoint(const Point& point, Course course)
 {
@@ -70,7 +69,6 @@ Point EtRallyMotion::convertPoint(const Point& point, Course course)
 /**
  * @brief Lコース方向を現在コース用へ変換する
  * @param direction Lコース方向
- * @return 現在コース用へ変換した方向
  */
 Direction EtRallyMotion::convertDirection(Direction direction, Course course)
 {
@@ -83,7 +81,6 @@ Direction EtRallyMotion::convertDirection(Direction direction, Course course)
 /**
  * @brief GoalColorを文字列へ変換する
  * @param color 変換するゲート色
- * @return GoalColorを表す文字列
  */
 const char* EtRallyMotion::colorToString(GoalColor color)
 {
@@ -195,8 +192,8 @@ void EtRallyMotion::executeStep()
   const Point leftCourseStartPoint{ 10, 2 };
 
   // マップの範囲外で経路探索を実行しないようにする。
-  if(leftCourseStartPoint.x < 0 || leftCourseStartPoint.x >= SystemInfo::X_GRID_NUM
-     || leftCourseStartPoint.y < 0 || leftCourseStartPoint.y >= SystemInfo::Y_GRID_NUM) {
+  if(leftCourseStartPoint.x < 0 || leftCourseStartPoint.x > SystemInfo::X_GRID_NUM
+     || leftCourseStartPoint.y < 0 || leftCourseStartPoint.y > SystemInfo::Y_GRID_NUM) {
     Logger::error("EtRallyMotion: start point is outside the rally map");
     robot.getWheelMotorControllerInstance().stopBoth();
     return;
@@ -289,6 +286,11 @@ void EtRallyMotion::executeStep()
   RouteFollower routeFollower(robot, etRallyMap, targetSpeed, rotationPid, squareRotationPid,
                               straightAnglePid, straightDeadbandRate, straightMaxoutRate);
 
+  // 1周目の実測時間を、2周目以降の周回可否判定に利用する。
+  // 競技全体の開始時刻は Robot::getRunningStartTime() から取得する。
+  constexpr int COMPETITION_TIME_LIMIT_MS = 120000;  // 競技全体で120秒
+  const int ETrallystartTime = ClockUtil::now();
+
   // ========================================
   // ゲート情報の確認（既存処理）
   // ========================================
@@ -302,10 +304,12 @@ void EtRallyMotion::executeStep()
   // ========================================
   // ETラリーを継続して周回
   // ========================================
-  // 赤 -> 青 -> 黄 -> 赤 -> ... の順に、終了時刻を設けず繰り返す。
+  // 赤 -> 青 -> 黄 を1周とし、ゲート情報がそろっていれば最低1周する。
+  // 2周目以降は、競技全体の残り時間と1周目の実測時間で継続判定する。
   // 経路探索に失敗した場合は停止する。
 
   int lap = 1;
+  int firstLapTime = 0;
 
   while(true) {
     for(const GoalColor targetColor : TARGET_COLORS) {
@@ -343,6 +347,74 @@ void EtRallyMotion::executeStep()
         currentGridY = routeResult.exit.y;
         currentDirection = routeResult.exitDirection;
       }
+    }
+
+    const int now = ClockUtil::now();
+
+    // 1周目だけ実測時間を記録し、以後の周回判定に使い続ける。
+    if(lap == 1) {
+      firstLapTime = now - ETrallystartTime;
+    }
+
+    // ET相撲などを含む、競技全体の開始からの経過時間を計算する。
+    const int elapsedTime = now - robot.getRunningStartTime();
+    const int remainingTime = COMPETITION_TIME_LIMIT_MS - elapsedTime;
+
+    // 残り時間で次の1周を完走できないと予測した場合は終了する。
+    // 残り時間で次の1周を完走できないと予測した場合
+    if(remainingTime <= firstLapTime) {
+      Logger::info("ETラリー周回終了 -> (10,10)へ移動");
+
+      // 最終到達地点と向き（Lコース基準）
+      const Point finalPoint = convertPoint({ 10, 10 }, course);
+      const Direction finalDirection = convertDirection(Direction::LEFT, course);
+
+      Logger::printfLog(Logger::INFO, "Final route: current=(%d,%d), target=(%d,%d)", currentGridX,
+                        currentGridY, finalPoint.x, finalPoint.y);
+
+      // マップの範囲外を指定していないか確認
+      if(finalPoint.x < 0 || finalPoint.x > SystemInfo::X_GRID_NUM || finalPoint.y < 0
+         || finalPoint.y > SystemInfo::Y_GRID_NUM) {
+        Logger::error("EtRallyMotion: final point is outside the map");
+        robot.getWheelMotorControllerInstance().stopBoth();
+        return;
+      }
+
+      // すでに目的地かつ指定方向なら移動しない
+      if(currentGridX != finalPoint.x || currentGridY != finalPoint.y
+         || currentDirection != finalDirection) {
+        // 現在位置・方向から(10,10)左向きまでの経路を探索
+        DijkstraRoutePlanner finalRoutePlanner(mapData.getGates());
+
+        RouteResult finalRoute = finalRoutePlanner.search(
+            currentGridX, currentGridY, currentDirection, finalPoint, finalDirection);
+
+        Logger::printfLog(Logger::INFO, "Final route size=%d",
+                          static_cast<int>(finalRoute.route.size()));
+
+        // 経路探索に失敗した場合
+        if(finalRoute.route.size() < 2) {
+          Logger::error("EtRallyMotion: final route search failed");
+          robot.getWheelMotorControllerInstance().stopBoth();
+          return;
+        }
+
+        // 探索した経路に沿って走行
+        Logger::info("Final route: running");
+        routeFollower.setRoute(finalRoute.route);
+        routeFollower.run();
+        Logger::info("Final route: run finished");
+      }
+
+      // 到達後の位置・向きを更新
+      currentGridX = finalPoint.x;
+      currentGridY = finalPoint.y;
+      currentDirection = finalDirection;
+
+      Logger::info("ETラリー: (10,10)への移動完了");
+
+      // 周回を終了
+      break;
     }
 
     ++lap;

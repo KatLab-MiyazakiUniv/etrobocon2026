@@ -150,9 +150,9 @@ double RouteFollower::directionToHeading(Direction direction) const
     case Direction::RIGHT:
       return 0.0;
     case Direction::UP:
-      return 90.0;
+      return 85.0;
     case Direction::LEFT:
-      return 180.0;
+      return 170.0;
     case Direction::DOWN:
       return -90.0;
   }

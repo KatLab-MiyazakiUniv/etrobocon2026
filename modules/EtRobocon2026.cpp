@@ -30,8 +30,8 @@ void EtRobocon2026::start()
   std::string runlogFileName = buffer;
   CsvLogger::setFileName(runlogFileName);
 
-  // Calibrator calibrator(robot, std::move(std::make_unique<RepeatCountCondition>(robot, 1)));
-  // calibrator.run();
+  Calibrator calibrator(robot, std::move(std::make_unique<RepeatCountCondition>(robot, 1)));
+  calibrator.run();
   // コース設定
   // Rコース
   // robot.setCourse(Course::Right);

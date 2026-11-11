@@ -1,3 +1,4 @@
+
 /**
  * @file   ArmMotorMotion.h
  * @brief  アームモータを指定角度まで回転させるクラス
@@ -42,18 +43,18 @@ class ArmMotorMotion : public BaseMotion {
   void finish() override;
 
  private:
-  std::unique_ptr<ArmMotorController> armMotor;  // アームモータのインスタンス
-  int power;                                    // アームモータの出力
-  int32_t targetCount;                          // 目標回転量[deg]
-  int32_t startCount = 0;                       // 動作開始時の角位置[deg]
-  int32_t lastCount = 0;                        // 前回確認した角位置[deg]
-  int startTime = 0;                            // 動作開始時刻[ms]
-  int lastMovementTime = 0;                     // 最後に角位置が変化した時刻[ms]
-  int lastLogTime = 0;                          // 最後にログを出力した時刻[ms]
-  bool completed = false;                       // 角度到達または異常停止で完了したか
-  bool reachedTarget = false;                   // 目標回転量に到達したか
-  bool stalled = false;                         // 回転が停止したか
-  bool wrongDirection = false;                  // 指定方向と逆に動いたか
+  ArmMotorController& armMotor;  // Robotが保持するアームモータの参照
+  int power;                     // アームモータの出力
+  int32_t targetCount;           // 目標回転量[deg]
+  int32_t startCount = 0;        // 動作開始時の角位置[deg]
+  int32_t lastCount = 0;         // 前回確認した角位置[deg]
+  int startTime = 0;             // 動作開始時刻[ms]
+  int lastMovementTime = 0;      // 最後に角位置が変化した時刻[ms]
+  int lastLogTime = 0;           // 最後にログを出力した時刻[ms]
+  bool completed = false;        // 角度到達または異常停止で完了したか
+  bool reachedTarget = false;    // 目標回転量に到達したか
+  bool stalled = false;          // 回転が停止したか
+  bool wrongDirection = false;   // 指定方向と逆に動いたか
 };
 
 #endif  // ARM_MOTOR_MOTION_H

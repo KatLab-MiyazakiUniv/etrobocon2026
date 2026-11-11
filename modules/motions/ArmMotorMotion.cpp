@@ -1,3 +1,4 @@
+
 /**
  * @file   ArmMotorMotion.cpp
  * @brief  アームモータを指定角度まで回転させるクラス
@@ -53,19 +54,13 @@ namespace {
     /**
      * @brief 外部の継続条件を初期化する
      */
-    void prepare() override
-    {
-      condition->prepare();
-    }
+    void prepare() override { condition->prepare(); }
 
     /**
      * @brief 目標未到達かつ外部の継続条件を満たす場合に継続する
      * @return true 動作を継続する、false 動作を終了する
      */
-    bool shouldContinue() override
-    {
-      return notCompleted() && condition->shouldContinue();
-    }
+    bool shouldContinue() override { return notCompleted() && condition->shouldContinue(); }
 
    private:
     std::unique_ptr<BaseContinuationCondition> condition;  // 外部の継続条件
@@ -79,8 +74,8 @@ ArmMotorMotion::ArmMotorMotion(Robot& _robot,
                                int _power, int32_t _targetCount)
   : BaseMotion(_robot,
                std::make_unique<ArmMotorCompletionCondition>(
-                   _robot, std::move(_continuationCondition),
-                   [this]() { return !completed; })),
+                   _robot, std::move(_continuationCondition), [this]() { return !completed; })),
+    armMotor(_robot.getArmMotorControllerInstance()),
     power(_power),
     targetCount(_targetCount)
 {
@@ -93,45 +88,45 @@ void ArmMotorMotion::prepare()
   stalled = false;
   wrongDirection = false;
 
-  // モーションを実行する時点でアームモータを生成する。
-  armMotor = std::make_unique<ArmMotorController>();
-  armMotor->stopMotor();
+  // Robotが初期化済みのアームモータを使用する。
+  armMotor.stopMotor();
 
-  startCount = armMotor->getCount();
+  startCount = armMotor.getCount();
   lastCount = startCount;
   startTime = ClockUtil::now();
   lastMovementTime = startTime;
   lastLogTime = startTime;
 
-  Logger::printfLog(Logger::INFO,
-                    "ArmMotorMotion start: power=%d target=%ld deg count=%ld",
-                    power, static_cast<long>(targetCount), static_cast<long>(startCount));
+  Logger::printfLog(Logger::INFO, "ArmMotorMotion start: power=%d target=%ld deg count=%ld", power,
+                    static_cast<long>(targetCount), static_cast<long>(startCount));
 
-  armMotor->setPower(power);
+  armMotor.setPower(power);
 }
 
 void ArmMotorMotion::executeStep()
 {
   const int now = ClockUtil::now();
-  const int32_t currentCount = armMotor->getCount();
+  const int32_t currentCount = armMotor.getCount();
   const int32_t movedCount = currentCount - startCount;
   const int32_t progress = power > 0 ? movedCount : -movedCount;
 
   if(now - lastLogTime >= ARM_LOG_INTERVAL_MS) {
     Logger::printfLog(Logger::INFO, "ArmMotorMotion: time=%d ms count=%ld deg power=%d",
-                      now - startTime, static_cast<long>(movedCount), armMotor->getPower());
+                      now - startTime, static_cast<long>(movedCount), armMotor.getPower());
     lastLogTime = now;
   }
 
   if(progress >= targetCount) {
     reachedTarget = true;
     completed = true;
+    armMotor.stopMotor();
     return;
   }
 
   if(progress <= -ARM_REVERSE_LIMIT) {
     wrongDirection = true;
     completed = true;
+    armMotor.stopMotor();
     return;
   }
 
@@ -141,18 +136,17 @@ void ArmMotorMotion::executeStep()
   } else if(now - lastMovementTime >= ARM_STALL_TIMEOUT_MS) {
     stalled = true;
     completed = true;
+    armMotor.stopMotor();
   }
 }
 
 void ArmMotorMotion::finish()
 {
-  if(!armMotor) return;
-
   // 目標到達・タイムアウト・異常停止のいずれでもモータを停止する。
-  armMotor->stopMotor();
+  armMotor.stopMotor();
 
   const int elapsedTime = ClockUtil::now() - startTime;
-  const int32_t movedCount = armMotor->getCount() - startCount;
+  const int32_t movedCount = armMotor.getCount() - startCount;
 
   Logger::printfLog(Logger::INFO, "ArmMotorMotion result: count=%ld deg elapsed=%d ms",
                     static_cast<long>(movedCount), elapsedTime);

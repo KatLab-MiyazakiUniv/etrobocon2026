@@ -557,6 +557,37 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                            fromString<double>(motionParams[8]));
     }
 
+    // case MOTION_COMMAND::CAMERA_TRACKING: {
+    //   CameraServer::ColorRegionDetectorRequest request;
+    //   request.requireLargestColorIndex = fromString<bool>(motionParams[12]);
+    //   // request.hsvRanges = ImageProcessingColor::BottleColors;
+    //   int count = 0;
+    //   for(int i = 0; i < ImageProcessingColor::BottleColors.size(); i++) {
+    //     if(fromString<bool>(motionParams[13 + i])) {
+    //       request.hsvRanges[count] = ImageProcessingColor::BottleColors[i];
+    //       count++;
+    //     }
+    //   }
+    //   request.hsvRangeCount = count;
+
+    //   request.roi = { fromString<int>(motionParams[8]), fromString<int>(motionParams[9]),
+    //                   fromString<int>(motionParams[10]), fromString<int>(motionParams[11]) };
+
+    //   int targetXCoordinate = fromString<int>(motionParams[3]);
+
+    //   Logger::printfLog(Logger::DEBUG,
+    //                     "[MotionParser] CameraTracking: targetXCoorddinate=%.d を生成しました",
+    //                     targetXCoordinate);
+
+    //   return new CameraTracking(
+    //       robot, std::move(condition), fromString<double>(motionParams[2]), targetXCoordinate,
+    //       Pid::PidGain(fromString<double>(motionParams[4]), fromString<double>(motionParams[5]),
+    //                    fromString<double>(motionParams[6])),
+    //       request, fromString<bool>(motionParams[7]));
+    //   // ここでCameraTrackigのメンバ変数のdetectorのメンバ変数のhsvRangesをセットする
+    // }
+
+
     case MOTION_COMMAND::CAMERA_TRACKING: {
 
        if(motionParams.size() < 20) {
@@ -596,6 +627,7 @@ return new CameraTracking(
            request, fromString<bool>(motionParams[7]), fromString<double>(motionParams[18]),
           fromString<double>(motionParams[19]));
     }
+
 
     case MOTION_COMMAND::ABSOLUTE_ROTATION: {
       // AbsoluteRotation:
@@ -782,6 +814,31 @@ return new CameraTracking(
                             anglePid, shouldUseIMU, deadbandRate, maxoutRate, qrRequest,
                             fromString<bool>(motionParams[9]));
     }
+    case MOTION_COMMAND::QR_ROTATION: {
+      if(motionParams.size() < 7) {
+        Logger::printfLog(Logger::ERROR, "[MotionParser] QRStraightのパラメータ数が不足しています");
+        return nullptr;
+      }
+      Pid::PidGain anglePidGain{ fromString<double>(motionParams[2]),
+                                 fromString<double>(motionParams[3]),
+                                 fromString<double>(motionParams[4]) };
+
+      double relativeTargetAngle = fromString<double>(motionParams[5]);
+
+      CameraServer::QrCodeDetectorRequest qrRequest;
+      qrRequest.roi.x = 0;
+      qrRequest.roi.y = 0;
+      qrRequest.roi.width = 1920;
+      qrRequest.roi.height = 1080;
+
+      Logger::printfLog(
+          Logger::DEBUG,
+          "[MotionParser] QRRelativeRotation: relativeTargetAngle=%.1f を生成しました",
+          relativeTargetAngle);
+
+      return new QRRotation(robot, std::move(condition), anglePidGain, relativeTargetAngle,
+                            qrRequest, fromString<bool>(motionParams[6]));
+    }
     case MOTION_COMMAND::COLOR_SENSOR_DEBUG: {
   return new ColorSensorDebug(robot, std::move(condition));
 }
@@ -811,6 +868,7 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "EtRallyFinish", MOTION_COMMAND::ET_RALLY_FINISH },
           { "ETZumoApproach", MOTION_COMMAND::ET_ZUMO_APPROACH },
           { "QRStraight", MOTION_COMMAND::QR_STRAIGHT },
+          { "QRRotation", MOTION_COMMAND::QR_ROTATION },
           { "ETZumoApproach", MOTION_COMMAND::ET_ZUMO_APPROACH },
           { "ColorSensorDebug", MOTION_COMMAND::COLOR_SENSOR_DEBUG } };
 

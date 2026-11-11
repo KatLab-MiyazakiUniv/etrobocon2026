@@ -22,6 +22,7 @@ void EtRobocon2026::start()
   int voltage = BatteryController::getVoltage();
   Logger::printfLog(Logger::INFO, "バッテリー電圧: %d mV", voltage);
 
+
   // runlogのファイル名を作成
   std::tm jstTime = Utils::getLocalTime();
   char buffer[128];
@@ -30,8 +31,10 @@ void EtRobocon2026::start()
   std::string runlogFileName = buffer;
   CsvLogger::setFileName(runlogFileName);
 
-  Calibrator calibrator(robot, std::move(std::make_unique<RepeatCountCondition>(robot, 1)));
-  calibrator.run();
+
+
+  // Calibrator calibrator(robot, std::move(std::make_unique<RepeatCountCondition>(robot, 1)));
+  // calibrator.run();
   // コース設定
   // Rコース
   // robot.setCourse(Course::Right);
@@ -44,13 +47,14 @@ void EtRobocon2026::start()
   // ライントレース走行
   Area lineTraceArea = Area::LineTrace;
   AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
-  lineTraceAreaMaster.run();
+  // lineTraceAreaMaster.run();
 
   // ボトルデリバリー走行
   Area bottleDeliveryArea = Area::BottleDelivery;
   AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
   // bottleDeliveryAreaMaster.run();
 
+  CsvLogger::outputToFile();
 
   // ET相撲走行
   Area ETZumo = Area::ETZumo;
@@ -61,6 +65,11 @@ void EtRobocon2026::start()
   Area etRallyArea = Area::ETRally;
   AreaMaster etRallyAreaMaster(robot, etRallyArea);
   // etRallyAreaMaster.run();
+
+  // 調整のための一時的な走行
+  Area tmpArea = Area::Tmp;
+  AreaMaster tmpAreaMaster(robot, tmpArea);
+  tmpAreaMaster.run();
 
   CsvLogger::outputToFile();
 

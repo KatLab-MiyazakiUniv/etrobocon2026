@@ -15,13 +15,21 @@ CameraTracking,R001,Distance,032
 CameraTracking,S001,Distance,015
 CameraTracking,L002,Distance,035
 CameraTracking,S001,Distance,050
+
+
+
+Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,S002,ColorRegion,001
 #CameraTracking,000,Distance,000
 
 Snapshot,clearBuffer1,RepeatCount,001
-CameraTracking,BC,Distance,025
-CameraTracking,BC3,Distance,010
+CameraTracking,BC,Distance,030
+CameraTracking,BC3,Distance,015
 CameraTracking,000,Distance,000
+
+
+
+
 
 
 

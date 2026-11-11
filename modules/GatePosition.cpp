@@ -6,20 +6,9 @@
 
 #include "GatePosition.h"
 
-GatePosition::GatePosition(Robot& _robot,
-                           const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
-                           bool _decryptRequired)
-  : robot(_robot), qrDetectionRequest(_qrDetectionRequest), decryptRequired(_decryptRequired)
-{
-  LOG_CREATE("GatePosition");
-}
-
-GatePosition::~GatePosition()
-{
-  LOG_DESTROY("GatePosition");
-}
-
-void GatePosition::setGatePosition()
+void GatePosition::setGatePosition(Robot& robot,
+                                   const CameraServer::QrCodeDetectorRequest& qrDetectionRequest,
+                                   bool decryptRequired)
 {
   // QR検出済みならreturn
   if(decryptRequired) {
@@ -33,55 +22,50 @@ void GatePosition::setGatePosition()
   }
 
   // QRコードを検出
-
   SocketClient& client = robot.getCameraSocketClientInstance();
-  bool success = false;
-  bool wasDetected = false;
 
   CameraServer::QrCodeDetectorResponse qrResponse;
-  success = client.executeQrCodeDetection(qrDetectionRequest, qrResponse);
-  wasDetected = qrResponse.wasDetected;
 
-  if(!wasDetected || !success) {
+  bool success = client.executeQrCodeDetection(qrDetectionRequest, qrResponse);
+
+  if(!success || !qrResponse.wasDetected) {
     Logger::error("GatePositionDetection: QRコードの検出に失敗しました。");
     return;
-  } else {
-    Logger::error("GatePositionDetection: QRコードの検出に成功しました。");
+  }
 
-    //  QRコードの暗号文を復号
-    std::string gatePositionData;
+  Logger::info("GatePositionDetection: QRコードの検出に成功しました。");
 
-    if(decryptRequired) {
-      // AesDecryptor decryptor(std::string(robot.getDecryptionKey()), qrResponse.content);
-      // 青・黄色：復号する
-      gatePositionData
-          = Decrypter::decrypt(std::string(robot.getDecryptionKey()), qrResponse.content);
+  // QRコードの暗号文を復号
+  std::string gatePositionData;
 
-      if(gatePositionData.empty()) {
-        Logger::error("GatePositionDetection: QRコードの復号に失敗しました。");
-        return;
-      }
-    } else {
-      // 赤：復号しない
-      gatePositionData = qrResponse.content;
-    }
+  if(decryptRequired) {
+    // 青・黄色：復号する
+    gatePositionData
+        = Decrypter::decrypt(std::string(robot.getDecryptionKey()), qrResponse.content);
 
-    //  平文を解析して,ゲート位置情報をRobotに設定
-
-    GatePositionParser parser(gatePositionData, robot);
-
-    if(!parser.parse()) {
-      Logger::error("GatePositionDetection: ゲート位置情報の解析に失敗しました。");
+    if(gatePositionData.empty()) {
+      Logger::error("GatePositionDetection: QRコードの復号に失敗しました。");
       return;
     }
+  } else {
+    // 赤：復号しない
+    gatePositionData = qrResponse.content;
+  }
 
-    Logger::info("GatePositionDetection: ゲート位置情報の設定に成功しました。");
+  // 平文を解析してゲート位置情報をRobotに設定
+  GatePositionParser parser(gatePositionData, robot);
 
-    // QR検出/解読成功ならフラグを更新
-    if(decryptRequired) {
-      robot.setHaveQR2contents();
-    } else {
-      robot.setHaveQR1contents();
-    }
+  if(!parser.parse()) {
+    Logger::error("GatePositionDetection: ゲート位置情報の解析に失敗しました。");
+    return;
+  }
+
+  Logger::info("GatePositionDetection: ゲート位置情報の設定に成功しました。");
+
+  // QR検出・解析成功ならフラグを更新
+  if(decryptRequired) {
+    robot.setHaveQR2contents();
+  } else {
+    robot.setHaveQR1contents();
   }
 }

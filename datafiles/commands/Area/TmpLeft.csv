@@ -1,4 +1,3 @@
-動作コマンド名,動作ID,条件コマンド名,条件ID
 # ボトルデリバリー
 
 AbsoluteRotation,-085,AbsoluteAngle,-085
@@ -11,10 +10,10 @@ QRStraight,001,DistanceOrColor,BLUE040
 
 AbsoluteRotation,-090,AbsoluteAngle,-090
 Snapshot,clearBuffer1,RepeatCount,001
-CameraTracking,LBS003-4,Distance,045
+CameraTracking,LBS003-4,Distance,070
 
 #QR2取得前カーブ直前
-Straight,007,DistanceOrColor,BLACK090
+Straight,001,DistanceOrColor,BLACK070
 
 # QR2検出
 
@@ -24,8 +23,18 @@ Snapshot,021,RepeatCount,001
 
 
 
+
+
+
+
+
+
+
+#動作コマンド名,動作ID,条件コマンド名,条件ID
 #赤色まで移動
 #AbsoluteRotation,-165,AbsoluteAngle,-165
+
+Snapshot,clearBuffer1,RepeatCount,001
 QRRotation,-070,RelativeAngle,-070
 #赤色が写る範囲まで移動
 Straight,006,DistanceOrColor,RED063
@@ -34,27 +43,29 @@ Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,RED,DistanceOrColor,RED025
 
 
-Straight,-001,Distance,005
+Straight,-001,Distance,010
 
 AbsoluteRotation,090,AbsoluteAngle,090
 
-Straight,001,Distance,005
+Straight,001,Distance,010
 Straight,001,ColorOrColor,001
 
+#Calibrator,001,RepeatCount,001
 
-AbsoluteRotation,165,AbsoluteAngle,165
+AbsoluteRotation,160,AbsoluteAngle,160
 Straight,006,Distance,010
 Straight,006,ColorRegion,004
 AbsoluteRotation,090,AbsoluteAngle,090
-Straight,006,Distance,115
+Straight,006,Distance,125
 #CameraTracking,000,RepeatCount,001
 #ETZumoApproach,L001,RepeatCount,001
 #ETZumoExit,L001,RepeatCount,001
 CameraTracking,014,DistanceOrUltraSonic,001
+CameraTracking,015,DistanceOrUltraSonic,003
 Straight,001,DistanceOrUltraSonic,002
 CameraTracking,001,RepeatCount,001
 Straight,004,ColorOrColor,004
-Straight,003,Distance,005
+Straight,003,Distance,010
 AbsoluteRotation,-040,AbsoluteAngle,-040
 CameraTracking,S003,Distance,020
 Straight,001,ColorOrColor,001
@@ -62,5 +73,4 @@ AbsoluteRotation,-090,AbsoluteAngle,-090
 #ColorSensorDebug,001,Distance,002
 
 #ColorSensorDebug,001,RepeatCount,010
-
 

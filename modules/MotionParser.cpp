@@ -568,7 +568,6 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
 
       CameraServer::ColorRegionDetectorRequest request;
       request.requireLargestColorIndex = fromString<bool>(motionParams[12]);
-      // request.hsvRanges = ImageProcessingColor::BottleColors;
       int count = 0;
       for(int i = 0; i < ImageProcessingColor::BottleColors.size(); i++) {
         if(fromString<bool>(motionParams[13 + i])) {

@@ -5,8 +5,11 @@ Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,S002,ColorRegion,001
 CameraTracking,000,Distance,000
 
-CameraTracking,BC,Distance,025
-CameraTracking,BC3,Distance,010
+
+#CameraTracking,BC,Distance,025
 CameraTracking,000,Distance,000
+
+#CameraTracking,BC3,Distance,010
+#CameraTracking,000,Distance,000
 # ボトルデリバリー
-AbsoluteRotation,-085,AbsoluteAngle,-085
+#AbsoluteRotation,-085,AbsoluteAngle,-085

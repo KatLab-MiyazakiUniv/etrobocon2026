@@ -3,8 +3,8 @@
  * @brief  絶対角度で回頭動作を実行するクラス
  * @author okuyama0528 yutaro-1214
  */
-#ifndef ABSOLUTE_ROTATION_H
-#define ABSOLUTE_ROTATION_H
+#ifndef QR_ABSOLUTE_ROTATION_H
+#define QR_ABSOLUTE_ROTATION_H
 
 #include "Rotation.h"
 #include "Logger.h"

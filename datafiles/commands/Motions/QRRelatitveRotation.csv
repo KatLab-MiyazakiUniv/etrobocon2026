@@ -1,0 +1,13 @@
+コマンド名,ID,a_kp,a_ki,a_kd,relativeTargetAngle,decryptRequired
+QRRelativeRotation,ID,double,double,double,double,bool
+QRRelativeRotation,000,1.5,2.5,0.0,0.0,1
+QRRelativeRotation,090,1.5,2.5,0.0,90.0,1
+QRRelativeRotation,-090,1.5,2.5,0.0,-90.0,1
+QRRelativeRotation,045,1.5,2.5,0.0,45.0,1
+QRRelativeRotation,-045,1.5,2.5,0.0,-45.0,1
+QRRelativeRotation,060,1.5,2.5,0.0,60.0,1
+QRRelativeRotation,-060,1.5,2.5,0.0,-60.0,1
+QRRelativeRotation,030,1.5,2.5,0.0,30.0,1
+QRRelativeRotation,-030,1.5,2.5,0.0,-30.0,1
+QRRelativeRotation,-070,0.75,1.25,0.0,-70.0,1
+QRRelativeRotation,-065,1.5,2.5,0.5,-65.0,1

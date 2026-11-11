@@ -1,0 +1,4 @@
+コマンド名,ID,a_kp,a_ki,a_kd,relativeTargetAngle,decryptRequired
+QRAbsoluteRotation,ID,double,double,double,double,bool
+AbsoluteRotation,000,3.0,2.2,0.2,000,1
+AbsoluteRotation,001,3.0,2.2,0.2,001,1

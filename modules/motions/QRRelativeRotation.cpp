@@ -3,28 +3,27 @@
  * @brief  相対角度で回頭動作を実行するクラス
  * @author okuyama0528　yutaro-1214
  */
-#include "QRRotation.h"
+#include "QRRelativeRotation.h"
 
-QRRotation::QRRotation(Robot& _robot,
-                       std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                       const Pid::PidGain& _anglePidGain, double _relativeTargetAngle,
-                       CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
-                       bool _decryptRequired)
+QRRelativeRotation::QRRelativeRotation(
+    Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+    const Pid::PidGain& _anglePidGain, double _relativeTargetAngle,
+    CameraServer::QrCodeDetectorRequest& _qrDetectionRequest, bool _decryptRequired)
   : Rotation(_robot, std::move(_continuationCondition), _anglePidGain),
     anglePidGain(_anglePidGain),
     relativeTargetAngle(_relativeTargetAngle),
     qrDetectionRequest(_qrDetectionRequest),
     decryptRequired(_decryptRequired)
 {
-  LOG_CREATE("QRRotation");
+  LOG_CREATE("QRRelativeRotation");
 }
 
-QRRotation::~QRRotation()
+QRRelativeRotation::~QRRelativeRotation()
 {
-  LOG_DESTROY("QRRotation");
+  LOG_DESTROY("QRRelativeRotation");
 }
 
-void QRRotation::prepare()
+void QRRelativeRotation::prepare()
 {
   double initialAngle = getCurrentAngle();  // 現在の走行体角度を取得する
 
@@ -35,7 +34,7 @@ void QRRotation::prepare()
   Rotation::prepare();
 }
 
-void QRRotation::executeStep()
+void QRRelativeRotation::executeStep()
 {
   // QR未検出なら検出処理を行う
   if(decryptRequired) {

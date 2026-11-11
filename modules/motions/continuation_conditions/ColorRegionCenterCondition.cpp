@@ -44,7 +44,7 @@ bool ColorRegionCenterCondition::shouldContinue()
   double currentCenterY = response.result.bottomRight.y;
 
   // 目標値 ± toleranceY の範囲内か判定
-  if(currentCenterY < targetCenterY) {
+  if(currentCenterY > targetCenterY) {
     inRangeCount++;
     Logger::printfLog(
         Logger::DEBUG,

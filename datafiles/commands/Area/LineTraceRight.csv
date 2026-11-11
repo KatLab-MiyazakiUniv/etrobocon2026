@@ -30,7 +30,7 @@ CameraTracking,000,Distance,000
 # ボトルデリバリー
 
 
-AbsoluteRotation,090,AbsoluteAngle,090
+AbsoluteRotation,085,AbsoluteAngle,085
 Straight,001,ColorOrColor,003
 AbsoluteRotation,000,AbsoluteAngle,000
 Straight,005,DistanceOrColor,GREEN100
@@ -49,4 +49,4 @@ Straight,001,DistanceOrColor,BLACK070
 
 Snapshot,clearBuffer1,RepeatCount,001
 Snapshot,021,RepeatCount,001
-GatePosition,2-1,RepeatCount,001
+#GatePosition,2-1,RepeatCount,001

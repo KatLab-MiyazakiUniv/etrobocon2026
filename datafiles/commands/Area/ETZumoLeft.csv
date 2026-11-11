@@ -1,9 +1,12 @@
-#動作コマンド名,動作ID,条件コマンド名,条件ID
-AbsoluteRotation,170,AbsoluteAngle,170
-Straight,001,Distance,010
-Straight,001,ColorRegion,004
+動作コマンド名,動作ID,条件コマンド名,条件ID
+
+#Calibrator,001,RepeatCount,001
+
+AbsoluteRotation,180,AbsoluteAngle,180
+Straight,006,Distance,010
+Straight,006,ColorRegion,004
 AbsoluteRotation,090,AbsoluteAngle,090
-Straight,001,Distance,115
+Straight,006,Distance,115
 #CameraTracking,000,RepeatCount,001
 #ETZumoApproach,L001,RepeatCount,001
 #ETZumoExit,L001,RepeatCount,001

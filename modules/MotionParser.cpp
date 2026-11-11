@@ -559,7 +559,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
 
     case MOTION_COMMAND::CAMERA_TRACKING: {
 
-       if(motionParams.size() < 19) {
+       if(motionParams.size() < 20) {
         Logger::printfLog(Logger::ERROR,
                           "[MotionParser] CameraTrackingのパラメータ数は[%d]です。不足です。",
                           motionParams.size());
@@ -583,7 +583,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       int targetXCoordinate = fromString<int>(motionParams[3]);
 
       Logger::printfLog(Logger::DEBUG,
-                        "[MotionParser] CameraTracking: targetXCoorddinate=%.d を生成しました",
+                        "[MotionParser] CameraTracking: targetXCoorddinate=%d を生成しました",
                         targetXCoordinate);
 
 
@@ -593,8 +593,8 @@ return new CameraTracking(
           robot, std::move(condition), fromString<double>(motionParams[2]), targetXCoordinate,
           Pid::PidGain(fromString<double>(motionParams[4]), fromString<double>(motionParams[5]),
                        fromString<double>(motionParams[6])),
-           request, fromString<bool>(motionParams[7]), fromString<double>(motionParams[17]),
-          fromString<double>(motionParams[18]));
+           request, fromString<bool>(motionParams[7]), fromString<double>(motionParams[18]),
+          fromString<double>(motionParams[19]));
     }
 
     case MOTION_COMMAND::ABSOLUTE_ROTATION: {

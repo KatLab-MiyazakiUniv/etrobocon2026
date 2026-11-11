@@ -1,10 +1,10 @@
 /**
- * @file   QRRotation.h
+ * @file   QRRelativeRotation.h
  * @brief  相対角度で回頭動作を実行するクラス
  * @author okuyama0528 yutaro-1214
  */
-#ifndef QR_ROTATION_H
-#define QR_ROTATION_H
+#ifndef QR_RELATIVE_ROTATION_H
+#define QR_RELATIVE_ROTATION_H
 
 #include "Rotation.h"
 #include "AngleNormalizer.h"
@@ -13,7 +13,7 @@
 #include <cmath>
 #include "GatePosition.h"
 
-class QRRotation : public Rotation {
+class QRRelativeRotation : public Rotation {
  public:
   /**
    * @brief コンストラクタ
@@ -27,14 +27,14 @@ class QRRotation : public Rotation {
    * ロボット、継続条件、PIDゲイン、および相対角度を受け取り、
    * 相対回転動作の初期設定を行う
    */
-  QRRotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+  QRRelativeRotation(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
              const Pid::PidGain& _anglePidGain, double _relativeTargetAngle,
              CameraServer::QrCodeDetectorRequest& _qrDetectionRequest, bool _decryptRequired);
 
   /**
    * デストラクタ
    */
-  ~QRRotation();
+  ~QRRelativeRotation();
 
  protected:
   /**

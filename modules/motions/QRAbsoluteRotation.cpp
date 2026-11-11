@@ -1,41 +1,38 @@
 /**
- * @file   RelativeRotation.cpp
- * @brief  相対角度で回頭動作を実行するクラス
- * @author okuyama0528　yutaro-1214
+ * @file   QRAbsoluteRotation.cpp
+ * @brief  絶対角度で回頭動作を実行するクラス
+ * @author okuyama0528 yutaro-1214
  */
-#include "QRRotation.h"
+#include "QRAbsoluteRotation.h"
+#include <algorithm>
+#include <cmath>
 
-QRRotation::QRRotation(Robot& _robot,
-                       std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                       const Pid::PidGain& _anglePidGain, double _relativeTargetAngle,
-                       CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
-                       bool _decryptRequired)
+QRAbsoluteRotation::QRAbsoluteRotation(
+    Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+    const Pid::PidGain& _anglePidGain, double _targetAbsAngle,
+    CameraServer::QrCodeDetectorRequest& _qrDetectionRequest, bool _decryptRequired)
   : Rotation(_robot, std::move(_continuationCondition), _anglePidGain),
     anglePidGain(_anglePidGain),
-    relativeTargetAngle(_relativeTargetAngle),
+    targetAbsAngle(_targetAbsAngle),
     qrDetectionRequest(_qrDetectionRequest),
     decryptRequired(_decryptRequired)
 {
-  LOG_CREATE("QRRotation");
+  LOG_CREATE("QRAbsoluteRotation");
 }
 
-QRRotation::~QRRotation()
+QRAbsoluteRotation::~QRAbsoluteRotation()
 {
-  LOG_DESTROY("QRRotation");
+  LOG_DESTROY("QRAbsoluteRotation");
 }
 
-void QRRotation::prepare()
+void QRAbsoluteRotation::prepare()
 {
-  double initialAngle = getCurrentAngle();  // 現在の走行体角度を取得する
-
-  // 現在角度にrelativeAngleを加算し、-180～180度に正規化して目標角度を算出する
-  targetAngle = AngleNormalizer::normalizeAngle(initialAngle + relativeTargetAngle);
-
+  targetAngle = targetAbsAngle;
   anglePid = Pid(anglePidGain.kp, anglePidGain.ki, anglePidGain.kd, 0.0);
   Rotation::prepare();
 }
 
-void QRRotation::executeStep()
+void QRAbsoluteRotation::executeStep()
 {
   // QR未検出なら検出処理を行う
   if(decryptRequired) {

@@ -30,25 +30,25 @@ void EtRobocon2026::start()
   // robot.setEdge(Edge::LeftEdge);
 
   // Lコース
-  // robot.setCourse(Course::Left);
-  // robot.setEdge(Edge::RightEdge);
+  robot.setCourse(Course::Left);
+  robot.setEdge(Edge::RightEdge);
 
   // ライントレース走行
-  Area lineTraceArea = Area::LineTrace;
-  AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
-  lineTraceAreaMaster.run();
+  //Area lineTraceArea = Area::LineTrace;
+  //AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
+  //lineTraceAreaMaster.run();
 
   // ボトルデリバリー走行
-  Area bottleDeliveryArea = Area::BottleDelivery;
-  AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
-  bottleDeliveryAreaMaster.run();
+  //Area bottleDeliveryArea = Area::BottleDelivery;
+  //AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
+  //bottleDeliveryAreaMaster.run();
 
-  CsvLogger::outputToFile();
+  //CsvLogger::outputToFile();
 
   // ET相撲走行
-  Area ETZumo = Area::ETZumo;
-  AreaMaster ETZumouAreaMaster(robot, ETZumo);
-  ETZumouAreaMaster.run();
+  //Area ETZumo = Area::ETZumo;
+  //AreaMaster ETZumouAreaMaster(robot, ETZumo);
+  //ETZumouAreaMaster.run();
 
   // ETラリー走行
   Area etRallyArea = Area::ETRally;
@@ -56,7 +56,7 @@ void EtRobocon2026::start()
   etRallyAreaMaster.run();
 
   // 調整のための一時的な走行
-  Area tmpArea = Area::Tmp;
-  AreaMaster tmpMaster(robot, tmpArea);
-  tmpAreaMaster.run();
+  // Area tmpArea = Area::Tmp;
+  // AreaMaster tmpMaster(robot, tmpArea);
+  // tmpAreaMaster.run();
 }

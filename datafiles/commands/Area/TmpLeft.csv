@@ -6,6 +6,7 @@ AbsoluteRotation,-085,AbsoluteAngle,-085
 Straight,001,ColorOrColor,003
 AbsoluteRotation,000,AbsoluteAngle,000
 Straight,005,DistanceOrColor,GREEN030
+Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,S003,DistanceOrColor,BLUE020
 QRStraight,001,DistanceOrColor,BLUE040
 
@@ -35,6 +36,7 @@ QRAbsoluteRotation,-160,AbsoluteAngle,-160
 Straight,006,DistanceOrColor,RED063
 #赤色がフレームに写る状態で赤色検知カメラ走行
 Snapshot,clearBuffer1,RepeatCount,001
+Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,RED,DistanceOrColor,RED025
 
 
@@ -55,6 +57,7 @@ Straight,006,Distance,122
 #CameraTracking,000,RepeatCount,001
 #ETZumoApproach,L001,RepeatCount,001
 #ETZumoExit,L001,RepeatCount,001
+Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,014,DistanceOrUltraSonic,001
 #CameraTracking,015,DistanceOrUltraSonic,003
 Straight,004,DistanceOrColor,GRAY030
@@ -63,6 +66,7 @@ Straight,004,DistanceOrColor,GRAY015
 Straight,001,Distance,010
 Straight,003,Distance,015
 AbsoluteRotation,-030,AbsoluteAngle,-030
+Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,S003,Distance,020
 Straight,008,ColorOrColor,001
 AbsoluteRotation,-090,AbsoluteAngle,-090

@@ -31,6 +31,11 @@ namespace {
   constexpr double ROTATION_TOLERANCE = 2.0;
 
   /**
+   * @brief 90度回頭に対して指定する回頭角度[deg]
+   */
+  constexpr double ROTATION_ANGLE = 70.0;
+
+  /**
    * @brief 外周ゲートか判定する
    * @param gate 判定するゲート
    * @return true 外周ゲート
@@ -169,18 +174,6 @@ void EtRallyMotion::executeStep()
 
   MapData& mapData = robot.getMapDataInstance();
 
-  // ========================================
-  // ゲート情報の確認（走行前）
-  //
-  // 情報不足の場合、ETZumoFinishが地区大会用ゴールへ
-  // 走行済みなので、QR補正やゲート巡回を行わず終了する。
-  // ========================================
-  if(!hasAllGates(mapData)) {
-    Logger::info("EtRallyMotion: ゲート情報不足のためETラリー走行をスキップ");
-    robot.getWheelMotorControllerInstance().stopBoth();
-    return;
-  }
-
   GateRoutePlanner routePlanner(mapData);
   EtRallyMap etRallyMap;
 
@@ -292,12 +285,44 @@ void EtRallyMotion::executeStep()
   const int ETrallystartTime = ClockUtil::now();
 
   // ========================================
-  // ゲート情報の確認（既存処理）
+  // ゲート情報が不足している場合のゴール走行
   // ========================================
-  // ゲート情報が足りない場合、最終地点には向かわず安全に終了する。
+  // QR補正後、x=10のラインに沿って(10,10)へ直進し、最後にLEFTを向く。
   if(!hasAllGates(mapData)) {
-    Logger::error("EtRallyMotion: gate information is incomplete");
+    Logger::info("EtRallyMotion: ゲート情報不足 -> 外周直進で最終地点へ移動");
+
+    const Point finalPoint = convertPoint({ 10, 10 }, course);
+    const Direction finalDirection = convertDirection(Direction::LEFT, course);
+
+    // 開始時のRIGHTからゴール方向のDOWNへ向く。
+    const double firstRotationAngle = course == Course::Right ? -ROTATION_ANGLE : ROTATION_ANGLE;
+    auto firstRotationCondition
+        = std::make_unique<RelativeAngleCondition>(robot, firstRotationAngle, ROTATION_TOLERANCE);
+    RelativeRotation firstRotation(robot, std::move(firstRotationCondition), rotationPid,
+                                   firstRotationAngle);
+    firstRotation.run();
+
+    // 開始地点からゴールまで同じX座標上を直進する。
+    const EtRallyMap::Node startNode = etRallyMap.getNode(startPoint.x, startPoint.y);
+    const EtRallyMap::Node finalNode = etRallyMap.getNode(finalPoint.x, finalPoint.y);
+    const double distance = std::abs(finalNode.y - startNode.y);
+    Logger::printfLog(Logger::INFO, "EtRallyMotion: ゴールまで直進 %.2f mm", distance);
+
+    auto straightCondition = std::make_unique<DistanceCondition>(robot, distance);
+    Straight straight(robot, std::move(straightCondition), targetSpeed, straightAnglePid, true,
+                      straightDeadbandRate, straightMaxoutRate);
+    straight.run();
+
+    // ゴールでLEFTへ向く。
+    const double finalRotationAngle = course == Course::Right ? -ROTATION_ANGLE : ROTATION_ANGLE;
+    auto finalRotationCondition
+        = std::make_unique<RelativeAngleCondition>(robot, finalRotationAngle, ROTATION_TOLERANCE);
+    RelativeRotation finalRotation(robot, std::move(finalRotationCondition), rotationPid,
+                                   finalRotationAngle);
+    finalRotation.run();
+
     robot.getWheelMotorControllerInstance().stopBoth();
+    Logger::info("EtRallyMotion: ゲート情報不足時のゴール走行完了");
     return;
   }
 

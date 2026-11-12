@@ -237,6 +237,10 @@ void EtRallyMotion::executeStep()
 
     rotate.run();
 
+    // 回頭後に停止して20ms待機
+    robot.getWheelMotorControllerInstance().stopBoth();
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+
     // ----------------------------------------
     // QRまで直進
     // ----------------------------------------
@@ -247,13 +251,9 @@ void EtRallyMotion::executeStep()
 
     straight.run();
 
-    // 正方形まで進んだ距離を後退
-    auto backwardCondition = std::make_unique<DistanceCondition>(robot, result.straightDistance);
-
-    Straight backward(robot, std::move(backwardCondition), -std::abs(targetSpeed), straightAnglePid,
-                      true, straightDeadbandRate, straightMaxoutRate);
-
-    backward.run();
+    // 直進後に停止して20ms待機
+    robot.getWheelMotorControllerInstance().stopBoth();
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
     // 元のETラリー開始方向へ戻す
     auto returnCondition = std::make_unique<RelativeAngleCondition>(robot, -result.correctionAngle,
@@ -263,6 +263,18 @@ void EtRallyMotion::executeStep()
                                   -result.correctionAngle);
 
     returnRotate.run();
+
+    // 逆回頭後に停止して20ms待機
+    robot.getWheelMotorControllerInstance().stopBoth();
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+
+    // 元の方向を向いたまま、QRまで進んだ距離を後退
+    auto backwardCondition = std::make_unique<DistanceCondition>(robot, result.straightDistance);
+
+    Straight backward(robot, std::move(backwardCondition), -std::abs(targetSpeed), straightAnglePid,
+                      true, straightDeadbandRate, straightMaxoutRate);
+
+    backward.run();
 
     Logger::info("ET Rally start square adjustment finished");
   } else {

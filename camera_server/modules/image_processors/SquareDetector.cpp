@@ -8,7 +8,6 @@
 
 #include <climits>
 #include <cmath>
-#include <limits>
 #include <vector>
 
 namespace {
@@ -19,11 +18,6 @@ namespace {
     cv::RotatedRect rect;
     double pointCount;
   };
-
-  /**
-   * @brief 検出したいQRコードが画像の下側にあると予想されるため、その基準となるY位置
-   */
-  constexpr double TARGET_Y_RATIO = 0.82;
 
   /**
    * @brief QRコードの黒と白の境目を検出するための基準値
@@ -43,7 +37,7 @@ namespace {
   /**
    * @brief 左右から検出対象外にする幅 [px]
    */
-  constexpr int SIDE_CROP_PX = 200;
+  constexpr int SIDE_CROP_PX = 0;
 }  // namespace
 
 SquareDetector::SquareDetector(const cv::Rect& _roi) : roi(_roi)
@@ -62,8 +56,8 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
     return;
   }
 
-  // ROIの切り出し（左右300pxを除外）
-  constexpr int SIDE_MARGIN = 300;
+  // ROIの切り出し
+  constexpr int SIDE_MARGIN = SIDE_CROP_PX;
 
   if(frame.cols <= SIDE_MARGIN * 2) {
     Logger::error("SquareDetector: 画像の横幅が不足しています。");
@@ -77,6 +71,7 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
   if(roiRect.empty()) {
     return;
   }
+
   const cv::Mat roiFrame = frame(roiRect);
 
   // グレースケール化
@@ -105,10 +100,11 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
   std::vector<SquareCandidate> candidates;
 
   constexpr float CLUSTER_RADIUS = 45.0f;  // 点を同じグループとしてまとめる範囲[px]
-  constexpr int MIN_CLUSTER_POINTS = 25;   // QRコードの候補として認める最小点数
+  constexpr int MIN_CLUSTER_POINTS = 100;   // QRコードの候補として認める最小点数
 
   // 近くにある点をひとまとめにする
   std::vector<bool> used(featurePoints.size(), false);
+
   for(size_t i = 0; i < featurePoints.size(); i++) {
     if(used[i]) {
       continue;
@@ -154,31 +150,23 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
     return;
   }
 
-  // QRコードを探す基準位置の設定
-  const double targetX = CAM_MAX_WIDTH / 2.0;
-  const double targetY = CAM_MAX_HEIGHT * TARGET_Y_RATIO;
+  // ========================================
+  // 最終候補選択
+  // 候補の中で最も下側にあるものを必ず選択
+  // ========================================
 
   double bestCenterY = -1.0;
-  // 基準位置から一番近い候補までの距離
-  double bestTargetDistance = std::numeric_limits<double>::max();
   bool foundCandidate = false;
-
   SquareCandidate bestCandidate{};
-  // 最終候補選択
+
   for(const auto& candidate : candidates) {
-    const double centerX = candidate.rect.center.x + static_cast<double>(roiRect.x);
     const double centerY = candidate.rect.center.y + static_cast<double>(roiRect.y);
 
-    const double dx = centerX - targetX;
-    const double dy = centerY - targetY;
-    const double targetDistance = std::sqrt(dx * dx + dy * dy);
-
-    // 画面下を優先し、同じくらいなら基準位置に近い方を選ぶ
-    if(!foundCandidate || centerY > bestCenterY + 40.0
-       || (std::abs(centerY - bestCenterY) <= 40.0 && targetDistance < bestTargetDistance)) {
+    // Y座標が最大の候補を選ぶ
+    // X座標や候補の大きさは考慮しない
+    if(!foundCandidate || centerY > bestCenterY) {
       bestCandidate = candidate;
       bestCenterY = centerY;
-      bestTargetDistance = targetDistance;
       foundCandidate = true;
     }
   }
@@ -192,6 +180,7 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
 
   cv::Point2f rectPoints[4];
   bestRect.points(rectPoints);
+
   std::vector<cv::Point> corners;
   corners.reserve(4);
 
@@ -210,6 +199,7 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
   int maxSum = INT_MIN;
   int minDiff = INT_MAX;
   int maxDiff = INT_MIN;
+
   for(const auto& point : corners) {
     const int sum = point.x + point.y;
     const int diff = point.x - point.y;

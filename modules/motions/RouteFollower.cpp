@@ -10,6 +10,10 @@
 
 namespace {
   /**
+   * @brief 90度回頭に対して指定する回頭角度[deg]
+   */
+  constexpr double ROTATION_ANGLE = 70.3;
+  /**
    * @brief 回頭終了判定許容誤差[deg]
    */
   constexpr double ROTATION_TOLERANCE = 2.0;
@@ -150,9 +154,9 @@ double RouteFollower::directionToHeading(Direction direction) const
     case Direction::RIGHT:
       return 0.0;
     case Direction::UP:
-      return 85.0;
+      return 90.0;
     case Direction::LEFT:
-      return 170.0;
+      return 180.0;
     case Direction::DOWN:
       return -90.0;
   }
@@ -163,7 +167,9 @@ double RouteFollower::calculateRotationAngle(Direction from, Direction to) const
 {
   const double currentHeading = directionToHeading(from);
   const double targetHeading = directionToHeading(to);
-  return AngleNormalizer::normalizeAngle(currentHeading - targetHeading);
+  const double angle = AngleNormalizer::normalizeAngle(currentHeading - targetHeading);
+  // 90度を基準として指定回頭角度に変換する。
+  return angle * (ROTATION_ANGLE / 90.0);
 }
 
 double RouteFollower::calculateDistance(const RouteState& from, const RouteState& to) const

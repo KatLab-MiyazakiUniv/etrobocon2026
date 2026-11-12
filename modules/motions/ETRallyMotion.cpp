@@ -5,6 +5,12 @@
  */
 
 #include "EtRallyMotion.h"
+#include "AbsoluteAngleCondition.h"
+#include "AbsoluteRotation.h"
+#include "AngleNormalizer.h"
+
+#include <chrono>
+#include <thread>
 
 namespace {
 
@@ -28,12 +34,28 @@ namespace {
    *
    * RouteFollowerと同じ値を使用する。
    */
-  constexpr double ROTATION_TOLERANCE = 2.0;
+  constexpr double ROTATION_TOLERANCE = 5.0;
 
   /**
    * @brief 90度回頭に対して指定する回頭角度[deg]
    */
-  constexpr double ROTATION_ANGLE = 70.0;
+  constexpr double ROTATION_ANGLE = 85.0;
+
+  /**
+   * @brief 現在のIMU角度を基準に絶対目標角度を算出して回頭する
+   * @param robot ロボット
+   * @param angle 現在方向からの回頭量[deg]
+   * @param pidGain 回頭用PIDゲイン
+   */
+  void rotateAbsolute(Robot& robot, double angle, const Pid::PidGain& pidGain)
+  {
+    const double currentAngle = robot.getIMUControllerInstance().getAzimuth();
+    const double targetAbsAngle = AngleNormalizer::normalizeAngle(currentAngle + angle);
+    auto condition
+        = std::make_unique<AbsoluteAngleCondition>(robot, targetAbsAngle, ROTATION_TOLERANCE);
+    AbsoluteRotation rotation(robot, std::move(condition), pidGain, targetAbsAngle);
+    rotation.run();
+  }
 
   /**
    * @brief 外周ゲートか判定する
@@ -229,13 +251,7 @@ void EtRallyMotion::executeStep()
     // ----------------------------------------
     // QR方向へ回頭
     // ----------------------------------------
-    auto rotateCondition = std::make_unique<RelativeAngleCondition>(robot, result.correctionAngle,
-                                                                    ROTATION_TOLERANCE);
-
-    RelativeRotation rotate(robot, std::move(rotateCondition), squareRotationPid,
-                            result.correctionAngle);
-
-    rotate.run();
+    rotateAbsolute(robot, result.correctionAngle, squareRotationPid);
 
     // 回頭後に停止して20ms待機
     robot.getWheelMotorControllerInstance().stopBoth();
@@ -256,17 +272,20 @@ void EtRallyMotion::executeStep()
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
     // 元のETラリー開始方向へ戻す
-    auto returnCondition = std::make_unique<RelativeAngleCondition>(robot, -result.correctionAngle,
-                                                                    ROTATION_TOLERANCE);
+    rotateAbsolute(robot, -result.correctionAngle, squareRotationPid);
 
-    RelativeRotation returnRotate(robot, std::move(returnCondition), squareRotationPid,
-                                  -result.correctionAngle);
-
-    returnRotate.run();
-
-    // 逆回頭後に停止して20ms待機
+    // 逆回頭後に停止してIMUリセット前に200ms待機
     robot.getWheelMotorControllerInstance().stopBoth();
-    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    // 元のETラリー開始方向へ戻した後にIMUの角度をリセット
+    robot.getIMUControllerInstance().resetAzimuth();
+
+    // IMUリセット後に200ms待機
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    Logger::printfLog(Logger::INFO, "ET Rally IMU reset: %.2f deg",
+                      robot.getIMUControllerInstance().getAzimuth());
 
     // 元の方向を向いたまま、QRまで進んだ距離を後退
     auto backwardCondition = std::make_unique<DistanceCondition>(robot, result.straightDistance);
@@ -308,11 +327,7 @@ void EtRallyMotion::executeStep()
 
     // 開始時のRIGHTからゴール方向のDOWNへ向く。
     const double firstRotationAngle = course == Course::Right ? -ROTATION_ANGLE : ROTATION_ANGLE;
-    auto firstRotationCondition
-        = std::make_unique<RelativeAngleCondition>(robot, firstRotationAngle, ROTATION_TOLERANCE);
-    RelativeRotation firstRotation(robot, std::move(firstRotationCondition), rotationPid,
-                                   firstRotationAngle);
-    firstRotation.run();
+    rotateAbsolute(robot, firstRotationAngle, rotationPid);
 
     // 開始地点からゴールまで同じX座標上を直進する。
     const EtRallyMap::Node startNode = etRallyMap.getNode(startPoint.x, startPoint.y);
@@ -327,11 +342,7 @@ void EtRallyMotion::executeStep()
 
     // ゴールでLEFTへ向く。
     const double finalRotationAngle = course == Course::Right ? -ROTATION_ANGLE : ROTATION_ANGLE;
-    auto finalRotationCondition
-        = std::make_unique<RelativeAngleCondition>(robot, finalRotationAngle, ROTATION_TOLERANCE);
-    RelativeRotation finalRotation(robot, std::move(finalRotationCondition), rotationPid,
-                                   finalRotationAngle);
-    finalRotation.run();
+    rotateAbsolute(robot, finalRotationAngle, rotationPid);
 
     robot.getWheelMotorControllerInstance().stopBoth();
     Logger::info("EtRallyMotion: ゲート情報不足時のゴール走行完了");

@@ -1,3 +1,4 @@
+
 /**
  * @file   SquareDetector.cpp
  * @brief  点群から回転矩形を検出する画像処理クラス
@@ -38,6 +39,11 @@ namespace {
    * @brief 左右から検出対象外にする幅 [px]
    */
   constexpr int SIDE_CROP_PX = 0;
+
+  /**
+   * @brief 上側から検出対象外にする高さ [px]
+   */
+  constexpr int TOP_CROP_PX = 600;
 }  // namespace
 
 SquareDetector::SquareDetector(const cv::Rect& _roi) : roi(_roi)
@@ -58,14 +64,21 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
 
   // ROIの切り出し
   constexpr int SIDE_MARGIN = SIDE_CROP_PX;
+  constexpr int TOP_MARGIN = TOP_CROP_PX;
 
   if(frame.cols <= SIDE_MARGIN * 2) {
     Logger::error("SquareDetector: 画像の横幅が不足しています。");
     return;
   }
 
+  if(frame.rows <= TOP_MARGIN) {
+    Logger::error("SquareDetector: 画像の高さが不足しています。");
+    return;
+  }
+
   const cv::Rect frameRect(0, 0, frame.cols, frame.rows);
-  const cv::Rect croppedRect(SIDE_MARGIN, 0, frame.cols - SIDE_MARGIN * 2, frame.rows);
+  const cv::Rect croppedRect(SIDE_MARGIN, TOP_MARGIN, frame.cols - SIDE_MARGIN * 2,
+                             frame.rows - TOP_MARGIN);
   const cv::Rect roiRect = roi & frameRect & croppedRect;
 
   if(roiRect.empty()) {

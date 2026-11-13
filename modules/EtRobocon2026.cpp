@@ -41,8 +41,8 @@ void EtRobocon2026::start()
   // robot.setEdge(Edge::LeftEdge);
 
   // Lコース
-  // robot.setCourse(Course::Left);
-  // robot.setEdge(Edge::RightEdge);
+  robot.setCourse(Course::Left);
+  robot.setEdge(Edge::RightEdge);
 
   // ライントレース走行
   Area lineTraceArea = Area::LineTrace;

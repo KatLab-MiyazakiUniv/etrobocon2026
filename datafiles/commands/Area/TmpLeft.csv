@@ -1,20 +1,38 @@
-動作コマンド名,動作ID,条件コマンド名,条件ID
+#動作コマンド名,動作ID,条件コマンド名,条件ID
+#黄色まで移動
 
-# ボトルデリバリー
 
-AbsoluteRotation,-084,AbsoluteAngle,-084
-Straight,001,ColorOrColor,003
-AbsoluteRotation,000,AbsoluteAngle,000
-Straight,005,DistanceOrColor,GREEN030
+QRAbsoluteRotation,-090,AbsoluteAngle,-090
+
+
+#浅めに回頭
+QRAbsoluteRotation,-170,AbsoluteAngle,-170
+#黄色を通り過ぎ無いぐらいまで直進
+#カメラでの調整は不安定そう。代わりに、第2QR前で、若干直進させる。
+#CameraTracking,LBS010,Distance,030
+Straight,001,Distance,030
+
+#黄色が見えるまで回頭
+QRAbsoluteRotation,-110,AbsoluteAngle,-110
+
+
+
+#黄色がフレームに写る状態で色検知カメラ走行
 Snapshot,clearBuffer1,RepeatCount,001
-
-#カメラトラッキングで、左に曲がる問題の対象。
-#CameraTracking,QR1S001,DistanceOrColor,BLUE020
-CameraTracking,S003,DistanceOrColor,BLUE020
-QRStraight,001,DistanceOrColor,BLUE040
+CameraTracking,YELLOW2,DistanceOrColor,YELLOW020
+Straight,001,Distance,010
 
 
-AbsoluteRotation,-090,AbsoluteAngle,-090
+##ボトルを離すために後進
+Straight,-001,Distance,010
 
+AbsoluteRotation,090,AbsoluteAngle,090
+##カラーセンサーがボトルデリバリーエリアの色を認識するのを防ぐため直進
+Straight,001,Distance,010
+Straight,001,ColorOrColor,001
+##何この動作?>180度(緑色色部分と直角に進む部分)の微調整かな?
+AbsoluteRotation,160,AbsoluteAngle,160
+Straight,006,Distance,010
+##緑色検知するまで、直進
 Snapshot,clearBuffer1,RepeatCount,001
-CameraTracking,LBS003-4,Distance,070
+Straight,006,ColorRegion,004

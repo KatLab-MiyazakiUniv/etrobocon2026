@@ -22,7 +22,7 @@ Straight,001,DistanceOrColor,BLACK070
 
 Snapshot,clearBuffer1,RepeatCount,001
 Snapshot,021,RepeatCount,001
-#GatePosition,2-1,RepeatCount,001
+GatePosition,2-1,RepeatCount,001
 
 
 
@@ -35,7 +35,6 @@ QRAbsoluteRotation,-160,AbsoluteAngle,-160
 #赤色が写る範囲まで移動
 Straight,006,DistanceOrColor,RED063
 #赤色がフレームに写る状態で赤色検知カメラ走行
-Snapshot,clearBuffer1,RepeatCount,001
 Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,RED,DistanceOrColor,RED025
 
@@ -51,6 +50,7 @@ Straight,001,ColorOrColor,001
 
 AbsoluteRotation,160,AbsoluteAngle,160
 Straight,006,Distance,010
+Snapshot,clearBuffer1,RepeatCount,001
 Straight,006,ColorRegion,004
 AbsoluteRotation,090,AbsoluteAngle,090
 Straight,006,Distance,122

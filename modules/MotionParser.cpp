@@ -379,6 +379,41 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
       return std::make_unique<ColorRegionCenterCondition>(robot, request, targetCenterY,
                                                           consecutiveCountThreshold);
     }
+
+    case CONDITION_COMMAND::COLOR_OR_COLOR_OR_DISTANCE: {
+      if(params.size() < 5) {
+        Logger::printfLog(Logger::ERROR, "[MotionParser] ColorOrColorOrDistanceのパラメータ数が不足しています");
+        return nullptr;
+      }
+
+      std::string targetColorName1 = params[2];
+      std::string targetColorName2 = params[3];
+      double targetDistance = fromString<double>(params[4]);
+
+      auto targetColor1 = ColorSensorController::convertStringToColor(targetColorName1);
+      auto targetColor2 = ColorSensorController::convertStringToColor(targetColorName2);
+
+      Logger::printfLog(
+          Logger::DEBUG,
+          "[MotionParser] ColorOrColorOrDistance: targetColor1=%s, targetColor2=%s, targetDistance=%.1f を生成しました",
+          targetColorName1.c_str(), targetColorName2.c_str(), targetDistance);
+
+      auto colorCondition1 = std::make_unique<SensorColorCondition>(robot, targetColor1);
+      auto colorCondition2 = std::make_unique<SensorColorCondition>(robot, targetColor2);
+      auto distanceCondition = std::make_unique<DistanceCondition>(robot, targetDistance);
+
+      // (Color1 OR Color2) を作成
+      auto colorOrColor = std::make_unique<CompoundCondition>(
+          robot, std::move(colorCondition1), std::move(colorCondition2),
+          CompoundCondition::LogicalOperator::OR);
+
+      // ((Color1 OR Color2) OR Distance) を作成して返す
+      return std::make_unique<CompoundCondition>(
+          robot, std::move(colorOrColor), std::move(distanceCondition),
+          CompoundCondition::LogicalOperator::OR);
+    }
+
+
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Condition %s は未実装です",
                         params[0].c_str());
@@ -961,6 +996,7 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
     { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC },
     { "ColorOrColor", CONDITION_COMMAND::COLOR_OR_COLOR },
     { "ColorRegion", CONDITION_COMMAND::COLOR_REGION_CENTER_CONDITION },
+    { "ColorOrColorOrDistance", CONDITION_COMMAND::COLOR_OR_COLOR_OR_DISTANCE },
   };
 
   auto it = conditionMap.find(str);

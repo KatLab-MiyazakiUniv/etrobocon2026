@@ -10,6 +10,8 @@
 #include <cmath>
 #include <memory>
 #include <vector>
+#include "AbsoluteAngleCondition.h"
+#include "AbsoluteRotation.h"
 #include "AngleNormalizer.h"
 #include "BaseMotion.h"
 #include "ClockUtil.h"
@@ -17,8 +19,6 @@
 #include "EtRallyMap.h"
 #include "Logger.h"
 #include "Pid.h"
-#include "RelativeAngleCondition.h"
-#include "RelativeRotation.h"
 #include "Robot.h"
 #include "RouteTypes.h"
 #include "SocketProtocol.h"
@@ -148,7 +148,7 @@ class RouteFollower : public BaseMotion {
    * @brief ゲートを含む区間を走行する
    * @param from 区間開始状態
    * @param to 区間終了状態
-   * @param distance 区間距離[mm]
+   * @param distance 区間距離
    * @param rotatedAtSegmentStart 区間開始時に回頭した場合はtrue
    */
   void runGateSegment(const RouteState& from, const RouteState& to, double distance,

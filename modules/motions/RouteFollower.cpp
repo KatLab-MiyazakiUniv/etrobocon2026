@@ -1,3 +1,4 @@
+
 /**
  * @file   RouteFollower.cpp
  * @brief  経路探索結果に従って自己位置を使用せず走行するクラス
@@ -10,9 +11,13 @@
 
 namespace {
   /**
+   * @brief 90度回頭に対して指定する回頭角度[deg]
+   */
+  constexpr double ROTATION_ANGLE = 85.0;
+  /**
    * @brief 回頭終了判定許容誤差[deg]
    */
-  constexpr double ROTATION_TOLERANCE = 2.0;
+  constexpr double ROTATION_TOLERANCE = 5.0;
   /**
    * @brief QR①とQR②の距離[mm]
    */
@@ -25,6 +30,10 @@ namespace {
    * @brief QRを検出する基準距離[mm]
    */
   constexpr double SQUARE_DETECTION_DISTANCE = 250.0;
+  /**
+   * @brief QR検出失敗時に直進する距離[mm]
+   */
+  constexpr double SQUARE_DETECTION_FAILURE_DISTANCE = 125.0;
   /**
    * @brief QR①検出位置の許容誤差[mm]
    */
@@ -150,9 +159,9 @@ double RouteFollower::directionToHeading(Direction direction) const
     case Direction::RIGHT:
       return 0.0;
     case Direction::UP:
-      return 85.0;
+      return 90.0;
     case Direction::LEFT:
-      return 170.0;
+      return 180.0;
     case Direction::DOWN:
       return -90.0;
   }
@@ -163,7 +172,9 @@ double RouteFollower::calculateRotationAngle(Direction from, Direction to) const
 {
   const double currentHeading = directionToHeading(from);
   const double targetHeading = directionToHeading(to);
-  return AngleNormalizer::normalizeAngle(currentHeading - targetHeading);
+  const double angle = AngleNormalizer::normalizeAngle(currentHeading - targetHeading);
+  // 90度を基準として指定回頭角度に変換する。
+  return angle * (ROTATION_ANGLE / 90.0);
 }
 
 double RouteFollower::calculateDistance(const RouteState& from, const RouteState& to) const
@@ -193,8 +204,11 @@ void RouteFollower::rotate(double angle)
   }
   robot.getWheelMotorControllerInstance().stopBoth();
   ClockUtil::sleep(MOTION_SWITCH_WAIT);
-  auto condition = std::make_unique<RelativeAngleCondition>(robot, angle, ROTATION_TOLERANCE);
-  RelativeRotation rotation(robot, std::move(condition), rotationPid, angle);
+  const double currentAngle = robot.getIMUControllerInstance().getAzimuth();
+  const double targetAbsAngle = AngleNormalizer::normalizeAngle(currentAngle + angle);
+  auto condition
+      = std::make_unique<AbsoluteAngleCondition>(robot, targetAbsAngle, ROTATION_TOLERANCE);
+  AbsoluteRotation rotation(robot, std::move(condition), rotationPid, targetAbsAngle);
   Logger::printfLog(Logger::INFO,
                     "RouteFollower: "
                     "回頭開始 %.2f 度",
@@ -217,8 +231,11 @@ void RouteFollower::rotateForSquare(double angle)
   }
   robot.getWheelMotorControllerInstance().stopBoth();
   ClockUtil::sleep(MOTION_SWITCH_WAIT);
-  auto condition = std::make_unique<RelativeAngleCondition>(robot, angle, ROTATION_TOLERANCE);
-  RelativeRotation rotation(robot, std::move(condition), squareRotationPid, angle);
+  const double currentAngle = robot.getIMUControllerInstance().getAzimuth();
+  const double targetAbsAngle = AngleNormalizer::normalizeAngle(currentAngle + angle);
+  auto condition
+      = std::make_unique<AbsoluteAngleCondition>(robot, targetAbsAngle, ROTATION_TOLERANCE);
+  AbsoluteRotation rotation(robot, std::move(condition), squareRotationPid, targetAbsAngle);
   Logger::printfLog(Logger::INFO,
                     "RouteFollower: "
                     "正方形回頭開始 %.2f 度",
@@ -407,9 +424,9 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
         Logger::warning("RouteFollower: "
                         "外周ゲート "
                         "QR①の検出に失敗しました "
-                        "→ 250mm直進");
-        // QR①の想定位置まで進む
-        straight(SQUARE_DETECTION_DISTANCE);
+                        "→ 125mm直進");
+        // QR①の検出失敗時に125mm進む
+        straight(SQUARE_DETECTION_FAILURE_DISTANCE);
       }
     }
     // =========================================================
@@ -580,8 +597,8 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
     else {
       Logger::warning("RouteFollower: "
                       "QR①の検出に失敗しました "
-                      "→ 250mm直進");
-      straightWithinSegment(SQUARE_DETECTION_DISTANCE);
+                      "→ 125mm直進");
+      straightWithinSegment(SQUARE_DETECTION_FAILURE_DISTANCE);
     }
     Logger::info("RouteFollower: "
                  "QR①位置 = QR②検出位置 "
@@ -626,6 +643,20 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
                       secondResult.straightDistance);
     // QR②まで進む
     straightWithinSegment(secondResult.straightDistance);
+
+    // QR②補正後に停止してIMUリセット前に200ms待機
+    robot.getWheelMotorControllerInstance().stopBoth();
+    ClockUtil::sleep(200);
+
+    // QR②補正完了後にIMUの角度をリセット
+    robot.getIMUControllerInstance().resetAzimuth();
+
+    // IMUリセット後に200ms待機
+    ClockUtil::sleep(200);
+
+    Logger::printfLog(Logger::INFO, "RouteFollower: QR②補正後IMUリセット=%.2f 度",
+                      robot.getIMUControllerInstance().getAzimuth());
+
     /*
      * QR②位置まで補正できたため、
      * QR②の既知位置から残り距離を計算する。
@@ -643,8 +674,8 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
     Logger::printfLog(Logger::INFO,
                       "RouteFollower: "
                       "QR②検出失敗時の直進 %.2f mm",
-                      SQUARE_DETECTION_DISTANCE);
-    straightWithinSegment(SQUARE_DETECTION_DISTANCE);
+                      SQUARE_DETECTION_FAILURE_DISTANCE);
+    straightWithinSegment(SQUARE_DETECTION_FAILURE_DISTANCE);
   }
   // 区間終端まで残りを走行
   double remainingDistance = 0.0;

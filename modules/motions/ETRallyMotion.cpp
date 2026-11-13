@@ -5,6 +5,12 @@
  */
 
 #include "EtRallyMotion.h"
+#include "AbsoluteAngleCondition.h"
+#include "AbsoluteRotation.h"
+#include "AngleNormalizer.h"
+
+#include <chrono>
+#include <thread>
 
 namespace {
 
@@ -28,7 +34,28 @@ namespace {
    *
    * RouteFollowerと同じ値を使用する。
    */
-  constexpr double ROTATION_TOLERANCE = 2.0;
+  constexpr double ROTATION_TOLERANCE = 5.0;
+
+  /**
+   * @brief 90度回頭に対して指定する回頭角度[deg]
+   */
+  constexpr double ROTATION_ANGLE = 85.0;
+
+  /**
+   * @brief 現在のIMU角度を基準に絶対目標角度を算出して回頭する
+   * @param robot ロボット
+   * @param angle 現在方向からの回頭量[deg]
+   * @param pidGain 回頭用PIDゲイン
+   */
+  void rotateAbsolute(Robot& robot, double angle, const Pid::PidGain& pidGain)
+  {
+    const double currentAngle = robot.getIMUControllerInstance().getAzimuth();
+    const double targetAbsAngle = AngleNormalizer::normalizeAngle(currentAngle + angle);
+    auto condition
+        = std::make_unique<AbsoluteAngleCondition>(robot, targetAbsAngle, ROTATION_TOLERANCE);
+    AbsoluteRotation rotation(robot, std::move(condition), pidGain, targetAbsAngle);
+    rotation.run();
+  }
 
   /**
    * @brief 外周ゲートか判定する
@@ -169,18 +196,6 @@ void EtRallyMotion::executeStep()
 
   MapData& mapData = robot.getMapDataInstance();
 
-  // ========================================
-  // ゲート情報の確認（走行前）
-  //
-  // 情報不足の場合、ETZumoFinishが地区大会用ゴールへ
-  // 走行済みなので、QR補正やゲート巡回を行わず終了する。
-  // ========================================
-  if(!hasAllGates(mapData)) {
-    Logger::info("EtRallyMotion: ゲート情報不足のためETラリー走行をスキップ");
-    robot.getWheelMotorControllerInstance().stopBoth();
-    return;
-  }
-
   GateRoutePlanner routePlanner(mapData);
   EtRallyMap etRallyMap;
 
@@ -236,13 +251,11 @@ void EtRallyMotion::executeStep()
     // ----------------------------------------
     // QR方向へ回頭
     // ----------------------------------------
-    auto rotateCondition = std::make_unique<RelativeAngleCondition>(robot, result.correctionAngle,
-                                                                    ROTATION_TOLERANCE);
+    rotateAbsolute(robot, result.correctionAngle, squareRotationPid);
 
-    RelativeRotation rotate(robot, std::move(rotateCondition), squareRotationPid,
-                            result.correctionAngle);
-
-    rotate.run();
+    // 回頭後に停止して20ms待機
+    robot.getWheelMotorControllerInstance().stopBoth();
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
     // ----------------------------------------
     // QRまで直進
@@ -254,22 +267,33 @@ void EtRallyMotion::executeStep()
 
     straight.run();
 
-    // 正方形まで進んだ距離を後退
+    // 直進後に停止して20ms待機
+    robot.getWheelMotorControllerInstance().stopBoth();
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+
+    // 元のETラリー開始方向へ戻す
+    rotateAbsolute(robot, -result.correctionAngle, squareRotationPid);
+
+    // 逆回頭後に停止してIMUリセット前に200ms待機
+    robot.getWheelMotorControllerInstance().stopBoth();
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    // 元のETラリー開始方向へ戻した後にIMUの角度をリセット
+    robot.getIMUControllerInstance().resetAzimuth();
+
+    // IMUリセット後に200ms待機
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+    Logger::printfLog(Logger::INFO, "ET Rally IMU reset: %.2f deg",
+                      robot.getIMUControllerInstance().getAzimuth());
+
+    // 元の方向を向いたまま、QRまで進んだ距離を後退
     auto backwardCondition = std::make_unique<DistanceCondition>(robot, result.straightDistance);
 
     Straight backward(robot, std::move(backwardCondition), -std::abs(targetSpeed), straightAnglePid,
                       true, straightDeadbandRate, straightMaxoutRate);
 
     backward.run();
-
-    // 元のETラリー開始方向へ戻す
-    auto returnCondition = std::make_unique<RelativeAngleCondition>(robot, -result.correctionAngle,
-                                                                    ROTATION_TOLERANCE);
-
-    RelativeRotation returnRotate(robot, std::move(returnCondition), squareRotationPid,
-                                  -result.correctionAngle);
-
-    returnRotate.run();
 
     Logger::info("ET Rally start square adjustment finished");
   } else {
@@ -292,12 +316,36 @@ void EtRallyMotion::executeStep()
   const int ETrallystartTime = ClockUtil::now();
 
   // ========================================
-  // ゲート情報の確認（既存処理）
+  // ゲート情報が不足している場合のゴール走行
   // ========================================
-  // ゲート情報が足りない場合、最終地点には向かわず安全に終了する。
+  // QR補正後、x=10のラインに沿って(10,10)へ直進し、最後にLEFTを向く。
   if(!hasAllGates(mapData)) {
-    Logger::error("EtRallyMotion: gate information is incomplete");
+    Logger::info("EtRallyMotion: ゲート情報不足 -> 外周直進で最終地点へ移動");
+
+    const Point finalPoint = convertPoint({ 10, 10 }, course);
+    const Direction finalDirection = convertDirection(Direction::LEFT, course);
+
+    // 開始時のRIGHTからゴール方向のDOWNへ向く。
+    const double firstRotationAngle = course == Course::Right ? -ROTATION_ANGLE : ROTATION_ANGLE;
+    rotateAbsolute(robot, firstRotationAngle, rotationPid);
+
+    // 開始地点からゴールまで同じX座標上を直進する。
+    const EtRallyMap::Node startNode = etRallyMap.getNode(startPoint.x, startPoint.y);
+    const EtRallyMap::Node finalNode = etRallyMap.getNode(finalPoint.x, finalPoint.y);
+    const double distance = std::abs(finalNode.y - startNode.y);
+    Logger::printfLog(Logger::INFO, "EtRallyMotion: ゴールまで直進 %.2f mm", distance);
+
+    auto straightCondition = std::make_unique<DistanceCondition>(robot, distance);
+    Straight straight(robot, std::move(straightCondition), targetSpeed, straightAnglePid, true,
+                      straightDeadbandRate, straightMaxoutRate);
+    straight.run();
+
+    // ゴールでLEFTへ向く。
+    const double finalRotationAngle = course == Course::Right ? -ROTATION_ANGLE : ROTATION_ANGLE;
+    rotateAbsolute(robot, finalRotationAngle, rotationPid);
+
     robot.getWheelMotorControllerInstance().stopBoth();
+    Logger::info("EtRallyMotion: ゲート情報不足時のゴール走行完了");
     return;
   }
 

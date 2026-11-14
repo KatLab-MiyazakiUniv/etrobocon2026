@@ -3,15 +3,11 @@
 #青色のエリアを向く
 #QRAbsoluteRotation,-090,AbsoluteAngle,-090
 
-Straight,001,Distance,002
 
-QRAbsoluteRotation,-170,AbsoluteAngle,-170
+QRAbsoluteRotation,-160,AbsoluteAngle,-160
 
 #青色が写る範囲まで移動
-Straight,006,DistanceOrColor,BLUE050
-
-QRAbsoluteRotation,-110,AbsoluteAngle,-110
-
+Straight,006,DistanceOrColor,BLUE040
 
 #青色がフレームに写る状態で色検知カメラ走行
 Snapshot,clearBuffer1,RepeatCount,001
@@ -19,14 +15,8 @@ CameraTracking,BLUE2,DistanceOrColor,BLUE015
 Straight,001,DistanceOrColor,BLUE025
 
 Straight,001,Distance,005
-Straight,-001,Distance,005
+Straight,-001,Distance,010
 
 AbsoluteRotation,090,AbsoluteAngle,090
 
-Straight,001,ColorOrColorOrDistance,BLUEorBLACK013
-
-AbsoluteRotation,160,AbsoluteAngle,160
-Straight,006,Distance,010
-
-Snapshot,clearBuffer1,RepeatCount,001
-Straight,006,ColorRegion,004
+Straight,001,ColorOrColorOrDistance,BLUEorBLACK018

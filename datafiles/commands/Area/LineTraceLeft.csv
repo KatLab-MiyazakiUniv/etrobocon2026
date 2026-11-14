@@ -52,7 +52,9 @@ QRStraight,001,DistanceOrColor,BLUE040
 
 AbsoluteRotation,-090,AbsoluteAngle,-090
 Snapshot,clearBuffer1,RepeatCount,001
-CameraTracking,LBS003-4,Distance,070
+CameraTracking,LBS003-4,Distance,062
+
+
 
 #QR2取得前カーブ直前
 Straight,001,DistanceOrColor,BLACK070

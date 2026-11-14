@@ -4,9 +4,11 @@ AbsoluteRotation,160,AbsoluteAngle,160
 Straight,006,Distance,010
 Snapshot,clearBuffer1,RepeatCount,001
 Straight,006,ColorRegion,004
+
 AbsoluteRotation,090,AbsoluteAngle,090
 
-##調整中!
+
+#調整中!
 Straight,006,Distance,117
 
 Snapshot,clearBuffer1,RepeatCount,001

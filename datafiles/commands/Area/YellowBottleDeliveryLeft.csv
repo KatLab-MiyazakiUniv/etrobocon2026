@@ -2,26 +2,20 @@
 #黄色まで移動
 #QRAbsoluteRotation,-090,AbsoluteAngle,-090
 #浅めに回頭
-QRAbsoluteRotation,-170,AbsoluteAngle,-170
+QRAbsoluteRotation,-150,AbsoluteAngle,-150
 
 #黄色を通り過ぎ無いぐらいまで直進
-Straight,001,Distance,030
+Straight,001,DistanceOrColor,YELLOW050
 
 #黄色が見えるまで回頭
-QRAbsoluteRotation,-110,AbsoluteAngle,-110
+#QRAbsoluteRotation,-110,AbsoluteAngle,-110
 #黄色がフレームに写る状態で色検知カメラ走行
-Snapshot,clearBuffer1,RepeatCount,001
-CameraTracking,YELLOW2,DistanceOrColor,YELLOW020
+#Snapshot,clearBuffer1,RepeatCount,001
+#CameraTracking,YELLOW2,DistanceOrColor,YELLOW020
 Straight,001,Distance,005
 
 ##ボトルを離すために後進
 Straight,-001,Distance,005
 
 AbsoluteRotation,090,AbsoluteAngle,090
-Straight,001,ColorOrColorOrDistance,BLUEorBLACK010
-##何この動作?>180度(緑色色部分と直角に進む部分)の微調整かな?
-AbsoluteRotation,160,AbsoluteAngle,160
-Straight,006,Distance,010
-##緑色検知するまで、直進
-Snapshot,clearBuffer1,RepeatCount,001
-Straight,006,ColorRegion,004
+Straight,001,ColorOrColorOrDistance,BLUEorBLACK018

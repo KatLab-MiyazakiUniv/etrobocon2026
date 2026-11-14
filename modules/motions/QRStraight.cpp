@@ -63,7 +63,7 @@ void QRStraight::prepare()
 }
 void QRStraight::executeStep()
 {
-    // QR未検出なら検出処理を行う
+  // QR未検出なら検出処理を行う
   if(decryptRequired) {
     if(!robot.getHaveQR2contents()) {
       // 検出処理
@@ -75,7 +75,6 @@ void QRStraight::executeStep()
       GatePosition::setGatePosition(robot, qrDetectionRequest, decryptRequired);
     }
   }
-
 
   double requiredRightPower = speedCalculator.calculateRightMotorPower();
   double requiredLeftPower = speedCalculator.calculateLeftMotorPower();

@@ -33,7 +33,6 @@
 #include "RepeatCountCondition.h"
 #include "Utils.h"
 
-
 class EtRobocon2026 {
  public:
   static void start();

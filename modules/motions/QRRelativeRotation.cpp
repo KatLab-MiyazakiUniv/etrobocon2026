@@ -5,11 +5,10 @@
  */
 #include "QRRelativeRotation.h"
 
-QRRelativeRotation::QRRelativeRotation(Robot& _robot,
-                       std::unique_ptr<BaseContinuationCondition> _continuationCondition,
-                       const Pid::PidGain& _anglePidGain, double _relativeTargetAngle,
-                       CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
-                       bool _decryptRequired)
+QRRelativeRotation::QRRelativeRotation(
+    Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+    const Pid::PidGain& _anglePidGain, double _relativeTargetAngle,
+    CameraServer::QrCodeDetectorRequest& _qrDetectionRequest, bool _decryptRequired)
   : Rotation(_robot, std::move(_continuationCondition), _anglePidGain),
     anglePidGain(_anglePidGain),
     relativeTargetAngle(_relativeTargetAngle),

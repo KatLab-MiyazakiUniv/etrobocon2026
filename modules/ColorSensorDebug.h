@@ -5,9 +5,8 @@
 
 class ColorSensorDebug : public BaseMotion {
  public:
-  ColorSensorDebug(
-      Robot& _robot,
-      std::unique_ptr<BaseContinuationCondition> _continuationCondition);
+  ColorSensorDebug(Robot& _robot,
+                   std::unique_ptr<BaseContinuationCondition> _continuationCondition);
 
   ~ColorSensorDebug() override;
 

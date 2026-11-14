@@ -11,7 +11,6 @@
 #include "./../utils/FrameSave.h"
 // #include "FrameSave.h"
 
-
 QrCodeDetectionActionHandler::QrCodeDetectionActionHandler(CameraCapture& _camera)
   : camera(_camera), detector(cv::Rect(0, 0, CAM_MAX_WIDTH, CAM_MAX_HEIGHT))
 {
@@ -35,8 +34,6 @@ void QrCodeDetectionActionHandler::execute(const CameraServer::QrCodeDetectorReq
     return;
   }
 
-
-
   cv::Rect localRoi(request.roi.x, request.roi.y, request.roi.width, request.roi.height);
   detector.setValidatedRoi(localRoi);
 
@@ -58,11 +55,9 @@ void QrCodeDetectionActionHandler::execute(const CameraServer::QrCodeDetectorReq
     Logger::error("QrCodeDetectionActionHandler:QRコードが検出されませんでした");
   }
 
-
   std::string directoryPath = "datafiles/line_trace";
 
-
-// clang-format off
+  // clang-format off
   std::string fileName = "det_d" + std::to_string(1) +
                           "_tlx" + Utils::toStrInt(0) +
                           "_tly" + Utils::toStrInt(0) +
@@ -80,10 +75,6 @@ void QrCodeDetectionActionHandler::execute(const CameraServer::QrCodeDetectorReq
                           "_"    + std::to_string(ClockUtil::now());
   // clang-format on
 
-
-
-  MultiThread::wrap(
-      [=]() mutable { FrameSave::save(frame, directoryPath,fileName); });
+  MultiThread::wrap([=]() mutable { FrameSave::save(frame, directoryPath, fileName); });
   int totalEndTime = ClockUtil::now();
-
 }

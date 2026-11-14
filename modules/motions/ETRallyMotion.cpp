@@ -273,13 +273,13 @@ void EtRallyMotion::executeStep()
 
     SquareAngleAdjustment::Result secondResult = adjustment.calculate(request);
     if(secondResult.wasDetected) {
-    Logger::printfLog(Logger::INFO, "Second square detected: angle=%f",
-    secondResult.correctionAngle);
-    rotateAbsolute(robot, secondResult.correctionAngle, squareRotationPid);
+      Logger::printfLog(Logger::INFO, "Second square detected: angle=%f",
+                        secondResult.correctionAngle);
+      rotateAbsolute(robot, secondResult.correctionAngle, squareRotationPid);
     } else {
-    Logger::info("Second square not detected -> stop adjustment");
-    robot.getWheelMotorControllerInstance().stopBoth();
-    return;
+      Logger::info("Second square not detected -> stop adjustment");
+      robot.getWheelMotorControllerInstance().stopBoth();
+      return;
     }
 
     // 逆回頭後に停止してIMUリセット前に200ms待機

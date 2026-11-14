@@ -113,7 +113,7 @@ void SquareDetector::detect(const cv::Mat& frame, BoundingBoxDetectionResult& re
   std::vector<SquareCandidate> candidates;
 
   constexpr float CLUSTER_RADIUS = 45.0f;  // 点を同じグループとしてまとめる範囲[px]
-  constexpr int MIN_CLUSTER_POINTS = 100;   // QRコードの候補として認める最小点数
+  constexpr int MIN_CLUSTER_POINTS = 100;  // QRコードの候補として認める最小点数
 
   // 近くにある点をひとまとめにする
   std::vector<bool> used(featurePoints.size(), false);

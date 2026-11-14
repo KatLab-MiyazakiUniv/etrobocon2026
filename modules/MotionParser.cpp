@@ -677,6 +677,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                           motionParams.size());
         return nullptr;
       }
+      CameraServer::SquareDetectorRequest squareRequest;
 
       squareRequest.roi = { fromString<int>(motionParams[8]), fromString<int>(motionParams[9]),
                             fromString<int>(motionParams[10]), fromString<int>(motionParams[11]) };
@@ -780,8 +781,6 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                           "[MotionParser] ETRallyのPIDパラメータ数が不足しています（14列必要）");
         return nullptr;
       }
-
-      CameraServer::SquareDetectorRequest squareRequest;
 
       int squareRequest_roi_x = fromString<double>(motionParams[18]);
       int squareRequest_roi_width = fromString<double>(motionParams[19]);

@@ -14,12 +14,14 @@
 #include <iostream>
 #include <optional>
 #include <vector>
+#include <chrono>
 #include "ClockUtil.h"
 #include "Logger.h"
 
 // デフォルトのログファイルパスとファイル名
 #define DEFAULT_CSV_LOG_FILE_PATH "etrobocon2026/datafiles/logfiles/"
 #define DEFAULT_CSV_LOG_FILE_NAME "runlog.csv"
+#define DEFAULT_CSV_ARCHIVE_PATH "etrobocon2026/datafiles/logfiles/archive/"
 
 /**
  * @struct LogData
@@ -45,6 +47,18 @@ struct LogData {
   std::optional<double> deadbandPower;  // デッドバンド閾値
   std::optional<double> maxoutPower;    // 旋回Power上限
   std::optional<int> maxoutActive;      // 上限に張り付いた場合は1
+
+  // CameraTrackigでの走行ログの定義
+  std::optional<double> targetSpeed;          // targetSpeed
+  std::optional<int> currentRightMotorPower;  // スピカル内のモーターの初期値
+  std::optional<int> currentRightSpeed;       // 公式apiで取得したモーター速度
+  std::optional<int> baseRightPower;          // 旋回量を加える前の値
+  std::optional<int> currentLeftMotorPower;   // スピカル内のモーターの初期値
+  std::optional<int> currentLeftSpeed;        // 公式apiで取得したモーター速度
+  std::optional<int> baseLeftPower;           // 旋回量を加える前の値
+  std::optional<int> turningPower;            // 旋回量
+  std::optional<int> finalRightMotorPower;    // 最終値
+  std::optional<int> finalLeftMotorPower;     // 最終値
   // 今後新しいセンサー値（例: gyro）を追加したい場合は、ここに std::optional<int> gyro;
 };
 
@@ -55,6 +69,14 @@ class CsvLogger {
    */
   static void init();
 
+  /*
+   * @brief 既存ログファイルを別ディレクトリへ退避
+   * @param targetDir 移動元のディレクトリ
+   * @param archiveDir 移動先のディレクトリ
+   * */
+  static void archiveExistingFiles(const std::filesystem::path& targetDir,
+                                   const std::filesystem::path& archiveDir);
+
   /**
    * @brief CSVヘッダを書き込む
    */
@@ -64,7 +86,7 @@ class CsvLogger {
    * @brief 各種値を追加する
    * @param data 走行データ構造体
    */
-  static void add(const LogData& data);
+  static void add(LogData& data);
 
   /**
    * @brief 記録した走行ログをファイル出力する
@@ -78,12 +100,11 @@ class CsvLogger {
    */
   static void setFileName(const std::string& name = DEFAULT_CSV_LOG_FILE_NAME,
                           const std::string& path = DEFAULT_CSV_LOG_FILE_PATH);
-
+  static LogData current_logData;  // ログを保持
  private:
   static constexpr int LOG_BUFFER_SIZE = 65536 * 5;  // ログ全体のバッファサイズ
   static char logs[LOG_BUFFER_SIZE];                 // ログのバッファ
   static int currentIndex;                           // ログの現在のインデックス
-
   // 現在使用しているログファイルパス
   static std::string fileName;
 

@@ -100,6 +100,15 @@ vector<BaseMotion*> MotionParser::createMotionList(Robot& robot, string& command
       continue;
     }
 
+    // アーム動作では時間制限条件を必須とする。
+    if(motionName == "ArmMotor" && conditionName != "MotionTime") {
+      Logger::printfLog(Logger::ERROR,
+                        "[MotionParser] ArmMotorにはMotionTime条件を指定してください: %s",
+                        motionId.c_str());
+      lineNum++;
+      continue;
+    }
+
     // 条件パラメータを取得する
     vector<string> conditionParams
         = extractParamsFromID(CONDITIONS_PATH + conditionName + ".csv", conditionId);
@@ -370,6 +379,41 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
       return std::make_unique<ColorRegionCenterCondition>(robot, request, targetCenterY,
                                                           consecutiveCountThreshold);
     }
+
+    case CONDITION_COMMAND::COLOR_OR_COLOR_OR_DISTANCE: {
+      if(params.size() < 5) {
+        Logger::printfLog(Logger::ERROR,
+                          "[MotionParser] ColorOrColorOrDistanceのパラメータ数が不足しています");
+        return nullptr;
+      }
+
+      std::string targetColorName1 = params[2];
+      std::string targetColorName2 = params[3];
+      double targetDistance = fromString<double>(params[4]);
+
+      auto targetColor1 = ColorSensorController::convertStringToColor(targetColorName1);
+      auto targetColor2 = ColorSensorController::convertStringToColor(targetColorName2);
+
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] ColorOrColorOrDistance: targetColor1=%s, targetColor2=%s, "
+                        "targetDistance=%.1f を生成しました",
+                        targetColorName1.c_str(), targetColorName2.c_str(), targetDistance);
+
+      auto colorCondition1 = std::make_unique<SensorColorCondition>(robot, targetColor1);
+      auto colorCondition2 = std::make_unique<SensorColorCondition>(robot, targetColor2);
+      auto distanceCondition = std::make_unique<DistanceCondition>(robot, targetDistance);
+
+      // (Color1 OR Color2) を作成
+      auto colorOrColor = std::make_unique<CompoundCondition>(
+          robot, std::move(colorCondition1), std::move(colorCondition2),
+          CompoundCondition::LogicalOperator::OR);
+
+      // ((Color1 OR Color2) OR Distance) を作成して返す
+      return std::make_unique<CompoundCondition>(robot, std::move(colorOrColor),
+                                                 std::move(distanceCondition),
+                                                 CompoundCondition::LogicalOperator::OR);
+    }
+
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Condition %s は未実装です",
                         params[0].c_str());
@@ -557,10 +601,47 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                            fromString<double>(motionParams[8]));
     }
 
+      // case MOTION_COMMAND::CAMERA_TRACKING: {
+      //   CameraServer::ColorRegionDetectorRequest request;
+      //   request.requireLargestColorIndex = fromString<bool>(motionParams[12]);
+      //   // request.hsvRanges = ImageProcessingColor::BottleColors;
+      //   int count = 0;
+      //   for(int i = 0; i < ImageProcessingColor::BottleColors.size(); i++) {
+      //     if(fromString<bool>(motionParams[13 + i])) {
+      //       request.hsvRanges[count] = ImageProcessingColor::BottleColors[i];
+      //       count++;
+      //     }
+      //   }
+      //   request.hsvRangeCount = count;
+
+      //   request.roi = { fromString<int>(motionParams[8]), fromString<int>(motionParams[9]),
+      //                   fromString<int>(motionParams[10]), fromString<int>(motionParams[11]) };
+
+      //   int targetXCoordinate = fromString<int>(motionParams[3]);
+
+      //   Logger::printfLog(Logger::DEBUG,
+      //                     "[MotionParser] CameraTracking: targetXCoorddinate=%.d を生成しました",
+      //                     targetXCoordinate);
+
+      //   return new CameraTracking(
+      //       robot, std::move(condition), fromString<double>(motionParams[2]), targetXCoordinate,
+      //       Pid::PidGain(fromString<double>(motionParams[4]),
+      //       fromString<double>(motionParams[5]),
+      //                    fromString<double>(motionParams[6])),
+      //       request, fromString<bool>(motionParams[7]));
+      //   // ここでCameraTrackigのメンバ変数のdetectorのメンバ変数のhsvRangesをセットする
+      // }
+
     case MOTION_COMMAND::CAMERA_TRACKING: {
+      if(motionParams.size() < 20) {
+        Logger::printfLog(Logger::ERROR,
+                          "[MotionParser] CameraTrackingのパラメータ数は[%d]です。不足です。",
+                          motionParams.size());
+        return nullptr;
+      }
+
       CameraServer::ColorRegionDetectorRequest request;
       request.requireLargestColorIndex = fromString<bool>(motionParams[12]);
-      // request.hsvRanges = ImageProcessingColor::BottleColors;
       int count = 0;
       for(int i = 0; i < ImageProcessingColor::BottleColors.size(); i++) {
         if(fromString<bool>(motionParams[13 + i])) {
@@ -576,15 +657,45 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       int targetXCoordinate = fromString<int>(motionParams[3]);
 
       Logger::printfLog(Logger::DEBUG,
-                        "[MotionParser] CameraTracking: targetXCoorddinate=%.d を生成しました",
+                        "[MotionParser] CameraTracking: targetXCoorddinate=%d を生成しました",
                         targetXCoordinate);
+
+      // ここでCameraTrackigのメンバ変数のdetectorのメンバ変数のhsvRangesをセットする
 
       return new CameraTracking(
           robot, std::move(condition), fromString<double>(motionParams[2]), targetXCoordinate,
           Pid::PidGain(fromString<double>(motionParams[4]), fromString<double>(motionParams[5]),
                        fromString<double>(motionParams[6])),
-          request, fromString<bool>(motionParams[7]));
+          request, fromString<bool>(motionParams[7]), fromString<double>(motionParams[18]),
+          fromString<double>(motionParams[19]));
+    }
+
+    case MOTION_COMMAND::SQUARE_TRACKING: {
+      if(motionParams.size() < 12) {
+        Logger::printfLog(Logger::ERROR,
+                          "[MotionParser] CameraTrackingのパラメータ数は[%d]です。不足です。",
+                          motionParams.size());
+        return nullptr;
+      }
+      CameraServer::SquareDetectorRequest squareRequest;
+
+      squareRequest.roi = { fromString<int>(motionParams[8]), fromString<int>(motionParams[9]),
+                            fromString<int>(motionParams[10]), fromString<int>(motionParams[11]) };
+
+      int targetXCoordinate = fromString<int>(motionParams[3]);
+
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] SquareTracking: targetXCoorddinate=%d を生成しました",
+                        targetXCoordinate);
+
       // ここでCameraTrackigのメンバ変数のdetectorのメンバ変数のhsvRangesをセットする
+
+      return new CameraTracking(
+          robot, std::move(condition), fromString<double>(motionParams[2]), targetXCoordinate,
+          Pid::PidGain(fromString<double>(motionParams[4]), fromString<double>(motionParams[5]),
+                       fromString<double>(motionParams[6])),
+          squareRequest, fromString<bool>(motionParams[7]), fromString<double>(motionParams[11]),
+          fromString<double>(motionParams[12]));
     }
 
     case MOTION_COMMAND::ABSOLUTE_ROTATION: {
@@ -659,6 +770,211 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       return new GatePositionDetection(robot, std::move(condition), qrRequest,
                                        fromString<bool>(motionParams[2]));
     }
+    case MOTION_COMMAND::ET_RALLY: {
+      // Motions/ETRally.csv:
+      // [0] 動作名 [1] ID
+      // [2..4] 通常回頭PID(Kp, Ki, Kd)
+      // [5..7] 調整回頭PID(Kp, Ki, Kd)
+      // [8..10] 直進角度PID(Kp, Ki, Kd)
+      if(motionParams.size() < 14) {
+        Logger::printfLog(Logger::ERROR,
+                          "[MotionParser] ETRallyのPIDパラメータ数が不足しています（14列必要）");
+        return nullptr;
+      }
+
+      int squareRequest_roi_x = fromString<double>(motionParams[18]);
+      int squareRequest_roi_width = fromString<double>(motionParams[19]);
+      int squareRequest_roi_y = fromString<double>(motionParams[20]);
+      int squareRequest_roi_height = fromString<double>(motionParams[21]);
+
+      Pid::PidGain rotationPid{ fromString<double>(motionParams[2]),
+                                fromString<double>(motionParams[3]),
+                                fromString<double>(motionParams[4]) };
+      Pid::PidGain squareRotationPid{ fromString<double>(motionParams[5]),
+                                      fromString<double>(motionParams[6]),
+                                      fromString<double>(motionParams[7]) };
+      Pid::PidGain straightAnglePid{ fromString<double>(motionParams[8]),
+                                     fromString<double>(motionParams[9]),
+                                     fromString<double>(motionParams[10]) };
+      double targetSpeed = fromString<double>(motionParams[11]);
+      double straightDeadbandRate = fromString<double>(motionParams[12]);
+      double straightMaxoutRate = fromString<double>(motionParams[13]);
+      double squareTargetSpeed = fromString<double>(motionParams[14]);
+      Pid::PidGain squareTrackingPid{ fromString<double>(motionParams[15]),
+                                      fromString<double>(motionParams[16]),
+                                      fromString<double>(motionParams[17]) };
+      return new EtRallyMotion(robot, std::move(condition), rotationPid, squareRotationPid,
+                               straightAnglePid, targetSpeed, straightDeadbandRate,
+                               straightMaxoutRate, squareTrackingPid, squareTargetSpeed,
+                               squareRequest_roi_x, squareRequest_roi_width, squareRequest_roi_y,
+                               squareRequest_roi_height);
+    }
+
+    case MOTION_COMMAND::ET_RALLY_FINISH: {
+      // Motions/EtRallyFinish.csv
+      // [0] 動作名 [1] ID
+      // [2..4] 回頭PID
+      // [5..7] 直進角度PID
+      // [8] 回頭角度
+      // [9] 直進距離
+      // [10] 目標速度
+      // [11] デッドバンド率
+      // [12] マックスアウト率
+
+      if(motionParams.size() < 13) {
+        Logger::error("[MotionParser] EtRallyFinishのパラメータ数が不足しています");
+        return nullptr;
+      }
+
+      Pid::PidGain rotationPid{ fromString<double>(motionParams[2]),
+                                fromString<double>(motionParams[3]),
+                                fromString<double>(motionParams[4]) };
+
+      Pid::PidGain straightAnglePid{ fromString<double>(motionParams[5]),
+                                     fromString<double>(motionParams[6]),
+                                     fromString<double>(motionParams[7]) };
+
+      double rotationAngle = fromString<double>(motionParams[8]);
+      double straightDistance = fromString<double>(motionParams[9]);
+      double targetSpeed = fromString<double>(motionParams[10]);
+      double straightDeadbandRate = fromString<double>(motionParams[11]);
+      double straightMaxoutRate = fromString<double>(motionParams[12]);
+
+      return new EtRallyFinish(robot, std::move(condition), rotationPid, straightAnglePid,
+                               rotationAngle, straightDistance, targetSpeed, straightDeadbandRate,
+                               straightMaxoutRate);
+    }
+    case MOTION_COMMAND::ET_ZUMO_APPROACH: {
+      if(motionParams.size() < 14) {
+        Logger::error("[MotionParser] ETZumoApproach requires 14 columns");
+        return nullptr;
+      }
+
+      Pid::PidGain rotationPid{ fromString<double>(motionParams[2]),
+                                fromString<double>(motionParams[3]),
+                                fromString<double>(motionParams[4]) };
+
+      Pid::PidGain adjustmentPid{ fromString<double>(motionParams[5]),
+                                  fromString<double>(motionParams[6]),
+                                  fromString<double>(motionParams[7]) };
+
+      Pid::PidGain straightPid{ fromString<double>(motionParams[8]),
+                                fromString<double>(motionParams[9]),
+                                fromString<double>(motionParams[10]) };
+
+      double targetSpeed = fromString<double>(motionParams[11]);
+      double straightDeadbandRate = fromString<double>(motionParams[12]);
+      double straightMaxoutRate = fromString<double>(motionParams[13]);
+
+      return new ETZumoApproach(robot, std::move(condition), rotationPid, adjustmentPid,
+                                straightPid, targetSpeed, straightDeadbandRate, straightMaxoutRate);
+    }
+    case MOTION_COMMAND::QR_STRAIGHT: {
+      if(motionParams.size() < 13) {
+        Logger::printfLog(Logger::ERROR, "[MotionParser] QRStraightのパラメータ数が不足しています");
+        return nullptr;
+      }
+      Pid::PidGain anglePid{ fromString<double>(motionParams[3]),
+                             fromString<double>(motionParams[4]),
+                             fromString<double>(motionParams[5]) };
+
+      bool shouldUseIMU = motionParams[6] == "true";
+
+      double deadbandRate = fromString<double>(motionParams[7]);
+      double maxoutRate = fromString<double>(motionParams[8]);
+
+      CameraServer::QrCodeDetectorRequest qrRequest;
+      qrRequest.roi.x = fromString<int32_t>(motionParams[10]);
+      qrRequest.roi.y = fromString<int32_t>(motionParams[11]);
+      qrRequest.roi.width = fromString<int32_t>(motionParams[12]);
+      qrRequest.roi.height = fromString<int32_t>(motionParams[13]);
+
+      return new QRStraight(robot, std::move(condition), fromString<double>(motionParams[2]),
+                            anglePid, shouldUseIMU, deadbandRate, maxoutRate, qrRequest,
+                            fromString<bool>(motionParams[9]));
+    }
+    case MOTION_COMMAND::QR_RELATIVE_ROTATION: {
+      if(motionParams.size() < 7) {
+        Logger::printfLog(Logger::ERROR, "[MotionParser] QRStraightのパラメータ数が不足しています");
+        return nullptr;
+      }
+      Pid::PidGain anglePidGain{ fromString<double>(motionParams[2]),
+                                 fromString<double>(motionParams[3]),
+                                 fromString<double>(motionParams[4]) };
+
+      double relativeTargetAngle = fromString<double>(motionParams[5]);
+
+      CameraServer::QrCodeDetectorRequest qrRequest;
+      qrRequest.roi.x = 0;
+      qrRequest.roi.y = 0;
+      qrRequest.roi.width = 1920;
+      qrRequest.roi.height = 1080;
+
+      Logger::printfLog(
+          Logger::DEBUG,
+          "[MotionParser] QRRelativeRotation: relativeTargetAngle=%.1f を生成しました",
+          relativeTargetAngle);
+
+      return new QRRelativeRotation(robot, std::move(condition), anglePidGain, relativeTargetAngle,
+                                    qrRequest, fromString<bool>(motionParams[6]));
+    }
+
+    case MOTION_COMMAND::ARM_MOTOR: {
+      /**
+       * ArmMotor.csv
+       * [0] command
+       * [1] id
+       * [2] power
+       * [3] targetCount
+       */
+      if(motionParams.size() != 4) {
+        Logger::error("[MotionParser] ArmMotorのパラメータは4列必要です");
+        return nullptr;
+      }
+
+      const int power = fromString<int>(motionParams[2]);
+      const int32_t targetCount = fromString<int32_t>(motionParams[3]);
+
+      if(power == 0 || power < -100 || power > 100 || targetCount <= 0) {
+        Logger::error("[MotionParser] ArmMotorの出力・回転量が不正です");
+        return nullptr;
+      }
+
+      Logger::printfLog(Logger::INFO, "[MotionParser] ArmMotor power=%d target=%ld", power,
+                        static_cast<long>(targetCount));
+
+      return new ArmMotorMotion(robot, std::move(condition), power, targetCount);
+    }
+
+    case MOTION_COMMAND::QR_ABSOLUTE_ROTATION: {
+      // AbsoluteRotation:
+      // motionParams[2]=anglePid.kp
+      // motionParams[3]=anglePid.ki
+      // motionParams[4]=anglePid.kd
+      // motionParams[5]=targetAbsAngle
+
+      Pid::PidGain anglePidGain{ fromString<double>(motionParams[2]),
+                                 fromString<double>(motionParams[3]),
+                                 fromString<double>(motionParams[4]) };
+
+      double targetAbsAngle = fromString<double>(motionParams[5]);
+
+      CameraServer::QrCodeDetectorRequest qrRequest;
+      qrRequest.roi.x = 0;
+      qrRequest.roi.y = 0;
+      qrRequest.roi.width = 1920;
+      qrRequest.roi.height = 1080;
+
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] QRAbsoluteRotation: targetAbsAngle=%.1f を生成しました",
+                        targetAbsAngle);
+
+      return new QRAbsoluteRotation(robot, std::move(condition), anglePidGain, targetAbsAngle,
+                                    qrRequest, fromString<bool>(motionParams[6]));
+    }
+    case MOTION_COMMAND::COLOR_SENSOR_DEBUG: {
+      return new ColorSensorDebug(robot, std::move(condition));
+    }
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Command %s は未実装です",
                         motionParams[0].c_str());
@@ -669,21 +985,28 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
 
 MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
 {
-  // コマンド文字列(string)と、それに対応する列挙型MOTION_COMMANDのマッピングを定義
   static const unordered_map<string, MOTION_COMMAND> commandMap
       = { { "Straight", MOTION_COMMAND::STRAIGHT },
           { "LineTrace", MOTION_COMMAND::LINETRACE },
           { "AbsoluteRotation", MOTION_COMMAND::ABSOLUTE_ROTATION },
           { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
           { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING },
+          { "SquareTracking", MOTION_COMMAND::SQUARE_TRACKING },
           { "Calibrator", MOTION_COMMAND::CALIBRATOR },
           { "Snapshot", MOTION_COMMAND::SNAPSHOT },
           { "ResetAzimuth", MOTION_COMMAND::RESET_AZIMUTH },
           { "ETZumoExit", MOTION_COMMAND::ET_ZUMO_EXIT },
           { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH },
-          { "GatePosition", MOTION_COMMAND::GATE_POSITION }
-
-        };
+          { "GatePosition", MOTION_COMMAND::GATE_POSITION },
+          { "ETRally", MOTION_COMMAND::ET_RALLY },
+          { "EtRallyFinish", MOTION_COMMAND::ET_RALLY_FINISH },
+          { "ETZumoApproach", MOTION_COMMAND::ET_ZUMO_APPROACH },
+          { "QRStraight", MOTION_COMMAND::QR_STRAIGHT },
+          { "QRRelativeRotation", MOTION_COMMAND::QR_RELATIVE_ROTATION },
+          { "QRAbsoluteRotation", MOTION_COMMAND::QR_ABSOLUTE_ROTATION },
+          { "ETZumoApproach", MOTION_COMMAND::ET_ZUMO_APPROACH },
+          { "ColorSensorDebug", MOTION_COMMAND::COLOR_SENSOR_DEBUG },
+          { "ArmMotor", MOTION_COMMAND::ARM_MOTOR } };
 
   auto it = commandMap.find(str);
 
@@ -712,7 +1035,7 @@ MotionParser::CONDITION_COMMAND MotionParser::convertCondition(const string& str
     { "UltraSonic", CONDITION_COMMAND::ULTRA_SONIC },
     { "ColorOrColor", CONDITION_COMMAND::COLOR_OR_COLOR },
     { "ColorRegion", CONDITION_COMMAND::COLOR_REGION_CENTER_CONDITION },
-
+    { "ColorOrColorOrDistance", CONDITION_COMMAND::COLOR_OR_COLOR_OR_DISTANCE },
   };
 
   auto it = conditionMap.find(str);

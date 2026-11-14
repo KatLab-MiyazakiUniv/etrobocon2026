@@ -30,32 +30,12 @@ CameraTracking,000,Distance,000
 # ボトルデリバリー
 
 
-AbsoluteRotation,090,AbsoluteAngle,090
+AbsoluteRotation,085,AbsoluteAngle,085
 Straight,001,ColorOrColor,003
 AbsoluteRotation,000,AbsoluteAngle,000
 Straight,005,DistanceOrColor,GREEN100
 CameraTracking,S003,DistanceOrColor,BLUE020
-Straight,005,Distance,012
-
-
-
-
-
-
-Snapshot,011,RepeatCount,001
-GatePosition,1-1,RepeatCount,001
-
-
-Straight,005,Distance,002
-Snapshot,clearBuffer1,RepeatCount,001
-GatePosition,1-2,RepeatCount,001
-
-Straight,005,ColorOrColor,001
-
-
-
-
-
+QRStraight,001,DistanceOrColor,BLUE050
 
 
 AbsoluteRotation,090,AbsoluteAngle,090
@@ -69,4 +49,4 @@ Straight,001,DistanceOrColor,BLACK070
 
 Snapshot,clearBuffer1,RepeatCount,001
 Snapshot,021,RepeatCount,001
-GatePosition,2-1,RepeatCount,001
+#GatePosition,2-1,RepeatCount,001

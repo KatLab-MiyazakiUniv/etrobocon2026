@@ -11,6 +11,7 @@
 #include "Pid.h"
 #include "SpeedCalculator.h"
 #include "SocketProtocol.h"
+#include "CsvLogger.h"
 
 class CameraTracking : public BaseMotion {
  public:
@@ -19,7 +20,8 @@ class CameraTracking : public BaseMotion {
    */
   enum class DetectionMode {
     COLOR_REGION,  // 色領域検出
-    QR_CODE        // QRコード検出
+    QR_CODE,       // QRコード検出
+    SQUARE         // 検出
   };
 
   /**
@@ -32,11 +34,33 @@ class CameraTracking : public BaseMotion {
    * @param _pidGain カメラ制御用PIDゲイン
    * @param _colorDetectionRequest 色領域検出リクエスト
    * @param _isStopMotorPower モーターを停止するかどうか
+   * @param _deadbandRate turningPowerに適用するデッドバンドの割合(0.0〜1.0、basePowerに対する割合)
+   * @param _maxoutRate turningPowerに適用するマックスアウトの割合(0.0〜1.0、basePowerに対する割合)
    */
   CameraTracking(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                  double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
                  const CameraServer::ColorRegionDetectorRequest& _colorDetectionRequest,
-                 bool _isStopMotorPower = true);
+                 bool _isStopMotorPower = true, double _deadbandRate = 0.0,
+                 double _maxoutRate = 1.0);
+
+  /**
+   * コンストラクタ
+   * @brief カメラ画像(QRコード検出)を使ったPID走行クラスを初期化する
+   * @param _robot ロボットインスタンス
+   * @param _continuationCondition 継続条件クラスのインスタンス
+   * @param _targetSpeed 目標速度
+   * @param _targetXCoordinate 目標x座標
+   * @param _pidGain カメラ制御用PIDゲイン
+   * @param _qrDetectionRequest QRコード検出リクエスト
+   * @param _isStopMotorPower モーターを停止するかどうか
+   * @param _deadbandRate turningPowerに適用するデッドバンドの割合(0.0〜1.0、basePowerに対する割合)
+   * @param _maxoutRate turningPowerに適用するマックスアウトの割合(0.0〜1.0、basePowerに対する割合)
+   */
+  CameraTracking(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+                 double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
+                 const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
+                 bool _isStopMotorPower = true, double _deadbandRate = 0.0,
+                 double _maxoutRate = 1.0);
 
   /**
    * コンストラクタ
@@ -51,8 +75,9 @@ class CameraTracking : public BaseMotion {
    */
   CameraTracking(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                  double _targetSpeed, int _targetXCoordinate, const Pid::PidGain& _pidGain,
-                 const CameraServer::QrCodeDetectorRequest& _qrDetectionRequest,
-                 bool _isStopMotorPower = true);
+                 const CameraServer::SquareDetectorRequest& _squareDetectionRequest,
+                 bool _isStopMotorPower = true, double _deadbandRate = 0.0,
+                 double _maxoutRate = 1.0);
 
   /**
    * デストラクタ
@@ -128,8 +153,11 @@ class CameraTracking : public BaseMotion {
   DetectionMode detectionMode;                                     // 検出方式
   CameraServer::ColorRegionDetectorRequest colorDetectionRequest;  // 色領域検出リクエスト
   CameraServer::QrCodeDetectorRequest qrDetectionRequest;          // QRコード検出リクエスト
-  bool isStopMotorPower;                                           // モーターを停止するかどうか
+  CameraServer::SquareDetectorRequest squareRequest;
+  bool isStopMotorPower;            // モーターを停止するかどうか
   SpeedCalculator speedCalculator;  // 目標速度に対するモータパワー計算
+  double deadbandRate;              // turningPowerに適用するデッドバンドの割合(0.0〜1.0)
+  double maxoutRate;                // turningPowerに適用するマックスアウトの割合(0.0〜1.0)
   Pid cameraPid;                    // カメラ画像x座標に対するPID制御
 };
 

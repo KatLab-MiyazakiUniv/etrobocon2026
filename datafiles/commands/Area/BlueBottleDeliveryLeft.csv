@@ -1,22 +1,22 @@
+#動作コマンド名,動作ID,条件コマンド名,条件ID
+# QR2検出
+#青色のエリアを向く
+#QRAbsoluteRotation,-090,AbsoluteAngle,-090
 
 
-#青色まで移動
-AbsoluteRotation,-165,AbsoluteAngle,-165
+QRAbsoluteRotation,-160,AbsoluteAngle,-160
+
 #青色が写る範囲まで移動
-Straight,001,DistanceOrColor,BLUE040
-#青色がフレームに写る状態で赤色検知カメラ走行
-CameraTracking,BLUE,DistanceOrColor,BLUE025
+Straight,006,DistanceOrColor,BLUE040
+
+#青色がフレームに写る状態で色検知カメラ走行
 Snapshot,clearBuffer1,RepeatCount,001
-#CameraTracking,LBS010,DistanceOrColor,BLUE025
+CameraTracking,BLUE2,DistanceOrColor,BLUE015
+Straight,001,DistanceOrColor,BLUE025
 
-
-
-
-Straight,-001,Distance,005
+Straight,001,Distance,005
+Straight,-001,Distance,010
 
 AbsoluteRotation,090,AbsoluteAngle,090
 
-
-
-Straight,001,ColorOrColor,001
-
+Straight,001,ColorOrColorOrDistance,BLUEorBLACK018

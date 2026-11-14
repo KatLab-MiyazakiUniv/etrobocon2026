@@ -1,0 +1,4 @@
+コマンド名,ID,time
+MotionTime,ID,int
+MotionTime,001,1000
+MotionTime,002,2000

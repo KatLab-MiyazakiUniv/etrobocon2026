@@ -154,6 +154,48 @@ GateRouteResult GateRoutePlanner::search(int currentX, int currentY, Direction c
   return result;
 }
 
+/**
+ * @brief 2地点間の移動が後退かどうか判定する
+ * @param from 移動開始地点
+ * @param to 移動終了地点
+ * @return true 後退、false 前進または移動なし
+ */
+bool isBackwardMove(const RouteState& from, const RouteState& to)
+{
+  Direction moveDirection;
+
+  // 座標の変化から実際の移動方向を求める
+  if(to.x < from.x) {
+    moveDirection = Direction::RIGHT;
+  } else if(to.x > from.x) {
+    moveDirection = Direction::LEFT;
+  } else if(to.y < from.y) {
+    moveDirection = Direction::UP;
+  } else if(to.y > from.y) {
+    moveDirection = Direction::DOWN;
+  } else {
+    // 同じ座標なら移動していない
+    return false;
+  }
+
+  // 移動方向とロボットの向きが反対なら後退
+  switch(to.direction) {
+    case Direction::UP:
+      return moveDirection == Direction::DOWN;
+
+    case Direction::RIGHT:
+      return moveDirection == Direction::LEFT;
+
+    case Direction::DOWN:
+      return moveDirection == Direction::UP;
+
+    case Direction::LEFT:
+      return moveDirection == Direction::RIGHT;
+  }
+
+  return false;
+}
+
 std::vector<RouteState> GateRoutePlanner::compressRoute(const std::vector<RouteState>& route) const
 {
   std::vector<RouteState> compressed;
@@ -199,46 +241,4 @@ std::vector<RouteState> GateRoutePlanner::compressRoute(const std::vector<RouteS
   }
 
   return compressed;
-}
-
-/**
- * @brief 2地点間の移動が後退かどうか判定する
- * @param from 移動開始地点
- * @param to 移動終了地点
- * @return true 後退、false 前進または移動なし
- */
-bool isBackwardMove(const RouteState& from, const RouteState& to)
-{
-  Direction moveDirection;
-
-  // 座標の変化から実際の移動方向を求める
-  if(to.x < from.x) {
-    moveDirection = Direction::RIGHT;
-  } else if(to.x > from.x) {
-    moveDirection = Direction::LEFT;
-  } else if(to.y < from.y) {
-    moveDirection = Direction::UP;
-  } else if(to.y > from.y) {
-    moveDirection = Direction::DOWN;
-  } else {
-    // 同じ座標なら移動していない
-    return false;
-  }
-
-  // 移動方向とロボットの向きが反対なら後退
-  switch(to.direction) {
-    case Direction::UP:
-      return moveDirection == Direction::DOWN;
-
-    case Direction::RIGHT:
-      return moveDirection == Direction::LEFT;
-
-    case Direction::DOWN:
-      return moveDirection == Direction::UP;
-
-    case Direction::LEFT:
-      return moveDirection == Direction::RIGHT;
-  }
-
-  return false;
 }

@@ -50,12 +50,15 @@ class EtRallyMotion : public BaseMotion {
   EtRallyMotion(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
                 const Pid::PidGain& _rotationPid, const Pid::PidGain& _squareRotationPid,
                 const Pid::PidGain& _straightAnglePid, double _targetSpeed,
-                double _straightDeadbandRate, double _straightMaxoutRate);
+                double _straightDeadbandRate, double _straightMaxoutRate,
+                Pid::PidGain& _squareTrackingPid, double _squareTargetSpeed,
+                int squareRequest_roi_x, int squareRequest_roi_width, int squareRequest_roi_y,
+                int squareRequest_roi_height);
 
  protected:
   /**
    * @brief 走行前の準備処理
-   */
+
   void prepare() override;
 
   /**
@@ -112,9 +115,15 @@ class EtRallyMotion : public BaseMotion {
   Pid::PidGain rotationPid;        // 90度回頭などの通常回頭PID
   Pid::PidGain squareRotationPid;  // QR補正などの調整回頭PID
   Pid::PidGain straightAnglePid;   // 直進角度PID
-  double targetSpeed;              // 走行速度
-  double straightDeadbandRate;     // 直進時のデッドバンド率
-  double straightMaxoutRate;       // 直進時の最大出力率
+  Pid::PidGain squareTrackingPid;
+  int squareRequest_roi_x;
+  int squareRequest_roi_width;
+  int squareRequest_roi_y;
+  int squareRequest_roi_height;
+  double targetSpeed;           // 走行速度
+  double straightDeadbandRate;  // 直進時のデッドバンド率
+  double straightMaxoutRate;    // 直進時の最大出力率
+  double squareTargetSpeed;
 };
 
 #endif  // ET_RALLY_MOTION_H

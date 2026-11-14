@@ -67,7 +67,10 @@ RouteFollower::RouteFollower(Robot& _robot, const EtRallyMap& _map, double _targ
                              const Pid::PidGain& _rotationPid,
                              const Pid::PidGain& _squareRotationPid,
                              const Pid::PidGain& _straightAnglePid, double _straightDeadbandRate,
-                             double _straightMaxoutRate)
+                             double _straightMaxoutRate, Pid::PidGain& _squareTrackingPid,
+                             double _squareTargetSpeed, int squareRequest_roi_x,
+                             int squareRequest_roi_width, int squareRequest_roi_y,
+                             int squareRequest_roi_height)
   : BaseMotion(_robot, std::make_unique<RouteContinuationCondition>(
                            _robot, [this]() { return !failed && nextIndex < route.size(); })),
     map(_map),
@@ -76,7 +79,13 @@ RouteFollower::RouteFollower(Robot& _robot, const EtRallyMap& _map, double _targ
     squareRotationPid(_squareRotationPid),
     straightAnglePid(_straightAnglePid),
     straightDeadbandRate(_straightDeadbandRate),
-    straightMaxoutRate(_straightMaxoutRate)
+    straightMaxoutRate(_straightMaxoutRate),
+    squareTrackingPid(_squareTrackingPid),
+    squareTargetSpeed(_squareTargetSpeed),
+    squareRequest_roi_x(squareRequest_roi_x),
+    squareRequest_roi_width(squareRequest_roi_width),
+    squareRequest_roi_y(squareRequest_roi_y),
+    squareRequest_roi_height(squareRequest_roi_height)
 {
   LOG_CREATE("RouteFollower");
 }
@@ -143,7 +152,8 @@ void RouteFollower::executeStep()
     runGateSegment(from, to, distance, rotatedAtSegmentStart);
   } else {
     Logger::info("RouteFollower: 通常区間");
-    straight(distance);
+    // straight(distance);
+    squareTracking(distance);
   }
   ++nextIndex;
 }
@@ -265,6 +275,39 @@ void RouteFollower::straight(double distance)
   Logger::printfLog(Logger::INFO,
                     "RouteFollower: "
                     "直進完了 %.2f mm",
+                    distance);
+}
+
+void RouteFollower::squareTracking(double distance)
+{
+  if(distance <= 0.0) {
+    return;
+  }
+  robot.getWheelMotorControllerInstance().stopBoth();
+  ClockUtil::sleep(MOTION_SWITCH_WAIT);
+  auto condition = std::make_unique<DistanceCondition>(robot, distance);
+  CameraServer::SquareDetectorRequest squareRequest;
+
+  squareRequest.roi = { squareRequest_roi_x, squareRequest_roi_width, squareRequest_roi_y,
+                        squareRequest_roi_height };
+
+  int targetXCoordinate = 960;
+  bool isStopMotor = true;
+  double deadbandRate = 0.0;
+  double maxoutRate = 1.0;
+
+  CameraTracking squareTracking(robot, std::move(condition), squareTargetSpeed, targetXCoordinate,
+                                squareTrackingPid, squareRequest, isStopMotor, deadbandRate,
+                                maxoutRate);
+
+  Logger::printfLog(Logger::INFO,
+                    "RouteFollower: "
+                    "トラッキング開始 %.2f mm",
+                    distance);
+  squareTracking.run();
+  Logger::printfLog(Logger::INFO,
+                    "RouteFollower: "
+                    "トラッキング完了 %.2f mm",
                     distance);
 }
 

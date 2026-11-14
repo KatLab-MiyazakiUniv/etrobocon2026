@@ -464,6 +464,31 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
   return result;
 }
 
+/**
+ * @brief 方向転換に必要なコストを計算する
+ * @param currentDirection 現在のロボットの向き
+ * @param nextDirection 次のロボットの向き
+ * @return 方向転換に必要なコスト
+ */
+int DijkstraRoutePlanner::calculateTurnCost(Direction currentDirection,
+                                            Direction nextDirection) const
+{
+  if(currentDirection == nextDirection) {
+    return 0;
+  }
+
+  const int current = static_cast<int>(currentDirection);
+  const int next = static_cast<int>(nextDirection);
+
+  const int difference = std::abs(current - next);
+
+  if(difference == 2) {
+    return TURN_180_COST;
+  }
+
+  return TURN_90_COST;
+}
+
 int DijkstraRoutePlanner::calculateMoveCost(int currentX, int currentY, Direction currentDirection,
                                             Direction nextDirection) const
 {

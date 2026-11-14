@@ -299,9 +299,9 @@ bool RouteFollower::detectSquare(SquareAngleAdjustment::Result& result)
   // 正方形検出要求
   CameraServer::SquareDetectorRequest request{};
   request.roi.x = 0;
-  request.roi.y = 0;
+  request.roi.y = 500;
   request.roi.width = CAM_MAX_WIDTH;
-  request.roi.height = CAM_MAX_HEIGHT;
+  request.roi.height = CAM_MAX_HEIGHT - 500;
   SquareAngleAdjustment adjustment(robot);
   result = adjustment.calculate(request);
   if(!result.wasDetected) {

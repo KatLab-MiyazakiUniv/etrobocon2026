@@ -120,6 +120,7 @@ void RouteFollower::executeStep()
   const double rotationAngle = calculateRotationAngle(from.direction, to.direction);
   // 区間開始時に回頭が必要だったかを判定する。
   const bool rotatedAtSegmentStart = std::abs(rotationAngle) > ROTATION_TOLERANCE;
+
   if(rotatedAtSegmentStart) {
     Logger::printfLog(Logger::INFO,
                       "RouteFollower: "
@@ -150,10 +151,13 @@ void RouteFollower::executeStep()
     Logger::info("RouteFollower: "
                  "ゲートを検出しました");
     runGateSegment(from, to, distance, rotatedAtSegmentStart);
+  } else if(isBackward(from.direction, to.direction)) {
+    Logger::info("RouteFollower: 通常区間");
+    backward(distance);
   } else {
     Logger::info("RouteFollower: 通常区間");
-    // straight(distance);
-    squareTracking(distance);
+    straight(distance);
+    // squareTracking(distance);
   }
   ++nextIndex;
 }
@@ -178,11 +182,24 @@ double RouteFollower::directionToHeading(Direction direction) const
   return 0.0;
 }
 
+bool RouteFollower::isBackward(Direction from, Direction to) const
+{
+  const double currentHeading = directionToHeading(from);
+  const double targetHeading = directionToHeading(to);
+  const double angle = AngleNormalizer::normalizeAngle(currentHeading - targetHeading);
+  if(angle == 180.0) {
+    return 1;
+  }
+}
+
 double RouteFollower::calculateRotationAngle(Direction from, Direction to) const
 {
   const double currentHeading = directionToHeading(from);
   const double targetHeading = directionToHeading(to);
   const double angle = AngleNormalizer::normalizeAngle(currentHeading - targetHeading);
+  if(angle == 180.0) {
+    return 0.0;
+  }
   // 90度を基準として指定回頭角度に変換する。
   return angle * (ROTATION_ANGLE / 90.0);
 }

@@ -105,6 +105,8 @@ class RouteFollower : public BaseMotion {
    */
   double directionToHeading(Direction direction) const;
 
+  bool isBackward(Direction from, Direction to) const;
+
   /**
    * @brief 2方向間で必要な回頭角度を計算する
    * @param from 現在方向

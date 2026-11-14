@@ -58,7 +58,7 @@ class EtRallyMotion : public BaseMotion {
  protected:
   /**
    * @brief 走行前の準備処理
-
+   */
   void prepare() override;
 
   /**

@@ -382,7 +382,8 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
 
     case CONDITION_COMMAND::COLOR_OR_COLOR_OR_DISTANCE: {
       if(params.size() < 5) {
-        Logger::printfLog(Logger::ERROR, "[MotionParser] ColorOrColorOrDistanceのパラメータ数が不足しています");
+        Logger::printfLog(Logger::ERROR,
+                          "[MotionParser] ColorOrColorOrDistanceのパラメータ数が不足しています");
         return nullptr;
       }
 
@@ -393,10 +394,10 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
       auto targetColor1 = ColorSensorController::convertStringToColor(targetColorName1);
       auto targetColor2 = ColorSensorController::convertStringToColor(targetColorName2);
 
-      Logger::printfLog(
-          Logger::DEBUG,
-          "[MotionParser] ColorOrColorOrDistance: targetColor1=%s, targetColor2=%s, targetDistance=%.1f を生成しました",
-          targetColorName1.c_str(), targetColorName2.c_str(), targetDistance);
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] ColorOrColorOrDistance: targetColor1=%s, targetColor2=%s, "
+                        "targetDistance=%.1f を生成しました",
+                        targetColorName1.c_str(), targetColorName2.c_str(), targetDistance);
 
       auto colorCondition1 = std::make_unique<SensorColorCondition>(robot, targetColor1);
       auto colorCondition2 = std::make_unique<SensorColorCondition>(robot, targetColor2);
@@ -408,11 +409,10 @@ unique_ptr<BaseContinuationCondition> MotionParser::createConditionInstance(
           CompoundCondition::LogicalOperator::OR);
 
       // ((Color1 OR Color2) OR Distance) を作成して返す
-      return std::make_unique<CompoundCondition>(
-          robot, std::move(colorOrColor), std::move(distanceCondition),
-          CompoundCondition::LogicalOperator::OR);
+      return std::make_unique<CompoundCondition>(robot, std::move(colorOrColor),
+                                                 std::move(distanceCondition),
+                                                 CompoundCondition::LogicalOperator::OR);
     }
-
 
     default:
       Logger::printfLog(Logger::WARNING, "[MotionParser] Condition %s は未実装です",
@@ -668,6 +668,35 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
                        fromString<double>(motionParams[6])),
           request, fromString<bool>(motionParams[7]), fromString<double>(motionParams[18]),
           fromString<double>(motionParams[19]));
+    }
+
+    case MOTION_COMMAND::SQUARE_TRACKING: {
+      if(motionParams.size() < 12) {
+        Logger::printfLog(Logger::ERROR,
+                          "[MotionParser] CameraTrackingのパラメータ数は[%d]です。不足です。",
+                          motionParams.size());
+        return nullptr;
+      }
+
+      CameraServer::SquareDetectorRequest squareRequest;
+
+      squareRequest.roi = { fromString<int>(motionParams[8]), fromString<int>(motionParams[9]),
+                            fromString<int>(motionParams[10]), fromString<int>(motionParams[11]) };
+
+      int targetXCoordinate = fromString<int>(motionParams[3]);
+
+      Logger::printfLog(Logger::DEBUG,
+                        "[MotionParser] SquareTracking: targetXCoorddinate=%d を生成しました",
+                        targetXCoordinate);
+
+      // ここでCameraTrackigのメンバ変数のdetectorのメンバ変数のhsvRangesをセットする
+
+      return new CameraTracking(
+          robot, std::move(condition), fromString<double>(motionParams[2]), targetXCoordinate,
+          Pid::PidGain(fromString<double>(motionParams[4]), fromString<double>(motionParams[5]),
+                       fromString<double>(motionParams[6])),
+          squareRequest, fromString<bool>(motionParams[7]), fromString<double>(motionParams[11]),
+          fromString<double>(motionParams[12]));
     }
 
     case MOTION_COMMAND::ABSOLUTE_ROTATION: {
@@ -953,6 +982,7 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "AbsoluteRotation", MOTION_COMMAND::ABSOLUTE_ROTATION },
           { "RelativeRotation", MOTION_COMMAND::RELATIVE_ROTATION },
           { "CameraTracking", MOTION_COMMAND::CAMERA_TRACKING },
+          { "SquareTracking", MOTION_COMMAND::SQUARE_TRACKING },
           { "Calibrator", MOTION_COMMAND::CALIBRATOR },
           { "Snapshot", MOTION_COMMAND::SNAPSHOT },
           { "ResetAzimuth", MOTION_COMMAND::RESET_AZIMUTH },

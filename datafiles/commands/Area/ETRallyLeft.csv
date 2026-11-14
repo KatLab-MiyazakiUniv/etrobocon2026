@@ -1,6 +1,7 @@
 コマンド名,動作ID,条件コマンド名,条件ID
 ArmMotor,001,MotionTime,001
 ETRally,L001,RepeatCount,001
-Straight,001,Distance,060
+Straight,001,Distance,050
 RelativeRotation,-045,RelativeAngle,-045
+Straight,001,Distance,010
 ArmMotor,002,MotionTime,001

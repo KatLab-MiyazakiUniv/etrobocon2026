@@ -59,31 +59,31 @@ void QrCodeDetectionActionHandler::execute(const CameraServer::QrCodeDetectorReq
   }
 
 
-//   std::string directoryPath = "datafiles/line_trace";
+  std::string directoryPath = "datafiles/line_trace";
 
 
-// // clang-format off
-//   std::string fileName = "det_d" + std::to_string(1) +
-//                           "_tlx" + Utils::toStrInt(0) +
-//                           "_tly" + Utils::toStrInt(0) +
-//                           "_trx" + Utils::toStrInt(0) +
-//                           "_try" + Utils::toStrInt(0) +
-//                           "_blx" + Utils::toStrInt(0) +
-//                           "_bly" + Utils::toStrInt(0) +
-//                           "_brx" + Utils::toStrInt(0) +
-//                           "_bry" + Utils::toStrInt(0) +
-//                           "_rx"  + Utils::toStrInt(0) +
-//                           "_ry"  + Utils::toStrInt(0) +
-//                           "_rw"  + Utils::toStrInt(0) +
-//                           "_rh"  + Utils::toStrInt(0) +
-//                           "_qrd" + std::to_string(0) +
-//                           "_"    + std::to_string(ClockUtil::now());
-//   // clang-format on
+// clang-format off
+  std::string fileName = "det_d" + std::to_string(1) +
+                          "_tlx" + Utils::toStrInt(0) +
+                          "_tly" + Utils::toStrInt(0) +
+                          "_trx" + Utils::toStrInt(0) +
+                          "_try" + Utils::toStrInt(0) +
+                          "_blx" + Utils::toStrInt(0) +
+                          "_bly" + Utils::toStrInt(0) +
+                          "_brx" + Utils::toStrInt(0) +
+                          "_bry" + Utils::toStrInt(0) +
+                          "_rx"  + Utils::toStrInt(0) +
+                          "_ry"  + Utils::toStrInt(0) +
+                          "_rw"  + Utils::toStrInt(10) +
+                          "_rh"  + Utils::toStrInt(1080) +
+                          "_qrd" + std::to_string(0) +
+                          "_"    + std::to_string(ClockUtil::now());
+  // clang-format on
 
 
 
-//   MultiThread::wrap(
-//       [=]() mutable { FrameSave::save(frame, directoryPath,fileName); });
-//   int totalEndTime = ClockUtil::now();
+  MultiThread::wrap(
+      [=]() mutable { FrameSave::save(frame, directoryPath,fileName); });
+  int totalEndTime = ClockUtil::now();
 
 }

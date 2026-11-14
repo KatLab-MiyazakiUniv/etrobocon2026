@@ -34,12 +34,12 @@ namespace {
    *
    * RouteFollowerと同じ値を使用する。
    */
-  constexpr double ROTATION_TOLERANCE = 5.0;
+  constexpr double ROTATION_TOLERANCE = 3.0;
 
   /**
    * @brief 90度回頭に対して指定する回頭角度[deg]
    */
-  constexpr double ROTATION_ANGLE = 85.0;
+  constexpr double ROTATION_ANGLE = 90.0;
 
   /**
    * @brief 現在のIMU角度を基準に絶対目標角度を算出して回頭する
@@ -271,8 +271,16 @@ void EtRallyMotion::executeStep()
     robot.getWheelMotorControllerInstance().stopBoth();
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
-    // 元のETラリー開始方向へ戻す
-    rotateAbsolute(robot, -result.correctionAngle, squareRotationPid);
+    SquareAngleAdjustment::Result secondResult = adjustment.calculate(request);
+    if(secondResult.wasDetected) {
+    Logger::printfLog(Logger::INFO, "Second square detected: angle=%f",
+    secondResult.correctionAngle);
+    rotateAbsolute(robot, secondResult.correctionAngle, squareRotationPid);
+    } else {
+    Logger::info("Second square not detected -> stop adjustment");
+    robot.getWheelMotorControllerInstance().stopBoth();
+    return;
+    }
 
     // 逆回頭後に停止してIMUリセット前に200ms待機
     robot.getWheelMotorControllerInstance().stopBoth();

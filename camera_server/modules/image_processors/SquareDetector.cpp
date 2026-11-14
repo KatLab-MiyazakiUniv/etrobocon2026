@@ -43,7 +43,7 @@ namespace {
   /**
    * @brief 上側から検出対象外にする高さ [px]
    */
-  constexpr int TOP_CROP_PX = 600;
+  constexpr int TOP_CROP_PX = 200;
 }  // namespace
 
 SquareDetector::SquareDetector(const cv::Rect& _roi) : roi(_roi)

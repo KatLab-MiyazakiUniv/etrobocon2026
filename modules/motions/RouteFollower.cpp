@@ -13,11 +13,11 @@ namespace {
   /**
    * @brief 90度回頭に対して指定する回頭角度[deg]
    */
-  constexpr double ROTATION_ANGLE = 85.0;
+  constexpr double ROTATION_ANGLE = 90.0;
   /**
    * @brief 回頭終了判定許容誤差[deg]
    */
-  constexpr double ROTATION_TOLERANCE = 5.0;
+  constexpr double ROTATION_TOLERANCE = 3.0;
   /**
    * @brief QR①とQR②の距離[mm]
    */

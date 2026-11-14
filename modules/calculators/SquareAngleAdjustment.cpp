@@ -26,7 +26,7 @@ namespace {
   /**
    * @brief 使用可能な最大前方距離[mm]
    */
-  constexpr double MAX_FORWARD_DISTANCE = 700.0;
+  constexpr double MAX_FORWARD_DISTANCE = 3000.0;
 
   /**
    * @brief 使用可能な横方向距離の最大絶対値[mm]

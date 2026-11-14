@@ -40,7 +40,7 @@ class DijkstraRoutePlanner {
  private:
   const std::vector<Gate>& gates;                  // 登録されているゲート
   static constexpr int TURN_90_COST = 2;           // 90度回頭コスト
-  static constexpr int TURN_180_COST = 0;          // 180度の場合は回頭しないためコスト0
+  static constexpr int TURN_180_COST = 4;          // 180度回頭コスト
   static constexpr int STRAIGHT_COST = 1;          // 直進コスト
   static constexpr int NEAR_GATE_TURN_COST = 100;  // 回頭時にゲート足との接触危険がある場合のコスト
   static constexpr int MOVE_STEP = 2;              // 1回の移動量

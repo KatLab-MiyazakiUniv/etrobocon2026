@@ -257,21 +257,29 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
   }
 
   // 探索する状態の総数
-  // X座標、Y座標、向いている方向の組み合わせで状態を表す
+  // X座標、Y座標、機体が向いている方向の組み合わせ
   constexpr int STATE_COUNT = GRID_SIZE * GRID_SIZE * DIRECTION_COUNT;
 
-  std::vector<int> distance(STATE_COUNT, INT_MAX);  // スタート地点から各状態までの最小コストを記録
-  std::vector<int> previous(STATE_COUNT, -1);       // 各状態に来る直前の状態を記録
+  std::vector<int> distance(STATE_COUNT, INT_MAX);
+  std::vector<int> previous(STATE_COUNT, -1);
 
-  // 探索する状態をコストの小さい順に取り出すための優先度付きキュー
+  // 優先度付きキュー
   std::priority_queue<QueueNode, std::vector<QueueNode>, std::greater<QueueNode>> queue;
 
-  // 開始位置と開始方向を、配列で使うインデックスに変換
+  // 開始位置と開始方向をインデックスに変換
   const int startIndex = stateToIndex(startX, startY, startDirection);
 
   distance[startIndex] = 0;
   queue.push({ 0, startIndex });
 
+  /*
+   * 移動方向ごとの座標変化
+   *
+   * UP    : Y -
+   * RIGHT : X -
+   * DOWN  : Y +
+   * LEFT  : X +
+   */
   constexpr int DX[DIRECTION_COUNT] = { 0, -MOVE_STEP, 0, MOVE_STEP };
   constexpr int DY[DIRECTION_COUNT] = { -MOVE_STEP, 0, MOVE_STEP, 0 };
 
@@ -280,42 +288,28 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
     const QueueNode currentNode = queue.top();
     queue.pop();
 
+    // 古いコストのノードは無視
     if(currentNode.cost != distance[currentNode.index]) {
       continue;
     }
 
     const RouteState current = indexToState(currentNode.index);
 
-    for(int directionValue = 0; directionValue < DIRECTION_COUNT; ++directionValue) {
-      const Direction nextDirection = static_cast<Direction>(directionValue);
-      const int nextX = current.x + DX[directionValue];
-      const int nextY = current.y + DY[directionValue];
+    /*
+     * 移動方向を4方向で探索する。
+     *
+     * 各移動方向について、
+     * 前進と後退の2パターンを探索する。
+     */
+    for(int moveValue = 0; moveValue < DIRECTION_COUNT; ++moveValue) {
+      const Direction moveDirection = static_cast<Direction>(moveValue);
 
+      // 移動先の座標
+      const int nextX = current.x + DX[moveValue];
+      const int nextY = current.y + DY[moveValue];
+
+      // 移動先が探索可能範囲か確認
       if(!isValid(nextX, nextY)) {
-        continue;
-      }
-
-      /*
-       * (0,2)、(0,6)、(0,10)では、
-       * 回頭してLEFTを向く動作を禁止する。
-       *
-       * すでにLEFTを向いている状態での
-       * LEFT方向への直進は許可する。
-       */
-      if(isTurnForbiddenPoint(current.x, current.y) && current.direction != nextDirection
-         && nextDirection == Direction::LEFT) {
-        continue;
-      }
-
-      /*
-       * 回頭時にロボット後部がゲート足へ
-       * 接触する可能性がある場合は、
-       * その回頭を含む経路を使用しない。
-       *
-       * 外周上の座標も判定対象とする。
-       */
-      if(current.direction != nextDirection
-         && isTurnBlockedByGatePost(current.x, current.y, current.direction, nextDirection)) {
         continue;
       }
 
@@ -324,19 +318,66 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
         continue;
       }
 
-      // 移動コスト
-      const int moveCost
-          = calculateMoveCost(current.x, current.y, current.direction, nextDirection);
+      /*
+       * 前進・後退をそれぞれ探索する。
+       *
+       * backwardValue = 0 : 前進
+       * backwardValue = 1 : 後退
+       */
+      for(int backwardValue = 0; backwardValue < 2; ++backwardValue) {
+        const bool isBackward = backwardValue == 1;
 
-      const int nextCost = currentNode.cost + moveCost;
-      const int nextIndex = stateToIndex(nextX, nextY, nextDirection);
+        Direction nextDirection = moveDirection;
 
-      // より低コストなら更新
-      if(nextCost < distance[nextIndex]) {
-        distance[nextIndex] = nextCost;
-        previous[nextIndex] = currentNode.index;
+        // 後退の場合は移動方向と機体方向が反対になる
+        if(isBackward) {
+          nextDirection = static_cast<Direction>((moveValue + 2) % DIRECTION_COUNT);
+        }
 
-        queue.push({ nextCost, nextIndex });
+        /*
+         * (0,2)、(0,6)、(0,10)では、
+         * 回頭してLEFTを向く動作を禁止する。
+         *
+         * すでにLEFTを向いている場合は、
+         * LEFT方向への前進を許可する。
+         *
+         * また、LEFT方向への後退であれば、
+         * 機体方向はRIGHTになるため許可される。
+         */
+        if(isTurnForbiddenPoint(current.x, current.y) && current.direction != nextDirection
+           && nextDirection == Direction::LEFT) {
+          continue;
+        }
+
+        /*
+         * 回頭時にロボット後部がゲート足へ
+         * 接触する可能性がある場合は、
+         * その回頭を含む経路を使用しない。
+         *
+         * 後退による移動では、
+         * 機体方向が変化しない場合は回頭判定を行わない。
+         */
+        if(current.direction != nextDirection
+           && isTurnBlockedByGatePost(current.x, current.y, current.direction, nextDirection)) {
+          continue;
+        }
+
+        // 移動コストを計算
+        const int moveCost
+            = calculateMoveCost(current.x, current.y, current.direction, nextDirection);
+
+        const int nextCost = currentNode.cost + moveCost;
+
+        // 移動先の座標と機体方向から状態を作成
+        const int nextIndex = stateToIndex(nextX, nextY, nextDirection);
+
+        // より低コストなら更新
+        if(nextCost < distance[nextIndex]) {
+          distance[nextIndex] = nextCost;
+          previous[nextIndex] = currentNode.index;
+
+          queue.push({ nextCost, nextIndex });
+        }
       }
     }
   }
@@ -370,8 +411,6 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
      * ゴール地点で最終回頭するときに、
      * ロボット後部がゲート足へ接触する場合は、
      * その到着方向を候補から除外する。
-     *
-     * 外周上のゴール地点も判定対象とする。
      */
     if(arrivalDirection != goalDirection
        && isTurnBlockedByGatePost(goal.x, goal.y, arrivalDirection, goalDirection)) {
@@ -423,29 +462,6 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
   result.route = route;
 
   return result;
-}
-
-int DijkstraRoutePlanner::calculateTurnCost(Direction currentDirection,
-                                            Direction nextDirection) const
-{
-  const int current = static_cast<int>(currentDirection);
-  const int next = static_cast<int>(nextDirection);
-
-  int difference = std::abs(current - next);
-  difference = std::min(difference, DIRECTION_COUNT - difference);
-
-  // 同じ方向
-  if(difference == 0) {
-    return 0;
-  }
-
-  // 90度回頭
-  if(difference == 1) {
-    return TURN_90_COST;
-  }
-
-  // 180度回頭
-  return TURN_180_COST;
 }
 
 int DijkstraRoutePlanner::calculateMoveCost(int currentX, int currentY, Direction currentDirection,

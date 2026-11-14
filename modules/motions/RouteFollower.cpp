@@ -151,11 +151,11 @@ void RouteFollower::executeStep()
     Logger::info("RouteFollower: "
                  "ゲートを検出しました");
     runGateSegment(from, to, distance, rotatedAtSegmentStart);
-  } else if(isBackward(from.direction, to.direction)) {
-    Logger::info("RouteFollower: 通常区間");
+  } else if(isBackward(from, to)) {
+    Logger::info("RouteFollower: 後退区間");
     backward(distance);
   } else {
-    Logger::info("RouteFollower: 通常区間");
+    Logger::info("RouteFollower: 前進区間");
     straight(distance);
     // squareTracking(distance);
   }
@@ -182,14 +182,42 @@ double RouteFollower::directionToHeading(Direction direction) const
   return 0.0;
 }
 
-bool RouteFollower::isBackward(Direction from, Direction to) const
+bool RouteFollower::isBackward(const RouteState& from, const RouteState& to) const
 {
-  const double currentHeading = directionToHeading(from);
-  const double targetHeading = directionToHeading(to);
-  const double angle = AngleNormalizer::normalizeAngle(currentHeading - targetHeading);
-  if(angle == 180.0) {
-    return 1;
+  Direction moveDirection;
+
+  // 座標の変化から実際の移動方向を求める。
+  // プロジェクトの座標系：
+  // UP    : Y減少
+  // RIGHT : X減少
+  // DOWN  : Y増加
+  // LEFT  : X増加
+  if(to.x < from.x) {
+    moveDirection = Direction::RIGHT;
+  } else if(to.x > from.x) {
+    moveDirection = Direction::LEFT;
+  } else if(to.y < from.y) {
+    moveDirection = Direction::UP;
+  } else {
+    moveDirection = Direction::DOWN;
   }
+
+  // 移動方向とロボットの向きが反対なら後退。
+  switch(to.direction) {
+    case Direction::UP:
+      return moveDirection == Direction::DOWN;
+
+    case Direction::RIGHT:
+      return moveDirection == Direction::LEFT;
+
+    case Direction::DOWN:
+      return moveDirection == Direction::UP;
+
+    case Direction::LEFT:
+      return moveDirection == Direction::RIGHT;
+  }
+
+  return false;
 }
 
 double RouteFollower::calculateRotationAngle(Direction from, Direction to) const
@@ -197,11 +225,9 @@ double RouteFollower::calculateRotationAngle(Direction from, Direction to) const
   const double currentHeading = directionToHeading(from);
   const double targetHeading = directionToHeading(to);
   const double angle = AngleNormalizer::normalizeAngle(currentHeading - targetHeading);
-  if(angle == 180.0) {
-    return 0.0;
-  }
-  // 90度を基準として指定回頭角度に変換する。
-  return angle * (ROTATION_ANGLE / 90.0);
+
+  // 180度の場合も実際に回頭する。
+  return angle;
 }
 
 double RouteFollower::calculateDistance(const RouteState& from, const RouteState& to) const

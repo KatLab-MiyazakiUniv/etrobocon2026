@@ -105,7 +105,14 @@ class RouteFollower : public BaseMotion {
    */
   double directionToHeading(Direction direction) const;
 
-  bool isBackward(Direction from, Direction to) const;
+  /**
+   * @brief 区間の移動が後退かどうか判定する
+   * @param from 区間開始状態
+   * @param to 区間終了状態
+   * @return true 後退
+   * @return false 前進
+   */
+  bool isBackward(const RouteState& from, const RouteState& to) const;
 
   /**
    * @brief 2方向間で必要な回頭角度を計算する

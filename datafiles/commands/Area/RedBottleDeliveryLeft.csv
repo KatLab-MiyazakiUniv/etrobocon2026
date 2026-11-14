@@ -1,18 +1,14 @@
 #動作コマンド名,動作ID,条件コマンド名,条件ID
+# 赤ボトルデリバリー
 #赤色まで移動
-QRAbsoluteRotation,-160,AbsoluteAngle,-160
-#QRAbsoluteRotation,-160,AbsoluteAngle,-160
-#QRRelativeRotation,-070,RelativeAngle,-070
+QRAbsoluteRotation,-167,AbsoluteAngle,-167
 #赤色が写る範囲まで移動
 Straight,006,DistanceOrColor,RED063
 #赤色がフレームに写る状態で赤色検知カメラ走行
 Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,RED,DistanceOrColor,RED025
-
-
-Straight,-001,Distance,010
+#ボトルを離す
+Straight,-001,Distance,005
 
 AbsoluteRotation,090,AbsoluteAngle,090
-
-Straight,001,Distance,010
-Straight,001,ColorOrColor,001
+Straight,001,ColorOrColorOrDistance,BLUEorBLACK010

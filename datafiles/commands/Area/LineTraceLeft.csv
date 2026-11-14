@@ -27,18 +27,27 @@ CameraTracking,BC,Distance,030
 CameraTracking,BC3,Distance,015
 CameraTracking,000,Distance,000
 
-
-
-
-
-# ボトルデリバリー
+# ボトルデリバリー(共通)
 
 AbsoluteRotation,-085,AbsoluteAngle,-085
+
+Straight,001,Distance,005
 Straight,001,ColorOrColor,003
 AbsoluteRotation,000,AbsoluteAngle,000
 Straight,005,DistanceOrColor,GREEN030
-CameraTracking,S003,DistanceOrColor,BLUE020
+
+
+#targetXが大きすぎて急旋回発生
+#CameraTracking,S003,DistanceOrColor,BLUE020
+#カメラトラッキングで、左に曲がる問題の対象。
+Snapshot,clearBuffer1,RepeatCount,001
+CameraTracking,QR1S001,ColorOrColorOrDistance,BLUEorBLACK020
+
+
+#間違えて
 QRStraight,001,DistanceOrColor,BLUE040
+
+
 
 
 AbsoluteRotation,-090,AbsoluteAngle,-090
@@ -49,7 +58,6 @@ CameraTracking,LBS003-4,Distance,070
 Straight,001,DistanceOrColor,BLACK070
 
 # QR2検出
-
 Snapshot,clearBuffer1,RepeatCount,001
 Snapshot,021,RepeatCount,001
-#GatePosition,2-1,RepeatCount,001
+GatePosition,2-1,RepeatCount,001

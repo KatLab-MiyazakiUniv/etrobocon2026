@@ -49,28 +49,32 @@ void EtRobocon2026::start()
   AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
   // lineTraceAreaMaster.run();
 
-  // ボトルデリバリー走行
-  Area bottleDeliveryArea = Area::BottleDelivery;
-  AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
-  // bottleDeliveryAreaMaster.run();
-
-  CsvLogger::outputToFile();
-
-  // ET相撲走行
-  Area ETZumo = Area::ETZumo;
-  AreaMaster ETZumouAreaMaster(robot, ETZumo);
-  // ETZumouAreaMaster.run();
-
-  // ETラリー走行
-  Area etRallyArea = Area::ETRally;
-  AreaMaster etRallyAreaMaster(robot, etRallyArea);
-  // etRallyAreaMaster.run();
 
   // 調整のための一時的な走行
   Area tmpArea = Area::Tmp;
   AreaMaster tmpAreaMaster(robot, tmpArea);
   tmpAreaMaster.run();
 
+  // ボトルデリバリー走行
+  Area bottleDeliveryArea = Area::BottleDelivery;
+  AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
+  bottleDeliveryAreaMaster.run();
+
+
+  // CsvLogger::outputToFile();
+
+  // ET相撲走行
+  Area ETZumo = Area::ETZumo;
+  AreaMaster ETZumouAreaMaster(robot, ETZumo);
+  ETZumouAreaMaster.run();
+
+  // ETラリー走行
+  Area etRallyArea = Area::ETRally;
+  AreaMaster etRallyAreaMaster(robot, etRallyArea);
+  // etRallyAreaMaster.run();
+
+
   CsvLogger::outputToFile();
+
 
 }

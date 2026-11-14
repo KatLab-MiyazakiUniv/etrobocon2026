@@ -29,7 +29,7 @@ CameraTracking,000,Distance,000
 
 # ボトルデリバリー(共通)
 
-AbsoluteRotation,-085,AbsoluteAngle,-085
+AbsoluteRotation,-095,AbsoluteAngle,-095
 
 Straight,001,Distance,005
 Straight,001,ColorOrColor,003

@@ -12,6 +12,8 @@
 #include <cmath>
 #include "GatePosition.h"
 
+
+
 class QRAbsoluteRotation : public Rotation {
  public:
   /**

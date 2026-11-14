@@ -2,6 +2,6 @@
 ArmMotor,001,MotionTime,001
 ETRally,L001,RepeatCount,001
 Straight,001,Distance,050
-RelativeRotation,-045,RelativeAngle,-045
+AbsoluteRotation,090,AbsoluteAngle,090
 Straight,001,Distance,010
 ArmMotor,002,MotionTime,001

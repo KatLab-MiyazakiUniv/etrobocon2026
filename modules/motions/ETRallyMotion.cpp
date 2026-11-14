@@ -282,15 +282,13 @@ void EtRallyMotion::executeStep()
     return;
     }
 
-    // 逆回頭後に停止してIMUリセット前に200ms待機
-    robot.getWheelMotorControllerInstance().stopBoth();
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    // 回頭後に停止して200ms待機
+robot.getWheelMotorControllerInstance().stopBoth();
+std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
-    // 元のETラリー開始方向へ戻した後にIMUの角度をリセット
-    robot.getIMUControllerInstance().resetAzimuth();
-
-    // IMUリセット後に200ms待機
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+// IMUの現在角度を維持する
+Logger::printfLog(Logger::INFO, "ET Rally IMU angle: %.2f deg",
+                  robot.getIMUControllerInstance().getAzimuth());
 
     Logger::printfLog(Logger::INFO, "ET Rally IMU reset: %.2f deg",
                       robot.getIMUControllerInstance().getAzimuth());

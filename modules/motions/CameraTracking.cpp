@@ -42,6 +42,25 @@ CameraTracking::CameraTracking(Robot& _robot,
   LOG_CREATE("CameraTracking");
 }
 
+CameraTracking::CameraTracking(Robot& _robot,
+                               std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+                               double _targetSpeed, int _targetXCoordinate,
+                               const Pid::PidGain& _pidGain,
+                               const CameraServer::SquareDetectorRequest& _squareDetectionRequest,
+                               bool _isStopMotorPower)
+  : BaseMotion(_robot, std::move(_continuationCondition)),
+    targetSpeed(_targetSpeed),
+    targetXCoordinate(_targetXCoordinate),
+    detectionMode(DetectionMode::SQUARE),
+    colorDetectionRequest(),
+    squareRequest(_squareDetectionRequest),
+    isStopMotorPower(_isStopMotorPower),
+    speedCalculator(_robot, _targetSpeed),
+    cameraPid(_pidGain.kp, _pidGain.ki, _pidGain.kd, _targetXCoordinate)
+{
+  LOG_CREATE("CameraTracking");
+}
+
 CameraTracking::~CameraTracking()
 {
   LOG_DESTROY("CameraTracking");
@@ -103,6 +122,20 @@ void CameraTracking::executeStep()
   else if(detectionMode == DetectionMode::QR_CODE) {
     CameraServer::QrCodeDetectorResponse response;
     success = client.executeQrCodeDetection(qrDetectionRequest, response);
+    wasDetected = response.wasDetected;
+    if(success && wasDetected) {
+      // QRコードの4頂点の中心X座標を計算
+      double sumX = 0.0;
+      for(const auto& corner : response.corners) {
+        sumX += corner.x;
+      }
+      currentX = sumX / CameraServer::QR_CODE_CORNER_COUNT;
+    }
+  }
+
+  else if(detectionMode == DetectionMode::SQUARE) {
+    CameraServer::SquareDetectorResponse response;
+    success = client.executeSquareDetection(squareRequest, response);
     wasDetected = response.wasDetected;
     if(success && wasDetected) {
       // QRコードの4頂点の中心X座標を計算

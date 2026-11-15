@@ -13,7 +13,7 @@ namespace {
   /**
    * @brief 90度回頭に対して指定する回頭角度[deg]
    */
-  constexpr double ROTATION_ANGLE = 90.0;
+  constexpr double ROTATION_ANGLE = 80.0;
   /**
    * @brief 回頭終了判定許容誤差[deg]
    */
@@ -138,84 +138,18 @@ void RouteFollower::executeStep()
                     "区間距離=%.2f mm",
                     distance);
   const Gate* gate = findGate(from, to);
-
   if(gate != nullptr) {
-    // ゲート区間は既存のQR①・QR②補正を使用する。
     Logger::info("RouteFollower: "
                  "ゲートを検出しました");
     runGateSegment(from, to, distance, rotatedAtSegmentStart);
-
   } else if(isBackward(from, to)) {
-    // 後退区間は既存の後退処理を維持する。
     Logger::info("RouteFollower: 後退区間");
     backward(distance);
-
   } else {
     Logger::info("RouteFollower: 前進区間");
-
-    double remainingDistance = distance;
-
-    // 区間開始時に回頭していた場合のみ正方形補正を行う。
-    if(rotatedAtSegmentStart) {
-      Logger::info("RouteFollower: "
-                   "回頭後の正方形検出を開始");
-
-      SquareAngleAdjustment::Result squareResult{};
-
-      if(detectSquare(squareResult)) {
-        const double correctionAngle = squareResult.correctionAngle;
-        const double correctionDistance = squareResult.straightDistance;
-
-        // 補正移動距離が区間内に収まる場合のみ補正する。
-        if(correctionDistance >= 0.0 && correctionDistance <= distance) {
-          Logger::printfLog(Logger::INFO,
-                            "RouteFollower: "
-                            "正方形検出成功 "
-                            "補正角度=%.2f 度 "
-                            "補正距離=%.2f mm",
-                            correctionAngle, correctionDistance);
-
-          // 正方形の方向に回頭する。
-          rotateForSquare(correctionAngle);
-
-          // 正方形の中心まで移動する。
-          straight(correctionDistance);
-
-          // 元の進行方向に戻す。
-          rotateForSquare(-correctionAngle);
-
-          // 補正で移動した距離を区間距離から差し引く。
-          remainingDistance -= correctionDistance;
-
-          Logger::printfLog(Logger::INFO,
-                            "RouteFollower: "
-                            "正方形補正完了 "
-                            "残り距離=%.2f mm",
-                            remainingDistance);
-        } else {
-          Logger::warning("RouteFollower: "
-                          "正方形補正距離が区間距離の範囲外です "
-                          "→ 補正をスキップ");
-        }
-
-      } else {
-        // 正方形が検出できなければ角度補正しない。
-        Logger::warning("RouteFollower: "
-                        "正方形検出失敗 "
-                        "→ 角度補正なしで通常走行");
-      }
-    }
-
-    // 正方形補正後の残り距離を通常走行する。
-    if(remainingDistance > 0.0) {
-      Logger::printfLog(Logger::INFO,
-                        "RouteFollower: "
-                        "通常直進開始 %.2f mm",
-                        remainingDistance);
-
-      straight(remainingDistance);
-    }
+    straight(distance);
   }
+  ++nextIndex;
 }
 
 void RouteFollower::finish()

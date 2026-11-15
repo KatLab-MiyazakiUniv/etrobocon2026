@@ -782,11 +782,6 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
         return nullptr;
       }
 
-      int squareRequest_roi_x = fromString<double>(motionParams[18]);
-      int squareRequest_roi_width = fromString<double>(motionParams[19]);
-      int squareRequest_roi_y = fromString<double>(motionParams[20]);
-      int squareRequest_roi_height = fromString<double>(motionParams[21]);
-
       Pid::PidGain rotationPid{ fromString<double>(motionParams[2]),
                                 fromString<double>(motionParams[3]),
                                 fromString<double>(motionParams[4]) };
@@ -799,15 +794,10 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       double targetSpeed = fromString<double>(motionParams[11]);
       double straightDeadbandRate = fromString<double>(motionParams[12]);
       double straightMaxoutRate = fromString<double>(motionParams[13]);
-      double squareTargetSpeed = fromString<double>(motionParams[14]);
-      Pid::PidGain squareTrackingPid{ fromString<double>(motionParams[15]),
-                                      fromString<double>(motionParams[16]),
-                                      fromString<double>(motionParams[17]) };
+
       return new EtRallyMotion(robot, std::move(condition), rotationPid, squareRotationPid,
                                straightAnglePid, targetSpeed, straightDeadbandRate,
-                               straightMaxoutRate, squareTrackingPid, squareTargetSpeed,
-                               squareRequest_roi_x, squareRequest_roi_width, squareRequest_roi_y,
-                               squareRequest_roi_height);
+                               straightMaxoutRate);
     }
 
     case MOTION_COMMAND::ET_RALLY_FINISH: {

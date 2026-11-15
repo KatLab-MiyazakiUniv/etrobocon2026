@@ -46,9 +46,7 @@ class RouteFollower : public BaseMotion {
   RouteFollower(Robot& _robot, const EtRallyMap& _map, double _targetSpeed,
                 const Pid::PidGain& _rotationPid, const Pid::PidGain& _squareRotationPid,
                 const Pid::PidGain& _straightAnglePid, double _straightDeadbandRate,
-                double _straightMaxoutRate, Pid::PidGain& _squareTrackingPid,
-                double _squareTargetSpeed, int squareRequest_roi_x, int squareRequest_roi_width,
-                int squareRequest_roi_y, int squareRequest_roi_height);
+                double _straightMaxoutRate);
 
   /**
    * @brief 走行する経路を設定する
@@ -91,12 +89,6 @@ class RouteFollower : public BaseMotion {
   Pid::PidGain straightAnglePid;   // 直進角度PIDゲイン
   double straightDeadbandRate;     // 直進デッドバンド率
   double straightMaxoutRate;       // 直進マックスアウト率
-  Pid::PidGain squareTrackingPid;
-  double squareTargetSpeed;
-  int squareRequest_roi_x;
-  int squareRequest_roi_width;
-  int squareRequest_roi_y;
-  int squareRequest_roi_height;
 
   /**
    * @brief Directionを角度へ変換する
@@ -147,12 +139,6 @@ class RouteFollower : public BaseMotion {
    * @param distance 直進距離[mm]
    */
   void straight(double distance);
-
-  /**
-   * @brief 指定距離をQRトラッキングする
-   * @param distance 直進距離[mm]
-   */
-  void squareTracking(double distance);
 
   /**
    * @brief 指定距離を後退する

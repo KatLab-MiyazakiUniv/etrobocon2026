@@ -157,10 +157,7 @@ EtRallyMotion::EtRallyMotion(Robot& _robot,
                              const Pid::PidGain& _rotationPid,
                              const Pid::PidGain& _squareRotationPid,
                              const Pid::PidGain& _straightAnglePid, double _targetSpeed,
-                             double _straightDeadbandRate, double _straightMaxoutRate,
-                             Pid::PidGain& _squareTrackingPid, double _squareTargetSpeed,
-                             int squareRequest_roi_x, int squareRequest_roi_width,
-                             int squareRequest_roi_y, int squareRequest_roi_height)
+                             double _straightDeadbandRate, double _straightMaxoutRate)
   : BaseMotion(_robot, std::make_unique<EtRallyCompletionCondition>(
                            _robot, [this]() { return !completed; })),
     rotationPid(_rotationPid),
@@ -168,13 +165,7 @@ EtRallyMotion::EtRallyMotion(Robot& _robot,
     straightAnglePid(_straightAnglePid),
     targetSpeed(_targetSpeed),
     straightDeadbandRate(_straightDeadbandRate),
-    straightMaxoutRate(_straightMaxoutRate),
-    squareTrackingPid(_squareTrackingPid),
-    squareTargetSpeed(_squareTargetSpeed),
-    squareRequest_roi_x(squareRequest_roi_x),
-    squareRequest_roi_width(squareRequest_roi_width),
-    squareRequest_roi_y(squareRequest_roi_y),
-    squareRequest_roi_height(squareRequest_roi_height)
+    straightMaxoutRate(_straightMaxoutRate)
 {
   // 元のETラリーには外部の継続条件がなかったため、
   // MotionParserから渡された条件は走行の開始・終了判定に使用しない。
@@ -324,10 +315,8 @@ void EtRallyMotion::executeStep()
   // ========================================
   // RouteFollower生成
   // ========================================
-  RouteFollower routeFollower(
-      robot, etRallyMap, targetSpeed, rotationPid, squareRotationPid, straightAnglePid,
-      straightDeadbandRate, straightMaxoutRate, squareTrackingPid, squareTargetSpeed,
-      squareRequest_roi_x, squareRequest_roi_width, squareRequest_roi_y, squareRequest_roi_height);
+  RouteFollower routeFollower(robot, etRallyMap, targetSpeed, rotationPid, squareRotationPid,
+                              straightAnglePid, straightDeadbandRate, straightMaxoutRate);
 
   // 1周目の実測時間を、2周目以降の周回可否判定に利用する。
   // 競技全体の開始時刻は Robot::getRunningStartTime() から取得する。

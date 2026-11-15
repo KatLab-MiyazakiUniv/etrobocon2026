@@ -349,9 +349,15 @@ void EtRallyMotion::executeStep()
   std::unique_ptr<RouteFollower> routeFollower;
 
   if(detectionMode == DetectionMode::SQUARE_TRACKING) {
+    if(!squareTrackingPid) {
+      Logger::error("EtRallyMotion: squareTrackingPid is nullptr");
+      robot.getWheelMotorControllerInstance().stopBoth();
+      return;
+    }
+
     routeFollower = std::make_unique<RouteFollower>(
         robot, etRallyMap, targetSpeed, rotationPid, squareRotationPid, straightAnglePid,
-        straightDeadbandRate, straightMaxoutRate, squareTrackingPid, squareTargetSpeed,
+        straightDeadbandRate, straightMaxoutRate, *squareTrackingPid, squareTargetSpeed,
         squareRequest_roi_x, squareRequest_roi_width, squareRequest_roi_y,
         squareRequest_roi_height);
 

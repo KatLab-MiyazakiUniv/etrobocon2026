@@ -42,23 +42,23 @@ void EtRobocon2026::start()
   robot.setEdge(Edge::RightEdge);
 
   // ETラリーのゲート情報を設定
-  MapData& mapData = robot.getMapDataInstance();
-  const Course course = robot.getCourse();
+  // MapData& mapData = robot.getMapDataInstance();
+  // const Course course = robot.getCourse();
 
-  // 赤ゲート：33 → 43
-  bool redGate = mapData.setGate(GoalColor::RED, 25, 35, course);
+  // // 赤ゲート：33 → 43
+  // bool redGate = mapData.setGate(GoalColor::RED, 25, 35, course);
 
-  // 青ゲート：14 → 15
-  bool blueGate = mapData.setGate(GoalColor::BLUE, 53, 54, course);
+  // // 青ゲート：14 → 15
+  // bool blueGate = mapData.setGate(GoalColor::BLUE, 53, 54, course);
 
-  // 黄ゲート：11 → 21
-  bool yellowGate = mapData.setGate(GoalColor::YELLOW, 12, 22, course);
+  // // 黄ゲート：11 → 21
+  // bool yellowGate = mapData.setGate(GoalColor::YELLOW, 12, 22, course);
 
-  if(!redGate || !blueGate || !yellowGate) {
-    Logger::error("ET Rally: gate setting failed");
-    CsvLogger::outputToFile();
-    return;
-  }
+  // if(!redGate || !blueGate || !yellowGate) {
+  //   Logger::error("ET Rally: gate setting failed");
+  //   CsvLogger::outputToFile();
+  //   return;
+  // }
 
   Logger::info("ET Rally: gate setting completed");
 
@@ -68,9 +68,10 @@ void EtRobocon2026::start()
   // lineTraceAreaMaster.run();
 
   // 調整のための一時的な走行
-  // Area tmpArea = Area::Tmp;
-  // AreaMaster tmpAreaMaster(robot, tmpArea);
-  // tmpAreaMaster.run();
+  Area tmpArea = Area::Tmp;
+  AreaMaster tmpAreaMaster(robot, tmpArea);
+  tmpAreaMaster.run();
+
   // ボトルデリバリー走行
   // Area bottleDeliveryArea = Area::BottleDelivery;
   // AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
@@ -86,7 +87,7 @@ void EtRobocon2026::start()
   // ETラリー走行
   Area etRallyArea = Area::ETRally;
   AreaMaster etRallyAreaMaster(robot, etRallyArea);
-  etRallyAreaMaster.run();
+  // etRallyAreaMaster.run();
 
   CsvLogger::outputToFile();
 }

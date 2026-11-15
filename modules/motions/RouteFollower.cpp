@@ -99,7 +99,7 @@ RouteFollower::RouteFollower(Robot& _robot, const EtRallyMap& _map, double _targ
     straightAnglePid(_straightAnglePid),
     straightDeadbandRate(_straightDeadbandRate),
     straightMaxoutRate(_straightMaxoutRate),
-    squareTrackingPid(_squareTrackingPid),
+    squareTrackingPid(std::make_unique<Pid::PidGain>(_squareTrackingPid)),
     squareTargetSpeed(_squareTargetSpeed),
     squareRequest_roi_x(squareRequest_roi_x),
     squareRequest_roi_width(squareRequest_roi_width),
@@ -185,7 +185,6 @@ void RouteFollower::executeStep()
       straight(distance);
     }
   }
-  ++nextIndex;
   ++nextIndex;
 }
 
@@ -367,7 +366,7 @@ void RouteFollower::squareTracking(double distance)
   double maxoutRate = 1.0;
 
   CameraTracking squareTracking(robot, std::move(condition), squareTargetSpeed, targetXCoordinate,
-                                squareTrackingPid, squareRequest, isStopMotor, deadbandRate,
+                                *squareTrackingPid, squareRequest, isStopMotor, deadbandRate,
                                 maxoutRate);
 
   Logger::printfLog(Logger::INFO,

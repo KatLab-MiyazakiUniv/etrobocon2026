@@ -116,7 +116,7 @@ class RouteFollower : public BaseMotion {
   double straightDeadbandRate;     // 直進デッドバンド率
   double straightMaxoutRate;       // 直進マックスアウト率
   DetectionMode detectionMode;     // 検出方式
-  Pid::PidGain squareTrackingPid;
+  std::unique_ptr<Pid::PidGain> squareTrackingPid;
   double squareTargetSpeed;
   int squareRequest_roi_x;
   int squareRequest_roi_width;

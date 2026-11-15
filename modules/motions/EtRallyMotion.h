@@ -138,7 +138,7 @@ class EtRallyMotion : public BaseMotion {
   Pid::PidGain rotationPid;        // 90度回頭などの通常回頭PID
   Pid::PidGain squareRotationPid;  // QR補正などの調整回頭PID
   Pid::PidGain straightAnglePid;   // 直進角度PID
-  Pid::PidGain squareTrackingPid;
+  std::unique_ptr<Pid::PidGain> squareTrackingPid;
   DetectionMode detectionMode;  // 検出方式
   int squareRequest_roi_x;
   int squareRequest_roi_width;

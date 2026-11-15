@@ -1,4 +1,3 @@
-
 /**
  * @file   RouteFollower.cpp
  * @brief  経路探索結果に従って自己位置を使用せず走行するクラス
@@ -13,7 +12,7 @@ namespace {
   /**
    * @brief 90度回頭に対して指定する回頭角度[deg]
    */
-  constexpr double ROTATION_ANGLE = 80.0;
+  constexpr double ROTATION_ANGLE = 90.0;
   /**
    * @brief 回頭終了判定許容誤差[deg]
    */
@@ -119,7 +118,7 @@ void RouteFollower::executeStep()
                       rotationAngle);
     rotate(rotationAngle);
   }
-  // 同一座標の場合は回頭のみ行う。
+  // 同一座標の場合は回頭のみ行い、補正は次の移動区間で行う。
   if(from.x == to.x && from.y == to.y) {
     ++nextIndex;
     return;
@@ -137,17 +136,64 @@ void RouteFollower::executeStep()
                     "RouteFollower: "
                     "区間距離=%.2f mm",
                     distance);
+
+  // 直前の区間がその場回頭だった場合も補正対象とする。
+  bool rotatedBeforeMovement = rotatedAtSegmentStart;
+  if(nextIndex >= 2) {
+    const RouteState& previous = route[nextIndex - 2];
+    if(previous.x == from.x && previous.y == from.y
+       && previous.direction != from.direction) {
+      rotatedBeforeMovement = true;
+    }
+  }
+
   const Gate* gate = findGate(from, to);
+  const bool movingBackward = isBackward(from, to);
+  double remainingDistance = distance;
+
+  // ゲート区間の回頭後補正はrunGateSegment内で、
+  // ゲート前QR検出位置までの距離を確認してから実行する。
+  // 後退区間では前方カメラのQRを移動目標として使用しない。
+  if(rotatedBeforeMovement && gate == nullptr && !movingBackward) {
+    Logger::info("RouteFollower: 回頭後の正方形補正を開始");
+    SquareAngleAdjustment::Result result{};
+    if(detectSquare(result)) {
+      const double correctionAngle = result.correctionAngle;
+      // QRへ向きを合わせた後、区間の残距離を超えない範囲で直進する。
+      rotateForSquare(correctionAngle);
+      double correctionDistance = result.straightDistance;
+      if(correctionDistance < 0.0) {
+        correctionDistance = 0.0;
+      }
+      if(correctionDistance > remainingDistance) {
+        Logger::printfLog(Logger::WARNING,
+                          "RouteFollower: 回頭後補正距離 %.2f mm を残距離 %.2f mm に制限",
+                          correctionDistance, remainingDistance);
+        correctionDistance = remainingDistance;
+      }
+      straight(correctionDistance);
+      remainingDistance -= correctionDistance;
+      // 元の経路方向に戻してから残りの区間を走行する。
+      rotateForSquare(-correctionAngle);
+      Logger::printfLog(Logger::INFO,
+                        "RouteFollower: 回頭後補正完了 残距離=%.2f mm",
+                        remainingDistance);
+    } else {
+      // 検出失敗時には余分な直進を追加せず、元の経路を走行する。
+      Logger::warning("RouteFollower: 回頭後の正方形検出失敗 → 通常走行を継続");
+    }
+  }
+
   if(gate != nullptr) {
     Logger::info("RouteFollower: "
                  "ゲートを検出しました");
-    runGateSegment(from, to, distance, rotatedAtSegmentStart);
-  } else if(isBackward(from, to)) {
+    runGateSegment(from, to, distance, rotatedBeforeMovement);
+  } else if(movingBackward) {
     Logger::info("RouteFollower: 後退区間");
-    backward(distance);
+    backward(remainingDistance);
   } else {
     Logger::info("RouteFollower: 前進区間");
-    straight(distance);
+    straight(remainingDistance);
   }
   ++nextIndex;
 }
@@ -215,9 +261,8 @@ double RouteFollower::calculateRotationAngle(Direction from, Direction to) const
   const double currentHeading = directionToHeading(from);
   const double targetHeading = directionToHeading(to);
   const double angle = AngleNormalizer::normalizeAngle(currentHeading - targetHeading);
-
-  // 180度の場合も実際に回頭する。
-  return angle;
+  // 90度を基準として指定回頭角度に変換する。
+  return angle * (ROTATION_ANGLE / 90.0);
 }
 
 double RouteFollower::calculateDistance(const RouteState& from, const RouteState& to) const
@@ -379,6 +424,40 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
     straight(distance);
     return;
   }
+  // 回頭直後にゲート前のQR検出位置まで直進する余裕がある場合のみ補正する。
+  // 補正で進んだ距離はゲート前補正までの直進距離から差し引く。
+  auto correctAfterTurn = [&](double availableDistance) -> double {
+    if(!rotatedAtSegmentStart || isBackward(from, to)
+       || availableDistance <= FIRST_DETECTION_TOLERANCE) {
+      Logger::info("RouteFollower: 回頭後すぐにゲート前補正を行うため追加補正をスキップ");
+      return 0.0;
+    }
+    Logger::info("RouteFollower: ゲート区間の回頭後補正を開始");
+    SquareAngleAdjustment::Result result{};
+    if(!detectSquare(result)) {
+      Logger::warning("RouteFollower: 回頭後の正方形検出失敗 → 通常走行を継続");
+      return 0.0;
+    }
+    const double correctionAngle = result.correctionAngle;
+    double correctionDistance = result.straightDistance;
+    if(correctionDistance < 0.0) {
+      correctionDistance = 0.0;
+    }
+    if(correctionDistance > availableDistance) {
+      Logger::printfLog(Logger::WARNING,
+                        "RouteFollower: 回頭後補正距離 %.2f mm をゲート前検出までの距離 %.2f mm に制限",
+                        correctionDistance, availableDistance);
+      correctionDistance = availableDistance;
+    }
+    rotateForSquare(correctionAngle);
+    straight(correctionDistance);
+    rotateForSquare(-correctionAngle);
+    Logger::printfLog(Logger::INFO,
+                      "RouteFollower: 回頭後補正完了 走行距離=%.2f mm",
+                      correctionDistance);
+    return correctionDistance;
+  };
+
   // 外周ゲート
   if(isOuterGate(*gate)) {
     Logger::info("RouteFollower: 外周ゲート");
@@ -414,7 +493,8 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
                       FIRST_DETECTION_TOLERANCE, skipFirstCorrection ? 1 : 0);
     // 外周ゲート QR①補正
     if(!skipFirstCorrection) {
-      double firstMoveDistance = distanceToFirstDetection;
+      const double turnCorrectionDistance = correctAfterTurn(distanceToFirstDetection);
+      double firstMoveDistance = distanceToFirstDetection - turnCorrectionDistance;
       // 少し通り過ぎているだけなら、
       // 後退せずその場でQR①を検出する。
       if(firstMoveDistance < 0.0) {
@@ -593,7 +673,9 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
                     FIRST_DETECTION_TOLERANCE, skipFirstCorrection ? 1 : 0);
   // QR①補正
   if(!skipFirstCorrection) {
-    double firstMoveDistance = distanceToFirstDetection;
+    const double turnCorrectionDistance = correctAfterTurn(distanceToFirstDetection);
+    traveledDistance += turnCorrectionDistance;
+    double firstMoveDistance = distanceToFirstDetection - turnCorrectionDistance;
     // 少し通り過ぎているだけなら、
     // 後退せずその場でQR①を検出する。
     if(firstMoveDistance < 0.0) {

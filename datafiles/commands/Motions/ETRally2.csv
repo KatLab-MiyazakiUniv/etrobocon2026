@@ -1,0 +1,4 @@
+コマンド名,ID,rotationKp,rotationKi,rotationKd,squareRotationKp,squareRotationKi,squareRotationKd,straightKp,straightKi,straightKd,targetSpeed,straightDeadbandRate,straightMaxoutRate,squarePid,squareSpeed,trackingPid,x,y,width,height
+ETRally2,ID,double,double,double,double,double,double,double,double,double,double,double,double,double,double,dou
+ETRally2,L001,3.0,2.2,0.2,3.0,2.2,0.2,0.033,0.003,0.03,300.0,0.25,0.54,300.0,0.3,0.0,0.1,480,0,960,1080
+ETRally2,R001,3.0,2.2,0.2,3.0,2.2,0.2,0.033,0.003,0.03,300.0,0.25,0.54,

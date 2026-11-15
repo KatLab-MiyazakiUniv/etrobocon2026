@@ -782,9 +782,38 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
         return nullptr;
       }
 
+      Pid::PidGain rotationPid{ fromString<double>(motionParams[2]),
+                                fromString<double>(motionParams[3]),
+                                fromString<double>(motionParams[4]) };
+      Pid::PidGain squareRotationPid{ fromString<double>(motionParams[5]),
+                                      fromString<double>(motionParams[6]),
+                                      fromString<double>(motionParams[7]) };
+      Pid::PidGain straightAnglePid{ fromString<double>(motionParams[8]),
+                                     fromString<double>(motionParams[9]),
+                                     fromString<double>(motionParams[10]) };
+      double targetSpeed = fromString<double>(motionParams[11]);
+      double straightDeadbandRate = fromString<double>(motionParams[12]);
+      double straightMaxoutRate = fromString<double>(motionParams[13]);
+      return new EtRallyMotion(robot, std::move(condition), rotationPid, squareRotationPid,
+                               straightAnglePid, targetSpeed, straightDeadbandRate,
+                               straightMaxoutRate);
+    }
+
+    case MOTION_COMMAND::ET_RALLY2: {
+      // Motions/ETRally.csv:
+      // [0] 動作名 [1] ID
+      // [2..4] 通常回頭PID(Kp, Ki, Kd)
+      // [5..7] 調整回頭PID(Kp, Ki, Kd)
+      // [8..10] 直進角度PID(Kp, Ki, Kd)
+      if(motionParams.size() < 22) {
+        Logger::printfLog(Logger::ERROR,
+                          "[MotionParser] ETRallyのPIDパラメータ数が不足しています（14列必要）");
+        return nullptr;
+      }
+
       int squareRequest_roi_x = fromString<double>(motionParams[18]);
-      int squareRequest_roi_width = fromString<double>(motionParams[19]);
-      int squareRequest_roi_y = fromString<double>(motionParams[20]);
+      int squareRequest_roi_y = fromString<double>(motionParams[19]);
+      int squareRequest_roi_width = fromString<double>(motionParams[20]);
       int squareRequest_roi_height = fromString<double>(motionParams[21]);
 
       Pid::PidGain rotationPid{ fromString<double>(motionParams[2]),
@@ -806,7 +835,7 @@ BaseMotion* MotionParser::createMotionInstance(Robot& robot, const vector<string
       return new EtRallyMotion(robot, std::move(condition), rotationPid, squareRotationPid,
                                straightAnglePid, targetSpeed, straightDeadbandRate,
                                straightMaxoutRate, squareTrackingPid, squareTargetSpeed,
-                               squareRequest_roi_x, squareRequest_roi_width, squareRequest_roi_y,
+                               squareRequest_roi_x, squareRequest_roi_y, squareRequest_roi_width,
                                squareRequest_roi_height);
     }
 
@@ -999,6 +1028,7 @@ MotionParser::MOTION_COMMAND MotionParser::convertCommand(const string& str)
           { "ETZumoFinish", MOTION_COMMAND::ET_ZUMO_FINISH },
           { "GatePosition", MOTION_COMMAND::GATE_POSITION },
           { "ETRally", MOTION_COMMAND::ET_RALLY },
+          { "ETRally2", MOTION_COMMAND::ET_RALLY2 },
           { "EtRallyFinish", MOTION_COMMAND::ET_RALLY_FINISH },
           { "ETZumoApproach", MOTION_COMMAND::ET_ZUMO_APPROACH },
           { "QRStraight", MOTION_COMMAND::QR_STRAIGHT },

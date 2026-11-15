@@ -75,7 +75,7 @@ class EtRallyMotion : public BaseMotion {
                 const Pid::PidGain& _straightAnglePid, double _targetSpeed,
                 double _straightDeadbandRate, double _straightMaxoutRate,
                 Pid::PidGain& _squareTrackingPid, double _squareTargetSpeed,
-                int squareRequest_roi_x, int squareRequest_roi_width, int squareRequest_roi_y,
+                int squareRequest_roi_x, int squareRequest_roi_y, int squareRequest_roi_width,
                 int squareRequest_roi_height);
 
  protected:
@@ -141,8 +141,8 @@ class EtRallyMotion : public BaseMotion {
   std::unique_ptr<Pid::PidGain> squareTrackingPid;
   DetectionMode detectionMode;  // 検出方式
   int squareRequest_roi_x;
-  int squareRequest_roi_width;
   int squareRequest_roi_y;
+  int squareRequest_roi_width;
   int squareRequest_roi_height;
   double targetSpeed;           // 走行速度
   double straightDeadbandRate;  // 直進時のデッドバンド率

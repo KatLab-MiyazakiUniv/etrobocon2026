@@ -71,8 +71,8 @@ class RouteFollower : public BaseMotion {
                 const Pid::PidGain& _rotationPid, const Pid::PidGain& _squareRotationPid,
                 const Pid::PidGain& _straightAnglePid, double _straightDeadbandRate,
                 double _straightMaxoutRate, Pid::PidGain& _squareTrackingPid,
-                double _squareTargetSpeed, int squareRequest_roi_x, int squareRequest_roi_width,
-                int squareRequest_roi_y, int squareRequest_roi_height);
+                double _squareTargetSpeed, int squareRequest_roi_x, int squareRequest_roi_y,
+                int squareRequest_roi_width, int squareRequest_roi_height);
 
   /**
    * @brief 走行する経路を設定する
@@ -119,8 +119,8 @@ class RouteFollower : public BaseMotion {
   std::unique_ptr<Pid::PidGain> squareTrackingPid;
   double squareTargetSpeed;
   int squareRequest_roi_x;
-  int squareRequest_roi_width;
   int squareRequest_roi_y;
+  int squareRequest_roi_width;
   int squareRequest_roi_height;
 
   /**

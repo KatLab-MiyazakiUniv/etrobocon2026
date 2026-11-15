@@ -180,8 +180,8 @@ EtRallyMotion::EtRallyMotion(Robot& _robot,
                              const Pid::PidGain& _straightAnglePid, double _targetSpeed,
                              double _straightDeadbandRate, double _straightMaxoutRate,
                              Pid::PidGain& _squareTrackingPid, double _squareTargetSpeed,
-                             int squareRequest_roi_x, int squareRequest_roi_width,
-                             int squareRequest_roi_y, int squareRequest_roi_height)
+                             int squareRequest_roi_x, int squareRequest_roi_y,
+                             int squareRequest_roi_width, int squareRequest_roi_height)
   : BaseMotion(_robot, std::make_unique<EtRallyCompletionCondition>(
                            _robot, [this]() { return !completed; })),
     rotationPid(_rotationPid),
@@ -193,8 +193,8 @@ EtRallyMotion::EtRallyMotion(Robot& _robot,
     squareTrackingPid(std::make_unique<Pid::PidGain>(_squareTrackingPid)),
     squareTargetSpeed(_squareTargetSpeed),
     squareRequest_roi_x(squareRequest_roi_x),
-    squareRequest_roi_width(squareRequest_roi_width),
     squareRequest_roi_y(squareRequest_roi_y),
+    squareRequest_roi_width(squareRequest_roi_width),
     squareRequest_roi_height(squareRequest_roi_height),
     detectionMode(DetectionMode::SQUARE_TRACKING)
 {
@@ -358,7 +358,7 @@ void EtRallyMotion::executeStep()
     routeFollower = std::make_unique<RouteFollower>(
         robot, etRallyMap, targetSpeed, rotationPid, squareRotationPid, straightAnglePid,
         straightDeadbandRate, straightMaxoutRate, *squareTrackingPid, squareTargetSpeed,
-        squareRequest_roi_x, squareRequest_roi_width, squareRequest_roi_y,
+        squareRequest_roi_x, squareRequest_roi_y, squareRequest_roi_width,
         squareRequest_roi_height);
 
   } else {

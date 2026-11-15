@@ -88,7 +88,7 @@ RouteFollower::RouteFollower(Robot& _robot, const EtRallyMap& _map, double _targ
                              const Pid::PidGain& _straightAnglePid, double _straightDeadbandRate,
                              double _straightMaxoutRate, Pid::PidGain& _squareTrackingPid,
                              double _squareTargetSpeed, int squareRequest_roi_x,
-                             int squareRequest_roi_width, int squareRequest_roi_y,
+                             int squareRequest_roi_y, int squareRequest_roi_width,
                              int squareRequest_roi_height)
   : BaseMotion(_robot, std::make_unique<RouteContinuationCondition>(
                            _robot, [this]() { return !failed && nextIndex < route.size(); })),
@@ -102,8 +102,8 @@ RouteFollower::RouteFollower(Robot& _robot, const EtRallyMap& _map, double _targ
     squareTrackingPid(std::make_unique<Pid::PidGain>(_squareTrackingPid)),
     squareTargetSpeed(_squareTargetSpeed),
     squareRequest_roi_x(squareRequest_roi_x),
-    squareRequest_roi_width(squareRequest_roi_width),
     squareRequest_roi_y(squareRequest_roi_y),
+    squareRequest_roi_width(squareRequest_roi_width),
     squareRequest_roi_height(squareRequest_roi_height),
     detectionMode(DetectionMode::SQUARE_TRACKING)
 {
@@ -357,7 +357,7 @@ void RouteFollower::squareTracking(double distance)
   auto condition = std::make_unique<DistanceCondition>(robot, distance);
   CameraServer::SquareDetectorRequest squareRequest;
 
-  squareRequest.roi = { squareRequest_roi_x, squareRequest_roi_width, squareRequest_roi_y,
+  squareRequest.roi = { squareRequest_roi_x, squareRequest_roi_y, squareRequest_roi_width,
                         squareRequest_roi_height };
 
   int targetXCoordinate = 960;

@@ -69,6 +69,7 @@ class MotionParser {
     ET_ZUMO_FINISH,
     GATE_POSITION,
     ET_RALLY,
+    ET_RALLY2,
     ET_RALLY_FINISH,
     ET_ZUMO_APPROACH,
     QR_STRAIGHT,

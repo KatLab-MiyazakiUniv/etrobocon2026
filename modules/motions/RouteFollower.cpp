@@ -67,6 +67,25 @@ RouteFollower::RouteFollower(Robot& _robot, const EtRallyMap& _map, double _targ
                              const Pid::PidGain& _rotationPid,
                              const Pid::PidGain& _squareRotationPid,
                              const Pid::PidGain& _straightAnglePid, double _straightDeadbandRate,
+                             double _straightMaxoutRate)
+  : BaseMotion(_robot, std::make_unique<RouteContinuationCondition>(
+                           _robot, [this]() { return !failed && nextIndex < route.size(); })),
+    map(_map),
+    targetSpeed(_targetSpeed),
+    rotationPid(_rotationPid),
+    squareRotationPid(_squareRotationPid),
+    straightAnglePid(_straightAnglePid),
+    straightDeadbandRate(_straightDeadbandRate),
+    straightMaxoutRate(_straightMaxoutRate),
+    detectionMode(DetectionMode::STRAIGHT)
+{
+  LOG_CREATE("RouteFollower");
+}
+
+RouteFollower::RouteFollower(Robot& _robot, const EtRallyMap& _map, double _targetSpeed,
+                             const Pid::PidGain& _rotationPid,
+                             const Pid::PidGain& _squareRotationPid,
+                             const Pid::PidGain& _straightAnglePid, double _straightDeadbandRate,
                              double _straightMaxoutRate, Pid::PidGain& _squareTrackingPid,
                              double _squareTargetSpeed, int squareRequest_roi_x,
                              int squareRequest_roi_width, int squareRequest_roi_y,
@@ -85,7 +104,8 @@ RouteFollower::RouteFollower(Robot& _robot, const EtRallyMap& _map, double _targ
     squareRequest_roi_x(squareRequest_roi_x),
     squareRequest_roi_width(squareRequest_roi_width),
     squareRequest_roi_y(squareRequest_roi_y),
-    squareRequest_roi_height(squareRequest_roi_height)
+    squareRequest_roi_height(squareRequest_roi_height),
+    detectionMode(DetectionMode::SQUARE_TRACKING)
 {
   LOG_CREATE("RouteFollower");
 }
@@ -156,9 +176,16 @@ void RouteFollower::executeStep()
     backward(distance);
   } else {
     Logger::info("RouteFollower: 前進区間");
-    straight(distance);
-    // squareTracking(distance);
+
+    if(detectionMode == DetectionMode::SQUARE_TRACKING) {
+      Logger::info("RouteFollower: Square Tracking走行");
+      squareTracking(distance);
+    } else {
+      Logger::info("RouteFollower: 通常直進走行");
+      straight(distance);
+    }
   }
+  ++nextIndex;
   ++nextIndex;
 }
 

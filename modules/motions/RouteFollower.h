@@ -31,7 +31,31 @@
  * @brief 経路探索結果に従って走行するクラス
  */
 class RouteFollower : public BaseMotion {
+  /**
+   * @brief 走行方式の種類
+   */
+  enum class DetectionMode {
+    STRAIGHT,  // 　直進
+    SQUARE_TRACKING
+  };
+
  public:
+  /**
+   * @brief コンストラクタ
+   * @param _robot ロボット
+   * @param _map ETラリーマップ
+   * @param _targetSpeed 直進速度
+   * @param _rotationPid 通常回頭PID
+   * @param _squareRotationPid 正方形補正回頭PID
+   * @param _straightAnglePid 直進角度PID
+   * @param _straightDeadbandRate 直進デッドバンド率
+   * @param _straightMaxoutRate 直進マックスアウト率
+   */
+  RouteFollower(Robot& _robot, const EtRallyMap& _map, double _targetSpeed,
+                const Pid::PidGain& _rotationPid, const Pid::PidGain& _squareRotationPid,
+                const Pid::PidGain& _straightAnglePid, double _straightDeadbandRate,
+                double _straightMaxoutRatet);
+
   /**
    * @brief コンストラクタ
    * @param _robot ロボット
@@ -91,6 +115,7 @@ class RouteFollower : public BaseMotion {
   Pid::PidGain straightAnglePid;   // 直進角度PIDゲイン
   double straightDeadbandRate;     // 直進デッドバンド率
   double straightMaxoutRate;       // 直進マックスアウト率
+  DetectionMode detectionMode;     // 検出方式
   Pid::PidGain squareTrackingPid;
   double squareTargetSpeed;
   int squareRequest_roi_x;

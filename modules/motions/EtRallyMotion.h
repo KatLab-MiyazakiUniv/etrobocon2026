@@ -37,6 +37,29 @@
 class EtRallyMotion : public BaseMotion {
  public:
   /**
+   * @brief 走行方式の種類
+   */
+  enum class DetectionMode {
+    STRAIGHT,  // 　直進
+    SQUARE_TRACKING
+  };
+  /**
+   * @brief コンストラクタ
+   * @param _robot ロボット
+   * @param _continuationCondition 継続条件
+   * @param _rotationPid 通常回頭PID
+   * @param _squareRotationPid 正方形補正回頭PID
+   * @param _straightAnglePid 直進角度PID
+   * @param _targetSpeed 走行速度
+   * @param _straightDeadbandRate 直進デッドバンド率
+   * @param _straightMaxoutRate 直進マックスアウト率
+   */
+  EtRallyMotion(Robot& _robot, std::unique_ptr<BaseContinuationCondition> _continuationCondition,
+                const Pid::PidGain& _rotationPid, const Pid::PidGain& _squareRotationPid,
+                const Pid::PidGain& _straightAnglePid, double _targetSpeed,
+                double _straightDeadbandRate, double _straightMaxoutRate);
+
+  /**
    * @brief コンストラクタ
    * @param _robot ロボット
    * @param _continuationCondition 継続条件
@@ -116,6 +139,7 @@ class EtRallyMotion : public BaseMotion {
   Pid::PidGain squareRotationPid;  // QR補正などの調整回頭PID
   Pid::PidGain straightAnglePid;   // 直進角度PID
   Pid::PidGain squareTrackingPid;
+  DetectionMode detectionMode;  // 検出方式
   int squareRequest_roi_x;
   int squareRequest_roi_width;
   int squareRequest_roi_y;

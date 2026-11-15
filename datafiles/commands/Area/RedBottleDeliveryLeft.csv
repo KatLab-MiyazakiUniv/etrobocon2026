@@ -1,7 +1,10 @@
 #動作コマンド名,動作ID,条件コマンド名,条件ID
 # 赤ボトルデリバリー
 #赤色まで移動
+QRAbsoluteRotation,-120,AbsoluteAngle,-120
+QRAbsoluteRotation,-150,AbsoluteAngle,-150
 QRAbsoluteRotation,-169,AbsoluteAngle,-169
+
 #赤色が写る範囲まで移動
 Straight,006,DistanceOrColor,RED063
 #赤色がフレームに写る状態で赤色検知カメラ走行

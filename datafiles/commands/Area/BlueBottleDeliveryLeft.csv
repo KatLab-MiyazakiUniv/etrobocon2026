@@ -3,7 +3,8 @@
 #青色のエリアを向く
 #QRAbsoluteRotation,-090,AbsoluteAngle,-090
 
-
+QRAbsoluteRotation,-120,AbsoluteAngle,-120
+QRAbsoluteRotation,-150,AbsoluteAngle,-150
 QRAbsoluteRotation,-160,AbsoluteAngle,-160
 
 #青色が写る範囲まで移動

@@ -2,6 +2,7 @@
 #黄色まで移動
 #QRAbsoluteRotation,-090,AbsoluteAngle,-090
 #浅めに回頭
+QRAbsoluteRotation,-120,AbsoluteAngle,-125
 QRAbsoluteRotation,-150,AbsoluteAngle,-150
 
 #黄色を通り過ぎ無いぐらいまで直進

@@ -13,7 +13,7 @@ namespace {
   /**
    * @brief 90度回頭に対して指定する回頭角度[deg]
    */
-  constexpr double ROTATION_ANGLE = 80.0;
+  constexpr double ROTATION_ANGLE = 90.0;
   /**
    * @brief 回頭終了判定許容誤差[deg]
    */

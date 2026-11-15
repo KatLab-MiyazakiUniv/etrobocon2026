@@ -10,6 +10,7 @@
 #include "Pid.h"
 #include "Robot.h"
 #include "SystemInfo.h"
+#include "CsvLogger.h"
 
 class SpeedCalculator {
  public:
@@ -41,6 +42,12 @@ class SpeedCalculator {
    * @return 走行速度に相当する左タイヤのPower値
    */
   double calculateLeftMotorPower();
+
+  /**
+   * @brief 目標走行速度に相当するのPower値の初期値を算出
+   * @return 走行速度に相当するタイヤのPower値
+   */
+  int getPowerFromSpeed(int speed);
 
  private:
   const double targetSpeed;  // 目標速度(mm/秒)

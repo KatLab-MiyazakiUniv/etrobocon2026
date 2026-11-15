@@ -1,10 +1,11 @@
 コマンド名,ID,targetDistance,targetColor
 DistanceOrColor,ID,double,COLOR
 
-
+DistanceOrColor,GRAY015,300,GRAY
 DistanceOrColor,GREEN030,30,GREEN
 DistanceOrColor,GREEN050,50,GREEN
 DistanceOrColor,GREEN100,1000,GREEN
+
 DistanceOrColor,RED000,0,RED
 DistanceOrColor,RED001,10,RED
 DistanceOrColor,RED002,20,RED

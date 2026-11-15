@@ -8,6 +8,65 @@
 
 namespace {
 
+  bool isBackwardMove(const RouteState& from, const RouteState& to)
+  {
+    Direction moveDirection;
+
+    // 座標の変化から実際の移動方向を求める
+    if(to.x < from.x) {
+      moveDirection = Direction::RIGHT;
+    } else if(to.x > from.x) {
+      moveDirection = Direction::LEFT;
+    } else if(to.y < from.y) {
+      moveDirection = Direction::UP;
+    } else if(to.y > from.y) {
+      moveDirection = Direction::DOWN;
+    } else {
+      // 同じ座標なら移動していない
+      return false;
+    }
+
+    // 移動方向とロボットの向きが反対なら後退
+    switch(to.direction) {
+      case Direction::UP:
+        return moveDirection == Direction::DOWN;
+
+      case Direction::RIGHT:
+        return moveDirection == Direction::LEFT;
+
+      case Direction::DOWN:
+        return moveDirection == Direction::UP;
+
+      case Direction::LEFT:
+        return moveDirection == Direction::RIGHT;
+    }
+
+    return false;
+  }
+
+  /**
+   * @brief 2地点間の移動方向を取得する
+   * @param from 移動開始地点
+   * @param to 移動終了地点
+   * @return 移動方向
+   */
+  Direction getMoveDirection(const RouteState& from, const RouteState& to)
+  {
+    if(to.x < from.x) {
+      return Direction::RIGHT;
+    }
+
+    if(to.x > from.x) {
+      return Direction::LEFT;
+    }
+
+    if(to.y < from.y) {
+      return Direction::UP;
+    }
+
+    return Direction::DOWN;
+  }
+
   /**
    * @brief 指定地点がマップの外周上にあるか判定する
    * @param point 判定する格子座標
@@ -153,45 +212,68 @@ GateRouteResult GateRoutePlanner::search(int currentX, int currentY, Direction c
 
   return result;
 }
-
+/**
+ * @brief 経路を圧縮する
+ *
+ * 直線上の中間地点を削除し、以下の地点は保持する。
+ * ・始点と終点
+ * ・その場で方向転換する地点
+ * ・移動方向が変わる地点
+ * ・前進とバック走行が切り替わる地点
+ */
 std::vector<RouteState> GateRoutePlanner::compressRoute(const std::vector<RouteState>& route) const
 {
-  std::vector<RouteState> compressed;
-
-  if(route.empty()) {
-    return compressed;
+  if(route.size() <= 2) {
+    return route;
   }
 
-  // 最初の地点を追加
-  compressed.push_back(route.front());
+  std::vector<RouteState> compressedRoute;
+  compressedRoute.push_back(route.front());
 
-  // robotの向きが変わる地点を追加する
-  for(size_t i = 1; i + 1 < route.size(); ++i) {
+  for(size_t i = 1; i < route.size() - 1; ++i) {
     const RouteState& previous = route[i - 1];
     const RouteState& current = route[i];
     const RouteState& next = route[i + 1];
 
-    // 同じ位置で向きだけ変わった場合
-    bool samePositionAsPrevious = previous.x == current.x && previous.y == current.y;
-
-    if(samePositionAsPrevious && previous.direction != current.direction) {
-      compressed.push_back(current);
-
+    // その場で方向転換する地点は保持する
+    if(previous.x == current.x && previous.y == current.y) {
+      if(previous.direction != current.direction) {
+        compressedRoute.push_back(current);
+      }
       continue;
     }
 
-    // 次の地点で進行方向が変わる場合
-    bool directionChangesNext = current.direction != next.direction;
+    // 次の地点と同じ座標の場合も、その場での方向転換として扱う
+    if(current.x == next.x && current.y == next.y) {
+      if(current.direction != next.direction) {
+        compressedRoute.push_back(current);
+      }
+      continue;
+    }
 
-    if(directionChangesNext) {
-      compressed.push_back(current);
+    // 前後の移動方向を取得する
+    const Direction moveDirectionBefore = getMoveDirection(previous, current);
+
+    const Direction moveDirectionAfter = getMoveDirection(current, next);
+
+    // 前後の移動が前進かバック走行かを判定する
+    const bool backwardBefore = isBackwardMove(previous, current);
+
+    const bool backwardAfter = isBackwardMove(current, next);
+
+    // 進行方向が変わる地点は保持する
+    const bool directionChanges = moveDirectionBefore != moveDirectionAfter;
+
+    // 前進とバック走行が切り替わる地点は保持する
+    const bool backwardChanges = backwardBefore != backwardAfter;
+
+    if(directionChanges || backwardChanges) {
+      compressedRoute.push_back(current);
     }
   }
 
-  // 最終地点を追加
-  if(route.size() >= 2) {
-    compressed.push_back(route.back());
-  }
+  // 終点を追加する
+  compressedRoute.push_back(route.back());
 
-  return compressed;
+  return compressedRoute;
 }

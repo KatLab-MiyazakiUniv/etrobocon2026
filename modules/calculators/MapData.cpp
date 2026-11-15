@@ -108,7 +108,7 @@ void MapData::setGatePoint(GoalColor color, const Point& start, const Point& end
   gates.push_back({ color, start, end });
 }
 
-bool MapData::setGate(GoalColor color, int startNumber, int endNumber)
+bool MapData::setGate(GoalColor color, int startNumber, int endNumber, Course course)
 {
   Point start;
   Point end;
@@ -123,7 +123,13 @@ bool MapData::setGate(GoalColor color, int startNumber, int endNumber)
     return false;
   }
 
-  // 変換した座標を使用してゲート情報を登録
+  // Rコースの場合だけ座標を左右反転
+  if(course == Course::Right) {
+    start = CourseMirror::mirrorPoint(start);
+    end = CourseMirror::mirrorPoint(end);
+  }
+
+  // ゲート情報を登録
   setGatePoint(color, start, end);
 
   return true;

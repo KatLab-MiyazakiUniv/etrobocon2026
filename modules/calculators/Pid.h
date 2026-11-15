@@ -1,7 +1,7 @@
 /**
  * @file Pid.h
  * @brief PIDを計算するクラス
- * @author migaku2645
+ * @author migaku2645 sadomiya-sousi
  */
 
 #ifndef PID_H

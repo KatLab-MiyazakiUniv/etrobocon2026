@@ -54,7 +54,7 @@ class RouteFollower : public BaseMotion {
   RouteFollower(Robot& _robot, const EtRallyMap& _map, double _targetSpeed,
                 const Pid::PidGain& _rotationPid, const Pid::PidGain& _squareRotationPid,
                 const Pid::PidGain& _straightAnglePid, double _straightDeadbandRate,
-                double _straightMaxoutRatet);
+                double _straightMaxoutRate);
 
   /**
    * @brief コンストラクタ

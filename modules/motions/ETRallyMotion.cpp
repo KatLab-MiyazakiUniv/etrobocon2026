@@ -39,7 +39,7 @@ namespace {
   /**
    * @brief 90度回頭に対して指定する回頭角度[deg]
    */
-  constexpr double ROTATION_ANGLE = 90.0;
+  constexpr double ROTATION_ANGLE = 80.0;
 
   /**
    * @brief 現在のIMU角度を基準に絶対目標角度を算出して回頭する

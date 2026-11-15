@@ -30,37 +30,58 @@ void EtRobocon2026::start()
   std::string runlogFileName = buffer;
   CsvLogger::setFileName(runlogFileName);
 
-  Calibrator calibrator(robot, std::move(std::make_unique<RepeatCountCondition>(robot, 1)));
-  calibrator.run();
+  // Calibrator calibrator(robot, std::move(std::make_unique<RepeatCountCondition>(robot, 1)));
+  // calibrator.run();
   // コース設定
   // Rコース
   // robot.setCourse(Course::Right);
   // robot.setEdge(Edge::LeftEdge);
 
   // Lコース
-  // robot.setCourse(Course::Left);
-  // robot.setEdge(Edge::RightEdge);
+  robot.setCourse(Course::Left);
+  robot.setEdge(Edge::RightEdge);
+
+  // ETラリーのゲート情報を設定
+  MapData& mapData = robot.getMapDataInstance();
+  const Course course = robot.getCourse();
+
+  // 赤ゲート：33 → 43
+  bool redGate = mapData.setGate(GoalColor::RED, 25, 35, course);
+
+  // 青ゲート：14 → 15
+  bool blueGate = mapData.setGate(GoalColor::BLUE, 53, 54, course);
+
+  // 黄ゲート：11 → 21
+  bool yellowGate = mapData.setGate(GoalColor::YELLOW, 12, 22, course);
+
+  if(!redGate || !blueGate || !yellowGate) {
+    Logger::error("ET Rally: gate setting failed");
+    CsvLogger::outputToFile();
+    return;
+  }
+
+  Logger::info("ET Rally: gate setting completed");
 
   // ライントレース走行
-  Area lineTraceArea = Area::LineTrace;
-  AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
-  lineTraceAreaMaster.run();
+  // Area lineTraceArea = Area::LineTrace;
+  // AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
+  // lineTraceAreaMaster.run();
 
   // 調整のための一時的な走行
   // Area tmpArea = Area::Tmp;
   // AreaMaster tmpAreaMaster(robot, tmpArea);
   // tmpAreaMaster.run();
   // ボトルデリバリー走行
-  Area bottleDeliveryArea = Area::BottleDelivery;
-  AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
-  bottleDeliveryAreaMaster.run();
+  // Area bottleDeliveryArea = Area::BottleDelivery;
+  // AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
+  // bottleDeliveryAreaMaster.run();
 
   // CsvLogger::outputToFile();
 
-  // ET相撲走行
-  Area ETZumo = Area::ETZumo;
-  AreaMaster ETZumouAreaMaster(robot, ETZumo);
-  ETZumouAreaMaster.run();
+  // // ET相撲走行
+  // Area ETZumo = Area::ETZumo;
+  // AreaMaster ETZumouAreaMaster(robot, ETZumo);
+  // ETZumouAreaMaster.run();
 
   // ETラリー走行
   Area etRallyArea = Area::ETRally;

@@ -4,7 +4,6 @@
  * @author yutaro-1214 okuyama0528
  */
 #include "RouteFollower.h"
-
 #include <functional>
 #include <utility>
 
@@ -141,8 +140,7 @@ void RouteFollower::executeStep()
   bool rotatedBeforeMovement = rotatedAtSegmentStart;
   if(nextIndex >= 2) {
     const RouteState& previous = route[nextIndex - 2];
-    if(previous.x == from.x && previous.y == from.y
-       && previous.direction != from.direction) {
+    if(previous.x == from.x && previous.y == from.y && previous.direction != from.direction) {
       rotatedBeforeMovement = true;
     }
   }
@@ -175,8 +173,7 @@ void RouteFollower::executeStep()
       remainingDistance -= correctionDistance;
       // 元の経路方向に戻してから残りの区間を走行する。
       rotateForSquare(-correctionAngle);
-      Logger::printfLog(Logger::INFO,
-                        "RouteFollower: 回頭後補正完了 残距離=%.2f mm",
+      Logger::printfLog(Logger::INFO, "RouteFollower: 回頭後補正完了 残距離=%.2f mm",
                         remainingDistance);
     } else {
       // 検出失敗時には余分な直進を追加せず、元の経路を走行する。
@@ -444,16 +441,16 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
       correctionDistance = 0.0;
     }
     if(correctionDistance > availableDistance) {
-      Logger::printfLog(Logger::WARNING,
-                        "RouteFollower: 回頭後補正距離 %.2f mm をゲート前検出までの距離 %.2f mm に制限",
-                        correctionDistance, availableDistance);
+      Logger::printfLog(
+          Logger::WARNING,
+          "RouteFollower: 回頭後補正距離 %.2f mm をゲート前検出までの距離 %.2f mm に制限",
+          correctionDistance, availableDistance);
       correctionDistance = availableDistance;
     }
     rotateForSquare(correctionAngle);
     straight(correctionDistance);
     rotateForSquare(-correctionAngle);
-    Logger::printfLog(Logger::INFO,
-                      "RouteFollower: 回頭後補正完了 走行距離=%.2f mm",
+    Logger::printfLog(Logger::INFO, "RouteFollower: 回頭後補正完了 走行距離=%.2f mm",
                       correctionDistance);
     return correctionDistance;
   };

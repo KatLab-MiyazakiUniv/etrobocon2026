@@ -1,27 +1,31 @@
 #動作コマンド名,動作ID,条件コマンド名,条件ID
-#Calibrator,001,RepeatCount,001
+
 # ライントレース
 Snapshot,clearBuffer1,RepeatCount,001
+
 CameraTracking,S001,Distance,035
 CameraTracking,R001,Distance,040
 CameraTracking,S001,Distance,031
 CameraTracking,R001,Distance,040
 CameraTracking,S001,Distance,030
+
+#急カーブ
 CameraTracking,L001,Distance,025
 CameraTracking,L002,Distance,095
 CameraTracking,S001,Distance,015
 
+#くねくね
 CameraTracking,R001,Distance,032
 CameraTracking,S001,Distance,015
 CameraTracking,L002,Distance,035
 CameraTracking,S001,Distance,050
 
-
-
+#ボトル前直線
 Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,S002,ColorRegion,001
 #CameraTracking,000,Distance,000
 
+#ボトルキャッチ
 Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,BC,Distance,030
 CameraTracking,BC3,Distance,015
@@ -30,24 +34,24 @@ CameraTracking,000,Distance,000
 # ボトルデリバリー(共通)
 
 AbsoluteRotation,-095,AbsoluteAngle,-095
-
 Straight,001,Distance,005
 Straight,001,ColorOrColor,003
+
+#第1QR前直線
 AbsoluteRotation,000,AbsoluteAngle,000
 Straight,005,DistanceOrColor,GREEN030
 
 
 #targetXが大きすぎて急旋回発生
 #CameraTracking,S003,DistanceOrColor,BLUE020
-#カメラトラッキングで、左に曲がる問題の対象。
+
+#角度補正
 Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,QR1S001,ColorOrColorOrDistance,BLUEorBLACK020
 
 
-#間違えて
+# 第1QR検出
 QRStraight,001,DistanceOrColor,BLUE040
-
-
 
 
 AbsoluteRotation,-090,AbsoluteAngle,-090

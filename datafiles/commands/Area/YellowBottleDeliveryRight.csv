@@ -1,7 +1,7 @@
 動作コマンド名,動作ID,条件コマンド名,条件ID
 
 #浅めに回頭
-QRAbsoluteRotation,120,AbsoluteAngle,125
+QRAbsoluteRotation,125,AbsoluteAngle,125
 QRAbsoluteRotation,150,AbsoluteAngle,150
 
 

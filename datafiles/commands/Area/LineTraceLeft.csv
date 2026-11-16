@@ -53,7 +53,6 @@ CameraTracking,QR1S001,ColorOrColorOrDistance,BLUEorBLACK020
 # 第1QR検出
 QRStraight,001,DistanceOrColor,BLUE040
 
-
 AbsoluteRotation,-090,AbsoluteAngle,-090
 Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,LBS003-4,Distance,062
@@ -66,4 +65,4 @@ Straight,001,DistanceOrColor,BLACK070
 # QR2検出
 Snapshot,clearBuffer1,RepeatCount,001
 Snapshot,021,RepeatCount,001
-#GatePosition,2-1,RepeatCount,001
+GatePosition,2-1,RepeatCount,001

@@ -35,6 +35,7 @@ CameraTracking,000,Distance,000
 # ボトルデリバリー
 
 AbsoluteRotation,095,AbsoluteAngle,095
+Straight,001,Distance,005
 Straight,001,ColorOrColor,003
 
 #第1QR前直線
@@ -46,7 +47,7 @@ Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,QR1S001,ColorOrColorOrDistance,BLUEorBLACK020
 
 #第1QR検出
-QRStraight,001,DistanceOrColor,BLUE050
+QRStraight,001,DistanceOrColor,BLUE040
 
 
 AbsoluteRotation,090,AbsoluteAngle,090
@@ -59,4 +60,4 @@ Straight,001,DistanceOrColor,BLACK070
 # QR2検出
 Snapshot,clearBuffer1,RepeatCount,001
 Snapshot,021,RepeatCount,001
-#GatePosition,2-1,RepeatCount,001
+GatePosition,2-1,RepeatCount,001

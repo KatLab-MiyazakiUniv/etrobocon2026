@@ -33,13 +33,6 @@ void EtRobocon2026::start()
   Calibrator calibrator(robot, std::move(std::make_unique<RepeatCountCondition>(robot, 1)));
   calibrator.run();
 
-
- // 調整のための一時的な走行
-  Area tmpArea = Area::Tmp;
-  AreaMaster tmpAreaMaster(robot, tmpArea);
-  tmpAreaMaster.run();
-
-
   // コース設定
   // Rコース
   // robot.setCourse(Course::Right);
@@ -52,22 +45,22 @@ void EtRobocon2026::start()
   // ライントレース走行
   Area lineTraceArea = Area::LineTrace;
   AreaMaster lineTraceAreaMaster(robot, lineTraceArea);
-  // lineTraceAreaMaster.run();
+  lineTraceAreaMaster.run();
 
   // ボトルデリバリー走行
   Area bottleDeliveryArea = Area::BottleDelivery;
   AreaMaster bottleDeliveryAreaMaster(robot, bottleDeliveryArea);
-  // bottleDeliveryAreaMaster.run();
+  bottleDeliveryAreaMaster.run();
 
   // // ET相撲走行
   Area ETZumo = Area::ETZumo;
   AreaMaster ETZumouAreaMaster(robot, ETZumo);
-  // ETZumouAreaMaster.run();
+  ETZumouAreaMaster.run();
 
   // ETラリー走行
   Area etRallyArea = Area::ETRally;
   AreaMaster etRallyAreaMaster(robot, etRallyArea);
-  // etRallyAreaMaster.run();
+  etRallyAreaMaster.run();
 
   // CsvLogger::outputToFile();
 

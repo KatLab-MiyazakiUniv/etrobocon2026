@@ -1,7 +1,9 @@
 #動作コマンド名,動作ID,条件コマンド名,条件ID
 #黄色まで移動
 QRAbsoluteRotation,-125,AbsoluteAngle,-125
+GatePosition,2-1,RepeatCount,001
 QRAbsoluteRotation,-150,AbsoluteAngle,-150
+GatePosition,2-1,RepeatCount,001
 
 #黄色を通り過ぎ無いぐらいまで直進
 Straight,001,DistanceOrColor,YELLOW050

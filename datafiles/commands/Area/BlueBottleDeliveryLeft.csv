@@ -4,8 +4,11 @@
 #QRAbsoluteRotation,-090,AbsoluteAngle,-090
 
 QRAbsoluteRotation,-120,AbsoluteAngle,-120
+GatePosition,2-1,RepeatCount,001
 QRAbsoluteRotation,-150,AbsoluteAngle,-150
+GatePosition,2-1,RepeatCount,001
 QRAbsoluteRotation,-160,AbsoluteAngle,-160
+GatePosition,2-1,RepeatCount,001
 
 #青色が写る範囲まで移動
 Straight,006,DistanceOrColor,BLUE040

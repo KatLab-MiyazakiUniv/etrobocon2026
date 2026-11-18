@@ -2,7 +2,9 @@
 
 #浅めに回頭
 QRAbsoluteRotation,125,AbsoluteAngle,125
+GatePosition,2-1,RepeatCount,001
 QRAbsoluteRotation,150,AbsoluteAngle,150
+GatePosition,2-1,RepeatCount,001
 
 
 #黄色を通り過ぎ無いぐらいまで直進

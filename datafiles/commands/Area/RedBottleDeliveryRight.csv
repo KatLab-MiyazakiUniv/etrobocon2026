@@ -2,8 +2,11 @@
 
 #赤色まで移動
 QRAbsoluteRotation,120,AbsoluteAngle,120
+GatePosition,2-1,RepeatCount,001
 QRAbsoluteRotation,150,AbsoluteAngle,150
+GatePosition,2-1,RepeatCount,001
 QRAbsoluteRotation,170,AbsoluteAngle,170
+GatePosition,2-1,RepeatCount,001
 
 #赤色が写る範囲まで移動
 Straight,006,DistanceOrColor,RED063

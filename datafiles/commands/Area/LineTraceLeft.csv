@@ -38,8 +38,6 @@ Straight,001,Distance,005
 
 #ColorOrColorOrDistanceに置き換える
 #Straight,001,ColorOrColor,003
-
-#Straight,001,ColorOrColor,003
 #距離の調整のために、まずは短めの値を使用
 #Straight,001,Distance,055
 Straight,001,ColorOrColorOrDistance,BLACKorYELLOW055
@@ -71,5 +69,8 @@ Straight,001,DistanceOrColor,BLACK070
 
 # QR2検出
 Snapshot,clearBuffer1,RepeatCount,001
-Snapshot,021,RepeatCount,001
+
+AbsoluteRotation,-070,AbsoluteAngle,-070
+GatePosition,2-1,RepeatCount,001
+AbsoluteRotation,-090,AbsoluteAngle,-090
 GatePosition,2-1,RepeatCount,001

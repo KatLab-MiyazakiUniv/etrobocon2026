@@ -39,7 +39,7 @@ namespace {
   /**
    * @brief 90度回頭に対して指定する回頭角度[deg]
    */
-  constexpr double ROTATION_ANGLE = 80.0;
+  constexpr double ROTATION_ANGLE = 85.0;
 
   /**
    * @brief 現在のIMU角度を基準に絶対目標角度を算出して回頭する
@@ -271,6 +271,22 @@ void EtRallyMotion::executeStep()
     robot.getWheelMotorControllerInstance().stopBoth();
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
+    // ----------------------------------------
+    // 最初のQR補正角度を戻す
+    // ----------------------------------------
+    Logger::printfLog(Logger::INFO, "Start square reverse rotation: %.2f deg",
+                      -result.correctionAngle);
+
+    // 最初の回頭と逆方向へ回頭して元の進行方向へ戻す。
+    rotateAbsolute(robot, -result.correctionAngle, squareRotationPid);
+
+    // 回頭後に停止して20ms待機
+    robot.getWheelMotorControllerInstance().stopBoth();
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+
+    // ----------------------------------------
+    // 2回目のQR検出
+    // ----------------------------------------
     SquareAngleAdjustment::Result secondResult = adjustment.calculate(request);
     if(secondResult.wasDetected) {
       Logger::printfLog(Logger::INFO, "Second square detected: angle=%f",
@@ -282,11 +298,11 @@ void EtRallyMotion::executeStep()
       return;
     }
 
-    // 逆回頭後に停止してIMUリセット前に200ms待機
+    // 2回目の補正回頭後に停止してIMUリセット前に200ms待機
     robot.getWheelMotorControllerInstance().stopBoth();
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
-    // 元のETラリー開始方向へ戻した後にIMUの角度をリセット
+    // QR補正完了後にIMUの角度をリセット
     robot.getIMUControllerInstance().resetAzimuth();
 
     // IMUリセット後に200ms待機

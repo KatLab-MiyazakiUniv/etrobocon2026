@@ -62,6 +62,45 @@ namespace {
   }
 
   /**
+   * @brief 外周位置で内側を向いているか判定する
+   * @param state 回頭した位置
+   * @param direction 回頭後の方向
+   * @return true マップ内側を向いている、false それ以外
+   */
+  bool isFacingInsideFromOuter(const RouteState& state, Direction direction)
+  {
+    if(state.x == 0 && direction == Direction::LEFT) {
+      return true;
+    }
+    if(state.x == SystemInfo::X_GRID_NUM && direction == Direction::RIGHT) {
+      return true;
+    }
+    if(state.y == 0 && direction == Direction::DOWN) {
+      return true;
+    }
+    if(state.y == SystemInfo::Y_GRID_NUM && direction == Direction::UP) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * @brief 回頭後にQR補正を行う走行方向か判定する
+   * @param from 区間開始状態
+   * @param to 区間終了状態
+   * @return true 補正対象、false 補正対象外
+   */
+  bool shouldCorrectAfterTurn(const RouteState& from, const RouteState& to)
+  {
+    if(isOuterRoutePosition(from)) {
+      // 外周から内側へ向かう場合だけ追加補正する。
+      return isFacingInsideFromOuter(from, to.direction);
+    }
+    // 内側の回頭は従来どおり補正する。
+    return !isOuterRoutePosition(to);
+  }
+
+  /**
    * @brief RouteFollowerの走行可能区間が残っているか判定する継続条件
    */
   class RouteContinuationCondition : public BaseContinuationCondition {
@@ -169,8 +208,8 @@ void RouteFollower::executeStep()
   // ゲート区間の回頭後補正はrunGateSegment内で、
   // ゲート前QR検出位置までの距離を確認してから実行する。
   // 後退区間では前方カメラのQRを移動目標として使用しない。
-  if(rotatedBeforeMovement && gate == nullptr && !movingBackward && !isOuterRoutePosition(from)
-     && !isOuterRoutePosition(to)) {
+  if(rotatedBeforeMovement && gate == nullptr && !movingBackward
+     && shouldCorrectAfterTurn(from, to)) {
     Logger::info("RouteFollower: 回頭後の正方形補正を開始");
     SquareAngleAdjustment::Result result{};
     if(detectSquare(result)) {
@@ -200,8 +239,8 @@ void RouteFollower::executeStep()
   }
 
   if(rotatedBeforeMovement && !movingBackward && gate == nullptr
-     && (isOuterRoutePosition(from) || isOuterRoutePosition(to))) {
-    Logger::info("RouteFollower: 外周走行のため回頭後の追加補正をスキップ");
+     && !shouldCorrectAfterTurn(from, to)) {
+    Logger::info("RouteFollower: 外周で内側を向かないため回頭後の追加補正をスキップ");
   }
 
   if(gate != nullptr) {
@@ -457,8 +496,8 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
   // 回頭直後にゲート前のQR検出位置まで直進する余裕がある場合のみ補正する。
   // 補正で進んだ距離はゲート前補正までの直進距離から差し引く。
   auto correctAfterTurn = [&](double availableDistance) -> double {
-    if(isOuterRoutePosition(from) || isOuterRoutePosition(to) || isOuterGate(*gate)) {
-      Logger::info("RouteFollower: 外周のため回頭後の追加補正をスキップ");
+    if(isOuterGate(*gate) || !shouldCorrectAfterTurn(from, to)) {
+      Logger::info("RouteFollower: 外周ゲートまたは内側を向かないため追加補正をスキップ");
       return 0.0;
     }
     if(!rotatedAtSegmentStart || isBackward(from, to)

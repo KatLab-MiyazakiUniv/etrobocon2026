@@ -1,3 +1,4 @@
+
 /**
  * @file   EtRallyMotion.cpp
  * @brief  ETラリーの経路探索・継続周回・QR補正
@@ -277,9 +278,9 @@ void EtRallyMotion::executeStep()
                         secondResult.correctionAngle);
       rotateAbsolute(robot, secondResult.correctionAngle, squareRotationPid);
     } else {
-      Logger::info("Second square not detected -> stop adjustment");
-      robot.getWheelMotorControllerInstance().stopBoth();
-      return;
+      // 2回目のQRが検出できなかった場合は角度補正をスキップする。
+      // 1回目に進んだ距離だけ後退してETラリーを継続する。
+      Logger::info("Second square not detected -> skip correction and backward");
     }
 
     // 逆回頭後に停止してIMUリセット前に200ms待機

@@ -297,12 +297,10 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
 
     /*
      * 移動方向を4方向で探索する。
-     *
-     * 各移動方向について、
-     * 前進と後退の2パターンを探索する。
+     * 通常経路では前進のみを許可する。
      */
     for(int moveValue = 0; moveValue < DIRECTION_COUNT; ++moveValue) {
-      const Direction moveDirection = static_cast<Direction>(moveValue);
+      const Direction nextDirection = static_cast<Direction>(moveValue);
 
       // 移動先の座標
       const int nextX = current.x + DX[moveValue];
@@ -319,65 +317,40 @@ RouteResult DijkstraRoutePlanner::search(int startX, int startY, Direction start
       }
 
       /*
-       * 前進・後退をそれぞれ探索する。
-       *
-       * backwardValue = 0 : 前進
-       * backwardValue = 1 : 後退
+       * (0,2)、(0,6)、(0,10)では、
+       * 回頭してLEFTを向く動作を禁止する。
+       * すでにLEFTを向いている場合は前進を許可する。
        */
-      for(int backwardValue = 0; backwardValue < 2; ++backwardValue) {
-        const bool isBackward = backwardValue == 1;
+      if(isTurnForbiddenPoint(current.x, current.y) && current.direction != nextDirection
+         && nextDirection == Direction::LEFT) {
+        continue;
+      }
 
-        Direction nextDirection = moveDirection;
+      /*
+       * 回頭時にロボット後部がゲート足へ
+       * 接触する可能性がある場合は、
+       * その回頭を含む経路を使用しない。
+       */
+      if(current.direction != nextDirection
+         && isTurnBlockedByGatePost(current.x, current.y, current.direction, nextDirection)) {
+        continue;
+      }
 
-        // 後退の場合は移動方向と機体方向が反対になる
-        if(isBackward) {
-          nextDirection = static_cast<Direction>((moveValue + 2) % DIRECTION_COUNT);
-        }
+      // 移動コストを計算
+      const int moveCost
+          = calculateMoveCost(current.x, current.y, current.direction, nextDirection);
 
-        /*
-         * (0,2)、(0,6)、(0,10)では、
-         * 回頭してLEFTを向く動作を禁止する。
-         *
-         * すでにLEFTを向いている場合は、
-         * LEFT方向への前進を許可する。
-         *
-         * また、LEFT方向への後退であれば、
-         * 機体方向はRIGHTになるため許可される。
-         */
-        if(isTurnForbiddenPoint(current.x, current.y) && current.direction != nextDirection
-           && nextDirection == Direction::LEFT) {
-          continue;
-        }
+      const int nextCost = currentNode.cost + moveCost;
 
-        /*
-         * 回頭時にロボット後部がゲート足へ
-         * 接触する可能性がある場合は、
-         * その回頭を含む経路を使用しない。
-         *
-         * 後退による移動では、
-         * 機体方向が変化しない場合は回頭判定を行わない。
-         */
-        if(current.direction != nextDirection
-           && isTurnBlockedByGatePost(current.x, current.y, current.direction, nextDirection)) {
-          continue;
-        }
+      // 移動先の座標と機体方向から状態を作成
+      const int nextIndex = stateToIndex(nextX, nextY, nextDirection);
 
-        // 移動コストを計算
-        const int moveCost
-            = calculateMoveCost(current.x, current.y, current.direction, nextDirection);
+      // より低コストなら更新
+      if(nextCost < distance[nextIndex]) {
+        distance[nextIndex] = nextCost;
+        previous[nextIndex] = currentNode.index;
 
-        const int nextCost = currentNode.cost + moveCost;
-
-        // 移動先の座標と機体方向から状態を作成
-        const int nextIndex = stateToIndex(nextX, nextY, nextDirection);
-
-        // より低コストなら更新
-        if(nextCost < distance[nextIndex]) {
-          distance[nextIndex] = nextCost;
-          previous[nextIndex] = currentNode.index;
-
-          queue.push({ nextCost, nextIndex });
-        }
+        queue.push({ nextCost, nextIndex });
       }
     }
   }

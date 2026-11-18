@@ -21,6 +21,7 @@
 // const CameraServer::HSVRangeData ImageProcessingColor::WHITE_HSV
 //     = { { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 } };
 
+//CS大会会場の暖色照明の下でのHSV
 const CameraServer::HSVRangeData ImageProcessingColor::RED_HSV
     = { { 0.0, 80.0, 80.0 }, { 15.0, 255.0, 255.0 } };
 

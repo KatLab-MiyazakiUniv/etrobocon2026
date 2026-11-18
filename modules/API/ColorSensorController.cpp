@@ -44,7 +44,10 @@ const char* ColorSensorController::convertColorToString(const COLOR& color)
 
 ColorSensorController::COLOR ColorSensorController::convertHsvToColor(HSV& hsv)
 {
-  Logger::printfLog(Logger::DEBUG, "h[%lf]s[%lf]v[%lf]", hsv.h, hsv.s, hsv.v);
+
+  // Logger::printfLog(Logger::DEBUG, "###############################");
+  // Logger::printfLog(Logger::DEBUG, "h[%lf]s[%lf]v[%lf]", hsv.h, hsv.s, hsv.v);
+  // Logger::printfLog(Logger::DEBUG, "###############################");
   // 明度が極端に低ければ、黒を返す
   if(hsv.v < BLACK_LIMIT_BORDER) return COLOR::BLACK;
   // 明度が極端に高ければ、白を返す

@@ -4,6 +4,8 @@
  * @author yutaro-1214 okuyama0528
  */
 #include "RouteFollower.h"
+
+#include <algorithm>
 #include <functional>
 #include <utility>
 
@@ -11,7 +13,7 @@ namespace {
   /**
    * @brief 90度回頭に対して指定する回頭角度[deg]
    */
-  constexpr double ROTATION_ANGLE = 90.0;
+  constexpr double ROTATION_ANGLE = 85.0;
   /**
    * @brief 回頭終了判定許容誤差[deg]
    */
@@ -29,6 +31,10 @@ namespace {
    */
   constexpr double SQUARE_DETECTION_DISTANCE = 250.0;
   /**
+   * @brief QR検出で除外する画像上部の高さ[px]
+   */
+  constexpr int SQUARE_DETECTION_ROI_TOP = 500;
+  /**
    * @brief QR検出失敗時に直進する距離[mm]
    */
   constexpr double SQUARE_DETECTION_FAILURE_DISTANCE = 125.0;
@@ -44,6 +50,56 @@ namespace {
    * @brief 動作切り替え待機時間[ms]
    */
   constexpr int MOTION_SWITCH_WAIT = 100;
+  /**
+   * @brief 指定座標がマップの外周上にあるか判定する
+   * @param state 判定する経路状態
+   * @return true 外周上、false 外周以外
+   */
+  bool isOuterRoutePosition(const RouteState& state)
+  {
+    return state.x == 0 || state.x == SystemInfo::X_GRID_NUM || state.y == 0
+           || state.y == SystemInfo::Y_GRID_NUM;
+  }
+
+  /**
+   * @brief 外周位置で内側を向いているか判定する
+   * @param state 回頭した位置
+   * @param direction 回頭後の方向
+   * @return true マップ内側を向いている、false それ以外
+   */
+  bool isFacingInsideFromOuter(const RouteState& state, Direction direction)
+  {
+    if(state.x == 0 && direction == Direction::LEFT) {
+      return true;
+    }
+    if(state.x == SystemInfo::X_GRID_NUM && direction == Direction::RIGHT) {
+      return true;
+    }
+    if(state.y == 0 && direction == Direction::DOWN) {
+      return true;
+    }
+    if(state.y == SystemInfo::Y_GRID_NUM && direction == Direction::UP) {
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * @brief 回頭後にQR補正を行う走行方向か判定する
+   * @param from 区間開始状態
+   * @param to 区間終了状態
+   * @return true 補正対象、false 補正対象外
+   */
+  bool shouldCorrectAfterTurn(const RouteState& from, const RouteState& to)
+  {
+    if(isOuterRoutePosition(from)) {
+      // 外周から内側へ向かう場合だけ追加補正する。
+      return isFacingInsideFromOuter(from, to.direction);
+    }
+    // 内側の回頭は従来どおり補正する。
+    return !isOuterRoutePosition(to);
+  }
+
   /**
    * @brief RouteFollowerの走行可能区間が残っているか判定する継続条件
    */
@@ -152,7 +208,8 @@ void RouteFollower::executeStep()
   // ゲート区間の回頭後補正はrunGateSegment内で、
   // ゲート前QR検出位置までの距離を確認してから実行する。
   // 後退区間では前方カメラのQRを移動目標として使用しない。
-  if(rotatedBeforeMovement && gate == nullptr && !movingBackward) {
+  if(rotatedBeforeMovement && gate == nullptr && !movingBackward
+     && shouldCorrectAfterTurn(from, to)) {
     Logger::info("RouteFollower: 回頭後の正方形補正を開始");
     SquareAngleAdjustment::Result result{};
     if(detectSquare(result)) {
@@ -181,13 +238,27 @@ void RouteFollower::executeStep()
     }
   }
 
+  if(rotatedBeforeMovement && !movingBackward && gate == nullptr
+     && !shouldCorrectAfterTurn(from, to)) {
+    Logger::info("RouteFollower: 外周で内側を向かないため回頭後の追加補正をスキップ");
+  }
+
   if(gate != nullptr) {
+    if(movingBackward) {
+      Logger::error("RouteFollower: ゲート区間に後退経路が含まれています");
+      robot.getWheelMotorControllerInstance().stopBoth();
+      failed = true;
+      return;
+    }
     Logger::info("RouteFollower: "
                  "ゲートを検出しました");
     runGateSegment(from, to, distance, rotatedBeforeMovement);
   } else if(movingBackward) {
-    Logger::info("RouteFollower: 後退区間");
-    backward(remainingDistance);
+    // 通常経路の後退は禁止する。誤って前進させないため停止する。
+    Logger::error("RouteFollower: 通常区間に後退経路が含まれています");
+    robot.getWheelMotorControllerInstance().stopBoth();
+    failed = true;
+    return;
   } else {
     Logger::info("RouteFollower: 前進区間");
     straight(remainingDistance);
@@ -382,11 +453,12 @@ bool RouteFollower::detectSquare(SquareAngleAdjustment::Result& result)
   robot.getWheelMotorControllerInstance().stopBoth();
   ClockUtil::sleep(MOTION_SWITCH_WAIT);
   // 正方形検出要求
+  // 遠くにある次のQRを検出しないよう、画像上部500pxを除外する。
   CameraServer::SquareDetectorRequest request{};
   request.roi.x = 0;
-  request.roi.y = 0;
+  request.roi.y = SQUARE_DETECTION_ROI_TOP;
   request.roi.width = CAM_MAX_WIDTH;
-  request.roi.height = CAM_MAX_HEIGHT;
+  request.roi.height = CAM_MAX_HEIGHT - SQUARE_DETECTION_ROI_TOP;
   SquareAngleAdjustment adjustment(robot);
   result = adjustment.calculate(request);
   if(!result.wasDetected) {
@@ -424,6 +496,10 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
   // 回頭直後にゲート前のQR検出位置まで直進する余裕がある場合のみ補正する。
   // 補正で進んだ距離はゲート前補正までの直進距離から差し引く。
   auto correctAfterTurn = [&](double availableDistance) -> double {
+    if(isOuterGate(*gate) || !shouldCorrectAfterTurn(from, to)) {
+      Logger::info("RouteFollower: 外周ゲートまたは内側を向かないため追加補正をスキップ");
+      return 0.0;
+    }
     if(!rotatedAtSegmentStart || isBackward(from, to)
        || availableDistance <= FIRST_DETECTION_TOLERANCE) {
       Logger::info("RouteFollower: 回頭後すぐにゲート前補正を行うため追加補正をスキップ");
@@ -545,8 +621,17 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
                         "外周ゲート "
                         "QR①の検出に失敗しました "
                         "→ 125mm直進");
-        // QR①の検出失敗時に125mm進む
+        // QR①の検出失敗時に125mm進む。
         straight(SQUARE_DETECTION_FAILURE_DISTANCE);
+        // 外周ゲートでは後でQR①位置に戻ることを前提とする。
+        // 検出失敗時も、QR①想定位置まで不足する距離を進む。
+        const double remainingToQr1
+            = std::max(0.0, distanceToQr1 - firstMoveDistance - SQUARE_DETECTION_FAILURE_DISTANCE);
+        if(remainingToQr1 > 0.0) {
+          Logger::printfLog(Logger::INFO, "RouteFollower: 外周ゲート QR①想定位置まで残り %.2f mm",
+                            remainingToQr1);
+          straight(remainingToQr1);
+        }
       }
     }
     // =========================================================

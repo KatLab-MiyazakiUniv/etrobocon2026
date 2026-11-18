@@ -35,7 +35,14 @@ CameraTracking,000,Distance,000
 
 AbsoluteRotation,-095,AbsoluteAngle,-095
 Straight,001,Distance,005
-Straight,001,ColorOrColor,003
+
+#ColorOrColorOrDistanceに置き換える
+#Straight,001,ColorOrColor,003
+
+#Straight,001,ColorOrColor,003
+#距離の調整のために、まずは短めの値を使用
+#Straight,001,Distance,055
+Straight,001,ColorOrColorOrDistance,BLACKorYELLOW055
 
 #第1QR前直線
 AbsoluteRotation,000,AbsoluteAngle,000

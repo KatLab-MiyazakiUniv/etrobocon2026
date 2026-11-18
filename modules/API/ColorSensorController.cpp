@@ -42,34 +42,90 @@ const char* ColorSensorController::convertColorToString(const COLOR& color)
   }
 }
 
+
+
 ColorSensorController::COLOR ColorSensorController::convertHsvToColor(HSV& hsv)
 {
+  COLOR detectedColor = COLOR::NONE;
 
-  // Logger::printfLog(Logger::DEBUG, "###############################");
-  // Logger::printfLog(Logger::DEBUG, "h[%lf]s[%lf]v[%lf]", hsv.h, hsv.s, hsv.v);
-  // Logger::printfLog(Logger::DEBUG, "###############################");
   // 明度が極端に低ければ、黒を返す
-  if(hsv.v < BLACK_LIMIT_BORDER) return COLOR::BLACK;
+  if(hsv.v < BLACK_LIMIT_BORDER) {
+    detectedColor = COLOR::BLACK;
+  }
   // 明度が極端に高ければ、白を返す
-  if(hsv.v > WHITE_LIMIT_BORDER) return COLOR::WHITE;
+  else if(hsv.v > WHITE_LIMIT_BORDER) {
+    detectedColor = COLOR::WHITE;
+  }
   // 彩度が低い場合
-  if(hsv.s < SATURATION_BORDER) {
+  else if(hsv.s < SATURATION_BORDER) {
     // 明度が低ければ、黒を返す
-    if(hsv.v < BLACK_BORDER) return COLOR::BLACK;
+    if(hsv.v < BLACK_BORDER) {
+      detectedColor = COLOR::BLACK;
+    }
     // 黒より明るく白より暗い無彩色は、灰色として区別する。
-    if(hsv.v < GRAY_VALUE_BORDER) return COLOR::GRAY;
+    else if(hsv.v < GRAY_VALUE_BORDER) {
+      detectedColor = COLOR::GRAY;
+    }
     // 明度が高ければ、白を返す
-    return COLOR::WHITE;
+    else {
+      detectedColor = COLOR::WHITE;
+    }
   }
   // この判定保留はSATURATION_BORDER以上の暗色だけに適用する。
-  if(hsv.v < CHROMATIC_VALUE_BORDER) return COLOR::NONE;
+  else if(hsv.v < CHROMATIC_VALUE_BORDER) {
+    detectedColor = COLOR::NONE;
+  }
   // 各色相の境界によって、色を判別する
-  if(hsv.h < RED_BORDER) return COLOR::RED;
-  if(hsv.h < YELLOW_BORDER) return COLOR::YELLOW;
-  if(hsv.h < GREEN_BORDER) return COLOR::GREEN;
-  if(hsv.h < BLUE_BORDER) return COLOR::BLUE;
-  return COLOR::RED;
+  else if(hsv.h < RED_BORDER) {
+    detectedColor = COLOR::RED;
+  }
+  else if(hsv.h < YELLOW_BORDER) {
+    detectedColor = COLOR::YELLOW;
+  }
+  else if(hsv.h < GREEN_BORDER) {
+    detectedColor = COLOR::GREEN;
+  }
+  else if(hsv.h < BLUE_BORDER) {
+    detectedColor = COLOR::BLUE;
+  }
+  else {
+    detectedColor = COLOR::RED;
+  }
+
+  // 測定されたHSVと、判定された色文字列を一緒にログ出力
+  Logger::printfLog(Logger::DEBUG, "ColorSensor: h[%u] s[%u] v[%u] -> %s", 
+                    hsv.h, hsv.s, hsv.v, convertColorToString(detectedColor));
+
+  return detectedColor;
 }
+
+
+// ColorSensorController::COLOR ColorSensorController::convertHsvToColor(HSV& hsv)
+// {
+// 
+//   // Logger::printfLog(Logger::DEBUG, "ColorSensorController:h[%lf]s[%lf]v[%lf]", hsv.h, hsv.s, hsv.v);
+//   // 明度が極端に低ければ、黒を返す
+//   if(hsv.v < BLACK_LIMIT_BORDER) return COLOR::BLACK;
+//   // 明度が極端に高ければ、白を返す
+//   if(hsv.v > WHITE_LIMIT_BORDER) return COLOR::WHITE;
+//   // 彩度が低い場合
+//   if(hsv.s < SATURATION_BORDER) {
+//     // 明度が低ければ、黒を返す
+//     if(hsv.v < BLACK_BORDER) return COLOR::BLACK;
+//     // 黒より明るく白より暗い無彩色は、灰色として区別する。
+//     if(hsv.v < GRAY_VALUE_BORDER) return COLOR::GRAY;
+//     // 明度が高ければ、白を返す
+//     return COLOR::WHITE;
+//   }
+//   // この判定保留はSATURATION_BORDER以上の暗色だけに適用する。
+//   if(hsv.v < CHROMATIC_VALUE_BORDER) return COLOR::NONE;
+//   // 各色相の境界によって、色を判別する
+//   if(hsv.h < RED_BORDER) return COLOR::RED;
+//   if(hsv.h < YELLOW_BORDER) return COLOR::YELLOW;
+//   if(hsv.h < GREEN_BORDER) return COLOR::GREEN;
+//   if(hsv.h < BLUE_BORDER) return COLOR::BLUE;
+//   return COLOR::RED;
+// }
 
 int ColorSensorController::getReflectance()
 {

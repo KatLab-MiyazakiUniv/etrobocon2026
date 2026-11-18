@@ -1,0 +1,10 @@
+#カメラのhsv値の調整のためのコマンド
+#Straight,005,ColorRegion,DebugGREEN
+#Straight,005,ColorRegion,DebugBLACK
+#Straight,005,ColorRegion,DebugYELLOW
+#Straight,005,ColorRegion,DebugBLUE
+#Straight,005,ColorRegion,DebugRED
+
+#カラーセンサーのhsv値の調整のためのコマンド
+#descript ログにhsv値を表示することが目的。
+Straight,005,DistanceOrColor,GREEN3000

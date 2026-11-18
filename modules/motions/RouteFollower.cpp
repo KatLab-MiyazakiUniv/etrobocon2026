@@ -5,6 +5,7 @@
  */
 #include "RouteFollower.h"
 
+#include <algorithm>
 #include <functional>
 #include <utility>
 
@@ -29,6 +30,10 @@ namespace {
    * @brief QRを検出する基準距離[mm]
    */
   constexpr double SQUARE_DETECTION_DISTANCE = 250.0;
+  /**
+   * @brief QR検出で除外する画像上部の高さ[px]
+   */
+  constexpr int SQUARE_DETECTION_ROI_TOP = 500;
   /**
    * @brief QR検出失敗時に直進する距離[mm]
    */
@@ -409,11 +414,12 @@ bool RouteFollower::detectSquare(SquareAngleAdjustment::Result& result)
   robot.getWheelMotorControllerInstance().stopBoth();
   ClockUtil::sleep(MOTION_SWITCH_WAIT);
   // 正方形検出要求
+  // 遠くにある次のQRを検出しないよう、画像上部500pxを除外する。
   CameraServer::SquareDetectorRequest request{};
   request.roi.x = 0;
-  request.roi.y = 0;
+  request.roi.y = SQUARE_DETECTION_ROI_TOP;
   request.roi.width = CAM_MAX_WIDTH;
-  request.roi.height = CAM_MAX_HEIGHT;
+  request.roi.height = CAM_MAX_HEIGHT - SQUARE_DETECTION_ROI_TOP;
   SquareAngleAdjustment adjustment(robot);
   result = adjustment.calculate(request);
   if(!result.wasDetected) {
@@ -805,13 +811,6 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
                       secondResult.straightDistance);
     // QR②まで進む
     straightWithinSegment(secondResult.straightDistance);
-
-    // QR②補正角度を戻して元の経路方向へ向き直す。
-    Logger::printfLog(Logger::INFO,
-                      "RouteFollower: "
-                      "QR②補正角度を戻す %.2f 度",
-                      -secondAngle);
-    rotateForSquare(-secondAngle);
 
     // QR②補正後に停止してIMUリセット前に200ms待機
     robot.getWheelMotorControllerInstance().stopBoth();

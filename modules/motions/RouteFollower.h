@@ -181,4 +181,5 @@ class RouteFollower : public BaseMotion {
    */
   double calculateDistanceToGate(const RouteState& from, const Gate& gate) const;
 };
+
 #endif  // ROUTE_FOLLOWER_H

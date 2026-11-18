@@ -1,3 +1,4 @@
+
 /**
  * @file   GateRoutePlanner.cpp
  * @brief  最新のマップ情報から指定ゲートへの経路を探索するクラス
@@ -7,42 +8,6 @@
 #include "GateRoutePlanner.h"
 
 namespace {
-
-  bool isBackwardMove(const RouteState& from, const RouteState& to)
-  {
-    Direction moveDirection;
-
-    // 座標の変化から実際の移動方向を求める
-    if(to.x < from.x) {
-      moveDirection = Direction::RIGHT;
-    } else if(to.x > from.x) {
-      moveDirection = Direction::LEFT;
-    } else if(to.y < from.y) {
-      moveDirection = Direction::UP;
-    } else if(to.y > from.y) {
-      moveDirection = Direction::DOWN;
-    } else {
-      // 同じ座標なら移動していない
-      return false;
-    }
-
-    // 移動方向とロボットの向きが反対なら後退
-    switch(to.direction) {
-      case Direction::UP:
-        return moveDirection == Direction::DOWN;
-
-      case Direction::RIGHT:
-        return moveDirection == Direction::LEFT;
-
-      case Direction::DOWN:
-        return moveDirection == Direction::UP;
-
-      case Direction::LEFT:
-        return moveDirection == Direction::RIGHT;
-    }
-
-    return false;
-  }
 
   /**
    * @brief 2地点間の移動方向を取得する
@@ -151,7 +116,7 @@ GateRouteResult GateRoutePlanner::search(int currentX, int currentY, Direction c
   int bestCost = INT_MAX;
 
   for(const GatePass& pass : passes) {
-    // 現在地点からゲート入口までの経路を探索
+    // 現在地点からゲート入口（QR①）までの経路を探索
     RouteResult candidate
         = planner.search(currentX, currentY, currentDirection, pass.entrance, pass.direction);
 
@@ -166,18 +131,21 @@ GateRouteResult GateRoutePlanner::search(int currentX, int currentY, Direction c
       continue;
     }
 
-    bestCost = totalCost;
-
-    // ゲート入口までの経路
+    // ゲート入口（QR①）までの経路
     std::vector<RouteState> fullRoute = candidate.route;
 
-    // ゲート出口を追加
+    // ゲート出口（QR②）を追加
     fullRoute.push_back({ pass.exit.x, pass.exit.y, pass.direction });
 
     /*
      * 通過後の最終停止位置。
-     * 外周に到達した場合はゲート出口のまま。
-     * 外周以外の場合は、この後で次の偶数座標へ変更する。
+     * 外周ゲートの場合は、RouteFollowerが
+     * 400mm前進して400mm後退するため、
+     * 実際の停止位置はゲート入口（QR①）となる。
+     *
+     * ここでは経路上の出口（QR②）を保持する。
+     * 外周ゲート通過後の現在位置は、
+     * EtRallyMotion側で入口座標に更新する。
      */
     Point finalPosition = pass.exit;
 
@@ -189,6 +157,10 @@ GateRouteResult GateRoutePlanner::search(int currentX, int currentY, Direction c
 
       // 偶数地点まで追加で直進する分のコスト
       totalCost += STRAIGHT_COST;
+    }
+
+    if(totalCost >= bestCost) {
+      continue;
     }
 
     // 経路を圧縮
@@ -212,6 +184,7 @@ GateRouteResult GateRoutePlanner::search(int currentX, int currentY, Direction c
 
   return result;
 }
+
 /**
  * @brief 経路を圧縮する
  *
@@ -219,7 +192,9 @@ GateRouteResult GateRoutePlanner::search(int currentX, int currentY, Direction c
  * ・始点と終点
  * ・その場で方向転換する地点
  * ・移動方向が変わる地点
- * ・前進とバック走行が切り替わる地点
+ *
+ * ダイクストラ法は前進のみを探索するため、
+ * 前進とバック走行の切り替え判定は行わない。
  */
 std::vector<RouteState> GateRoutePlanner::compressRoute(const std::vector<RouteState>& route) const
 {
@@ -253,21 +228,10 @@ std::vector<RouteState> GateRoutePlanner::compressRoute(const std::vector<RouteS
 
     // 前後の移動方向を取得する
     const Direction moveDirectionBefore = getMoveDirection(previous, current);
-
     const Direction moveDirectionAfter = getMoveDirection(current, next);
 
-    // 前後の移動が前進かバック走行かを判定する
-    const bool backwardBefore = isBackwardMove(previous, current);
-
-    const bool backwardAfter = isBackwardMove(current, next);
-
     // 進行方向が変わる地点は保持する
-    const bool directionChanges = moveDirectionBefore != moveDirectionAfter;
-
-    // 前進とバック走行が切り替わる地点は保持する
-    const bool backwardChanges = backwardBefore != backwardAfter;
-
-    if(directionChanges || backwardChanges) {
+    if(moveDirectionBefore != moveDirectionAfter) {
       compressedRoute.push_back(current);
     }
   }

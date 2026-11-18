@@ -1,3 +1,4 @@
+
 /**
  * @file   RouteFollower.h
  * @brief  経路探索結果に従って自己位置を使用せず走行するクラス
@@ -98,15 +99,6 @@ class RouteFollower : public BaseMotion {
   double directionToHeading(Direction direction) const;
 
   /**
-   * @brief 区間の移動が後退かどうか判定する
-   * @param from 区間開始状態
-   * @param to 区間終了状態
-   * @return true 後退
-   * @return false 前進
-   */
-  bool isBackward(const RouteState& from, const RouteState& to) const;
-
-  /**
    * @brief 2方向間で必要な回頭角度を計算する
    * @param from 現在方向
    * @param to 目標方向
@@ -139,12 +131,6 @@ class RouteFollower : public BaseMotion {
    * @param distance 直進距離[mm]
    */
   void straight(double distance);
-
-  /**
-   * @brief 指定距離を後退する
-   * @param distance 後退距離[mm]
-   */
-  void backward(double distance);
 
   /**
    * @brief 正方形を検出して補正情報を取得する
@@ -181,4 +167,5 @@ class RouteFollower : public BaseMotion {
    */
   double calculateDistanceToGate(const RouteState& from, const Gate& gate) const;
 };
+
 #endif  // ROUTE_FOLLOWER_H

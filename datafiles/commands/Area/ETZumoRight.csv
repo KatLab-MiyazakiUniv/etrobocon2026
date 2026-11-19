@@ -9,7 +9,7 @@ Straight,006,ColorRegion,004
 
 AbsoluteRotation,-090,AbsoluteAngle,-090
 
-Straight,006,Distance,117
+Straight,006,Distance,114
 
 #ボトル押し出し
 Snapshot,clearBuffer1,RepeatCount,001
@@ -22,7 +22,7 @@ Straight,001,Distance,010
 Straight,003,Distance,015
 
 # ETラリー開始位置まで移動
-AbsoluteRotation,031,AbsoluteAngle,031
+AbsoluteRotation,030,AbsoluteAngle,030
 Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,R-S003,Distance,020
 Straight,008,ColorOrColor,001

@@ -14,7 +14,7 @@ Straight,006,DistanceOrColor,RED063
 #赤色がフレームに写る状態で赤色検知カメラ走行
 Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,RED,DistanceOrColor,RED025
-Straight,001,Distance,003
+Straight,001,Distance,010
 
 #ボトルを離す
 Straight,-001,Distance,005

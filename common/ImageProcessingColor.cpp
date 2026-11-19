@@ -6,24 +6,48 @@
 
 #include "ImageProcessingColor.h"
 
+// const CameraServer::HSVRangeData ImageProcessingColor::RED_HSV
+//     = { { 0.0, 100.0, 100.0 }, { 10.0, 255.0, 255.0 } };
+// const CameraServer::HSVRangeData ImageProcessingColor::BLUE_HSV
+//     = { { 100.0, 100.0, 100.0 }, { 130.0, 255.0, 255.0 } };
+// const CameraServer::HSVRangeData ImageProcessingColor::GREEN_HSV
+//     = { { 40.0, 100.0, 100.0 }, { 80.0, 255.0, 255.0 } };
+// const CameraServer::HSVRangeData ImageProcessingColor::YELLOW_HSV
+//     = { { 20.0, 100.0, 100.0 }, { 35.0, 255.0, 255.0 } };
+// const CameraServer::HSVRangeData ImageProcessingColor::BLACK_HSV
+//     = { { 0.0, 0.0, 0.0 }, { 180.0, 255.0, 50.0 } };
+// const CameraServer::HSVRangeData ImageProcessingColor::GRAY_HSV
+//     = { { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 } };
+// const CameraServer::HSVRangeData ImageProcessingColor::WHITE_HSV
+//     = { { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 } };
+
+//CS大会会場の暖色照明の下でのHSV
 const CameraServer::HSVRangeData ImageProcessingColor::RED_HSV
-    = { { 0.0, 100.0, 100.0 }, { 10.0, 255.0, 255.0 } };
+    = { { 0.0, 80.0, 80.0 }, { 15.0, 255.0, 255.0 } };
+
 const CameraServer::HSVRangeData ImageProcessingColor::BLUE_HSV
-    = { { 100.0, 100.0, 100.0 }, { 130.0, 255.0, 255.0 } };
+    = { { 95.0, 70.0, 50.0 }, { 135.0, 255.0, 255.0 } };
+
 const CameraServer::HSVRangeData ImageProcessingColor::GREEN_HSV
-    = { { 40.0, 100.0, 100.0 }, { 80.0, 255.0, 255.0 } };
+    = { { 35.0, 70.0, 50.0 }, { 85.0, 255.0, 255.0 } };
+
 const CameraServer::HSVRangeData ImageProcessingColor::YELLOW_HSV
-    = { { 20.0, 100.0, 100.0 }, { 35.0, 255.0, 255.0 } };
+    = { { 15.0, 80.0, 80.0 }, { 35.0, 255.0, 255.0 } };
+
 const CameraServer::HSVRangeData ImageProcessingColor::BLACK_HSV
     = { { 0.0, 0.0, 0.0 }, { 180.0, 255.0, 50.0 } };
+
 const CameraServer::HSVRangeData ImageProcessingColor::GRAY_HSV
     = { { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 } };
+
 const CameraServer::HSVRangeData ImageProcessingColor::WHITE_HSV
     = { { 0.0, 0.0, 0.0 }, { 0.0, 0.0, 0.0 } };
 
+  
 const std::vector<CameraServer::HSVRangeData> ImageProcessingColor::BottleColors
     = { ImageProcessingColor::RED_HSV, ImageProcessingColor::BLUE_HSV,
-        ImageProcessingColor::YELLOW_HSV, ImageProcessingColor::BLACK_HSV };
+        ImageProcessingColor::YELLOW_HSV, ImageProcessingColor::BLACK_HSV,
+        ImageProcessingColor::GREEN_HSV };
 
 const CameraServer::HSVRangeData& ImageProcessingColor::getHSVRangeFromColor(Color color)
 {

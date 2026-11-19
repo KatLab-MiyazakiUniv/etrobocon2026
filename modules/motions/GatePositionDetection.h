@@ -9,10 +9,7 @@
 
 #include "BaseMotion.h"
 #include "SocketProtocol.h"
-#include <string>
-#include "GatePositionParser.h"
-#include "Logger.h"
-#include "Decrypter.h"
+#include "GatePosition.h"
 
 class GatePositionDetection : public BaseMotion {
  public:

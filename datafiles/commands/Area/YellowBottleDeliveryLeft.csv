@@ -1,24 +1,18 @@
+#動作コマンド名,動作ID,条件コマンド名,条件ID
+#黄色まで移動
+QRAbsoluteRotation,-125,AbsoluteAngle,-125
+GatePosition,2-1,RepeatCount,001
+QRAbsoluteRotation,-150,AbsoluteAngle,-150
+GatePosition,2-1,RepeatCount,001
+
+#黄色を通り過ぎ無いぐらいまで直進
+Straight,001,DistanceOrColor,YELLOW050
 
 
-#赤色まで移動
-#RelativeRotation,-060,RelativeAngle,-060
-AbsoluteRotation,-155,AbsoluteAngle,-155
-#赤色が写る範囲まで移動
-Straight,001,DistanceOrColor,YELLOW060
-Straight,005,Distance,004
+Straight,001,Distance,005
 
+##ボトルを離すために後進
+Straight,-001,Distance,005
 
-
-
-
-Straight,-001,Distance,010
-
-#RelativeRotation,-110,RelativeAngle,-110
-#AbsoluteRotation,090,AbsoluteAngle,090
-
-
-AbsoluteRotation,-180,AbsoluteAngle,-180
-Straight,005,Distance,055
 AbsoluteRotation,090,AbsoluteAngle,090
-
-Straight,005,ColorOrColor,001
+Straight,001,ColorOrColorOrDistance,BLUEorBLACK018

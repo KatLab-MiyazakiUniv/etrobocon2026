@@ -1,3 +1,4 @@
+
 /**
  * @file   GateRoutePlanner.cpp
  * @brief  最新のマップ情報から指定ゲートへの経路を探索するクラス
@@ -7,6 +8,29 @@
 #include "GateRoutePlanner.h"
 
 namespace {
+
+  /**
+   * @brief 2地点間の移動方向を取得する
+   * @param from 移動開始地点
+   * @param to 移動終了地点
+   * @return 移動方向
+   */
+  Direction getMoveDirection(const RouteState& from, const RouteState& to)
+  {
+    if(to.x < from.x) {
+      return Direction::RIGHT;
+    }
+
+    if(to.x > from.x) {
+      return Direction::LEFT;
+    }
+
+    if(to.y < from.y) {
+      return Direction::UP;
+    }
+
+    return Direction::DOWN;
+  }
 
   /**
    * @brief 指定地点がマップの外周上にあるか判定する
@@ -92,7 +116,7 @@ GateRouteResult GateRoutePlanner::search(int currentX, int currentY, Direction c
   int bestCost = INT_MAX;
 
   for(const GatePass& pass : passes) {
-    // 現在地点からゲート入口までの経路を探索
+    // 現在地点からゲート入口（QR①）までの経路を探索
     RouteResult candidate
         = planner.search(currentX, currentY, currentDirection, pass.entrance, pass.direction);
 
@@ -107,18 +131,21 @@ GateRouteResult GateRoutePlanner::search(int currentX, int currentY, Direction c
       continue;
     }
 
-    bestCost = totalCost;
-
-    // ゲート入口までの経路
+    // ゲート入口（QR①）までの経路
     std::vector<RouteState> fullRoute = candidate.route;
 
-    // ゲート出口を追加
+    // ゲート出口（QR②）を追加
     fullRoute.push_back({ pass.exit.x, pass.exit.y, pass.direction });
 
     /*
      * 通過後の最終停止位置。
-     * 外周に到達した場合はゲート出口のまま。
-     * 外周以外の場合は、この後で次の偶数座標へ変更する。
+     * 外周ゲートの場合は、RouteFollowerが
+     * 400mm前進して400mm後退するため、
+     * 実際の停止位置はゲート入口（QR①）となる。
+     *
+     * ここでは経路上の出口（QR②）を保持する。
+     * 外周ゲート通過後の現在位置は、
+     * EtRallyMotion側で入口座標に更新する。
      */
     Point finalPosition = pass.exit;
 
@@ -130,6 +157,10 @@ GateRouteResult GateRoutePlanner::search(int currentX, int currentY, Direction c
 
       // 偶数地点まで追加で直進する分のコスト
       totalCost += STRAIGHT_COST;
+    }
+
+    if(totalCost >= bestCost) {
+      continue;
     }
 
     // 経路を圧縮
@@ -154,44 +185,59 @@ GateRouteResult GateRoutePlanner::search(int currentX, int currentY, Direction c
   return result;
 }
 
+/**
+ * @brief 経路を圧縮する
+ *
+ * 直線上の中間地点を削除し、以下の地点は保持する。
+ * ・始点と終点
+ * ・その場で方向転換する地点
+ * ・移動方向が変わる地点
+ *
+ * ダイクストラ法は前進のみを探索するため、
+ * 前進とバック走行の切り替え判定は行わない。
+ */
 std::vector<RouteState> GateRoutePlanner::compressRoute(const std::vector<RouteState>& route) const
 {
-  std::vector<RouteState> compressed;
-
-  if(route.empty()) {
-    return compressed;
+  if(route.size() <= 2) {
+    return route;
   }
 
-  // 最初の地点を追加
-  compressed.push_back(route.front());
+  std::vector<RouteState> compressedRoute;
+  compressedRoute.push_back(route.front());
 
-  // robotの向きが変わる地点を追加する
-  for(size_t i = 1; i + 1 < route.size(); ++i) {
+  for(size_t i = 1; i < route.size() - 1; ++i) {
     const RouteState& previous = route[i - 1];
     const RouteState& current = route[i];
     const RouteState& next = route[i + 1];
 
-    // 同じ位置で向きだけ変わった場合
-    bool samePositionAsPrevious = previous.x == current.x && previous.y == current.y;
-
-    if(samePositionAsPrevious && previous.direction != current.direction) {
-      compressed.push_back(current);
-
+    // その場で方向転換する地点は保持する
+    if(previous.x == current.x && previous.y == current.y) {
+      if(previous.direction != current.direction) {
+        compressedRoute.push_back(current);
+      }
       continue;
     }
 
-    // 次の地点で進行方向が変わる場合
-    bool directionChangesNext = current.direction != next.direction;
+    // 次の地点と同じ座標の場合も、その場での方向転換として扱う
+    if(current.x == next.x && current.y == next.y) {
+      if(current.direction != next.direction) {
+        compressedRoute.push_back(current);
+      }
+      continue;
+    }
 
-    if(directionChangesNext) {
-      compressed.push_back(current);
+    // 前後の移動方向を取得する
+    const Direction moveDirectionBefore = getMoveDirection(previous, current);
+    const Direction moveDirectionAfter = getMoveDirection(current, next);
+
+    // 進行方向が変わる地点は保持する
+    if(moveDirectionBefore != moveDirectionAfter) {
+      compressedRoute.push_back(current);
     }
   }
 
-  // 最終地点を追加
-  if(route.size() >= 2) {
-    compressed.push_back(route.back());
-  }
+  // 終点を追加する
+  compressedRoute.push_back(route.back());
 
-  return compressed;
+  return compressedRoute;
 }

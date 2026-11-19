@@ -1,72 +1,73 @@
 #動作コマンド名,動作ID,条件コマンド名,条件ID
-# キャリブレイター
 
 
-Calibrator,001,RepeatCount,001
 
+# ライントレース
 Snapshot,clearBuffer1,RepeatCount,001
+
 CameraTracking,S001,Distance,035
 CameraTracking,R-R001,Distance,040
-CameraTracking,S001,Distance,035
+CameraTracking,S001,Distance,031
 CameraTracking,R-R001,Distance,040
 CameraTracking,S001,Distance,030
+
+#急カーブ
 CameraTracking,R-L001,Distance,025
 CameraTracking,R-L002,Distance,095
 CameraTracking,S001,Distance,015
 
+#くねくね
 CameraTracking,R-R001,Distance,032
 CameraTracking,S001,Distance,015
 CameraTracking,R-L002,Distance,035
 CameraTracking,S001,Distance,050
-CameraTracking,S002,ColorRegion,001
-CameraTracking,000,Distance,000
 
+#ボトル前直線
+Snapshot,clearBuffer1,RepeatCount,001
+CameraTracking,S002,ColorRegion,001
+#CameraTracking,000,Distance,000
+
+#ボトルキャッチ
 Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,BC,Distance,030
-CameraTracking,BC3,Distance,005
+CameraTracking,BC3,Distance,015
 CameraTracking,000,Distance,000
 
 
 # ボトルデリバリー
 
+AbsoluteRotation,095,AbsoluteAngle,095
+Straight,001,Distance,005
 
-AbsoluteRotation,090,AbsoluteAngle,090
-Straight,001,ColorOrColor,003
+#ColorOrColorOrDistanceに置き換える
+#Straight,001,ColorOrColor,003
+#距離の調整のために、まずは短めの値を使用
+#Straight,001,Distance,055
+Straight,001,ColorOrColorOrDistance,BLACKorYELLOW055
+
+
+#第1QR前直線
 AbsoluteRotation,000,AbsoluteAngle,000
-Straight,005,DistanceOrColor,GREEN100
-CameraTracking,S003,DistanceOrColor,BLUE020
-Straight,005,Distance,012
+Straight,001,DistanceOrColor,GREEN030
 
-
-
-
-
-
-Snapshot,011,RepeatCount,001
-GatePosition,1-1,RepeatCount,001
-
-
-Straight,005,Distance,002
+#角度補正
 Snapshot,clearBuffer1,RepeatCount,001
-GatePosition,1-2,RepeatCount,001
+CameraTracking,QR1S001,ColorOrColorOrDistance,BLUEorBLACK020
 
-Straight,005,ColorOrColor,001
-
-
-
-
-
+#第1QR検出
+QRStraight,001,DistanceOrColor,BLUE040
 
 
 AbsoluteRotation,090,AbsoluteAngle,090
 Snapshot,clearBuffer1,RepeatCount,001
-CameraTracking,R-LBS003-4,Distance,080
+CameraTracking,R-LBS003-4,Distance,062
 
 #QR2取得前カーブ直前
 Straight,001,DistanceOrColor,BLACK070
 
 # QR2検出
-
 Snapshot,clearBuffer1,RepeatCount,001
-Snapshot,021,RepeatCount,001
+AbsoluteRotation,070,AbsoluteAngle,070
+GatePosition,2-1,RepeatCount,001
+AbsoluteRotation,090,AbsoluteAngle,090
 GatePosition,2-1,RepeatCount,001

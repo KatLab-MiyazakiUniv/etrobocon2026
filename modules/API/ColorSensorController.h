@@ -10,7 +10,7 @@
 #include "ColorSensor.h"
 #include <cstdint>
 #include <string_view>
-
+#include "Logger.h"
 class ColorSensorController {
  public:
   /**
@@ -104,16 +104,31 @@ class ColorSensorController {
   const char* getColor(HSV& hsv);
 
  private:
-  static constexpr int SATURATION_BORDER = 37;       // 無彩色かどうかの彩度の境界
+  //CS大会の暖色照明の下でのhsvの(憶測)改良版
+  static constexpr int SATURATION_BORDER = 40;       // 無彩色かどうかの彩度の境界
   static constexpr int BLACK_LIMIT_BORDER = 30;      // 黒の明度の境界
   static constexpr int WHITE_LIMIT_BORDER = 250;     // 白の明度の境界
   static constexpr int BLACK_BORDER = 30;            // 無彩色の黒の明度の境界
   static constexpr int GRAY_VALUE_BORDER = 80;       // 灰色と白の明度の境界（要実測調整）
-  static constexpr int CHROMATIC_VALUE_BORDER = 45;  // 有彩色判定を許可する最低明度（要実測調整)65
-  static constexpr int RED_BORDER = 25;              // 赤の色相の境界
-  static constexpr int YELLOW_BORDER = 90;           // 黄の色相の境界
-  static constexpr int GREEN_BORDER = 170;           // 緑の色相の境界
+  static constexpr int CHROMATIC_VALUE_BORDER = 60;  // 有彩色判定を許可する最低明度（要実測調整)65
+  static constexpr int RED_BORDER = 30;              // 赤の色相の境界
+  static constexpr int YELLOW_BORDER = 95;           // 黄の色相の境界
+  static constexpr int GREEN_BORDER = 175;           // 緑の色相の境界
   static constexpr int BLUE_BORDER = 300;            // 青の色相の境界
+
+  //変更前
+  // static constexpr int SATURATION_BORDER = 45;       // 無彩色かどうかの彩度の境界
+  // static constexpr int BLACK_LIMIT_BORDER = 30;      // 黒の明度の境界
+  // static constexpr int WHITE_LIMIT_BORDER = 250;     // 白の明度の境界
+  // static constexpr int BLACK_BORDER = 30;            // 無彩色の黒の明度の境界
+  // static constexpr int GRAY_VALUE_BORDER = 95;       // 灰色と白の明度の境界（要実測調整）
+  // static constexpr int CHROMATIC_VALUE_BORDER = 45;  // 有彩色判定を許可する最低明度（要実測調整)65
+  // static constexpr int RED_BORDER = 25;              // 赤の色相の境界
+  // static constexpr int YELLOW_BORDER = 90;           // 黄の色相の境界
+  // static constexpr int GREEN_BORDER = 170;           // 緑の色相の境界
+  // static constexpr int BLUE_BORDER = 300;            // 青の色相の境界
+
+
 
   spikeapi::ColorSensor colorSensor;  // カラーセンサインスタンス
 };

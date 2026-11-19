@@ -1,7 +1,7 @@
 /**
  * @file   RouteFollower.h
  * @brief  経路探索結果に従って自己位置を使用せず走行するクラス
- * @author yutaro-1214
+ * @author yutaro-1214 okuyama0528
  */
 
 #ifndef ROUTE_FOLLOWER_H
@@ -10,26 +10,27 @@
 #include <cmath>
 #include <memory>
 #include <vector>
-
+#include "AbsoluteAngleCondition.h"
+#include "AbsoluteRotation.h"
 #include "AngleNormalizer.h"
+#include "BaseMotion.h"
 #include "ClockUtil.h"
 #include "DistanceCondition.h"
 #include "EtRallyMap.h"
 #include "Logger.h"
 #include "Pid.h"
-#include "RelativeAngleCondition.h"
-#include "RelativeRotation.h"
 #include "Robot.h"
 #include "RouteTypes.h"
 #include "SocketProtocol.h"
 #include "SquareAngleAdjustment.h"
 #include "Straight.h"
+#include "CameraTracking.h"
 #include "SystemInfo.h"
 
 /**
  * @brief 経路探索結果に従って走行するクラス
  */
-class RouteFollower {
+class RouteFollower : public BaseMotion {
  public:
   /**
    * @brief コンストラクタ
@@ -48,14 +49,40 @@ class RouteFollower {
                 double _straightMaxoutRate);
 
   /**
-   * @brief 経路探索結果に従って走行する
-   * @param route 走行する経路
+   * @brief 走行する経路を設定する
+   * @param _route 走行経路
    */
-  void run(const std::vector<RouteState>& route);
+  void setRoute(const std::vector<RouteState>& _route);
+
+  /**
+   * @brief 外周ゲートか判定する
+   * @param gate 判定するゲート
+   * @return true 外周ゲート
+   * @return false 内側ゲート
+   */
+  bool isOuterGate(const Gate& gate) const;
+
+ protected:
+  /**
+   * @brief 走行開始前の初期化処理
+   */
+  void prepare() override;
+
+  /**
+   * @brief 経路の1区間を走行する
+   */
+  void executeStep() override;
+
+  /**
+   * @brief 走行終了後の処理
+   */
+  void finish() override;
 
  private:
-  Robot& robot;                    // ロボット本体
   const EtRallyMap& map;           // ETラリーのマップ情報
+  std::vector<RouteState> route;   // 走行経路
+  std::size_t nextIndex = 1;       // 次に走行する区間の番号
+  bool failed = false;             // 走行異常の判定
   double targetSpeed;              // 目標走行速度
   Pid::PidGain rotationPid;        // 通常回頭用PIDゲイン
   Pid::PidGain squareRotationPid;  // 正方形補正回頭用PIDゲイン
@@ -69,6 +96,15 @@ class RouteFollower {
    * @return Directionに対応する角度[deg]
    */
   double directionToHeading(Direction direction) const;
+
+  /**
+   * @brief 区間の移動が後退かどうか判定する
+   * @param from 区間開始状態
+   * @param to 区間終了状態
+   * @return true 後退
+   * @return false 前進
+   */
+  bool isBackward(const RouteState& from, const RouteState& to) const;
 
   /**
    * @brief 2方向間で必要な回頭角度を計算する
@@ -122,7 +158,7 @@ class RouteFollower {
    * @brief ゲートを含む区間を走行する
    * @param from 区間開始状態
    * @param to 区間終了状態
-   * @param distance 区間距離[mm]
+   * @param distance 区間距離
    * @param rotatedAtSegmentStart 区間開始時に回頭した場合はtrue
    */
   void runGateSegment(const RouteState& from, const RouteState& to, double distance,
@@ -136,14 +172,6 @@ class RouteFollower {
    * @return nullptr ゲートが存在しない場合
    */
   const Gate* findGate(const RouteState& from, const RouteState& to) const;
-
-  /**
-   * @brief 外周ゲートか判定する
-   * @param gate 判定するゲート
-   * @return true 外周ゲート
-   * @return false 内側ゲート
-   */
-  bool isOuterGate(const Gate& gate) const;
 
   /**
    * @brief 区間開始位置からゲート中央までの距離を計算する

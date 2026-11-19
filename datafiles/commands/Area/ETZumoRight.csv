@@ -22,7 +22,7 @@ Straight,001,Distance,010
 Straight,003,Distance,015
 
 # ETラリー開始位置まで移動
-AbsoluteRotation,030,AbsoluteAngle,030
+AbsoluteRotation,031,AbsoluteAngle,031
 Snapshot,clearBuffer1,RepeatCount,001
 CameraTracking,R-S003,Distance,020
 Straight,008,ColorOrColor,001

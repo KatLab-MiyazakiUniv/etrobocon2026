@@ -13,7 +13,7 @@ namespace {
   /**
    * @brief 90度回頭に対して指定する回頭角度[deg]
    */
-  constexpr double ROTATION_ANGLE = 85.0;
+  constexpr double ROTATION_ANGLE = 90.0;
   /**
    * @brief 回頭終了判定許容誤差[deg]
    */
@@ -57,8 +57,8 @@ namespace {
    */
   bool isOuterRoutePosition(const RouteState& state)
   {
-    return state.x == 0 || state.x == SystemInfo::X_GRID_NUM || state.y == 0
-           || state.y == SystemInfo::Y_GRID_NUM;
+    return state.x == 0 || state.x == SystemInfo::X_GRID_NUM
+           || state.y == 0 || state.y == SystemInfo::Y_GRID_NUM;
   }
 
   /**
@@ -196,7 +196,8 @@ void RouteFollower::executeStep()
   bool rotatedBeforeMovement = rotatedAtSegmentStart;
   if(nextIndex >= 2) {
     const RouteState& previous = route[nextIndex - 2];
-    if(previous.x == from.x && previous.y == from.y && previous.direction != from.direction) {
+    if(previous.x == from.x && previous.y == from.y
+       && previous.direction != from.direction) {
       rotatedBeforeMovement = true;
     }
   }
@@ -230,7 +231,8 @@ void RouteFollower::executeStep()
       remainingDistance -= correctionDistance;
       // 元の経路方向に戻してから残りの区間を走行する。
       rotateForSquare(-correctionAngle);
-      Logger::printfLog(Logger::INFO, "RouteFollower: 回頭後補正完了 残距離=%.2f mm",
+      Logger::printfLog(Logger::INFO,
+                        "RouteFollower: 回頭後補正完了 残距離=%.2f mm",
                         remainingDistance);
     } else {
       // 検出失敗時には余分な直進を追加せず、元の経路を走行する。
@@ -517,16 +519,16 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
       correctionDistance = 0.0;
     }
     if(correctionDistance > availableDistance) {
-      Logger::printfLog(
-          Logger::WARNING,
-          "RouteFollower: 回頭後補正距離 %.2f mm をゲート前検出までの距離 %.2f mm に制限",
-          correctionDistance, availableDistance);
+      Logger::printfLog(Logger::WARNING,
+                        "RouteFollower: 回頭後補正距離 %.2f mm をゲート前検出までの距離 %.2f mm に制限",
+                        correctionDistance, availableDistance);
       correctionDistance = availableDistance;
     }
     rotateForSquare(correctionAngle);
     straight(correctionDistance);
     rotateForSquare(-correctionAngle);
-    Logger::printfLog(Logger::INFO, "RouteFollower: 回頭後補正完了 走行距離=%.2f mm",
+    Logger::printfLog(Logger::INFO,
+                      "RouteFollower: 回頭後補正完了 走行距離=%.2f mm",
                       correctionDistance);
     return correctionDistance;
   };
@@ -625,10 +627,11 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
         straight(SQUARE_DETECTION_FAILURE_DISTANCE);
         // 外周ゲートでは後でQR①位置に戻ることを前提とする。
         // 検出失敗時も、QR①想定位置まで不足する距離を進む。
-        const double remainingToQr1
-            = std::max(0.0, distanceToQr1 - firstMoveDistance - SQUARE_DETECTION_FAILURE_DISTANCE);
+        const double remainingToQr1 = std::max(
+            0.0, distanceToQr1 - firstMoveDistance - SQUARE_DETECTION_FAILURE_DISTANCE);
         if(remainingToQr1 > 0.0) {
-          Logger::printfLog(Logger::INFO, "RouteFollower: 外周ゲート QR①想定位置まで残り %.2f mm",
+          Logger::printfLog(Logger::INFO,
+                            "RouteFollower: 外周ゲート QR①想定位置まで残り %.2f mm",
                             remainingToQr1);
           straight(remainingToQr1);
         }
@@ -850,19 +853,6 @@ void RouteFollower::runGateSegment(const RouteState& from, const RouteState& to,
                       secondResult.straightDistance);
     // QR②まで進む
     straightWithinSegment(secondResult.straightDistance);
-
-    // QR②補正後に停止してIMUリセット前に200ms待機
-    robot.getWheelMotorControllerInstance().stopBoth();
-    ClockUtil::sleep(200);
-
-    // QR②補正完了後にIMUの角度をリセット
-    robot.getIMUControllerInstance().resetAzimuth();
-
-    // IMUリセット後に200ms待機
-    ClockUtil::sleep(200);
-
-    Logger::printfLog(Logger::INFO, "RouteFollower: QR②補正後IMUリセット=%.2f 度",
-                      robot.getIMUControllerInstance().getAzimuth());
 
     /*
      * QR②位置まで補正できたため、

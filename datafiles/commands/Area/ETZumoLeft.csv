@@ -9,7 +9,7 @@ Straight,006,ColorRegion,004
 
 AbsoluteRotation,090,AbsoluteAngle,090
 
-Straight,006,Distance,117
+Straight,006,Distance,107
 
 #ボトル押し出し
 Snapshot,clearBuffer1,RepeatCount,001
